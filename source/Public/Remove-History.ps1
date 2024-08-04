@@ -36,6 +36,8 @@
 #>
 function Remove-History
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '', Justification = 'Because ShouldProcess is handled in the commands it calls')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
     param
     (
         [Parameter(Mandatory = $true, Position = 0)]
