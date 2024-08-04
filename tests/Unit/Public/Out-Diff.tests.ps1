@@ -42,43 +42,33 @@ AfterAll {
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
 }
 
-Describe 'Remove-History' {
+Describe 'Out-Diff' {
     BeforeAll {
-        Mock -CommandName Remove-PSReadLineHistory
-        Mock -CommandName Remove-PSHistory
+        Mock -CommandName Write-Verbose
     }
 
-    It 'Should removes entries matching a pattern' {
-        # Arrange
-        $pattern = ".*\.txt"
+    It 'Should output differences between two different strings' {
+        $expected = 'This is a longer text string that was expected to be shown'
+        $actual = 'This is the actual text string'
 
-        # Act
-        Viscalyx.Common\Remove-History -Pattern $pattern
+        Out-Diff -ExpectedString $expected -ActualString $actual
 
-        # Assert
-        Should -Invoke -CommandName Remove-PSReadLineHistory -Exactly -Times 1 -Scope It -ParameterFilter {
-            $Pattern -eq $pattern -and -not $EscapeRegularExpression.IsPresent
-        }
-
-        Should -Invoke -CommandName Remove-PSHistory -Exactly -Times 1 -Scope It -ParameterFilter {
-            $Pattern -eq $pattern -and -not $EscapeRegularExpression.IsPresent
-        }
+        Should -Invoke -CommandName Write-Verbose -Exactly -Times 5 -Scope It
     }
 
-    It 'Should treat the pattern as a literal string when EscapeRegularExpression is specified' {
-        # Arrange
-        $pattern = './build.ps1'
+    It 'Should handle string array' {
+        $expected = @(
+            'Line 1'
+            'Line 2'
+            'Line 3'
+        )
+        $actual = @(
+            'Line 1'
+            'Line 2'
+        )
 
-        # Act
-        Viscalyx.Common\Remove-History -Pattern $pattern -EscapeRegularExpression
+        Out-Diff -ExpectedString $expected -ActualString $actual
 
-        # Assert
-        Should -Invoke -CommandName Remove-PSReadLineHistory -Exactly -Times 1 -Scope It -ParameterFilter {
-            $Pattern -eq $pattern -and $EscapeRegularExpression.IsPresent
-        }
-
-        Should -Invoke -CommandName Remove-PSHistory -Exactly -Times 1 -Scope It -ParameterFilter {
-            $Pattern -eq $pattern -and $EscapeRegularExpression.IsPresent
-        }
+        Should -Invoke -CommandName Write-Verbose -Exactly -Times 4 -Scope It
     }
 }

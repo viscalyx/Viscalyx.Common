@@ -16,6 +16,12 @@
         switch parameter is specified, the pattern will not be treated as a regular
         expression.
 
+    .INPUTS
+        None. You cannot pipe input to this function.
+
+    .OUTPUTS
+        None. The function does not generate any output.
+
     .EXAMPLE
         Remove-History -Pattern ".*\.txt"
 
