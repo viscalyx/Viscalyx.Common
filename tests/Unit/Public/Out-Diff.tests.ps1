@@ -43,32 +43,173 @@ AfterAll {
 }
 
 Describe 'Out-Diff' {
-    BeforeAll {
-        Mock -CommandName Write-Verbose
+    Context 'When output is made as verbose message' {
+        BeforeAll {
+            Mock -CommandName Write-Verbose
+        }
+
+        It 'Should output differences between two different strings' {
+            $expected = 'This is a longer text string that was expected to be shown'
+            $actual = 'This is the actual text string'
+
+            Out-Diff -ExpectedString $expected -ActualString $actual
+
+            Should -Invoke -CommandName Write-Verbose -Exactly -Times 5 -Scope It
+        }
+
+        It 'Should handle string array' {
+            $expected = @(
+                'Line 1'
+                'Line 2'
+                'Line 3'
+            )
+            $actual = @(
+                'Line 1'
+                'Line 2'
+            )
+
+            Out-Diff -ExpectedString $expected -ActualString $actual
+
+            Should -Invoke -CommandName Write-Verbose -Exactly -Times 4 -Scope It
+        }
     }
 
-    It 'Should output differences between two different strings' {
-        $expected = 'This is a longer text string that was expected to be shown'
-        $actual = 'This is the actual text string'
+    Context 'When output is made as informational message' {
+        It 'Should output to console' {
+            $expected = @(
+                'My String very long string that is longer than actual'
+                'Line 2'
+                'Line 3'
+            )
+            $actual = @(
+                'My string that is shorter'
+                'Line 2'
+                'Line 3 is longer than expected'
+                'Line 4'
+            )
 
-        Out-Diff -ExpectedString $expected -ActualString $actual
+            $result = Out-Diff -ExpectedString $expected -ActualString $actual
+            Write-Verbose ($result -is [array]) -Verbose
+            Write-Verbose ($null -eq $result) -Verbose
+            $result | Should-BeNull
+        }
 
-        Should -Invoke -CommandName Write-Verbose -Exactly -Times 5 -Scope It
-    }
+        Context 'When actual value is an empty value' {
+            It 'Should output to console' {
+                $expected = @(
+                    'My String very long string that is longer than actual'
+                    'Line 2'
+                    'Line 3'
+                )
+                $actual = ''
 
-    It 'Should handle string array' {
-        $expected = @(
-            'Line 1'
-            'Line 2'
-            'Line 3'
-        )
-        $actual = @(
-            'Line 1'
-            'Line 2'
-        )
+                $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                $result | Should-BeNull
+            }
+        }
 
-        Out-Diff -ExpectedString $expected -ActualString $actual
+        Context 'When actual value is null' {
+            It 'Should output to console' {
+                $expected = @(
+                    'My String very long string that is longer than actual'
+                    'Line 2'
+                    'Line 3'
+                )
+                $actual = $null
 
-        Should -Invoke -CommandName Write-Verbose -Exactly -Times 4 -Scope It
+                $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                $result | Should-BeNull
+            }
+        }
+
+        Context 'When expected value is an empty value' {
+            It 'Should output to console' {
+                $expected = ''
+                $actual = @(
+                    'My String very long string that is longer than actual'
+                    'Line 2'
+                    'Line 3'
+                )
+
+                $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                $result | Should-BeNull
+            }
+        }
+
+        Context 'When expected value is null' {
+            It 'Should output to console' {
+                $expected = $null
+                $actual = @(
+                    'My String very long string that is longer than actual'
+                    'Line 2'
+                    'Line 3'
+                )
+
+                $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                $result | Should-BeNull
+            }
+        }
+
+        Context 'When expected and actual value is null' {
+            It 'Should output to console' {
+                $expected = $null
+                $actual = $null
+
+                $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                $result | Should-BeNull
+            }
+        }
+
+        Context 'When expected and actual value is both an empty string' {
+            It 'Should output to console' {
+                $expected = ''
+                $actual = ''
+
+                $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                $result | Should-BeNull
+            }
+        }
+
+        Context 'When expected and actual value is a single string' {
+            Context 'When expected and actual value is the same' {
+                It 'Should output to console' {
+                    $expected = 'This is a test'
+                    $actual = 'This is a test'
+
+                    $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                    $result | Should-BeNull
+                }
+            }
+
+            Context 'When expected and actual value is different' {
+                It 'Should output to console' {
+                    $expected = 'This is a test'
+                    $actual = 'This is another test'
+
+                    $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                    $result | Should-BeNull
+                }
+            }
+
+            Context 'When expected and actual value contain line breaks and new line' {
+                It 'Should output to console' {
+                    $expected = "This is`r`na test"
+                    $actual = "This Is`r`nAnother`r`nTest"
+
+                    $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                    $result | Should-BeNull
+                }
+            }
+
+            Context 'When expected and actual value just different in case sensitivity' {
+                It 'Should output to console' {
+                    $expected = @('Test','a','b')
+                    $actual = @('rest','a','b')
+
+                    $result = Out-Diff -ExpectedString $expected -ActualString $actual
+                    $result | Should-BeNull
+                }
+            }
+        }
     }
 }

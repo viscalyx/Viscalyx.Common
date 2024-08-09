@@ -42,7 +42,7 @@ function Get-NumericalSequence
 
     end
     {
-        if ($null -eq $start)
+        if ($null -ne $start)
         {
             if ($start -eq $end)
             {

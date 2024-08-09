@@ -11,3 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Remove-History`
   - `Remove-PSHistory`
   - `Remove-PSReadLineHistory`
+  - `Add-Diff`
+  - `Get-NumericalSequence`
+  - `Split-StringAtIndices`
