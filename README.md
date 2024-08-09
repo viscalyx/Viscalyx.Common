@@ -2,10 +2,10 @@
 
 Commands to convert Pester tests.
 
-[![Build Status](https://dev.azure.com/viscalyx/Viscalyx.Common/_apis/build/status/viscalyx.Viscalyx.Common?branchName=main)](https://dev.azure.com/viscalyx/Viscalyx.Common/_build/latest?definitionId=33&branchName=main)
-![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/viscalyx/Viscalyx.Common/33/main)
+[![Build Status](https://dev.azure.com/viscalyx/Viscalyx.Common/_apis/build/status/viscalyx.Viscalyx.Common?branchName=main)](https://dev.azure.com/viscalyx/Viscalyx.Common/_build/latest?definitionId=34&branchName=main)
+![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/viscalyx/Viscalyx.Common/34/main)
 [![codecov](https://codecov.io/gh/viscalyx/Viscalyx.Common/branch/main/graph/badge.svg)](https://codecov.io/gh/viscalyx/Viscalyx.Common)
-[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/viscalyx/Viscalyx.Common/33/main)](https://viscalyx.visualstudio.com/Viscalyx.Common/_test/analytics?definitionId=33&contextType=build)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/viscalyx/Viscalyx.Common/34/main)](https://viscalyx.visualstudio.com/Viscalyx.Common/_test/analytics?definitionId=34&contextType=build)
 [![PowerShell Gallery (with prerelease)](https://img.shields.io/powershellgallery/vpre/Viscalyx.Common?label=Viscalyx.Common%20Preview)](https://www.powershellgallery.com/packages/Viscalyx.Common/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/Viscalyx.Common?label=Viscalyx.Common)](https://www.powershellgallery.com/packages/Viscalyx.Common/)
 
