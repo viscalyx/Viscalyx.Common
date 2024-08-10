@@ -72,7 +72,6 @@ Describe 'Out-Diff' {
             $result = Out-Diff -ExpectedString $expected -ActualString $actual -AsVerbose
 
             $result | Should-BeNull
-
             Should -Invoke -CommandName Write-Verbose -Exactly -Times 4 -Scope It
         }
     }

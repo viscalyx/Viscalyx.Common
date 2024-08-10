@@ -91,21 +91,39 @@ function Out-Diff
 
     if (@($expectedHex)[0])
     {
+        $hexBytesWidth = $expectedHex[0].HexBytes.Length
+
         # Width is the length of HexBytes + Ascii + 2 for the space between the columns.
-        $column1Width = $expectedHex[0].HexBytes.Length + $expectedHex[0].Ascii.Length + $columnSeparatorWidth
+        $column1Width = $hexBytesWidth + $expectedHex[0].Ascii.Length
     }
     else
     {
         $column1Width = 64
     }
 
+    $headerMessage = @(
+        (
+            ConvertTo-DiffString -InputString 'Expected:' -IndexObject @{
+                Start = 0
+                End = 8
+            } -DiffAnsiColor '4m' -DiffAnsiColorReset $DiffAnsiColorReset
+        )
+        ''.PadRight($column1Width - 1)
+        (
+            ConvertTo-DiffString -InputString 'But was:' -IndexObject @{
+                Start = 0
+                End = 6
+            } -DiffAnsiColor '4m' -DiffAnsiColorReset $DiffAnsiColorReset
+        )
+    ) -join ''
+
     if ($AsVerbose.IsPresent)
     {
-        Write-Verbose -Message ('Expected:{0}But was:' -f ''.PadRight($column1Width - 1)) -Verbose
+        Write-Verbose -Message $headerMessage -Verbose
     }
     else
     {
-        Write-Information -MessageData ('Expected:{0}But was:' -f ''.PadRight($column1Width - 1)) -InformationAction 'Continue'
+        Write-Information -MessageData $headerMessage -InformationAction 'Continue'
     }
 
     $convertToDiffStringDefaultParameters = @{
@@ -143,30 +161,32 @@ function Out-Diff
 
         if ($actualRowAscii)
         {
-            $actualDiffIndex = 0..($actualBytes.Length - 1) |
-                Where-Object -FilterScript {
-                    $actualBytes[$_] -ne @($expectedBytes)[$_]
-                }
+            $actualRow = ConvertFrom-ByteCollection -Reference @($actualHex)[$_] -Difference @($expectedHex)[$_] -Column1Width $column1Width -ColumnSeparatorWidth $columnSeparatorWidth @convertToDiffStringDefaultParameters
+            # $actualDiffIndex = 0..($actualBytes.Length - 1) |
+            #     Where-Object -FilterScript {
+            #         $actualBytes[$_] -ne @($expectedBytes)[$_]
+            #     }
 
-            $actualRowHexArray = -split $actualRowHex
+            # $actualRowHexArray = -split $actualRowHex
 
-            $actualDiffIndex |
-                ForEach-Object -Process {
-                    $hexValue = $actualRowHexArray[$_]
+            # $actualDiffIndex |
+            #     ForEach-Object -Process {
+            #         $hexValue = $actualRowHexArray[$_]
 
-                    $actualRowHexArray[$_] = ConvertTo-DiffString -InputString $hexValue -IndexObject @{
-                        Start = 0
-                        End = $hexValue.Length - 1
-                    } @convertToDiffStringDefaultParameters
-                }
+            #         # TODO: Should not need to pass IndexObject here when entire string should be converted.
+            #         $actualRowHexArray[$_] = ConvertTo-DiffString -InputString $hexValue -IndexObject @{
+            #             Start = 0
+            #             End = $hexValue.Length - 1
+            #         } @convertToDiffStringDefaultParameters
+            #     }
 
-            $actualRow = $actualRowHexArray -join ' '
+            # $actualRow = ($actualRowHexArray -join ' ') + (' ' * ($hexBytesWidth - $actualRowHex.Length))
 
-            $actualRow += ' ' * $columnSeparatorWidth
+            # $actualRow += ' ' * $columnSeparatorWidth
 
-            $actualRow += $actualDiffIndex |
-                Get-NumericalSequence |
-                ConvertTo-DiffString -InputString $actualRowAscii @convertToDiffStringDefaultParameters
+            # $actualRow += $actualDiffIndex |
+            #     Get-NumericalSequence |
+            #     ConvertTo-DiffString -InputString $actualRowAscii @convertToDiffStringDefaultParameters
         }
         else
         {
@@ -179,30 +199,32 @@ function Out-Diff
 
         if ($expectedRowAscii)
         {
-            $expectedDiffIndex = 0..($expectedBytes.Length - 1) |
-                Where-Object -FilterScript {
-                    $expectedBytes[$_] -ne @($actualBytes)[$_]
-                }
+            $expectedRow = ConvertFrom-ByteCollection -Reference @($expectedHex)[$_] -Difference @($actualHex)[$_] -Column1Width $column1Width -ColumnSeparatorWidth $columnSeparatorWidth @convertToDiffStringDefaultParameters
 
-            $expectedRowHexArray = -split $expectedRowHex
+            # $expectedDiffIndex = 0..($expectedBytes.Length - 1) |
+            #     Where-Object -FilterScript {
+            #         $expectedBytes[$_] -ne @($actualBytes)[$_]
+            #     }
 
-            $expectedDiffIndex |
-                ForEach-Object -Process {
-                    $hexValue = $expectedRowHexArray[$_]
+            # $expectedRowHexArray = -split $expectedRowHex
 
-                    $expectedRowHexArray[$_] = ConvertTo-DiffString -InputString $hexValue -IndexObject @{
-                        Start = 0
-                        End = $hexValue.Length - 1
-                    } @convertToDiffStringDefaultParameters
-                }
+            # $expectedDiffIndex |
+            #     ForEach-Object -Process {
+            #         $hexValue = $expectedRowHexArray[$_]
 
-            $expectedRow = $expectedRowHexArray -join ' '
+            #         $expectedRowHexArray[$_] = ConvertTo-DiffString -InputString $hexValue -IndexObject @{
+            #             Start = 0
+            #             End = $hexValue.Length - 1
+            #         } @convertToDiffStringDefaultParameters
+            #     }
 
-            $expectedRow += '  '
+            # $expectedRow = ($expectedRowHexArray -join ' ') + (' ' * ($hexBytesWidth - $expectedRowHex.Length))
 
-            $expectedRow += $expectedDiffIndex |
-                Get-NumericalSequence |
-                ConvertTo-DiffString -InputString $expectedRowAscii @convertToDiffStringDefaultParameters
+            # $expectedRow += ' ' * $columnSeparatorWidth
+
+            # $expectedRow += $expectedDiffIndex |
+            #     Get-NumericalSequence |
+            #     ConvertTo-DiffString -InputString $expectedRowAscii @convertToDiffStringDefaultParameters
         }
         else
         {
@@ -216,22 +238,30 @@ function Out-Diff
         #>
         $expectedRowLengthDiff = $column1Width - ($expectedRow -replace "`e\[[0-9;]*[a-zA-Z]").Length
 
-        $expectedRow = $expectedRow.PadRight($expectedRow.Length + $expectedRowLengthDiff)
+        $expectedRow = $expectedRow.PadRight($expectedRow.Length + $expectedRowLengthDiff + $columnSeparatorWidth)
 
-        $outputDiffIndicator = '  '
+        $outputDiffIndicator = ' ' * $columnSeparatorWidth
 
         if ($expectedRowAscii -cne $actualRowAscii)
         {
             $outputDiffIndicator = $DiffIndicator
         }
 
+        $diffRowMessage = @(
+            $expectedRow
+            (' ' * $columnSeparatorWidth)
+            $outputDiffIndicator
+            (' ' * $columnSeparatorWidth)
+            $actualRow
+        ) -join ''
+
         if ($AsVerbose.IsPresent)
         {
-            Write-Verbose -Message ('{0}   {1}   {2}' -f $expectedRow, $outputDiffIndicator, $actualRow) -Verbose
+            Write-Verbose -Message $diffRowMessage -Verbose
         }
         else
         {
-            Write-Information -MessageData ('{0}   {1}   {2}' -f $expectedRow, $outputDiffIndicator, $actualRow) -InformationAction 'Continue'
+            Write-Information -MessageData $diffRowMessage -InformationAction 'Continue'
         }
     }
 
