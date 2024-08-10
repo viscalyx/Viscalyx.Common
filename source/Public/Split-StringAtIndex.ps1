@@ -1,4 +1,4 @@
-function Split-StringAtIndices
+function Split-StringAtIndex
 {
     [CmdletBinding()]
     param
