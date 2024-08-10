@@ -25,12 +25,12 @@
         optional when using start and end indices. If not provided, only one
         character will be converted specified by the start index.
 
-    .PARAMETER AnsiColor
+    .PARAMETER Ansi
         Specifies the ANSI color code to apply to the converted portion. The
         default value is '30;43m', which represents black text on a yellow
         background.
 
-    .PARAMETER AnsiColorReset
+    .PARAMETER AnsiReset
         Specifies the ANSI color code to reset the color after the converted portion.
         The default value is '0m', which resets the color to the default.
 
@@ -78,11 +78,11 @@ function ConvertTo-DiffString
 
         [Parameter()]
         [System.String]
-        $AnsiColor = '30;43m',
+        $Ansi = '30;43m',
 
         [Parameter()]
         [System.String]
-        $AnsiColorReset = '0m'
+        $AnsiReset = '0m'
     )
 
     begin
@@ -90,8 +90,8 @@ function ConvertTo-DiffString
         $result = @()
         $previousIndex = 0
 
-        $ansiSequence = "`e[$AnsiColor"
-        $resetSequence = "`e[$AnsiColorReset"
+        $ansiSequence = "`e[$Ansi"
+        $resetSequence = "`e[$AnsiReset"
     }
 
     process

@@ -14,11 +14,11 @@
     .PARAMETER Difference
         Specifies the difference byte collection. This parameter is mandatory.
 
-    .PARAMETER DiffAnsiColor
+    .PARAMETER Ansi
         Specifies the ANSI color code to apply to the differences in the formatted
         string.
 
-    .PARAMETER DiffAnsiColorReset
+    .PARAMETER AnsiReset
         Specifies the ANSI color code to reset the color in the formatted string.
 
     .PARAMETER Column1Width
@@ -60,11 +60,11 @@ function Get-DiffString
 
         [Parameter()]
         [System.String]
-        $DiffAnsiColor,
+        $Ansi,
 
         [Parameter()]
         [System.String]
-        $DiffAnsiColorReset,
+        $AnsiReset,
 
         [Parameter()]
         [System.Int32]
@@ -76,8 +76,8 @@ function Get-DiffString
     )
 
     $convertToDiffStringDefaultParameters = @{
-        AnsiColor = $DiffAnsiColor
-        AnsiColorReset = $DiffAnsiColorReset
+        Ansi      = $Ansi
+        AnsiReset = $AnsiReset
     }
 
     $diffIndex = 0..($Reference.Bytes.Length - 1) |
@@ -94,7 +94,7 @@ function Get-DiffString
             $rowHexArray[$_] = ConvertTo-DiffString -InputString $hexValue @convertToDiffStringDefaultParameters
         }
 
-        $byteCollectionString = ($rowHexArray -join ' ') + (' ' * ($Column1Width - $Reference.HexBytes.Length))
+    $byteCollectionString = ($rowHexArray -join ' ') + (' ' * ($Column1Width - $Reference.HexBytes.Length))
 
     $byteCollectionString += ' ' * $ColumnSeparatorWidth
 

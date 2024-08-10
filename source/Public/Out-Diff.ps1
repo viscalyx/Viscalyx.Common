@@ -49,11 +49,11 @@ function Out-Diff
 
         [Parameter()]
         [System.String]
-        $DiffAnsiColor = '30;31m', # '30;43m' or '38;5;(255);48;5;(124)m'
+        $DifferenceAnsi = '30;31m', # '30;43m' or '38;5;(255);48;5;(124)m'
 
         [Parameter()]
         [System.String]
-        $DiffAnsiColorReset = '0m',
+        $AnsiReset = '0m',
 
         [Parameter()]
         [System.String]
@@ -66,6 +66,24 @@ function Out-Diff
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $NoHeader,
+
+        [Parameter()]
+        [ValidateScript({ $_.Length -le 65 })]
+        [System.String]
+        $ReferenceLabel = 'Expected:',
+
+        [Parameter()]
+        [ValidateScript({ $_.Length -le 65 })]
+        [System.String]
+        $DifferenceLabel = 'But was:',
+
+        [Parameter()]
+        [System.String]
+        $ReferenceLabelAnsi = '4m',
+
+        [Parameter()]
+        [System.String]
+        $DifferenceLabelAnsi = '4m',
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -107,21 +125,19 @@ function Out-Diff
     if (@($actualHex)[0])
     {
         $actualColumn1Width = $actualHex[0].HexBytes.Length
-        #$actualColumn2Width = $actualHex[0].Ascii.Length
     }
     else
     {
         $actualColumn1Width = 47
-        #$actualColumn2Width = 16
     }
 
     if (-not $NoHeader)
     {
         # TODO: The labels should be able to be specified, and have the option to choose the coloring.
         $headerMessage = @(
-            (ConvertTo-DiffString -InputString 'Expected:' -AnsiColor '4m' -AnsiColorReset $DiffAnsiColorReset)
-            ''.PadRight(($expectedColumn1Width + $expectedColumn2Width) - 1)
-            (ConvertTo-DiffString -InputString 'But was:' -AnsiColor '4m' -AnsiColorReset $DiffAnsiColorReset)
+            (ConvertTo-DiffString -InputString $ReferenceLabel -Ansi $ReferenceLabelAnsi -AnsiReset $AnsiReset)
+            ''.PadRight((($expectedColumn1Width + $expectedColumn2Width - $ReferenceLabel.Length) + ($columnSeparatorWidth * 3) + $DiffIndicator.Length))
+            (ConvertTo-DiffString -InputString $DifferenceLabel -Ansi $DifferenceLabelAnsi -AnsiReset $AnsiReset)
         ) -join ''
     }
 
@@ -159,12 +175,12 @@ function Out-Diff
         if ($actualRowAscii)
         {
             $getDiffStringParameters = @{
-                Reference = @($actualHex)[$index]
-                Difference = @($expectedHex)[$index]
-                Column1Width = $actualColumn1Width
+                Reference            = @($actualHex)[$index]
+                Difference           = @($expectedHex)[$index]
+                Column1Width         = $actualColumn1Width
                 ColumnSeparatorWidth = $columnSeparatorWidth
-                DiffAnsiColor      = $DiffAnsiColor
-                DiffAnsiColorReset = $DiffAnsiColorReset
+                Ansi                 = $DifferenceAnsi
+                AnsiReset            = $AnsiReset
             }
 
             $actualRow = Get-DiffString @getDiffStringParameters
@@ -181,12 +197,12 @@ function Out-Diff
         if ($expectedRowAscii)
         {
             $getDiffStringParameters = @{
-                Reference = @($expectedHex)[$index]
-                Difference = @($actualHex)[$index]
-                Column1Width = $expectedColumn1Width
+                Reference            = @($expectedHex)[$index]
+                Difference           = @($actualHex)[$index]
+                Column1Width         = $expectedColumn1Width
                 ColumnSeparatorWidth = $columnSeparatorWidth
-                DiffAnsiColor      = $DiffAnsiColor
-                DiffAnsiColorReset = $DiffAnsiColorReset
+                Ansi                 = $DifferenceAnsi
+                AnsiReset            = $AnsiReset
             }
 
             $expectedRow = Get-DiffString @getDiffStringParameters
