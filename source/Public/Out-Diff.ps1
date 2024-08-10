@@ -119,19 +119,9 @@ function Out-Diff
     {
         # TODO: The labels should be able to be specified, and have the option to choose the coloring.
         $headerMessage = @(
-            (
-                ConvertTo-DiffString -InputString 'Expected:' -IndexObject @{
-                    Start = 0
-                    End   = 8
-                } -DiffAnsiColor '4m' -DiffAnsiColorReset $DiffAnsiColorReset
-            )
+            (ConvertTo-DiffString -InputString 'Expected:' -AnsiColor '4m' -AnsiColorReset $DiffAnsiColorReset)
             ''.PadRight(($expectedColumn1Width + $expectedColumn2Width) - 1)
-            (
-                ConvertTo-DiffString -InputString 'But was:' -IndexObject @{
-                    Start = 0
-                    End   = 6
-                } -DiffAnsiColor '4m' -DiffAnsiColorReset $DiffAnsiColorReset
-            )
+            (ConvertTo-DiffString -InputString 'But was:' -AnsiColor '4m' -AnsiColorReset $DiffAnsiColorReset)
         ) -join ''
     }
 
