@@ -1,4 +1,4 @@
-function ConvertFrom-ByteCollection
+function Get-DiffString
 {
     [CmdletBinding()]
     [OutputType([System.String])]
@@ -54,7 +54,7 @@ function ConvertFrom-ByteCollection
             } @convertToDiffStringDefaultParameters
         }
 
-    $byteCollectionString = ($rowHexArray -join ' ').PadRight($Column1Width)
+        $byteCollectionString = ($rowHexArray -join ' ') + (' ' * ($Column1Width - $Reference.HexBytes.Length))
 
     $byteCollectionString += ' ' * $ColumnSeparatorWidth
 

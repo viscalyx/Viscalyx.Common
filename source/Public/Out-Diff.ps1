@@ -65,6 +65,10 @@ function Out-Diff
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
+        $NoHeader,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
         $PassThru
     )
 
@@ -91,31 +95,45 @@ function Out-Diff
 
     if (@($expectedHex)[0])
     {
-        $hexBytesWidth = $expectedHex[0].HexBytes.Length
-
-        # Width is the length of HexBytes + Ascii + 2 for the space between the columns.
-        $column1Width = $hexBytesWidth + $expectedHex[0].Ascii.Length
+        $expectedColumn1Width = $expectedHex[0].HexBytes.Length
+        $expectedColumn2Width = $expectedHex[0].Ascii.Length
     }
     else
     {
-        $column1Width = 64
+        $expectedColumn1Width = 47
+        $expectedColumn2Width = 16
     }
 
-    $headerMessage = @(
-        (
-            ConvertTo-DiffString -InputString 'Expected:' -IndexObject @{
-                Start = 0
-                End = 8
-            } -DiffAnsiColor '4m' -DiffAnsiColorReset $DiffAnsiColorReset
-        )
-        ''.PadRight($column1Width - 1)
-        (
-            ConvertTo-DiffString -InputString 'But was:' -IndexObject @{
-                Start = 0
-                End = 6
-            } -DiffAnsiColor '4m' -DiffAnsiColorReset $DiffAnsiColorReset
-        )
-    ) -join ''
+    if (@($actualHex)[0])
+    {
+        $actualColumn1Width = $actualHex[0].HexBytes.Length
+        #$actualColumn2Width = $actualHex[0].Ascii.Length
+    }
+    else
+    {
+        $actualColumn1Width = 47
+        #$actualColumn2Width = 16
+    }
+
+    if (-not $NoHeader)
+    {
+        # TODO: The labels should be able to be specified, and have the option to choose the coloring.
+        $headerMessage = @(
+            (
+                ConvertTo-DiffString -InputString 'Expected:' -IndexObject @{
+                    Start = 0
+                    End   = 8
+                } -DiffAnsiColor '4m' -DiffAnsiColorReset $DiffAnsiColorReset
+            )
+            ''.PadRight(($expectedColumn1Width + $expectedColumn2Width) - 1)
+            (
+                ConvertTo-DiffString -InputString 'But was:' -IndexObject @{
+                    Start = 0
+                    End   = 6
+                } -DiffAnsiColor '4m' -DiffAnsiColorReset $DiffAnsiColorReset
+            )
+        ) -join ''
+    }
 
     if ($AsVerbose.IsPresent)
     {
@@ -126,33 +144,22 @@ function Out-Diff
         Write-Information -MessageData $headerMessage -InformationAction 'Continue'
     }
 
-    $convertToDiffStringDefaultParameters = @{
-        DiffAnsiColor = $DiffAnsiColor
-        DiffAnsiColorReset = $DiffAnsiColorReset
-    }
-
     # Remove one since we start at 0.
     $maxLength -= 1
 
-    0..$maxLength | ForEach-Object -Process {
-        $expectedRowHex = ''
+    foreach ($index in 0..$maxLength)
+    {
         $expectedRowAscii = ''
-
-        $actualRowHex = ''
         $actualRowAscii = ''
 
-        if (@($expectedHex)[$_])
+        if (@($expectedHex)[$index])
         {
-            $expectedRowHex = $expectedHex[$_].HexBytes
-            $expectedRowAscii = $expectedHex[$_].Ascii
-            $expectedBytes = $expectedHex[$_].Bytes
+            $expectedRowAscii = $expectedHex[$index].Ascii
         }
 
-        if (@($actualHex)[$_])
+        if (@($actualHex)[$index])
         {
-            $actualRowHex = $actualHex[$_].HexBytes
-            $actualRowAscii = $actualHex[$_].Ascii
-            $actualBytes = $actualHex[$_].Bytes
+            $actualRowAscii = $actualHex[$index].Ascii
         }
 
         ##
@@ -161,32 +168,16 @@ function Out-Diff
 
         if ($actualRowAscii)
         {
-            $actualRow = ConvertFrom-ByteCollection -Reference @($actualHex)[$_] -Difference @($expectedHex)[$_] -Column1Width $column1Width -ColumnSeparatorWidth $columnSeparatorWidth @convertToDiffStringDefaultParameters
-            # $actualDiffIndex = 0..($actualBytes.Length - 1) |
-            #     Where-Object -FilterScript {
-            #         $actualBytes[$_] -ne @($expectedBytes)[$_]
-            #     }
+            $getDiffStringParameters = @{
+                Reference = @($actualHex)[$index]
+                Difference = @($expectedHex)[$index]
+                Column1Width = $actualColumn1Width
+                ColumnSeparatorWidth = $columnSeparatorWidth
+                DiffAnsiColor      = $DiffAnsiColor
+                DiffAnsiColorReset = $DiffAnsiColorReset
+            }
 
-            # $actualRowHexArray = -split $actualRowHex
-
-            # $actualDiffIndex |
-            #     ForEach-Object -Process {
-            #         $hexValue = $actualRowHexArray[$_]
-
-            #         # TODO: Should not need to pass IndexObject here when entire string should be converted.
-            #         $actualRowHexArray[$_] = ConvertTo-DiffString -InputString $hexValue -IndexObject @{
-            #             Start = 0
-            #             End = $hexValue.Length - 1
-            #         } @convertToDiffStringDefaultParameters
-            #     }
-
-            # $actualRow = ($actualRowHexArray -join ' ') + (' ' * ($hexBytesWidth - $actualRowHex.Length))
-
-            # $actualRow += ' ' * $columnSeparatorWidth
-
-            # $actualRow += $actualDiffIndex |
-            #     Get-NumericalSequence |
-            #     ConvertTo-DiffString -InputString $actualRowAscii @convertToDiffStringDefaultParameters
+            $actualRow = Get-DiffString @getDiffStringParameters
         }
         else
         {
@@ -199,32 +190,16 @@ function Out-Diff
 
         if ($expectedRowAscii)
         {
-            $expectedRow = ConvertFrom-ByteCollection -Reference @($expectedHex)[$_] -Difference @($actualHex)[$_] -Column1Width $column1Width -ColumnSeparatorWidth $columnSeparatorWidth @convertToDiffStringDefaultParameters
+            $getDiffStringParameters = @{
+                Reference = @($expectedHex)[$index]
+                Difference = @($actualHex)[$index]
+                Column1Width = $expectedColumn1Width
+                ColumnSeparatorWidth = $columnSeparatorWidth
+                DiffAnsiColor      = $DiffAnsiColor
+                DiffAnsiColorReset = $DiffAnsiColorReset
+            }
 
-            # $expectedDiffIndex = 0..($expectedBytes.Length - 1) |
-            #     Where-Object -FilterScript {
-            #         $expectedBytes[$_] -ne @($actualBytes)[$_]
-            #     }
-
-            # $expectedRowHexArray = -split $expectedRowHex
-
-            # $expectedDiffIndex |
-            #     ForEach-Object -Process {
-            #         $hexValue = $expectedRowHexArray[$_]
-
-            #         $expectedRowHexArray[$_] = ConvertTo-DiffString -InputString $hexValue -IndexObject @{
-            #             Start = 0
-            #             End = $hexValue.Length - 1
-            #         } @convertToDiffStringDefaultParameters
-            #     }
-
-            # $expectedRow = ($expectedRowHexArray -join ' ') + (' ' * ($hexBytesWidth - $expectedRowHex.Length))
-
-            # $expectedRow += ' ' * $columnSeparatorWidth
-
-            # $expectedRow += $expectedDiffIndex |
-            #     Get-NumericalSequence |
-            #     ConvertTo-DiffString -InputString $expectedRowAscii @convertToDiffStringDefaultParameters
+            $expectedRow = Get-DiffString @getDiffStringParameters
         }
         else
         {
@@ -234,17 +209,19 @@ function Out-Diff
         <#
             Calculate the difference in length between the expected row and calculated
             column width by removing all the ANSI escape sequences and subtracting the
-            length from the column width.
+            length from the column widths.
         #>
-        $expectedRowLengthDiff = $column1Width - ($expectedRow -replace "`e\[[0-9;]*[a-zA-Z]").Length
+        $expectedRowLengthDiff = ($expectedColumn1Width + $expectedColumn2Width) - ($expectedRow -replace "`e\[[0-9;]*[a-zA-Z]").Length
 
         $expectedRow = $expectedRow.PadRight($expectedRow.Length + $expectedRowLengthDiff + $columnSeparatorWidth)
-
-        $outputDiffIndicator = ' ' * $columnSeparatorWidth
 
         if ($expectedRowAscii -cne $actualRowAscii)
         {
             $outputDiffIndicator = $DiffIndicator
+        }
+        else
+        {
+            $outputDiffIndicator = ' ' * $DiffIndicator.Length
         }
 
         $diffRowMessage = @(
