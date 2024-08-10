@@ -52,8 +52,9 @@ Describe 'Out-Diff' {
             $expected = 'This is a longer text string that was expected to be shown'
             $actual = 'This is the actual text string'
 
-            Out-Diff -ExpectedString $expected -ActualString $actual
+            $result = Out-Diff -ExpectedString $expected -ActualString $actual -AsVerbose
 
+            $result | Should-BeNull
             Should -Invoke -CommandName Write-Verbose -Exactly -Times 5 -Scope It
         }
 
@@ -68,13 +69,19 @@ Describe 'Out-Diff' {
                 'Line 2'
             )
 
-            Out-Diff -ExpectedString $expected -ActualString $actual
+            $result = Out-Diff -ExpectedString $expected -ActualString $actual -AsVerbose
+
+            $result | Should-BeNull
 
             Should -Invoke -CommandName Write-Verbose -Exactly -Times 4 -Scope It
         }
     }
 
     Context 'When output is made as informational message' {
+        BeforeAll {
+            Mock -CommandName Write-Information
+        }
+
         It 'Should output to console' {
             $expected = @(
                 'My String very long string that is longer than actual'
@@ -89,9 +96,9 @@ Describe 'Out-Diff' {
             )
 
             $result = Out-Diff -ExpectedString $expected -ActualString $actual
-            Write-Verbose ($result -is [array]) -Verbose
-            Write-Verbose ($null -eq $result) -Verbose
+
             $result | Should-BeNull
+            Should -Invoke -CommandName Write-Information -Exactly -Times 7 -Scope It
         }
 
         Context 'When actual value is an empty value' {
@@ -104,7 +111,9 @@ Describe 'Out-Diff' {
                 $actual = ''
 
                 $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                 $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 7 -Scope It
             }
         }
 
@@ -118,7 +127,9 @@ Describe 'Out-Diff' {
                 $actual = $null
 
                 $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                 $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 7 -Scope It
             }
         }
 
@@ -132,7 +143,9 @@ Describe 'Out-Diff' {
                 )
 
                 $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                 $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 7 -Scope It
             }
         }
 
@@ -146,7 +159,9 @@ Describe 'Out-Diff' {
                 )
 
                 $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                 $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 7 -Scope It
             }
         }
 
@@ -156,7 +171,9 @@ Describe 'Out-Diff' {
                 $actual = $null
 
                 $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                 $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 3 -Scope It
             }
         }
 
@@ -166,7 +183,9 @@ Describe 'Out-Diff' {
                 $actual = ''
 
                 $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                 $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 3 -Scope It
             }
         }
 
@@ -177,7 +196,9 @@ Describe 'Out-Diff' {
                     $actual = 'This is a test'
 
                     $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                     $result | Should-BeNull
+                    Should -Invoke -CommandName Write-Information -Exactly -Times 2 -Scope It
                 }
             }
 
@@ -187,7 +208,9 @@ Describe 'Out-Diff' {
                     $actual = 'This is another test'
 
                     $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                     $result | Should-BeNull
+                    Should -Invoke -CommandName Write-Information -Exactly -Times 3 -Scope It
                 }
             }
 
@@ -197,7 +220,9 @@ Describe 'Out-Diff' {
                     $actual = "This Is`r`nAnother`r`nTest"
 
                     $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                     $result | Should-BeNull
+                    Should -Invoke -CommandName Write-Information -Exactly -Times 3 -Scope It
                 }
             }
 
@@ -207,7 +232,9 @@ Describe 'Out-Diff' {
                     $actual = @('rest','a','b')
 
                     $result = Out-Diff -ExpectedString $expected -ActualString $actual
+
                     $result | Should-BeNull
+                    Should -Invoke -CommandName Write-Information -Exactly -Times 4 -Scope It
                 }
             }
         }

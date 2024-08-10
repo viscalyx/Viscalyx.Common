@@ -61,12 +61,14 @@ function Out-Diff
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
-        $RemoveNewLine,
+        $AsVerbose,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $PassThru
     )
+
+    $outDiffResult = $null
 
     if (-not $ActualString)
     {
@@ -85,9 +87,6 @@ function Out-Diff
         Measure-Object -Maximum |
         Select-Object -ExpandProperty 'Maximum'
 
-    # TODO: Handle if RemoveNewLine is set
-    #$column1Width = ($expectedHex[0] -replace '\r?\n').Length
-
     $columnSeparatorWidth = 2
 
     if (@($expectedHex)[0])
@@ -100,40 +99,42 @@ function Out-Diff
         $column1Width = 64
     }
 
-    #Write-Verbose -Message ("Expected:{0}But was:" -f ''.PadRight($column1Width - 1)) -Verbose
-    Write-Information -MessageData ('Expected:{0}But was:' -f ''.PadRight($column1Width - 1)) -InformationAction 'Continue'
+    if ($AsVerbose.IsPresent)
+    {
+        Write-Verbose -Message ('Expected:{0}But was:' -f ''.PadRight($column1Width - 1)) -Verbose
+    }
+    else
+    {
+        Write-Information -MessageData ('Expected:{0}But was:' -f ''.PadRight($column1Width - 1)) -InformationAction 'Continue'
+    }
+
+    $convertToDiffStringDefaultParameters = @{
+        DiffAnsiColor = $DiffAnsiColor
+        DiffAnsiColorReset = $DiffAnsiColorReset
+    }
 
     # Remove one since we start at 0.
     $maxLength -= 1
 
-    $null = 0..$maxLength | ForEach-Object -Process {
+    0..$maxLength | ForEach-Object -Process {
         $expectedRowHex = ''
         $expectedRowAscii = ''
 
         $actualRowHex = ''
         $actualRowAscii = ''
 
-        if ($RemoveNewLine)
+        if (@($expectedHex)[$_])
         {
-            # TODO: this must remove the new line from the HexBytes, Bytes and Ascii
-            # $expectedRow = $expectedHex[$_] -replace '\r?\n'
-            # $actualRow = $actualHex[$_] -replace '\r?\n'
+            $expectedRowHex = $expectedHex[$_].HexBytes
+            $expectedRowAscii = $expectedHex[$_].Ascii
+            $expectedBytes = $expectedHex[$_].Bytes
         }
-        else
-        {
-            if (@($expectedHex)[$_])
-            {
-                $expectedRowHex = $expectedHex[$_].HexBytes
-                $expectedRowAscii = $expectedHex[$_].Ascii
-                $expectedBytes = $expectedHex[$_].Bytes
-            }
 
-            if (@($actualHex)[$_])
-            {
-                $actualRowHex = $actualHex[$_].HexBytes
-                $actualRowAscii = $actualHex[$_].Ascii
-                $actualBytes = $actualHex[$_].Bytes
-            }
+        if (@($actualHex)[$_])
+        {
+            $actualRowHex = $actualHex[$_].HexBytes
+            $actualRowAscii = $actualHex[$_].Ascii
+            $actualBytes = $actualHex[$_].Bytes
         }
 
         ##
@@ -153,7 +154,10 @@ function Out-Diff
                 ForEach-Object -Process {
                     $hexValue = $actualRowHexArray[$_]
 
-                    $actualRowHexArray[$_] = ConvertTo-DiffString -IndexObject @{Start = 0; End = $hexValue.Length - 1 } -InputString $hexValue -DiffAnsiColor $DiffAnsiColor -DiffAnsiColorReset $DiffAnsiColorReset
+                    $actualRowHexArray[$_] = ConvertTo-DiffString -InputString $hexValue -IndexObject @{
+                        Start = 0
+                        End = $hexValue.Length - 1
+                    } @convertToDiffStringDefaultParameters
                 }
 
             $actualRow = $actualRowHexArray -join ' '
@@ -162,7 +166,7 @@ function Out-Diff
 
             $actualRow += $actualDiffIndex |
                 Get-NumericalSequence |
-                ConvertTo-DiffString -InputString $actualRowAscii -DiffAnsiColor $DiffAnsiColor -DiffAnsiColorReset $DiffAnsiColorReset
+                ConvertTo-DiffString -InputString $actualRowAscii @convertToDiffStringDefaultParameters
         }
         else
         {
@@ -186,7 +190,10 @@ function Out-Diff
                 ForEach-Object -Process {
                     $hexValue = $expectedRowHexArray[$_]
 
-                    $expectedRowHexArray[$_] = ConvertTo-DiffString -IndexObject @{Start = 0; End = $hexValue.Length - 1 } -InputString $hexValue -DiffAnsiColor $DiffAnsiColor -DiffAnsiColorReset $DiffAnsiColorReset
+                    $expectedRowHexArray[$_] = ConvertTo-DiffString -InputString $hexValue -IndexObject @{
+                        Start = 0
+                        End = $hexValue.Length - 1
+                    } @convertToDiffStringDefaultParameters
                 }
 
             $expectedRow = $expectedRowHexArray -join ' '
@@ -195,7 +202,7 @@ function Out-Diff
 
             $expectedRow += $expectedDiffIndex |
                 Get-NumericalSequence |
-                ConvertTo-DiffString -InputString $expectedRowAscii -DiffAnsiColor $DiffAnsiColor -DiffAnsiColorReset $DiffAnsiColorReset
+                ConvertTo-DiffString -InputString $expectedRowAscii @convertToDiffStringDefaultParameters
         }
         else
         {
@@ -218,7 +225,15 @@ function Out-Diff
             $outputDiffIndicator = $DiffIndicator
         }
 
-        #Write-Verbose -Message ("{0}   {1}   {2}" -f $expectedRow, $diffIndicator, $actualRow) -Verbose
-        Write-Information -MessageData ('{0}   {1}   {2}' -f $expectedRow, $outputDiffIndicator, $actualRow) -InformationAction 'Continue'
+        if ($AsVerbose.IsPresent)
+        {
+            Write-Verbose -Message ('{0}   {1}   {2}' -f $expectedRow, $outputDiffIndicator, $actualRow) -Verbose
+        }
+        else
+        {
+            Write-Information -MessageData ('{0}   {1}   {2}' -f $expectedRow, $outputDiffIndicator, $actualRow) -InformationAction 'Continue'
+        }
     }
+
+    return $outDiffResult
 }
