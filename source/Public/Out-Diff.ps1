@@ -90,7 +90,14 @@ function Out-Diff
         $PassThru
     )
 
-    $outDiffResult = $null
+    if ($PassThru.IsPresent)
+    {
+        $outDiffResult = @()
+    }
+    else
+    {
+        $outDiffResult = $null
+    }
 
     if (-not $ActualString)
     {
@@ -131,7 +138,7 @@ function Out-Diff
         $actualColumn1Width = 47
     }
 
-    if (-not $NoHeader)
+    if (-not $NoHeader.IsPresent)
     {
         # TODO: The labels should be able to be specified, and have the option to choose the coloring.
         $headerMessage = @(
@@ -139,15 +146,19 @@ function Out-Diff
             ''.PadRight((($expectedColumn1Width + $expectedColumn2Width - $ReferenceLabel.Length) + ($columnSeparatorWidth * 3) + $DiffIndicator.Length))
             (ConvertTo-DiffString -InputString $DifferenceLabel -Ansi $DifferenceLabelAnsi -AnsiReset $AnsiReset)
         ) -join ''
-    }
 
-    if ($AsVerbose.IsPresent)
-    {
-        Write-Verbose -Message $headerMessage -Verbose
-    }
-    else
-    {
-        Write-Information -MessageData $headerMessage -InformationAction 'Continue'
+        if ($PassThru.IsPresent)
+        {
+            $outDiffResult += $headerMessage
+        }
+        elseif ($AsVerbose.IsPresent)
+        {
+            Write-Verbose -Message $headerMessage -Verbose
+        }
+        else
+        {
+            Write-Information -MessageData $headerMessage -InformationAction 'Continue'
+        }
     }
 
     # Remove one since we start at 0.
@@ -238,7 +249,11 @@ function Out-Diff
             $actualRow
         ) -join ''
 
-        if ($AsVerbose.IsPresent)
+        if ($PassThru.IsPresent)
+        {
+            $outDiffResult += $diffRowMessage
+        }
+        elseif ($AsVerbose.IsPresent)
         {
             Write-Verbose -Message $diffRowMessage -Verbose
         }
