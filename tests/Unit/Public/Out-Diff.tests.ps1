@@ -298,4 +298,57 @@ Describe 'Out-Diff' {
             }
         }
     }
+
+    Context 'When returning output' {
+        It 'Should output to console' {
+            $expected = @(
+                'My String very long string that is longer than actual'
+                'Line 2'
+                'Line 3'
+            )
+            $actual = @(
+                'My string that is shorter'
+                'Line 2'
+                'Line 3 is longer than expected'
+                'Line 4'
+            )
+
+            $result = Out-Diff -Reference $expected -Difference $actual -PassThru
+
+            $result | Should-BeEquivalent @(
+                "`e[4mExpected:`e[0m                                                              `e[4mBut was:`e[0m"
+                "4D 79 20 `e[30;31m53`e[0m 74 72 69 6E 67 20 `e[30;31m76`e[0m `e[30;31m65`e[0m `e[30;31m72`e[0m `e[30;31m79`e[0m 20 `e[30;31m6C`e[0m  My `e[30;31mS`e[0mtring `e[30;31mvery`e[0m `e[30;31ml`e[0m  !=  4D 79 20 `e[30;31m73`e[0m 74 72 69 6E 67 20 `e[30;31m74`e[0m `e[30;31m68`e[0m `e[30;31m61`e[0m `e[30;31m74`e[0m 20 `e[30;31m69`e[0m  My `e[30;31ms`e[0mtring `e[30;31mthat`e[0m `e[30;31mi`e[0m"
+                "`e[30;31m6F`e[0m `e[30;31m6E`e[0m `e[30;31m67`e[0m `e[30;31m20`e[0m `e[30;31m73`e[0m `e[30;31m74`e[0m `e[30;31m72`e[0m `e[30;31m69`e[0m `e[30;31m6E`e[0m `e[30;31m67`e[0m `e[30;31m20`e[0m `e[30;31m74`e[0m `e[30;31m68`e[0m `e[30;31m61`e[0m `e[30;31m74`e[0m `e[30;31m20`e[0m  `e[30;31mong string that `e[0m  !=  `e[30;31m73`e[0m `e[30;31m20`e[0m `e[30;31m73`e[0m `e[30;31m68`e[0m `e[30;31m6F`e[0m `e[30;31m72`e[0m `e[30;31m74`e[0m `e[30;31m65`e[0m `e[30;31m72`e[0m                       `e[30;31ms shorter`e[0m"
+                "`e[30;31m69`e[0m `e[30;31m73`e[0m `e[30;31m20`e[0m `e[30;31m6C`e[0m `e[30;31m6F`e[0m `e[30;31m6E`e[0m `e[30;31m67`e[0m `e[30;31m65`e[0m `e[30;31m72`e[0m `e[30;31m20`e[0m `e[30;31m74`e[0m `e[30;31m68`e[0m `e[30;31m61`e[0m `e[30;31m6E`e[0m `e[30;31m20`e[0m `e[30;31m61`e[0m  `e[30;31mis longer than a`e[0m  !=  `e[30;31m4C`e[0m `e[30;31m69`e[0m `e[30;31m6E`e[0m `e[30;31m65`e[0m `e[30;31m20`e[0m `e[30;31m32`e[0m                                `e[30;31mLine 2`e[0m"
+                "`e[30;31m63`e[0m `e[30;31m74`e[0m `e[30;31m75`e[0m `e[30;31m61`e[0m `e[30;31m6C`e[0m                                   `e[30;31mctual`e[0m             !=  `e[30;31m4C`e[0m `e[30;31m69`e[0m `e[30;31m6E`e[0m `e[30;31m65`e[0m `e[30;31m20`e[0m `e[30;31m33`e[0m `e[30;31m20`e[0m `e[30;31m69`e[0m `e[30;31m73`e[0m `e[30;31m20`e[0m `e[30;31m6C`e[0m `e[30;31m6F`e[0m `e[30;31m6E`e[0m `e[30;31m67`e[0m `e[30;31m65`e[0m `e[30;31m72`e[0m  `e[30;31mLine 3 is longer`e[0m"
+                "`e[30;31m4C`e[0m `e[30;31m69`e[0m `e[30;31m6E`e[0m `e[30;31m65`e[0m `e[30;31m20`e[0m `e[30;31m32`e[0m                                `e[30;31mLine 2`e[0m            !=  `e[30;31m20`e[0m `e[30;31m74`e[0m `e[30;31m68`e[0m `e[30;31m61`e[0m `e[30;31m6E`e[0m `e[30;31m20`e[0m `e[30;31m65`e[0m `e[30;31m78`e[0m `e[30;31m70`e[0m `e[30;31m65`e[0m `e[30;31m63`e[0m `e[30;31m74`e[0m `e[30;31m65`e[0m `e[30;31m64`e[0m        `e[30;31m than expected`e[0m"
+                "4C 69 6E 65 20 `e[30;31m33`e[0m                                Line `e[30;31m3`e[0m            !=  4C 69 6E 65 20 `e[30;31m34`e[0m                                Line `e[30;31m4`e[0m"
+            )
+        }
+
+        It 'Should output to console, but without header' {
+            $expected = @(
+                'My String very long string that is longer than actual'
+                'Line 2'
+                'Line 3'
+            )
+            $actual = @(
+                'My string that is shorter'
+                'Line 2'
+                'Line 3 is longer than expected'
+                'Line 4'
+            )
+
+            $result = Out-Diff -Reference $expected -Difference $actual -PassThru -NoHeader
+
+            $result | Should-BeEquivalent @(
+                "4D 79 20 `e[30;31m53`e[0m 74 72 69 6E 67 20 `e[30;31m76`e[0m `e[30;31m65`e[0m `e[30;31m72`e[0m `e[30;31m79`e[0m 20 `e[30;31m6C`e[0m  My `e[30;31mS`e[0mtring `e[30;31mvery`e[0m `e[30;31ml`e[0m  !=  4D 79 20 `e[30;31m73`e[0m 74 72 69 6E 67 20 `e[30;31m74`e[0m `e[30;31m68`e[0m `e[30;31m61`e[0m `e[30;31m74`e[0m 20 `e[30;31m69`e[0m  My `e[30;31ms`e[0mtring `e[30;31mthat`e[0m `e[30;31mi`e[0m"
+                "`e[30;31m6F`e[0m `e[30;31m6E`e[0m `e[30;31m67`e[0m `e[30;31m20`e[0m `e[30;31m73`e[0m `e[30;31m74`e[0m `e[30;31m72`e[0m `e[30;31m69`e[0m `e[30;31m6E`e[0m `e[30;31m67`e[0m `e[30;31m20`e[0m `e[30;31m74`e[0m `e[30;31m68`e[0m `e[30;31m61`e[0m `e[30;31m74`e[0m `e[30;31m20`e[0m  `e[30;31mong string that `e[0m  !=  `e[30;31m73`e[0m `e[30;31m20`e[0m `e[30;31m73`e[0m `e[30;31m68`e[0m `e[30;31m6F`e[0m `e[30;31m72`e[0m `e[30;31m74`e[0m `e[30;31m65`e[0m `e[30;31m72`e[0m                       `e[30;31ms shorter`e[0m"
+                "`e[30;31m69`e[0m `e[30;31m73`e[0m `e[30;31m20`e[0m `e[30;31m6C`e[0m `e[30;31m6F`e[0m `e[30;31m6E`e[0m `e[30;31m67`e[0m `e[30;31m65`e[0m `e[30;31m72`e[0m `e[30;31m20`e[0m `e[30;31m74`e[0m `e[30;31m68`e[0m `e[30;31m61`e[0m `e[30;31m6E`e[0m `e[30;31m20`e[0m `e[30;31m61`e[0m  `e[30;31mis longer than a`e[0m  !=  `e[30;31m4C`e[0m `e[30;31m69`e[0m `e[30;31m6E`e[0m `e[30;31m65`e[0m `e[30;31m20`e[0m `e[30;31m32`e[0m                                `e[30;31mLine 2`e[0m"
+                "`e[30;31m63`e[0m `e[30;31m74`e[0m `e[30;31m75`e[0m `e[30;31m61`e[0m `e[30;31m6C`e[0m                                   `e[30;31mctual`e[0m             !=  `e[30;31m4C`e[0m `e[30;31m69`e[0m `e[30;31m6E`e[0m `e[30;31m65`e[0m `e[30;31m20`e[0m `e[30;31m33`e[0m `e[30;31m20`e[0m `e[30;31m69`e[0m `e[30;31m73`e[0m `e[30;31m20`e[0m `e[30;31m6C`e[0m `e[30;31m6F`e[0m `e[30;31m6E`e[0m `e[30;31m67`e[0m `e[30;31m65`e[0m `e[30;31m72`e[0m  `e[30;31mLine 3 is longer`e[0m"
+                "`e[30;31m4C`e[0m `e[30;31m69`e[0m `e[30;31m6E`e[0m `e[30;31m65`e[0m `e[30;31m20`e[0m `e[30;31m32`e[0m                                `e[30;31mLine 2`e[0m            !=  `e[30;31m20`e[0m `e[30;31m74`e[0m `e[30;31m68`e[0m `e[30;31m61`e[0m `e[30;31m6E`e[0m `e[30;31m20`e[0m `e[30;31m65`e[0m `e[30;31m78`e[0m `e[30;31m70`e[0m `e[30;31m65`e[0m `e[30;31m63`e[0m `e[30;31m74`e[0m `e[30;31m65`e[0m `e[30;31m64`e[0m        `e[30;31m than expected`e[0m"
+                "4C 69 6E 65 20 `e[30;31m33`e[0m                                Line `e[30;31m3`e[0m            !=  4C 69 6E 65 20 `e[30;31m34`e[0m                                Line `e[30;31m4`e[0m"
+            )
+        }
+    }
 }
