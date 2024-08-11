@@ -237,5 +237,65 @@ Describe 'Out-Diff' {
                 }
             }
         }
+
+        Context 'When expected and actual value have different lengths but similar content' {
+            It 'Should output to console' {
+                $expected = 'This is a test string that is quite long'
+                $actual = 'This is a test string'
+
+                $result = Out-Diff -Reference $expected -Difference $actual
+
+                $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 4 -Scope It
+            }
+        }
+
+        Context 'When expected and actual value contain special characters' {
+            It 'Should output to console' {
+                $expected = 'This is a test string with special characters: !@#$%^&*()'
+                $actual = 'This is a test string with special characters: !@#$%^&*()'
+
+                $result = Out-Diff -Reference $expected -Difference $actual
+
+                $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 5 -Scope It
+            }
+        }
+
+        Context 'When expected and actual value are empty arrays' {
+            It 'Should output to console' {
+                $expected = @()
+                $actual = @()
+
+                $result = Out-Diff -Reference $expected -Difference $actual
+
+                $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 3 -Scope It
+            }
+        }
+
+        Context 'When expected and actual value contain mixed content' {
+            It 'Should output to console' {
+                $expected = @('String', 123, 'Another String')
+                $actual = @('String', 456, 'Another String')
+
+                $result = Out-Diff -Reference $expected -Difference $actual
+
+                $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 4 -Scope It
+            }
+        }
+
+        Context 'When expected and actual value contain Unicode characters' {
+            It 'Should output to console' {
+                $expected = 'This is a test string with Unicode: 你好, мир, hello'
+                $actual = 'This is a test string with Unicode: 你好, мир, hello'
+
+                $result = Out-Diff -Reference $expected -Difference $actual
+
+                $result | Should-BeNull
+                Should -Invoke -CommandName Write-Information -Exactly -Times 5 -Scope It
+            }
+        }
     }
 }

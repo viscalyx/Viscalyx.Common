@@ -160,8 +160,9 @@ function Out-Diff
         $Reference = @()
     }
 
-    $expectedHex = $Reference | Format-Hex
-    $actualHex = $Difference | Format-Hex
+    # Using ForEach-Object to convert numerical values to string.
+    $expectedHex = $Reference | ForEach-Object -Process { $_.ToString() } | Format-Hex
+    $actualHex = $Difference | ForEach-Object -Process { $_.ToString() } | Format-Hex
 
     $maxLength = @($expectedHex.Length, $actualHex.Length) |
         Measure-Object -Maximum |
@@ -169,10 +170,23 @@ function Out-Diff
 
     $columnSeparatorWidth = 2
 
-    if (@($expectedHex)[0])
+    if ($expectedHex)
     {
-        $expectedColumn1Width = $expectedHex[0].HexBytes.Length
-        $expectedColumn2Width = $expectedHex[0].Ascii.Length
+        $expectedColumn1Width = (
+            $expectedHex.HexBytes |
+                ForEach-Object -Process {
+                    $_.Length
+                } |
+                Measure-Object -Maximum
+        ).Maximum
+
+        $expectedColumn2Width = (
+            $expectedHex.Ascii |
+                ForEach-Object -Process {
+                    $_.Length
+                } |
+                Measure-Object -Maximum
+        ).Maximum
     }
     else
     {
@@ -182,7 +196,13 @@ function Out-Diff
 
     if (@($actualHex)[0])
     {
-        $actualColumn1Width = $actualHex[0].HexBytes.Length
+        $actualColumn1Width = (
+            $actualHex.HexBytes |
+                ForEach-Object -Process {
+                    $_.Length
+                } |
+                Measure-Object -Maximum
+        ).Maximum
     }
     else
     {
@@ -191,7 +211,6 @@ function Out-Diff
 
     if (-not $NoHeader.IsPresent)
     {
-        # TODO: The labels should be able to be specified, and have the option to choose the coloring.
         $headerMessage = @(
             (ConvertTo-DiffString -InputString $ReferenceLabel -Ansi $ReferenceLabelAnsi -AnsiReset $AnsiReset)
             ''.PadRight((($expectedColumn1Width + $expectedColumn2Width - $ReferenceLabel.Length) + ($columnSeparatorWidth * 3) + $DiffIndicator.Length))
