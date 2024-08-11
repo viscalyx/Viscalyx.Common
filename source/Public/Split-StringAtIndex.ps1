@@ -55,8 +55,9 @@
 #>
 function Split-StringAtIndex
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseSyntacticallyCorrectExamples', '', Justification = 'Because the examples are syntactically correct. The rule does not seem to understand that there is pipeline input.')]
     [CmdletBinding()]
-    [OutputType([System.String[]])]
+    [OutputType([System.String])]
     param
     (
         [Parameter(ParameterSetName = 'PipelineInput', Mandatory = $true, ValueFromPipeline = $true)]
