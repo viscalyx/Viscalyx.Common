@@ -56,6 +56,7 @@
 function Split-StringAtIndex
 {
     [CmdletBinding()]
+    [OutputType([System.String[]])]
     param
     (
         [Parameter(ParameterSetName = 'PipelineInput', Mandatory = $true, ValueFromPipeline = $true)]
