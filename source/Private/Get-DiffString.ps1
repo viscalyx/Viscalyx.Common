@@ -49,7 +49,6 @@ function Get-DiffString
     param
     (
         [Parameter(Mandatory = $true)]
-        [AllowNull()]
         [Microsoft.PowerShell.Commands.ByteCollection]
         $Reference,
 
@@ -60,11 +59,11 @@ function Get-DiffString
 
         [Parameter()]
         [System.String]
-        $Ansi,
+        $Ansi = '30;31m',
 
         [Parameter()]
         [System.String]
-        $AnsiReset,
+        $AnsiReset = '0m',
 
         [Parameter()]
         [System.Int32]
@@ -74,6 +73,16 @@ function Get-DiffString
         [System.Int32]
         $ColumnSeparatorWidth
     )
+
+    if ($Column1Width -eq 0)
+    {
+        $Column1Width = $Reference.HexBytes.Length
+    }
+
+    if ($ColumnSeparatorWidth -eq 0)
+    {
+        $ColumnSeparatorWidth = 2
+    }
 
     $convertToDiffStringDefaultParameters = @{
         Ansi      = $Ansi
