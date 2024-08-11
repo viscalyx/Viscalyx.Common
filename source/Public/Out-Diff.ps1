@@ -1,31 +1,82 @@
 <#
     .SYNOPSIS
-        This output two text blocks side-by-side in hex to easily
-        compare the diff.
+        Compares two sets of strings and highlights the differences in hexadecimal
+        output.
 
     .DESCRIPTION
-        This output two text blocks side-by-side in hex to easily
-        compare the diff. It is main intended use is as a helper for unit test
-        when comparing large text mass which can have small normally invisible
-        difference like an extra pch missing LF.
+        The Out-Diff command compares two sets of strings, $Difference and $Reference.
+        Outputs the result using hexadecimal output and highlights the differences
+        between the two sets of strings in a side-by-side format, making it easier
+        to spot discrepancies at a byte level.
 
-    .PARAMETER ActualString
-        A text string that should be compared against the text string that is passed
-        in parameter 'Expected'.
+        Its main intended use is in unit tests when comparing large text masses that
+        can have small, normally invisible differences, such as an extra or missing
+        line feed or new line character.
 
-    .PARAMETER ExpectedString
-        A text string that should be compared against the text string that is passed
-        in parameter 'Actual'.
+        The command supports ANSI escape sequences for coloring the differences
+        between the actual and expected strings. The default color for differences
+        is red. The command defaults to outputting the result as informational
+        messages, but it also supports displaying the differences using the
+        Write-Verbose cmdlet or returning the result as output.
+
+    .PARAMETER Difference
+        Specifies the set of strings to compare against the reference strings.
+        This parameter is mandatory.
+
+    .PARAMETER Reference
+        Specifies the set of reference strings to compare against the difference
+        strings. This parameter is mandatory.
+
+    .PARAMETER DifferenceAnsi
+        Specifies the ANSI escape sequence for controlling how the difference is
+        highlighted. The default value is '30;31m' (red).
+
+    .PARAMETER AnsiReset
+        Specifies the ANSI escape sequence to reset the formatting. The
+        default value is '0m'.
+
+    .PARAMETER DiffIndicator
+        Specifies the indicator to display for differences between the difference
+        and reference strings. The default value is '!='.
+
+    .PARAMETER AsVerbose
+        Switch parameter. If specified, the differences are displayed using the
+        Write-Verbose cmdlet.
+
+    .PARAMETER NoHeader
+        Switch parameter. If specified, the header message is not displayed.
+
+    .PARAMETER ReferenceLabel
+        Specifies the label for the reference strings. The default value is
+        'Expected:'. The label should be no longer than 65 characters.
+
+    .PARAMETER DifferenceLabel
+        Specifies the label for the difference strings. The default value is
+        'But was:'. The label should be no longer than 65 characters.
+
+    .PARAMETER ReferenceLabelAnsi
+        Specifies the ANSI escape sequence for controlling the look of the reference
+        label. The default value is '4m' (underline).
+
+    .PARAMETER DifferenceLabelAnsi
+        Specifies the ANSI escape sequence for controlling the look of the difference
+        label. The default value is '4m' (underline).
+
+    .PARAMETER PassThru
+        Switch parameter. If specified, the output is returned as an array of strings.
+
+    .OUTPUTS
+        If the PassThru parameter is specified, the function returns an array of
+        strings representing the differences between the actual and expected strings.
 
     .EXAMPLE
-        Out-Diff `
-            -ExpectedString 'This is a longer text string that was expected to be shown' `
-            -ActualString 'This is the actual text string'
+        $actual = "Hello", "World"
+        $expected = "Hello", "Universe"
+        Out-Diff -Difference $actual -Reference $expected
 
-    .NOTES
-        This outputs the lines in verbose statements because it is the easiest way
-        to show output when running tests in Pester. The output is wide, 185 characters,
-        to get the best side-by-side comparison.
+        This example compares the actual strings "Hello" and "World" with the expected
+        strings "Hello" and "Universe". The function displays the differences between
+        the two sets of strings.
 #>
 function Out-Diff
 {
@@ -38,14 +89,14 @@ function Out-Diff
         [AllowEmptyString()]
         [AllowNull()]
         [System.String[]]
-        $ActualString,
+        $Difference,
 
         [Parameter(Mandatory = $true)]
         [AllowEmptyCollection()]
         [AllowEmptyString()]
         [AllowNull()]
         [System.String[]]
-        $ExpectedString,
+        $Reference,
 
         [Parameter()]
         [System.String]
@@ -99,18 +150,18 @@ function Out-Diff
         $outDiffResult = $null
     }
 
-    if (-not $ActualString)
+    if (-not $Difference)
     {
-        $ActualString = @()
+        $Difference = @()
     }
 
-    if (-not $ExpectedString)
+    if (-not $Reference)
     {
-        $ExpectedString = @()
+        $Reference = @()
     }
 
-    $expectedHex = $ExpectedString | Format-Hex
-    $actualHex = $ActualString | Format-Hex
+    $expectedHex = $Reference | Format-Hex
+    $actualHex = $Difference | Format-Hex
 
     $maxLength = @($expectedHex.Length, $actualHex.Length) |
         Measure-Object -Maximum |
