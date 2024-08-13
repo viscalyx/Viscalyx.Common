@@ -45,7 +45,7 @@
     PrivateData          = @{
         PSData = @{
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags         = @('Pester', 'Converter')
+            Tags         = @('Common', 'Utility')
 
             # A URL to the license for this module.
             LicenseUri   = 'https://github.com/viscalyx/Viscalyx.Common/blob/main/LICENSE'
