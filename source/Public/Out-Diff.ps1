@@ -111,6 +111,10 @@ function Out-Diff
         $DiffIndicator = '!=',
 
         [Parameter()]
+        [System.String]
+        $EqualIndicator = '==',
+
+        [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $AsVerbose,
 
@@ -308,7 +312,14 @@ function Out-Diff
         }
         else
         {
-            $outputDiffIndicator = ' ' * $DiffIndicator.Length
+            if ($EqualIndicator)
+            {
+                $outputDiffIndicator = $EqualIndicator
+            }
+            else
+            {
+                $outputDiffIndicator = ' ' * $DiffIndicator.Length
+            }
         }
 
         $diffRowMessage = @(
