@@ -36,8 +36,12 @@
         default value is '0m'.
 
     .PARAMETER DiffIndicator
-        Specifies the indicator to display for differences between the difference
-        and reference strings. The default value is '!='.
+        Specifies the indicator to display when there is a differences between the
+        strings. The default value is '!='.
+
+    .PARAMETER EqualIndicator
+        Specifies the indicator to display when there is equality between the strings.
+        The default value is '!='.
 
     .PARAMETER AsVerbose
         Switch parameter. If specified, the differences are displayed using the
