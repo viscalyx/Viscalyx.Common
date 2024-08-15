@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ConvertTo-DiffString`
   - `Get-NumericalSequence`
   - `Out-Diff`
+  - `Pop-VMLatestSnapShot`
   - `Remove-History`
   - `Remove-PSHistory`
   - `Remove-PSReadLineHistory`
