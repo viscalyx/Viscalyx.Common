@@ -194,7 +194,7 @@ function New-SamplerGitHubReleaseTag
 
     if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
     {
-        #git tag $ReleaseTag
+        git tag $ReleaseTag
 
         Write-Information -MessageData "`e[32mTag created, push tag to upstream by running 'git push $UpstreamRemoteName --tags'`e[0m" -InformationAction Continue
     }
