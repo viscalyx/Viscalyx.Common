@@ -33,4 +33,11 @@
     # Prerequisite modules for documentation.
     'DscResource.DocGenerator'     = 'latest'
     PlatyPS                        = 'latest'
+
+    'Viscalyx.Assert'              = @{
+        Version    = 'latest'
+        Parameters = @{
+            AllowPrerelease = $true
+        }
+    }
 }
