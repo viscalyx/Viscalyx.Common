@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Get-PSReadLineHistory`
   - `New-SamplerGitHubReleaseTag`
   - `Out-Diff`
+  - `Out-DiffString`
   - `Pop-VMLatestSnapShot`
   - `Remove-History`
   - `Remove-PSHistory`
