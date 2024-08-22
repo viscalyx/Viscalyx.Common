@@ -75,6 +75,10 @@ function Out-DiffString
         $diffHexArray = @()
         $diffCharArray = @()
 
+        # Escape $HighlightStart and $HighlightEnd for regex matching
+        $escapedHighlightStart = [regex]::Escape($HighlightStart)
+        $escapedHighlightEnd = [regex]::Escape($HighlightEnd)
+
         # Output the labels if NoLabels is not specified
         if (-not $NoLabels) {
             "$($ReferenceLabelAnsi)$($ReferenceLabel)$($HighlightEnd)                                                               $($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
@@ -116,10 +120,6 @@ function Out-DiffString
                 $diffHex = "$($HighlightStart)$diffHex$($HighlightEnd)"
                 $diffChar = "$($HighlightStart)$diffChar$($HighlightEnd)"
             }
-
-            # Escape $HighlightStart and $HighlightEnd for regex matching
-            $escapedHighlightStart = [regex]::Escape($HighlightStart)
-            $escapedHighlightEnd = [regex]::Escape($HighlightEnd)
 
             # Replace control characters with their Unicode representations in the output
             $refChar = $refChar -replace "`0", '␀' -replace "`a", '␇' -replace "`b", '␈' -replace "`t", '␉' -replace "`f", '␌' -replace "`r", '␍' -replace "`n", '␊' -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
