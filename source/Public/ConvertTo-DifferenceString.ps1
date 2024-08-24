@@ -1,3 +1,82 @@
+<#
+    .SYNOPSIS
+        Converts two strings into a difference string, highlighting the differences
+        between them.
+
+    .DESCRIPTION
+        The ConvertTo-DifferenceString command takes two strings, a reference string
+        and a difference string, and converts them into a difference string that
+        highlights the differences between the two strings. The function compares
+        the byte values of each character in the strings and outputs the differences
+        in a formatted manner. It supports customizing the indicators, labels, colors,
+        and encoding type.
+
+    .PARAMETER ReferenceString
+        Specifies the reference string to compare against.
+
+    .PARAMETER DifferenceString
+        Specifies the difference string to compare.
+
+    .PARAMETER EqualIndicator
+        Specifies the indicator to use for equal bytes. Default is '=='.
+
+    .PARAMETER NotEqualIndicator
+        Specifies the indicator to use for not equal bytes. Default is '!='.
+
+    .PARAMETER HighlightStart
+        Specifies the ANSI escape sequence to start highlighting. Default is
+        "`e[31m" (red color).
+
+    .PARAMETER HighlightEnd
+        Specifies the ANSI escape sequence to end highlighting. Default is
+        "`e[0m" (reset color).
+
+    .PARAMETER ReferenceLabel
+        Specifies the label for the reference string. Default is 'Expected:'.
+
+    .PARAMETER DifferenceLabel
+        Specifies the label for the difference string. Default is 'But was:'.
+
+    .PARAMETER NoColumnHeader
+        Specifies whether to exclude the column header from the output.
+
+    .PARAMETER NoLabels
+        Specifies whether to exclude the labels from the output.
+
+    .PARAMETER ReferenceLabelAnsi
+        Specifies the ANSI escape sequence to apply to the reference label.
+
+    .PARAMETER DifferenceLabelAnsi
+        Specifies the ANSI escape sequence to apply to the difference label.
+
+    .PARAMETER ColumnHeaderAnsi
+        Specifies the ANSI escape sequence to apply to the column header.
+
+    .PARAMETER ColumnHeaderResetAnsi
+        Specifies the ANSI escape sequence to reset the column header.
+
+    .PARAMETER EncodingType
+        Specifies the encoding type to use for converting the strings to byte arrays.
+        Default is 'UTF8'.
+
+    .EXAMPLE
+        PS> ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo'
+
+        Expected:                                                               But was:
+        ----------------------------------------------------------------        --------------------------------------------------------
+        Bytes                                           Ascii                   Bytes                                           Ascii
+        -----                                           -----                   -----                                           -----
+        48 65 6C 6C 6F                                  Hello              ==   48 61 6C 6C 6F                                  Hallo
+
+        Converts the reference string 'Hello' and the difference string 'Hallo'
+        into a difference string, highlighting the differences.
+
+    .INPUTS
+        None.
+
+    .OUTPUTS
+        System.String.
+#>
 function ConvertTo-DifferenceString
 {
     [CmdletBinding()]
