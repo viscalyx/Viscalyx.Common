@@ -104,11 +104,11 @@ function ConvertTo-DifferenceString
 
         [Parameter()]
         [System.String]
-        $HighlightStart = "`e[31m", # Default to red color
+        $HighlightStart = '[31m', # Default to red color
 
         [Parameter()]
         [System.String]
-        $HighlightEnd = "`e[0m", # Default to reset color
+        $HighlightEnd = '[0m', # Default to reset color
 
         [Parameter()]
         [System.String]
@@ -147,6 +147,13 @@ function ConvertTo-DifferenceString
         [System.String]
         $EncodingType = 'UTF8'
     )
+
+    $HighlightStart = ConvertTo-AnsiSequence -Value $HighlightStart
+    $HighlightEnd = ConvertTo-AnsiSequence -Value $HighlightEnd
+    $ReferenceLabelAnsi = ConvertTo-AnsiSequence -Value $ReferenceLabelAnsi
+    $DifferenceLabelAnsi = ConvertTo-AnsiSequence -Value $DifferenceLabelAnsi
+    $ColumnHeaderAnsi = ConvertTo-AnsiSequence -Value $ColumnHeaderAnsi
+    $ColumnHeaderResetAnsi = ConvertTo-AnsiSequence -Value $ColumnHeaderResetAnsi
 
     # Handle empty string or single character indicator
     $NotEqualIndicator = $NotEqualIndicator.PadRight(2)
