@@ -25,11 +25,11 @@
 
     .PARAMETER HighlightStart
         Specifies the ANSI escape sequence to start highlighting. Default is
-        "`e[31m" (red color).
+        "[31m" (red color).
 
     .PARAMETER HighlightEnd
         Specifies the ANSI escape sequence to end highlighting. Default is
-        "`e[0m" (reset color).
+        "[0m" (reset color).
 
     .PARAMETER ReferenceLabel
         Specifies the label for the reference string. Default is 'Expected:'.
@@ -80,6 +80,7 @@
 function ConvertTo-DifferenceString
 {
     [CmdletBinding()]
+    [OutputType([System.String])]
     param
     (
         [Parameter(Mandatory = $true)]
