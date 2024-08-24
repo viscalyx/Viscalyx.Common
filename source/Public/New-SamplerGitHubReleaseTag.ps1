@@ -1,7 +1,64 @@
+<#
+    .SYNOPSIS
+        Creates a new GitHub release tag for the Sampler project.
+
+    .DESCRIPTION
+        The New-SamplerGitHubReleaseTag function creates a new release tag for the
+        Sampler project on GitHub. It performs the following steps:
+
+        1. Checks if the 'main' branch exists and throws an error if it doesn't.
+        2. Checks if the 'origin' remote exists and throws an error if it doesn't.
+        3. Optionally switches back to the previous branch.
+        4. Checks out the 'main' branch.
+        5. Fetches the 'main' branch from the 'origin' remote.
+        6. Rebases the local 'main' branch with the 'origin/main' branch.
+        7. Gets the last commit ID of the 'main' branch.
+        8. Fetches tags from the 'origin' remote.
+        9. If no release tag is specified, it checks if there are any tags in the local repository and selects the latest preview tag.
+        10. Creates a new tag with the specified release tag.
+        11. Optionally pushes the tag to the 'origin' remote.
+        12. Switches back to the previous branch if requested.
+
+    .PARAMETER DefaultBranchName
+        Specifies the name of the default branch. Default value is 'main'.
+
+    .PARAMETER UpstreamRemoteName
+        Specifies the name of the upstream remote. Default value is 'origin'.
+
+    .PARAMETER ReleaseTag
+        Specifies the release tag to create. Must be in the format 'vX.X.X'. If
+        not specified, the latest preview tag will be used.
+
+    .PARAMETER SwitchBackToPreviousBranch
+        Specifies that the command should switches back to the previous branch after
+        creating the release tag.
+
+    .PARAMETER Force
+        Specifies that the command should run without prompting for confirmation.
+
+    .PARAMETER PushTag
+        Specifies that the tag should also be pushed to the upstream remote after
+        creating it. This will always ask for confirmation before pushing the tag,
+        unless Force is also specified.
+
+    .EXAMPLE
+        New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -PushTag
+
+        Creates a new release tag with the specified tag 'v1.0.0' and pushes it
+        to the 'origin' remote.
+
+    .EXAMPLE
+        New-SamplerGitHubReleaseTag -SwitchBackToPreviousBranch
+
+        Creates a new release tag and switches back to the previous branch.
+
+    .NOTES
+        This function requires Git to be installed and accessible from the command
+        line.
+#>
 function New-SamplerGitHubReleaseTag
 {
-    # TODO: Change to Medium impact once the function is stable.
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param
     (
         [Parameter()]
@@ -23,7 +80,11 @@ function New-SamplerGitHubReleaseTag
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
-        $Force
+        $Force,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $PushTag
     )
 
     if ($Force.IsPresent -and -not $Confirm)
@@ -31,9 +92,21 @@ function New-SamplerGitHubReleaseTag
         $ConfirmPreference = 'None'
     }
 
-    # TODO: Check if 'main' branch exists and throw an error if it doesn't.
+    # Check if the remote specified in $UpstreamRemoteName exists locally and throw an error if it doesn't.
+    $remoteExists = git remote | Where-Object -FilterScript { $_ -eq $UpstreamRemoteName }
 
-    # TODO: Check if 'origin' remote exists and throw an error if it doesn't.
+    if (-not $remoteExists)
+    {
+        throw "Remote '$UpstreamRemoteName' does not exist in the local git repository."
+    }
+
+    # Fetch $DefaultBranchName from upstream and throw an error if it doesn't exist.
+    git fetch $UpstreamRemoteName $DefaultBranchName
+
+    if ($LASTEXITCODE -ne 0)
+    {
+        throw "Branch '$DefaultBranchName' does not exist in the upstream remote '$UpstreamRemoteName'."
+    }
 
     if ($SwitchBackToPreviousBranch.IsPresent)
     {
@@ -196,8 +269,17 @@ function New-SamplerGitHubReleaseTag
     {
         git tag $ReleaseTag
 
-        # cSpell: disable-next-line
-        Write-Information -MessageData ("`e[32mTag `e[1;37;44m{0}`e[0m`e[32m created, push tag to upstream by running `e[1;37;44mgit push {1} --tags`e[0m`e[32m.`e[0m" -f $ReleaseTag, $UpstreamRemoteName ) -InformationAction Continue
+        if ($PushTag -and ($Force -or $PSCmdlet.ShouldContinue(('Do you want to push the tags to the upstream ''{0}''?' -f $UpstreamRemoteName), 'Confirm')))
+        {
+            git push origin --tags
+
+            Write-Information -MessageData ("`e[32mTag `e[1;37;44m{0}`e[0m`e[32m was created and pushed to upstream '{1}'`e[0m" -f $ReleaseTag, $UpstreamRemoteName) -InformationAction Continue
+        }
+        else
+        {
+            # cSpell: disable-next-line
+            Write-Information -MessageData ("`e[32mTag `e[1;37;44m{0}`e[0m`e[32m was created. To push the tag to upstream, run `e[1;37;44mgit push {1} --tags`e[0m`e[32m.`e[0m" -f $ReleaseTag, $UpstreamRemoteName) -InformationAction Continue
+        }
     }
 
     if ($SwitchBackToPreviousBranch.IsPresent)

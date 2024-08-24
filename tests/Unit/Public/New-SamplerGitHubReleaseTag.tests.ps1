@@ -56,6 +56,11 @@ Describe 'New-SamplerGitHubReleaseTag' {
 
             switch ($args[0])
             {
+                'remote'
+                {
+                    return 'origin' # Default remote name
+                }
+
                 'rev-parse'
                 {
                     if ($args[1] -eq '--abbrev-ref' -and $args[2] -eq 'HEAD')
@@ -109,17 +114,21 @@ Describe 'New-SamplerGitHubReleaseTag' {
         It 'Should throw if branch does not exist' {
             {
                 New-SamplerGitHubReleaseTag -DefaultBranchName 'UnknownBranchName' -ReleaseTag 'v1.0.0' -Force
-            } | Should -Throw 'Failed to checkout branch UnknownBranchName. Make sure the branch exists in the local git repository.'
+            } | Should -Throw 'Branch ''UnknownBranchName'' does not exist in the upstream remote ''origin''.'
         }
 
         It 'Should throw if remote does not exist' {
             {
                 New-SamplerGitHubReleaseTag -UpstreamRemoteName 'UnknownRemoteName' -ReleaseTag 'v1.0.0' -Force
-            } | Should -Throw 'Failed to checkout branch main. Make sure the branch exists in the local git repository.'
+            } | Should -Throw 'Remote ''UnknownRemoteName'' does not exist in the local git repository.'
         }
     }
 
     It 'Should switch back to previous branch if specified' {
         { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -SwitchBackToPreviousBranch -Force } | Should -Not -Throw
+    }
+
+    It 'Should push tag to upstream if specified' {
+        { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -PushTag -Force } | Should -Not -Throw
     }
 }
