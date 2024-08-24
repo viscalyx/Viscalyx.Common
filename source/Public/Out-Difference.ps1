@@ -91,10 +91,12 @@ function Out-Difference
         $Difference,
 
         [Parameter()]
+        [ValidateLength(0, 2)]
         [System.String]
         $EqualIndicator,
 
         [Parameter()]
+        [ValidateLength(0, 2)]
         [System.String]
         $NotEqualIndicator,
 

@@ -93,10 +93,12 @@ function ConvertTo-DifferenceString
         $DifferenceString,
 
         [Parameter()]
+        [ValidateLength(0, 2)]
         [System.String]
         $EqualIndicator = '==',
 
         [Parameter()]
+        [ValidateLength(0, 2)]
         [System.String]
         $NotEqualIndicator = '!=',
 
@@ -145,6 +147,10 @@ function ConvertTo-DifferenceString
         [System.String]
         $EncodingType = 'UTF8'
     )
+
+    # Handle empty string or single character indicator
+    $NotEqualIndicator = $NotEqualIndicator.PadRight(2)
+    $EqualIndicator = $EqualIndicator.PadRight(2)
 
     # Convert the strings to byte arrays using the specified encoding
     $referenceBytes = ([System.Text.Encoding]::$EncodingType).GetBytes($ReferenceString)
