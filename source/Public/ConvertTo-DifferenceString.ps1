@@ -79,6 +79,7 @@
 #>
 function ConvertTo-DifferenceString
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseBOMForUnicodeEncodedFile', '', Justification = 'This file is not intended to be saved as a Unicode-encoded file even though it has unicode characters, if that is a problem that can be re-evaluated.')]
     [CmdletBinding()]
     [OutputType([System.String])]
     param
@@ -230,8 +231,25 @@ function ConvertTo-DifferenceString
         }
 
         # Replace control characters with their Unicode representations in the output
-        $refChar = $refChar -replace "`0", '␀' -replace "`a", '␇' -replace "`b", '␈' -replace "`t", '␉' -replace "`f", '␌' -replace "`r", '␍' -replace "`n", '␊' -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
-        $diffChar = $diffChar -replace "`0", '␀' -replace "`a", '␇' -replace "`b", '␈' -replace "`t", '␉' -replace "`f", '␌' -replace "`r", '␍' -replace "`n", '␊' -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
+        $refChar = $refChar`
+            -replace "`0", '␀' `
+            -replace "`a", '␇' `
+            -replace "`b", '␈' `
+            -replace "`t", '␉' `
+            -replace "`f", '␌' `
+            -replace "`r", '␍' `
+            -replace "`n", '␊' `
+            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
+
+        $diffChar = $diffChar `
+            -replace "`0", '␀' `
+            -replace "`a", '␇' `
+            -replace "`b", '␈' `
+            -replace "`t", '␉' `
+            -replace "`f", '␌' `
+            -replace "`r", '␍' `
+            -replace "`n", '␊' `
+            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
 
         # Add to arrays
         $refHexArray += $refHex
