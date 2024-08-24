@@ -67,7 +67,7 @@ function ConvertTo-DifferenceString
         $EncodingType = 'UTF8'
     )
 
-    # Convert the strings to byte arrays using UTF-8 encoding
+    # Convert the strings to byte arrays using the specified encoding
     $referenceBytes = ([System.Text.Encoding]::$EncodingType).GetBytes($ReferenceString)
     $differenceBytes = ([System.Text.Encoding]::$EncodingType).GetBytes($DifferenceString)
 
