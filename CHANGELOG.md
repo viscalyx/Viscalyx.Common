@@ -8,12 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Public commands:
-  - `ConvertTo-DiffString`
+  - `ConvertTo-DifferenceString`
   - `Get-NumericalSequence`
   - `Get-PSReadLineHistory`
   - `New-SamplerGitHubReleaseTag`
-  - `Out-Diff`
-  - `Out-DiffString`
+  - `Out-Difference`
   - `Pop-VMLatestSnapShot`
   - `Remove-History`
   - `Remove-PSHistory`
