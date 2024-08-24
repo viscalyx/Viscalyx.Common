@@ -196,7 +196,8 @@ function New-SamplerGitHubReleaseTag
     {
         git tag $ReleaseTag
 
-        Write-Information -MessageData "`e[32mTag created, push tag to upstream by running 'git push $UpstreamRemoteName --tags'`e[0m" -InformationAction Continue
+        # cSpell: disable-next-line
+        Write-Information -MessageData ("`e[32mTag `e[1;37;44m{0}`e[0m`e[32m created, push tag to upstream by running `e[1;37;44mgit push {1} --tags`e[0m`e[32m.`e[0m" -f $ReleaseTag, $UpstreamRemoteName ) -InformationAction Continue
     }
 
     if ($SwitchBackToPreviousBranch.IsPresent)
