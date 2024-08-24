@@ -43,6 +43,7 @@ AfterAll {
 }
 
 Describe 'Out-Difference' {
+    # cSpell: disable
     Context 'When there are multiple lines' {
         It 'Should output to console' {
             $expected = @(
@@ -266,24 +267,24 @@ Describe 'Out-Difference' {
             $result = Out-Difference -Reference $expected -Difference $actual
 
             $result | Should-BeBlockString @(
-                "Expected:[0m                                                               But was:[0m"
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m   !=   [31m4D[0m [31m79[0m [31m20[0m [31m53[0m [31m74[0m [31m72[0m [31m69[0m [31m6E[0m [31m67[0m [31m20[0m [31m76[0m [31m65[0m [31m72[0m [31m79[0m [31m20[0m [31m6C[0m [31mM[0m[31my[0m[31m [0m[31mS[0m[31mt[0m[31mr[0m[31mi[0m[31mn[0m[31mg[0m[31m [0m[31mv[0m[31me[0m[31mr[0m[31my[0m[31m [0m[31ml[0m"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m   !=   [31m6F[0m [31m6E[0m [31m67[0m [31m20[0m [31m73[0m [31m74[0m [31m72[0m [31m69[0m [31m6E[0m [31m67[0m [31m20[0m [31m74[0m [31m68[0m [31m61[0m [31m74[0m [31m20[0m [31mo[0m[31mn[0m[31mg[0m[31m [0m[31ms[0m[31mt[0m[31mr[0m[31mi[0m[31mn[0m[31mg[0m[31m [0m[31mt[0m[31mh[0m[31ma[0m[31mt[0m[31m [0m"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m   !=   [31m69[0m [31m73[0m [31m20[0m [31m6C[0m [31m6F[0m [31m6E[0m [31m67[0m [31m65[0m [31m72[0m [31m20[0m [31m74[0m [31m68[0m [31m61[0m [31m6E[0m [31m20[0m [31m61[0m [31mi[0m[31ms[0m[31m [0m[31ml[0m[31mo[0m[31mn[0m[31mg[0m[31me[0m[31mr[0m[31m [0m[31mt[0m[31mh[0m[31ma[0m[31mn[0m[31m [0m[31ma[0m"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m                                  [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m              !=   [31m63[0m [31m74[0m [31m75[0m [31m61[0m [31m6C[0m                                  [31mc[0m[31mt[0m[31mu[0m[31ma[0m[31ml[0m           "
-                "Expected:[0m                                                               But was:[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m   !=   `e[31m4D`e[0m `e[31m79`e[0m `e[31m20`e[0m `e[31m53`e[0m `e[31m74`e[0m `e[31m72`e[0m `e[31m69`e[0m `e[31m6E`e[0m `e[31m67`e[0m `e[31m20`e[0m `e[31m76`e[0m `e[31m65`e[0m `e[31m72`e[0m `e[31m79`e[0m `e[31m20`e[0m `e[31m6C`e[0m `e[31mM`e[0m`e[31my`e[0m`e[31m `e[0m`e[31mS`e[0m`e[31mt`e[0m`e[31mr`e[0m`e[31mi`e[0m`e[31mn`e[0m`e[31mg`e[0m`e[31m `e[0m`e[31mv`e[0m`e[31me`e[0m`e[31mr`e[0m`e[31my`e[0m`e[31m `e[0m`e[31ml`e[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m   !=   `e[31m6F`e[0m `e[31m6E`e[0m `e[31m67`e[0m `e[31m20`e[0m `e[31m73`e[0m `e[31m74`e[0m `e[31m72`e[0m `e[31m69`e[0m `e[31m6E`e[0m `e[31m67`e[0m `e[31m20`e[0m `e[31m74`e[0m `e[31m68`e[0m `e[31m61`e[0m `e[31m74`e[0m `e[31m20`e[0m `e[31mo`e[0m`e[31mn`e[0m`e[31mg`e[0m`e[31m `e[0m`e[31ms`e[0m`e[31mt`e[0m`e[31mr`e[0m`e[31mi`e[0m`e[31mn`e[0m`e[31mg`e[0m`e[31m `e[0m`e[31mt`e[0m`e[31mh`e[0m`e[31ma`e[0m`e[31mt`e[0m`e[31m `e[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m   !=   `e[31m69`e[0m `e[31m73`e[0m `e[31m20`e[0m `e[31m6C`e[0m `e[31m6F`e[0m `e[31m6E`e[0m `e[31m67`e[0m `e[31m65`e[0m `e[31m72`e[0m `e[31m20`e[0m `e[31m74`e[0m `e[31m68`e[0m `e[31m61`e[0m `e[31m6E`e[0m `e[31m20`e[0m `e[31m61`e[0m `e[31mi`e[0m`e[31ms`e[0m`e[31m `e[0m`e[31ml`e[0m`e[31mo`e[0m`e[31mn`e[0m`e[31mg`e[0m`e[31me`e[0m`e[31mr`e[0m`e[31m `e[0m`e[31mt`e[0m`e[31mh`e[0m`e[31ma`e[0m`e[31mn`e[0m`e[31m `e[0m`e[31ma`e[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m                                  `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m              !=   `e[31m63`e[0m `e[31m74`e[0m `e[31m75`e[0m `e[31m61`e[0m `e[31m6C`e[0m                                  `e[31mc`e[0m`e[31mt`e[0m`e[31mu`e[0m`e[31ma`e[0m`e[31ml`e[0m           "
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m                               [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m             !=   [31m4C[0m [31m69[0m [31m6E[0m [31m65[0m [31m20[0m [31m32[0m                               [31mL[0m[31mi[0m[31mn[0m[31me[0m[31m [0m[31m2[0m          "
-                "Expected:[0m                                                               But was:[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m                               `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m             !=   `e[31m4C`e[0m `e[31m69`e[0m `e[31m6E`e[0m `e[31m65`e[0m `e[31m20`e[0m `e[31m32`e[0m                               `e[31mL`e[0m`e[31mi`e[0m`e[31mn`e[0m`e[31me`e[0m`e[31m `e[0m`e[31m2`e[0m          "
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m                               [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m             !=   [31m4C[0m [31m69[0m [31m6E[0m [31m65[0m [31m20[0m [31m33[0m                               [31mL[0m[31mi[0m[31mn[0m[31me[0m[31m [0m[31m3[0m          "
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m                               `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m             !=   `e[31m4C`e[0m `e[31m69`e[0m `e[31m6E`e[0m `e[31m65`e[0m `e[31m20`e[0m `e[31m33`e[0m                               `e[31mL`e[0m`e[31mi`e[0m`e[31mn`e[0m`e[31me`e[0m`e[31m `e[0m`e[31m3`e[0m          "
             )
         }
     }
@@ -300,24 +301,24 @@ Describe 'Out-Difference' {
             $result = Out-Difference -Reference $expected -Difference $actual
 
             $result | Should-BeBlockString @(
-                "Expected:[0m                                                               But was:[0m"
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m   !=   [31m4D[0m [31m79[0m [31m20[0m [31m53[0m [31m74[0m [31m72[0m [31m69[0m [31m6E[0m [31m67[0m [31m20[0m [31m76[0m [31m65[0m [31m72[0m [31m79[0m [31m20[0m [31m6C[0m [31mM[0m[31my[0m[31m [0m[31mS[0m[31mt[0m[31mr[0m[31mi[0m[31mn[0m[31mg[0m[31m [0m[31mv[0m[31me[0m[31mr[0m[31my[0m[31m [0m[31ml[0m"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m   !=   [31m6F[0m [31m6E[0m [31m67[0m [31m20[0m [31m73[0m [31m74[0m [31m72[0m [31m69[0m [31m6E[0m [31m67[0m [31m20[0m [31m74[0m [31m68[0m [31m61[0m [31m74[0m [31m20[0m [31mo[0m[31mn[0m[31mg[0m[31m [0m[31ms[0m[31mt[0m[31mr[0m[31mi[0m[31mn[0m[31mg[0m[31m [0m[31mt[0m[31mh[0m[31ma[0m[31mt[0m[31m [0m"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m   !=   [31m69[0m [31m73[0m [31m20[0m [31m6C[0m [31m6F[0m [31m6E[0m [31m67[0m [31m65[0m [31m72[0m [31m20[0m [31m74[0m [31m68[0m [31m61[0m [31m6E[0m [31m20[0m [31m61[0m [31mi[0m[31ms[0m[31m [0m[31ml[0m[31mo[0m[31mn[0m[31mg[0m[31me[0m[31mr[0m[31m [0m[31mt[0m[31mh[0m[31ma[0m[31mn[0m[31m [0m[31ma[0m"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m                                  [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m              !=   [31m63[0m [31m74[0m [31m75[0m [31m61[0m [31m6C[0m                                  [31mc[0m[31mt[0m[31mu[0m[31ma[0m[31ml[0m           "
-                "Expected:[0m                                                               But was:[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m   !=   `e[31m4D`e[0m `e[31m79`e[0m `e[31m20`e[0m `e[31m53`e[0m `e[31m74`e[0m `e[31m72`e[0m `e[31m69`e[0m `e[31m6E`e[0m `e[31m67`e[0m `e[31m20`e[0m `e[31m76`e[0m `e[31m65`e[0m `e[31m72`e[0m `e[31m79`e[0m `e[31m20`e[0m `e[31m6C`e[0m `e[31mM`e[0m`e[31my`e[0m`e[31m `e[0m`e[31mS`e[0m`e[31mt`e[0m`e[31mr`e[0m`e[31mi`e[0m`e[31mn`e[0m`e[31mg`e[0m`e[31m `e[0m`e[31mv`e[0m`e[31me`e[0m`e[31mr`e[0m`e[31my`e[0m`e[31m `e[0m`e[31ml`e[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m   !=   `e[31m6F`e[0m `e[31m6E`e[0m `e[31m67`e[0m `e[31m20`e[0m `e[31m73`e[0m `e[31m74`e[0m `e[31m72`e[0m `e[31m69`e[0m `e[31m6E`e[0m `e[31m67`e[0m `e[31m20`e[0m `e[31m74`e[0m `e[31m68`e[0m `e[31m61`e[0m `e[31m74`e[0m `e[31m20`e[0m `e[31mo`e[0m`e[31mn`e[0m`e[31mg`e[0m`e[31m `e[0m`e[31ms`e[0m`e[31mt`e[0m`e[31mr`e[0m`e[31mi`e[0m`e[31mn`e[0m`e[31mg`e[0m`e[31m `e[0m`e[31mt`e[0m`e[31mh`e[0m`e[31ma`e[0m`e[31mt`e[0m`e[31m `e[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m   !=   `e[31m69`e[0m `e[31m73`e[0m `e[31m20`e[0m `e[31m6C`e[0m `e[31m6F`e[0m `e[31m6E`e[0m `e[31m67`e[0m `e[31m65`e[0m `e[31m72`e[0m `e[31m20`e[0m `e[31m74`e[0m `e[31m68`e[0m `e[31m61`e[0m `e[31m6E`e[0m `e[31m20`e[0m `e[31m61`e[0m `e[31mi`e[0m`e[31ms`e[0m`e[31m `e[0m`e[31ml`e[0m`e[31mo`e[0m`e[31mn`e[0m`e[31mg`e[0m`e[31me`e[0m`e[31mr`e[0m`e[31m `e[0m`e[31mt`e[0m`e[31mh`e[0m`e[31ma`e[0m`e[31mn`e[0m`e[31m `e[0m`e[31ma`e[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m                                  `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m              !=   `e[31m63`e[0m `e[31m74`e[0m `e[31m75`e[0m `e[31m61`e[0m `e[31m6C`e[0m                                  `e[31mc`e[0m`e[31mt`e[0m`e[31mu`e[0m`e[31ma`e[0m`e[31ml`e[0m           "
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m                               [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m             !=   [31m4C[0m [31m69[0m [31m6E[0m [31m65[0m [31m20[0m [31m32[0m                               [31mL[0m[31mi[0m[31mn[0m[31me[0m[31m [0m[31m2[0m          "
-                "Expected:[0m                                                               But was:[0m"
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m                               `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m             !=   `e[31m4C`e[0m `e[31m69`e[0m `e[31m6E`e[0m `e[31m65`e[0m `e[31m20`e[0m `e[31m32`e[0m                               `e[31mL`e[0m`e[31mi`e[0m`e[31mn`e[0m`e[31me`e[0m`e[31m `e[0m`e[31m2`e[0m          "
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
-                "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m                               [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m             !=   [31m4C[0m [31m69[0m [31m6E[0m [31m65[0m [31m20[0m [31m33[0m                               [31mL[0m[31mi[0m[31mn[0m[31me[0m[31m [0m[31m3[0m          "
+                "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m                               `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m             !=   `e[31m4C`e[0m `e[31m69`e[0m `e[31m6E`e[0m `e[31m65`e[0m `e[31m20`e[0m `e[31m33`e[0m                               `e[31mL`e[0m`e[31mi`e[0m`e[31mn`e[0m`e[31me`e[0m`e[31m `e[0m`e[31m3`e[0m          "
             )
         }
     }
@@ -341,7 +342,7 @@ Describe 'Out-Difference' {
             $result = Out-Difference -Reference $expected -Difference $actual
 
             $result | Should-BeBlockString @(
-                "Expected:[0m                                                               But was:[0m"
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
@@ -358,7 +359,7 @@ Describe 'Out-Difference' {
                 $result = Out-Difference -Reference $expected -Difference $actual -EqualIndicator '='
 
                 $result | Should-BeBlockString @(
-                    "Expected:[0m                                                               But was:[0m"
+                    "Expected:`e[0m                                                               But was:`e[0m"
                     "----------------------------------------------------------------        ----------------------------------------------------------------"
                     "Bytes                                           Ascii                   Bytes                                           Ascii"
                     "-----                                           -----                   -----                                           -----"
@@ -375,12 +376,12 @@ Describe 'Out-Difference' {
                 $result = Out-Difference -Reference $expected -Difference $actual -NotEqualIndicator '!'
 
                 $result | Should-BeBlockString @(
-                    "Expected:[0m                                                               But was:[0m"
+                    "Expected:`e[0m                                                               But was:`e[0m"
                     "----------------------------------------------------------------        ----------------------------------------------------------------"
                     "Bytes                                           Ascii                   Bytes                                           Ascii"
                     "-----                                           -----                   -----                                           -----"
-                    "54 68 69 73 20 69 73 20 61 [31m20[0m [31m74[0m [31m65[0m [31m73[0m [31m74[0m [31m  [0m [31m  [0m This is a[31m [0m[31mt[0m[31me[0m[31ms[0m[31mt[0m[31m [0m[31m [0m   !    54 68 69 73 20 69 73 20 61 [31m6E[0m [31m6F[0m [31m74[0m [31m68[0m [31m65[0m [31m72[0m [31m20[0m This is a[31mn[0m[31mo[0m[31mt[0m[31mh[0m[31me[0m[31mr[0m[31m [0m"
-                    "[31m  [0m [31m  [0m [31m  [0m [31m  [0m                                     [31m [0m[31m [0m[31m [0m[31m [0m               !    [31m74[0m [31m65[0m [31m73[0m [31m74[0m                                     [31mt[0m[31me[0m[31ms[0m[31mt[0m            "
+                    "54 68 69 73 20 69 73 20 61 `e[31m20`e[0m `e[31m74`e[0m `e[31m65`e[0m `e[31m73`e[0m `e[31m74`e[0m `e[31m  `e[0m `e[31m  `e[0m This is a`e[31m `e[0m`e[31mt`e[0m`e[31me`e[0m`e[31ms`e[0m`e[31mt`e[0m`e[31m `e[0m`e[31m `e[0m   !    54 68 69 73 20 69 73 20 61 `e[31m6E`e[0m `e[31m6F`e[0m `e[31m74`e[0m `e[31m68`e[0m `e[31m65`e[0m `e[31m72`e[0m `e[31m20`e[0m This is a`e[31mn`e[0m`e[31mo`e[0m`e[31mt`e[0m`e[31mh`e[0m`e[31me`e[0m`e[31mr`e[0m`e[31m `e[0m"
+                    "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m                                     `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m               !    `e[31m74`e[0m `e[31m65`e[0m `e[31m73`e[0m `e[31m74`e[0m                                     `e[31mt`e[0m`e[31me`e[0m`e[31ms`e[0m`e[31mt`e[0m            "
                 )
             }
         }
@@ -393,12 +394,12 @@ Describe 'Out-Difference' {
                 $result = Out-Difference -Reference $expected -Difference $actual
 
                 $result | Should-BeBlockString @(
-                    "Expected:[0m                                                               But was:[0m"
+                    "Expected:`e[0m                                                               But was:`e[0m"
                     "----------------------------------------------------------------        ----------------------------------------------------------------"
                     "Bytes                                           Ascii                   Bytes                                           Ascii"
                     "-----                                           -----                   -----                                           -----"
-                    "54 68 69 73 20 [31m69[0m 73 0D 0A [31m61[0m [31m20[0m [31m74[0m [31m65[0m [31m73[0m [31m74[0m [31m  [0m This [31mi[0ms␍␊[31ma[0m[31m [0m[31mt[0m[31me[0m[31ms[0m[31mt[0m[31m [0m   !=   54 68 69 73 20 [31m49[0m 73 0D 0A [31m41[0m [31m6E[0m [31m6F[0m [31m74[0m [31m68[0m [31m65[0m [31m72[0m This [31mI[0ms␍␊[31mA[0m[31mn[0m[31mo[0m[31mt[0m[31mh[0m[31me[0m[31mr[0m"
-                    "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m                               [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m             !=   [31m0D[0m [31m0A[0m [31m54[0m [31m65[0m [31m73[0m [31m74[0m                               [31m␍[0m[31m␊[0m[31mT[0m[31me[0m[31ms[0m[31mt[0m          "
+                    "54 68 69 73 20 `e[31m69`e[0m 73 0D 0A `e[31m61`e[0m `e[31m20`e[0m `e[31m74`e[0m `e[31m65`e[0m `e[31m73`e[0m `e[31m74`e[0m `e[31m  `e[0m This `e[31mi`e[0ms␍␊`e[31ma`e[0m`e[31m `e[0m`e[31mt`e[0m`e[31me`e[0m`e[31ms`e[0m`e[31mt`e[0m`e[31m `e[0m   !=   54 68 69 73 20 `e[31m49`e[0m 73 0D 0A `e[31m41`e[0m `e[31m6E`e[0m `e[31m6F`e[0m `e[31m74`e[0m `e[31m68`e[0m `e[31m65`e[0m `e[31m72`e[0m This `e[31mI`e[0ms␍␊`e[31mA`e[0m`e[31mn`e[0m`e[31mo`e[0m`e[31mt`e[0m`e[31mh`e[0m`e[31me`e[0m`e[31mr`e[0m"
+                    "`e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m                               `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m             !=   `e[31m0D`e[0m `e[31m0A`e[0m `e[31m54`e[0m `e[31m65`e[0m `e[31m73`e[0m `e[31m74`e[0m                               `e[31m␍`e[0m`e[31m␊`e[0m`e[31mT`e[0m`e[31me`e[0m`e[31ms`e[0m`e[31mt`e[0m          "
                 )
             }
         }
@@ -411,17 +412,17 @@ Describe 'Out-Difference' {
                 $result = Out-Difference -Reference $expected -Difference $actual
 
                 $result | Should-BeBlockString @(
-                    "Expected:[0m                                                               But was:[0m"
+                    "Expected:`e[0m                                                               But was:`e[0m"
                     "----------------------------------------------------------------        ----------------------------------------------------------------"
                     "Bytes                                           Ascii                   Bytes                                           Ascii"
                     "-----                                           -----                   -----                                           -----"
-                    "[31m54[0m 65 73 74                                     [31mT[0mest               !=   [31m74[0m 65 73 74                                     [31mt[0mest            "
-                    "Expected:[0m                                                               But was:[0m"
+                    "`e[31m54`e[0m 65 73 74                                     `e[31mT`e[0mest               !=   `e[31m74`e[0m 65 73 74                                     `e[31mt`e[0mest            "
+                    "Expected:`e[0m                                                               But was:`e[0m"
                     "----------------------------------------------------------------        ----------------------------------------------------------------"
                     "Bytes                                           Ascii                   Bytes                                           Ascii"
                     "-----                                           -----                   -----                                           -----"
                     "61                                              a                  ==   61                                              a               "
-                    "Expected:[0m                                                               But was:[0m"
+                    "Expected:`e[0m                                                               But was:`e[0m"
                     "----------------------------------------------------------------        ----------------------------------------------------------------"
                     "Bytes                                           Ascii                   Bytes                                           Ascii"
                     "-----                                           -----                   -----                                           -----"
@@ -438,11 +439,11 @@ Describe 'Out-Difference' {
                 $result = Out-Difference -Reference $expected -Difference $actual -ConcatenateArray -ConcatenateChar ''
 
                 $result | Should-BeBlockString @(
-                    "Expected:[0m                                                               But was:[0m"
+                    "Expected:`e[0m                                                               But was:`e[0m"
                     "----------------------------------------------------------------        ----------------------------------------------------------------"
                     "Bytes                                           Ascii                   Bytes                                           Ascii"
                     "-----                                           -----                   -----                                           -----"
-                    "[31m54[0m 65 73 74 61 62                               [31mT[0mestab             !=   [31m74[0m 65 73 74 61 62                               [31mt[0mestab          "
+                    "`e[31m54`e[0m 65 73 74 61 62                               `e[31mT`e[0mestab             !=   `e[31m74`e[0m 65 73 74 61 62                               `e[31mt`e[0mestab          "
                 )
             }
         }
@@ -456,13 +457,13 @@ Describe 'Out-Difference' {
             $result = Out-Difference -Reference $expected -Difference $actual
 
             $result | Should-BeBlockString @(
-                "Expected:[0m                                                               But was:[0m"
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
                 "54 68 69 73 20 69 73 20 61 20 74 65 73 74 20 73 This is a test s   ==   54 68 69 73 20 69 73 20 61 20 74 65 73 74 20 73 This is a test s"
-                "74 72 69 6E 67 [31m20[0m [31m74[0m [31m68[0m [31m61[0m [31m74[0m [31m20[0m [31m69[0m [31m73[0m [31m20[0m [31m71[0m [31m75[0m tring[31m [0m[31mt[0m[31mh[0m[31ma[0m[31mt[0m[31m [0m[31mi[0m[31ms[0m[31m [0m[31mq[0m[31mu[0m   !=   74 72 69 6E 67 [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m tring[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m"
-                "[31m69[0m [31m74[0m [31m65[0m [31m20[0m [31m6C[0m [31m6F[0m [31m6E[0m [31m67[0m                         [31mi[0m[31mt[0m[31me[0m[31m [0m[31ml[0m[31mo[0m[31mn[0m[31mg[0m           !=   [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m                         [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m        "
+                "74 72 69 6E 67 `e[31m20`e[0m `e[31m74`e[0m `e[31m68`e[0m `e[31m61`e[0m `e[31m74`e[0m `e[31m20`e[0m `e[31m69`e[0m `e[31m73`e[0m `e[31m20`e[0m `e[31m71`e[0m `e[31m75`e[0m tring`e[31m `e[0m`e[31mt`e[0m`e[31mh`e[0m`e[31ma`e[0m`e[31mt`e[0m`e[31m `e[0m`e[31mi`e[0m`e[31ms`e[0m`e[31m `e[0m`e[31mq`e[0m`e[31mu`e[0m   !=   74 72 69 6E 67 `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m tring`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m"
+                "`e[31m69`e[0m `e[31m74`e[0m `e[31m65`e[0m `e[31m20`e[0m `e[31m6C`e[0m `e[31m6F`e[0m `e[31m6E`e[0m `e[31m67`e[0m                         `e[31mi`e[0m`e[31mt`e[0m`e[31me`e[0m`e[31m `e[0m`e[31ml`e[0m`e[31mo`e[0m`e[31mn`e[0m`e[31mg`e[0m           !=   `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m `e[31m  `e[0m                         `e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m`e[31m `e[0m        "
             )
         }
     }
@@ -475,7 +476,7 @@ Describe 'Out-Difference' {
             $result = Out-Difference -Reference $expected -Difference $actual
 
             $result | Should-BeBlockString @(
-                "Expected:[0m                                                               But was:[0m"
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
@@ -506,17 +507,17 @@ Describe 'Out-Difference' {
             $result = Out-Difference -Reference $expected -Difference $actual
 
             $result | Should-BeBlockString @(
-                "Expected:[0m                                                               But was:[0m"
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
                 "53 74 72 69 6E 67                               String             ==   53 74 72 69 6E 67                               String          "
-                "Expected:[0m                                                               But was:[0m"
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
-                "[31m31[0m [31m32[0m [31m33[0m                                        [31m1[0m[31m2[0m[31m3[0m                !=   [31m34[0m [31m35[0m [31m36[0m                                        [31m4[0m[31m5[0m[31m6[0m             "
-                "Expected:[0m                                                               But was:[0m"
+                "`e[31m31`e[0m `e[31m32`e[0m `e[31m33`e[0m                                        `e[31m1`e[0m`e[31m2`e[0m`e[31m3`e[0m                !=   `e[31m34`e[0m `e[31m35`e[0m `e[31m36`e[0m                                        `e[31m4`e[0m`e[31m5`e[0m`e[31m6`e[0m             "
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
@@ -533,7 +534,7 @@ Describe 'Out-Difference' {
             $result = Out-Difference -Reference $expected -Difference $actual
 
             $result | Should-BeBlockString @(
-                "Expected:[0m                                                               But was:[0m"
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
@@ -553,7 +554,7 @@ Describe 'Out-Difference' {
             $result = Out-Difference -Reference $expected -Difference $actual
 
             $result | Should-BeBlockString @(
-                "Expected:[0m                                                               But was:[0m"
+                "Expected:`e[0m                                                               But was:`e[0m"
                 "----------------------------------------------------------------        ----------------------------------------------------------------"
                 "Bytes                                           Ascii                   Bytes                                           Ascii"
                 "-----                                           -----                   -----                                           -----"
@@ -563,4 +564,6 @@ Describe 'Out-Difference' {
             )
         }
     }
+
+    # cSpell: enable
 }
