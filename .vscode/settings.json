@@ -36,7 +36,8 @@
         "CODEOWNERS"
     ],
     "cSpell.ignorePaths": [
-        ".git"
+        ".git",
+        "output/**"
     ],
     "cSpell.ignoreRegExpList": [
         "/HKCU:/g",
