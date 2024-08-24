@@ -49,6 +49,9 @@
     .PARAMETER ColumnHeaderResetAnsi
         Specifies the ANSI escape sequence to reset the column header formatting.
 
+    .PARAMETER EncodingType
+        Specifies the encoding type to use for converting the strings to byte arrays.
+
     .PARAMETER ConcatenateArray
         Indicates whether to concatenate the arrays of strings into a single string.
 
@@ -139,6 +142,11 @@ function Out-Difference
         [Parameter()]
         [System.String]
         $ColumnHeaderResetAnsi,
+
+        [Parameter()]
+        [ValidateSet('ASCII', 'BigEndianUnicode', 'Default', 'Unicode', 'UTF32', 'UTF7', 'UTF8')]
+        [System.String]
+        $EncodingType,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
