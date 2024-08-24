@@ -4,13 +4,18 @@ function ConvertTo-AnsiSequence
     param
     (
         [Parameter(Mandatory = $true, Position = 0)]
+        [AllowEmptyString()]
+        [AllowNull()]
         [System.String]
         $Value
     )
 
-    if ($Value -match "^(?:`e)?\[?([0-9;]+)m?$")
+    if ($Value)
     {
-        $Value = "`e[" + $Matches[1] + 'm'
+        if ($Value -match "^(?:`e)?\[?([0-9;]+)m?$")
+        {
+            $Value = "`e[" + $Matches[1] + 'm'
+        }
     }
 
     return $Value
