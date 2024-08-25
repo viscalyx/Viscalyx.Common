@@ -7,6 +7,16 @@
 
 # cSpell: ignore unstaged
 ConvertFrom-StringData @'
+    ## Assert-GitLocalChanges
+    Assert_GitLocalChanges_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
+
+    ## Get-GitLocalBranchName
+    Get_GitLocalBranchName_Failed = Failed to get the name of the local branch. Make sure git repository is accessible.
+
+    ## Get-GitBranchCommit
+    Get_GitBranchCommit_FailedFromBranch = Failed to retrieve commits. Make sure the branch '{0}' exists and is accessible.
+    Get_GitBranchCommit_FailedFromCurrent = Failed to retrieve commits from current branch.
+
     ## Remove-History
     Convert_PesterSyntax_ShouldProcessVerboseDescription = Converting the script file '{0}'.
     Convert_PesterSyntax_ShouldProcessVerboseWarning = Are you sure you want to convert the script file '{0}'?
@@ -15,21 +25,12 @@ ConvertFrom-StringData @'
 
     ## New-SamplerGitHubReleaseTag
     New_SamplerGitHubReleaseTag_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding.
-    New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote = Failed to fetch branch '{0}' from the remote '{1}'. Make sure the branch exists in the remote git repository and the remote is accessible.
-    New_SamplerGitHubReleaseTag_FailedGetLocalBranchName = Failed to get the name of the local branch. Make sure the local branch exists and is accessible.
-    New_SamplerGitHubReleaseTag_FailedCheckoutLocalBranch = Failed to checkout the local branch '{0}'. Make sure the branch exists and is accessible.
     New_SamplerGitHubReleaseTag_FailedRebaseLocalDefaultBranch = Failed to rebase the local default branch '{0}' using '{1}/{0}'. Make sure the branch exists and is accessible.
-    New_SamplerGitHubReleaseTag_FailedGetLastCommitId = Failed to get the last commit id of the local branch '{0}'. Make sure the branch exists and is accessible.
     New_SamplerGitHubReleaseTag_FailedFetchTagsFromUpstreamRemote = Failed to fetch tags from the upstream remote '{0}'. Make sure the remote exists and is accessible.
     New_SamplerGitHubReleaseTag_FailedGetTagsOrMissingTagsInLocalRepository = Failed to get tags from the local repository or the tags are missing. Make sure that at least one preview tag exist in the local repository, or specify a release tag.
     New_SamplerGitHubReleaseTag_FailedDescribeTags = Failed to describe the tags. Make sure the tags exist in the local repository.
     New_SamplerGitHubReleaseTag_LatestTagIsNotPreview = The latest tag '{0}' is not a preview tag or not a correctly formatted preview tag. Make sure the latest tag is a preview tag, or specify a release tag.
     New_SamplerGitHubReleaseTag_FailedCheckoutPreviousBranch = Failed to checkout the previous branch '{0}'.
-
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseDescription = Fetching branch '{0}' from the upstream remote '{1}'.
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseWarning = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'?
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessCaption = Fetch upstream branch
 
     New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseDescription = Switching to and rebasing the local default branch '{0}' using the upstream branch '{1}/{0}'.
     New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseWarning = Are you sure you want switch to and rebase the local branch '{0}'?
@@ -52,6 +53,13 @@ ConvertFrom-StringData @'
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption = Switch to previous branch
 
-    ## Update-GitBranch
-    Update_GitBranch_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
+    ## Switch-GitLocalBranch
+    Switch_GitLocalBranch_FailedCheckoutLocalBranch = Failed to checkout the local branch '{0}'. Make sure the branch exists and is accessible.
+
+    ## Update-RemoteTrackingBranch
+    Update_RemoteTrackingBranch_FailedFetchBranchFromRemote = Failed to fetch from '{0}'. Make sure the branch exists in the remote git repository and the remote is accessible.
+    Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessVerboseDescription = Fetching branch '{0}' from the upstream remote '{1}'.
+    Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessVerboseWarning = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessCaption = Fetch upstream branch
 '@
