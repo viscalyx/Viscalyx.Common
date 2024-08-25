@@ -5,6 +5,7 @@
         classes (that are not a DSC resource).
 #>
 
+# cSpell: ignore unstaged
 ConvertFrom-StringData @'
     ## New-SamplerGitHubReleaseTag
     New_SamplerGitHubReleaseTag_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (NSGRT0001)
@@ -155,46 +156,6 @@ ConvertFrom-StringData @'
     ## Invoke-PesterJob
     Invoke_PesterJob_ModuleBuilderRequired = The ModuleBuilder module is required for source line mapping but is not available. Please install the ModuleBuilder module or run the command in a Sampler project environment. (IPJ0001)
 
-    ## Remove-PSHistory
-    Remove_PSHistory_ShouldProcessDescription = Removing content matching the pattern '{0}'. (RH0001)
-    Remove_PSHistory_ShouldProcessConfirmation = Are you sure you want to remove the content matching the pattern '{0}' from PowerShell history? (RH0002)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    Remove_PSHistory_ShouldProcessCaption = Remove content matching the pattern from PowerShell history (RH0005)
-    Remove_PSHistory_Removed = Removed PowerShell history content matching the pattern. (RH0003)
-    Remove_PSHistory_NoMatches = No PowerShell history content matching the pattern. (RH0004)
-
-    ## Remove-PSReadLineHistory
-    Remove_PSReadLineHistory_ShouldProcessDescription = Removing content matching the pattern '{0}'. (RPSH0001)
-    Remove_PSReadLineHistory_ShouldProcessConfirmation = Are you sure you want to remove the content matching the pattern '{0}' from PSReadLine history? (RPSH0002)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    Remove_PSReadLineHistory_ShouldProcessCaption = Remove content matching the pattern from PSReadLine history (RPSH0005)
-    Remove_PSReadLineHistory_Removed = Removed PSReadLine history content matching the pattern. (RPSH0003)
-    Remove_PSReadLineHistory_NoMatches = No PSReadLine history content matching the pattern. (RPSH0004)
-
-    ## ConvertTo-AnsiString
-    ConvertTo_AnsiString_ProcessingBegin = Begin processing ANSI sequence conversion. (CTAS0001)
-    ConvertTo_AnsiString_EmptyInput = Input string is null or empty, returning as-is. (CTAS0002)
-    ConvertTo_AnsiString_ProcessingString = Processing string with {0} characters for ANSI sequence conversion. (CTAS0003)
-    ConvertTo_AnsiString_ProcessingSequence = Processing ANSI sequence with codes '{0}'. (CTAS0004)
-    ConvertTo_AnsiString_ProcessingComplete = ANSI sequence conversion completed. (CTAS0005)
-
-    ## Get-ClassAst
-    Get_ClassAst_ParsingScriptFile = Parsing script file '{0}' for class definitions. (GCA0001)
-    Get_ClassAst_FilteringForClass = Filtering for specific class '{0}'. (GCA0002)
-    Get_ClassAst_ReturningAllClasses = Returning all class definitions found in the script file. (GCA0003)
-    Get_ClassAst_FoundClassCount = Found {0} class definition(s) in the script file. (GCA0004)
-    Get_ClassAst_ScriptFileNotFound = The script file '{0}' does not exist. (GCA0005)
-    Get_ClassAst_ParseFailed = Parsing of script file '{0}' failed: {1} (GCA0006)
-
-    ## Get-ClassResourceAst
-    Get_ClassResourceAst_FoundClassCount = Found {0} DSC class resource definition(s) in the script file. (GCRA0004)
-
-    ## Clear-AnsiSequence
-    Clear_AnsiSequence_ProcessingBegin = Begin processing ANSI sequence clearing. (CAS0001)
-    Clear_AnsiSequence_EmptyInput = Input string is null or empty, returning as-is. (CAS0002)
-    Clear_AnsiSequence_ProcessingString = Processing string with {0} characters for ANSI sequence clearing. (CAS0003)
-    Clear_AnsiSequence_ProcessingComplete = ANSI sequence clearing completed. (CAS0004)
-
-    ## ConvertTo-DifferenceString
-    ConvertTo_DifferenceString_ReferenceLabelTruncated = Reference label '{0}' is longer than the maximum width of {1} characters and has been truncated to '{2}'. (CTDS0001)
+    ## Update-GitBranch
+    Update_GitBranch_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
 '@
