@@ -122,7 +122,7 @@ function New-SamplerGitHubReleaseTag
                 [System.Management.Automation.ErrorRecord]::new(
                     ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote -f $DefaultBranchName, $UpstreamRemoteName),
                     'NSGRT0002', # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
                     $DatabaseName
                 )
             )
@@ -139,7 +139,7 @@ function New-SamplerGitHubReleaseTag
                 [System.Management.Automation.ErrorRecord]::new(
                     $script:localizedData.New_SamplerGitHubReleaseTag_FailedGetLocalBranchName,
                     'NSGRT0003', # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
                     $DatabaseName
                 )
             )
@@ -202,7 +202,7 @@ function New-SamplerGitHubReleaseTag
                 [System.Management.Automation.ErrorRecord]::new(
                     $errorMessage,
                     $errorCode, # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
                     $DatabaseName
                 )
             )
@@ -228,7 +228,7 @@ function New-SamplerGitHubReleaseTag
                 [System.Management.Automation.ErrorRecord]::new(
                     ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchTagsFromUpstreamRemote -f $UpstreamRemoteName),
                     'NSGRT0007', # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
                     $DatabaseName
                 )
             )
@@ -285,7 +285,7 @@ function New-SamplerGitHubReleaseTag
                 [System.Management.Automation.ErrorRecord]::new(
                     $errorMessage,
                     $errorCode, # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
                     $DatabaseName
                 )
             )
@@ -334,7 +334,14 @@ function New-SamplerGitHubReleaseTag
 
             if ($LASTEXITCODE -ne 0)
             {
-                throw 'Failed to checkout the previous local branch.'
+                $PSCmdlet.ThrowTerminatingError(
+                    [System.Management.Automation.ErrorRecord]::new(
+                        ($script:localizedData.New_SamplerGitHubReleaseTag_FailedCheckoutPreviousBranch -f $currentLocalBranchName),
+                        'NSGRT0011', # cspell: disable-line
+                        [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                        $DatabaseName
+                    )
+                )
             }
         }
     }
