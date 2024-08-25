@@ -6,8 +6,8 @@
         The New-SamplerGitHubReleaseTag function creates a new release tag for the
         Sampler project on GitHub. It performs the following steps:
 
-        1. Checks if the 'main' branch exists and throws an error if it doesn't.
-        2. Checks if the 'origin' remote exists and throws an error if it doesn't.
+        1. Checks if the 'origin' remote exists locally and throws an error if it doesn't.
+        2. Fetches the 'main' branch from the 'origin' remote and throws an error if it doesn't exist.
         3. Optionally switches back to the previous branch.
         4. Checks out the 'main' branch.
         5. Fetches the 'main' branch from the 'origin' remote.
@@ -100,12 +100,20 @@ function New-SamplerGitHubReleaseTag
         throw "Remote '$UpstreamRemoteName' does not exist in the local git repository."
     }
 
-    # Fetch $DefaultBranchName from upstream and throw an error if it doesn't exist.
-    git fetch $UpstreamRemoteName $DefaultBranchName
+    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseDescription -f $DefaultBranchName, $UpstreamRemoteName
+    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseWarning -f $DefaultBranchName, $UpstreamRemoteName
+    $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessCaption
 
-    if ($LASTEXITCODE -ne 0)
+    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
     {
-        throw "Branch '$DefaultBranchName' does not exist in the upstream remote '$UpstreamRemoteName'."
+        # Fetch $DefaultBranchName from upstream and throw an error if it doesn't exist.
+        git fetch $UpstreamRemoteName $DefaultBranchName
+
+        if ($LASTEXITCODE -ne 0)
+        {
+            throw "Failed to fetch branch $DefaultBranchName from $UpstreamRemoteName. Make sure the branch exists in the remote git repository and there is a remote named $UpstreamRemoteName."
+
+        }
     }
 
     if ($SwitchBackToPreviousBranch.IsPresent)
@@ -122,7 +130,7 @@ function New-SamplerGitHubReleaseTag
     $previousCommandFailed = $false
     $errorMessage = $null
 
-    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseDescription -f $DefaultBranchName
+    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseDescription -f $DefaultBranchName, $UpstreamRemoteName
     $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseWarning -f $DefaultBranchName
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessCaption
 
@@ -142,39 +150,29 @@ function New-SamplerGitHubReleaseTag
 
         if (-not $previousCommandFailed)
         {
-            git fetch $UpstreamRemoteName $DefaultBranchName
+            git rebase $UpstreamRemoteName/$DefaultBranchName
 
             if ($LASTEXITCODE -ne 0)
             {
                 $previousCommandFailed = $true
-                $errorMessage = "Failed to fetch branch $DefaultBranchName from $UpstreamRemoteName. Make sure the branch exists in the remote git repository and there is a remote named $UpstreamRemoteName."
+                $errorMessage = "Failed to rebase local branch $DefaultBranchName with $UpstreamRemoteName/$DefaultBranchName"
             }
 
             if (-not $previousCommandFailed)
             {
-                git rebase $UpstreamRemoteName/$DefaultBranchName
+                $headCommitId = git rev-parse HEAD
 
                 if ($LASTEXITCODE -ne 0)
                 {
                     $previousCommandFailed = $true
-                    $errorMessage = "Failed to rebase local branch $DefaultBranchName with $UpstreamRemoteName/$DefaultBranchName"
-                }
-
-                if (-not $previousCommandFailed)
-                {
-                    $headCommitId = git rev-parse HEAD
-
-                    if ($LASTEXITCODE -ne 0)
-                    {
-                        $previousCommandFailed = $true
-                        $errorMessage = "Failed to get the last commit ID of the branch '$DefaultBranchName'."
-                    }
+                    $errorMessage = "Failed to get the last commit ID of the branch '$DefaultBranchName'."
                 }
             }
         }
 
         if ($previousCommandFailed)
         {
+            # If something failed, revert back to the previous branch if requested.
             if ($SwitchBackToPreviousBranch.IsPresent -and $switchedToDefaultBranch)
             {
                 git checkout $currentLocalBranchName
