@@ -5,6 +5,7 @@
         classes (that are not a DSC resource).
 #>
 
+# cSpell: ignore unstaged
 ConvertFrom-StringData @'
     ## New-SamplerGitHubReleaseTag
     New_SamplerGitHubReleaseTag_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding.
@@ -44,4 +45,7 @@ ConvertFrom-StringData @'
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessVerboseWarning = Are you sure you want to switch back to previous local branch '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption = Switch to previous branch
+
+    ## Update-GitBranch
+    Update_GitBranch_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
 '@

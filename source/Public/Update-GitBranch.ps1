@@ -87,12 +87,21 @@ function Update-GitBranch
     if ($status)
     {
         # cSpell:ignore unstaged
-        throw 'There are unstaged or staged changes. Please commit or stash your changes before proceeding.'
+        $PSCmdlet.ThrowTerminatingError(
+            [System.Management.Automation.ErrorRecord]::new(
+                ($script:localizedData.Update_GitBranch_FailedUnstagedChanges),
+                'UGB0001', # cspell: disable-line
+                [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                ($status -join ', ')
+            )
+        )
     }
 
     if ($BranchName -eq '.')
     {
         $BranchName = git rev-parse --abbrev-ref HEAD
+
+        Write-Debug -Message ('Using the current branch ''{0}''.' -f $BranchName)
     }
 
     # Capture the current branch name only if CheckoutOriginalBranch is specified.
