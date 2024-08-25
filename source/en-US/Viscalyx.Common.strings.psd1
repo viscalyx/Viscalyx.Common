@@ -7,6 +7,22 @@
 
 # cSpell: ignore unstaged
 ConvertFrom-StringData @'
+    ## Assert-GitLocalChanges
+    Assert_GitLocalChanges_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
+
+    ## Get-GitLocalBranchName
+    Get_GitLocalBranchName_Failed = Failed to get the name of the local branch. Make sure git repository is accessible.
+
+    ## Get-GitBranchCommit
+    Get_GitBranchCommit_FailedFromBranch = Failed to retrieve commits. Make sure the branch '{0}' exists and is accessible.
+    Get_GitBranchCommit_FailedFromCurrent = Failed to retrieve commits from current branch.
+
+    ## Remove-History
+    Convert_PesterSyntax_ShouldProcessVerboseDescription = Converting the script file '{0}'.
+    Convert_PesterSyntax_ShouldProcessVerboseWarning = Are you sure you want to convert the script file '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Convert_PesterSyntax_ShouldProcessCaption = Convert script file
+
     ## New-SamplerGitHubReleaseTag
     New_SamplerGitHubReleaseTag_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (NSGRT0001)
     New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote = Failed to fetch branch '{0}' from the remote '{1}'. Make sure the branch exists in the remote git repository and the remote is accessible. (NSGRT0002)
@@ -158,4 +174,14 @@ ConvertFrom-StringData @'
 
     ## Update-GitBranch
     Update_GitBranch_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
+
+    ## Switch-GitLocalBranch
+    Switch_GitLocalBranch_FailedCheckoutLocalBranch = Failed to checkout the local branch '{0}'. Make sure the branch exists and is accessible.
+
+    ## Update-RemoteTrackingBranch
+    Update_RemoteTrackingBranch_FailedFetchBranchFromRemote = Failed to fetch from '{0}'. Make sure the branch exists in the remote git repository and the remote is accessible.
+    Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessVerboseDescription = Fetching branch '{0}' from the upstream remote '{1}'.
+    Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessVerboseWarning = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessCaption = Fetch upstream branch
 '@
