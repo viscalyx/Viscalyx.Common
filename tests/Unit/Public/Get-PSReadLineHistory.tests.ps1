@@ -42,35 +42,53 @@ AfterAll {
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
 }
 
-Describe 'ConvertTo-DiffString' {
-    It 'should convert the entire string when only InputString is provided' {
-        $result = ConvertTo-DiffString -InputString "Hello, world!"
+Describe 'Get-PSReadLineHistory' {
+    BeforeAll {
+        # Mock Get-PSReadLineOption to return a custom history path
+        Mock -CommandName Get-PSReadLineOption -MockWith {
+            return @{
+                HistorySavePath = '/mock/path/PSReadLineHistory.txt'
+            }
+        }
 
-        $result | Should -BeExactly "`e[30;43mHello, world!`e[0m"
+        # Mock Get-Content to return predefined history content
+        Mock -CommandName Get-Content -MockWith {
+            return @(
+                'git status',
+                'ls',
+                'git commit -m "Initial commit"',
+                'cd /projects',
+                'git push'
+            )
+        }
     }
 
-    It 'should convert the specified portion of the string using StartEndInput' {
-        $result = ConvertTo-DiffString -InputString "Hello, world!" -StartIndex 7 -EndIndex 11
+    It 'Returns the entire history when no pattern is specified' {
+        $result = Get-PSReadLineHistory
 
-        $result | Should -BeExactly "Hello, `e[30;43mworld`e[0m!"
+        $expected = @(
+            'git status',
+            'ls',
+            'git commit -m "Initial commit"',
+            'cd /projects',
+            'git push'
+        )
+
+        $result | Should-BeEquivalent $expected
     }
 
-    It 'should convert the specified portion of the string using PipelineInput' {
-        $indexObject = [PSCustomObject]@{ Start = 7; End = 11 }
-        $result = $indexObject | ConvertTo-DiffString -InputString "Hello, world!"
+    It 'Returns filtered history when a pattern is specified' {
+        $result = Get-PSReadLineHistory -Pattern 'git'
 
-        $result | Should -BeExactly "Hello, `e[30;43mworld`e[0m!"
-    }
+        <#
+            The last line is always skipped by Get-PSReadLineHistory, since it's
+            the `Get-PSReadLineHistory` entry.
+        #>
+        $expected = @(
+            'git status',
+            'git commit -m "Initial commit"'
+        )
 
-    It 'should use default ANSI color codes' {
-        $result = ConvertTo-DiffString -InputString "Hello, world!" -StartIndex 7 -EndIndex 11
-
-        $result | Should -BeExactly "Hello, `e[30;43mworld`e[0m!"
-    }
-
-    It 'should use custom ANSI color codes' {
-        $result = ConvertTo-DiffString -InputString "Hello, world!" -StartIndex 7 -EndIndex 11 -Ansi '31;42m' -AnsiReset '0m'
-
-        $result | Should -BeExactly "Hello, `e[31;42mworld`e[0m!"
+        $result | Should-BeEquivalent $expected
     }
 }
