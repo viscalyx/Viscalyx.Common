@@ -112,15 +112,23 @@ Describe 'New-SamplerGitHubReleaseTag' {
         }
 
         It 'Should throw if branch does not exist' {
+            $mockErrorMessage = InModuleScope -ScriptBlock {
+                ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote -f 'UnknownBranchName', 'origin')
+            }
+
             {
                 New-SamplerGitHubReleaseTag -DefaultBranchName 'UnknownBranchName' -ReleaseTag 'v1.0.0' -Force
-            } | Should -Throw 'Branch ''UnknownBranchName'' does not exist in the upstream remote ''origin''.'
+            } | Should-Throw -ExceptionMessage $mockErrorMessage
         }
 
         It 'Should throw if remote does not exist' {
+            $mockErrorMessage = InModuleScope -ScriptBlock {
+                ($script:localizedData.New_SamplerGitHubReleaseTag_RemoteMissing -f 'UnknownRemoteName')
+            }
+
             {
                 New-SamplerGitHubReleaseTag -UpstreamRemoteName 'UnknownRemoteName' -ReleaseTag 'v1.0.0' -Force
-            } | Should -Throw 'Remote ''UnknownRemoteName'' does not exist in the local git repository.'
+            } | Should-Throw -ExceptionMessage $mockErrorMessage
         }
     }
 

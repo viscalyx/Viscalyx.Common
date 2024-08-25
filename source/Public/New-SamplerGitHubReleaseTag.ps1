@@ -97,7 +97,14 @@ function New-SamplerGitHubReleaseTag
 
     if (-not $remoteExists)
     {
-        throw "Remote '$UpstreamRemoteName' does not exist in the local git repository."
+        $PSCmdlet.ThrowTerminatingError(
+            [System.Management.Automation.ErrorRecord]::new(
+                ($script:localizedData.New_SamplerGitHubReleaseTag_RemoteMissing -f $UpstreamRemoteName),
+                'NSGRT0001', # cspell: disable-line
+                [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                $DatabaseName
+            )
+        )
     }
 
     $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseDescription -f $DefaultBranchName, $UpstreamRemoteName
@@ -109,10 +116,16 @@ function New-SamplerGitHubReleaseTag
         # Fetch $DefaultBranchName from upstream and throw an error if it doesn't exist.
         git fetch $UpstreamRemoteName $DefaultBranchName
 
-        if ($LASTEXITCODE -ne 0)
+        if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
         {
-            throw "Failed to fetch branch $DefaultBranchName from $UpstreamRemoteName. Make sure the branch exists in the remote git repository and there is a remote named $UpstreamRemoteName."
-
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote -f $DefaultBranchName, $UpstreamRemoteName),
+                    'NSGRT0002', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    $DatabaseName
+                )
+            )
         }
     }
 
@@ -122,12 +135,18 @@ function New-SamplerGitHubReleaseTag
 
         if ($LASTEXITCODE -ne 0)
         {
-            # cSpell: ignore LASTEXITCODE
-            throw 'Failed to fetch the name of the current branch.'
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    $script:localizedData.New_SamplerGitHubReleaseTag_FailedGetLocalBranchName,
+                    'NSGRT0003', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    $DatabaseName
+                )
+            )
         }
     }
 
-    $previousCommandFailed = $false
+    $continueProcessing = $true
     $errorMessage = $null
 
     $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseDescription -f $DefaultBranchName, $UpstreamRemoteName
@@ -136,41 +155,42 @@ function New-SamplerGitHubReleaseTag
 
     if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
     {
-        $previousCommandFailed = $false
-
         git checkout $DefaultBranchName
 
         if ($LASTEXITCODE -ne 0)
         {
-            $previousCommandFailed = $true
-            $errorMessage = "Failed to checkout branch $DefaultBranchName. Make sure the branch exists in the local git repository."
+            $continueProcessing = $false
+            $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedCheckoutLocalBranch -f $DefaultBranchName
+            $errorCode = 'NSGRT0004' # cspell: disable-line
         }
 
         $switchedToDefaultBranch = $true
 
-        if (-not $previousCommandFailed)
+        if ($continueProcessing)
         {
             git rebase $UpstreamRemoteName/$DefaultBranchName
 
             if ($LASTEXITCODE -ne 0)
             {
-                $previousCommandFailed = $true
-                $errorMessage = "Failed to rebase local branch $DefaultBranchName with $UpstreamRemoteName/$DefaultBranchName"
+                $continueProcessing = $false
+                $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedRebaseLocalDefaultBranch -f $DefaultBranchName, $UpstreamRemoteName
+                $errorCode = 'NSGRT0005' # cspell: disable-line
             }
 
-            if (-not $previousCommandFailed)
+            if ($continueProcessing)
             {
                 $headCommitId = git rev-parse HEAD
 
                 if ($LASTEXITCODE -ne 0)
                 {
-                    $previousCommandFailed = $true
-                    $errorMessage = "Failed to get the last commit ID of the branch '$DefaultBranchName'."
+                    $continueProcessing = $false
+                    $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedGetLastCommitId -f $DefaultBranchName
+                    $errorCode = 'NSGRT0006' # cspell: disable-line
                 }
             }
         }
 
-        if ($previousCommandFailed)
+        if (-not $continueProcessing)
         {
             # If something failed, revert back to the previous branch if requested.
             if ($SwitchBackToPreviousBranch.IsPresent -and $switchedToDefaultBranch)
@@ -178,7 +198,14 @@ function New-SamplerGitHubReleaseTag
                 git checkout $currentLocalBranchName
             }
 
-            throw $errorMessage
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    $errorMessage,
+                    $errorCode, # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    $DatabaseName
+                )
+            )
         }
     }
 
@@ -197,33 +224,40 @@ function New-SamplerGitHubReleaseTag
                 git checkout $currentLocalBranchName
             }
 
-            throw "Failed to fetch tags from $UpstreamRemoteName."
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchTagsFromUpstreamRemote -f $UpstreamRemoteName),
+                    'NSGRT0007', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    $DatabaseName
+                )
+            )
         }
     }
 
     if (-not $ReleaseTag)
     {
-        $previousCommandFailed = $false
-
         $tagExist = git tag  | Select-Object -First 1
 
         if ($LASTEXITCODE -ne 0 -or -not $tagExist)
         {
-            $previousCommandFailed = $true
-            $errorMessage = 'Either failed to list tags or no tags were found in the local repository. Please specify a release tag.'
+            $continueProcessing = $false
+            $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedGetTagsOrMissingTagsInLocalRepository
+            $errorCode = 'NSGRT0008' # cspell: disable-line
         }
 
-        if (-not $previousCommandFailed)
+        if ($continueProcessing)
         {
             $latestPreviewTag = git describe --tags --abbrev=0
 
             if ($LASTEXITCODE -ne 0)
             {
-                $previousCommandFailed = $true
-                $errorMessage = 'Failed to describe tags.'
+                $continueProcessing = $false
+                $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedDescribeTags
+                $errorCode = 'NSGRT0009' # cspell: disable-line
             }
 
-            if (-not $previousCommandFailed)
+            if ($continueProcessing)
             {
                 $isCorrectlyFormattedPreviewTag = $latestPreviewTag -match '^(v\d+\.\d+\.\d+)-.*'
 
@@ -233,20 +267,28 @@ function New-SamplerGitHubReleaseTag
                 }
                 else
                 {
-                    $previousCommandFailed = $true
-                    $errorMessage = 'Latest tag ''{0}'' is not a preview tag or not a correctly formatted preview tag.' -f $latestPreviewTag
+                    $continueProcessing = $false
+                    $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_LatestTagIsNotPreview -f $latestPreviewTag
+                    $errorCode = 'NSGRT0010' # cspell: disable-line
                 }
             }
         }
 
-        if ($previousCommandFailed)
+        if (-not $continueProcessing)
         {
             if ($SwitchBackToPreviousBranch.IsPresent -and $switchedToDefaultBranch)
             {
                 git checkout $currentLocalBranchName
             }
 
-            throw $errorMessage
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    $errorMessage,
+                    $errorCode, # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                    $DatabaseName
+                )
+            )
         }
     }
 
