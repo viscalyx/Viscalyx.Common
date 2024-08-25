@@ -28,7 +28,7 @@
         Specifies the release tag to create. Must be in the format 'vX.X.X'. If
         not specified, the latest preview tag will be used.
 
-    .PARAMETER SwitchBackToPreviousBranch
+    .PARAMETER CheckoutOriginalBranch
         Specifies that the command should switches back to the previous branch after
         creating the release tag.
 
@@ -47,7 +47,7 @@
         to the 'origin' remote.
 
     .EXAMPLE
-        New-SamplerGitHubReleaseTag -SwitchBackToPreviousBranch
+        New-SamplerGitHubReleaseTag -CheckoutOriginalBranch
 
         Creates a new release tag and switches back to the previous branch.
 
@@ -75,7 +75,7 @@ function New-SamplerGitHubReleaseTag
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
-        $SwitchBackToPreviousBranch,
+        $CheckoutOriginalBranch,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -128,7 +128,7 @@ function New-SamplerGitHubReleaseTag
         }
     }
 
-    if ($SwitchBackToPreviousBranch.IsPresent)
+    if ($CheckoutOriginalBranch.IsPresent)
     {
         $currentLocalBranchName = git rev-parse --abbrev-ref HEAD
 
@@ -197,7 +197,7 @@ function New-SamplerGitHubReleaseTag
         if (-not $continueProcessing)
         {
             # If something failed, revert back to the previous branch if requested.
-            if ($SwitchBackToPreviousBranch.IsPresent -and $switchedToDefaultBranch)
+            if ($CheckoutOriginalBranch.IsPresent -and $switchedToDefaultBranch)
             {
                 git checkout $currentLocalBranchName
             }
@@ -223,7 +223,7 @@ function New-SamplerGitHubReleaseTag
 
         if ($LASTEXITCODE -ne 0)
         {
-            if ($SwitchBackToPreviousBranch.IsPresent -and $switchedToDefaultBranch)
+            if ($CheckoutOriginalBranch.IsPresent -and $switchedToDefaultBranch)
             {
                 git checkout $currentLocalBranchName
             }
@@ -280,7 +280,7 @@ function New-SamplerGitHubReleaseTag
 
         if (-not $continueProcessing)
         {
-            if ($SwitchBackToPreviousBranch.IsPresent -and $switchedToDefaultBranch)
+            if ($CheckoutOriginalBranch.IsPresent -and $switchedToDefaultBranch)
             {
                 git checkout $currentLocalBranchName
             }
@@ -344,7 +344,7 @@ function New-SamplerGitHubReleaseTag
         }
     }
 
-    if ($SwitchBackToPreviousBranch.IsPresent)
+    if ($CheckoutOriginalBranch.IsPresent)
     {
         $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessDescription -f $currentLocalBranchName
         $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessConfirmation -f $currentLocalBranchName
