@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `TestNameFilter` parameter (with aliases `TestName` and `Test`). This feature
   enables AI agents and automation scenarios to focus on specific tests by
   providing test name patterns with wildcard support.
+- Public commands:
+  - `Update-GitBranch`
 
 ### Fixed
 
@@ -182,3 +184,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Remove-PSHistory`
   - `Remove-PSReadLineHistory`
   - `Split-StringAtIndices`
+  - `Update-GitBranch`
