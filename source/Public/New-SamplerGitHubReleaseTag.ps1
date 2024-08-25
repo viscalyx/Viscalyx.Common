@@ -6,18 +6,17 @@
         The New-SamplerGitHubReleaseTag function creates a new release tag for the
         Sampler project on GitHub. It performs the following steps:
 
-        1. Checks if the 'origin' remote exists locally and throws an error if it doesn't.
-        2. Fetches the 'main' branch from the 'origin' remote and throws an error if it doesn't exist.
-        3. Optionally switches back to the previous branch.
-        4. Checks out the 'main' branch.
-        5. Fetches the 'main' branch from the 'origin' remote.
-        6. Rebases the local 'main' branch with the 'origin/main' branch.
-        7. Gets the last commit ID of the 'main' branch.
-        8. Fetches tags from the 'origin' remote.
-        9. If no release tag is specified, it checks if there are any tags in the local repository and selects the latest preview tag.
-        10. Creates a new tag with the specified release tag.
-        11. Optionally pushes the tag to the 'origin' remote.
-        12. Switches back to the previous branch if requested.
+        1. Checks if the remote specified in $UpstreamRemoteName exists locally and throws an error if it doesn't.
+        2. Fetches the $DefaultBranchName branch from the $UpstreamRemoteName remote and throws an error if it doesn't exist.
+        3. Checks out the $DefaultBranchName branch.
+        4. Fetches the $DefaultBranchName branch from the $UpstreamRemoteName remote.
+        5. Rebases the local $DefaultBranchName branch with the $UpstreamRemoteName/$DefaultBranchName branch.
+        6. Gets the last commit ID of the $DefaultBranchName branch.
+        7. Fetches tags from the $UpstreamRemoteName remote.
+        8. If no release tag is specified, it checks if there are any tags in the local repository and selects the latest preview tag.
+        9. Creates a new tag with the specified release tag or based on the latest preview tag.
+        10. Optionally pushes the tag to the $UpstreamRemoteName remote.
+        11. Switches back to the previous branch if requested.
 
     .PARAMETER DefaultBranchName
         Specifies the name of the default branch. Default value is 'main'.
