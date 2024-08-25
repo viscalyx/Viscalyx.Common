@@ -237,7 +237,7 @@ function New-SamplerGitHubReleaseTag
 
     if (-not $ReleaseTag)
     {
-        $tagExist = git tag  | Select-Object -First 1
+        $tagExist = git tag | Select-Object -First 1
 
         if ($LASTEXITCODE -ne 0 -or -not $tagExist)
         {
