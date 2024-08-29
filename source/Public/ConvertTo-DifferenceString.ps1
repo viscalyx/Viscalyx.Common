@@ -168,11 +168,11 @@ function ConvertTo-DifferenceString
     # Determine the maximum length of the two byte arrays
     $maxLength = [Math]::Max($referenceBytes.Length, $differenceBytes.Length)
 
-    # Initialize arrays to hold hex values and characters
-    $refHexArray = @()
-    $refCharArray = @()
-    $diffHexArray = @()
-    $diffCharArray = @()
+    # Initialize lists to hold hex values and characters
+    $refHexList = [System.Collections.Generic.List[string]]::new()
+    $refCharList = [System.Collections.Generic.List[string]]::new()
+    $diffHexList = [System.Collections.Generic.List[string]]::new()
+    $diffCharList = [System.Collections.Generic.List[string]]::new()
 
     # Escape $HighlightStart and $HighlightEnd for regex matching
     $escapedHighlightStart = [regex]::Escape($HighlightStart)
@@ -251,37 +251,37 @@ function ConvertTo-DifferenceString
             -replace "`n", '␊' `
             -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
 
-        # Add to arrays
-        $refHexArray += $refHex
-        $refCharArray += $refChar
-        $diffHexArray += $diffHex
-        $diffCharArray += $diffChar
+        # Add to lists
+        $refHexList.Add($refHex)
+        $refCharList.Add($refChar)
+        $diffHexList.Add($diffHex)
+        $diffCharList.Add($diffChar)
 
         # Output the results in groups of 16
         if (($i + 1) % 16 -eq 0 -or $i -eq $maxLength - 1)
         {
-            # Pad arrays to ensure they have 16 elements
-            while ($refHexArray.Count -lt 16)
+            # Pad lists to ensure they have 16 elements
+            while ($refHexList.Count -lt 16)
             {
-                $refHexArray += '  '
+                $refHexList.Add('  ')
             }
-            while ($refCharArray.Count -lt 16)
+            while ($refCharList.Count -lt 16)
             {
-                $refCharArray += ' '
+                $refCharList.Add(' ')
             }
-            while ($diffHexArray.Count -lt 16)
+            while ($diffHexList.Count -lt 16)
             {
-                $diffHexArray += '  '
+                $diffHexList.Add('  ')
             }
-            while ($diffCharArray.Count -lt 16)
+            while ($diffCharList.Count -lt 16)
             {
-                $diffCharArray += ' '
+                $diffCharList.Add(' ')
             }
 
-            $refHexLine = ($refHexArray -join ' ')
-            $refCharLine = ($refCharArray -join '')
-            $diffHexLine = ($diffHexArray -join ' ')
-            $diffCharLine = ($diffCharArray -join '')
+            $refHexLine = ($refHexList -join ' ')
+            $refCharLine = ($refCharList -join '')
+            $diffHexLine = ($diffHexList -join ' ')
+            $diffCharLine = ($diffCharList -join '')
 
             # Determine if the line was highlighted
             $indicator = if ($refHexLine -match $escapedHighlightStart -or $diffHexLine -match $escapedHighlightStart)
@@ -296,11 +296,11 @@ function ConvertTo-DifferenceString
             # Output the results in the specified format
             '{0} {1}   {2}   {3} {4}' -f $refHexLine, $refCharLine, $indicator, $diffHexLine, $diffCharLine
 
-            # Clear arrays for the next group of 16
-            $refHexArray = @()
-            $refCharArray = @()
-            $diffHexArray = @()
-            $diffCharArray = @()
+            # Clear lists for the next group of 16
+            $refHexList.Clear()
+            $refCharList.Clear()
+            $diffHexList.Clear()
+            $diffCharList.Clear()
         }
     }
 }
