@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `TestNameFilter` parameter (with aliases `TestName` and `Test`). This feature
   enables AI agents and automation scenarios to focus on specific tests by
   providing test name patterns with wildcard support.
+- Viscalyx.Common
+  - Added unit tests to run in Windows PowerShell.
 - Public commands:
   - `Update-GitBranch`
 
