@@ -44,6 +44,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Out-Difference`
   - Added parameter `NoHexOutput`.
 
+### Fixed
+
+- `ConvertTo-DifferenceString`
+  - Make it render ANSI sequences in Windows PowerShell
+  - Optimize using List\<T\> instead of using `+=` for adding to arrays.
+
 ## [0.3.0] - 2024-09-02
 
 ### Added
