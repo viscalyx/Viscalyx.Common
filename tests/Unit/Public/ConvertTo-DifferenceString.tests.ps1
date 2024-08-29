@@ -43,13 +43,13 @@ AfterAll {
 }
 
 Describe '-join (ConvertTo-DifferenceString' {
-    It 'should use custom labels' {
+    It 'Should use custom labels' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -ReferenceLabel 'Ref:' -DifferenceLabel 'Diff:')
         $result | Should -Match 'Ref:'
         $result | Should -Match 'Diff:'
     }
 
-    It 'should handle different encoding types' {
+    It 'Should handle different encoding types' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -EncodingType 'ASCII')
         $result | Should -Match '31m65'
         $result | Should -Match '31m61'
@@ -57,24 +57,24 @@ Describe '-join (ConvertTo-DifferenceString' {
         $result | Should -Match '31ma'
     }
 
-    It 'should exclude column header when NoColumnHeader is specified' {
+    It 'Should exclude column header when NoColumnHeader is specified' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -NoColumnHeader)
         $result | Should -Not -Match 'Bytes'
         $result | Should -Not -Match 'Ascii'
     }
 
-    It 'should exclude labels when NoLabels is specified' {
+    It 'Should exclude labels when NoLabels is specified' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -NoLabels)
         $result | Should -Not -Match 'Expected:'
         $result | Should -Not -Match 'But was:'
     }
 
-    It 'should return equal indicators for identical strings' {
+    It 'Should return equal indicators for identical strings' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hello')
         $result | Should -Not -Match '!='
     }
 
-    It 'should highlight differences for different strings' {
+    It 'Should highlight differences for different strings' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo')
         $result | Should -Match '31m65'
         $result | Should -Match '31m61'
@@ -82,19 +82,19 @@ Describe '-join (ConvertTo-DifferenceString' {
         $result | Should -Match '31ma'
     }
 
-    It 'should use custom indicators' {
+    It 'Should use custom indicators' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -EqualIndicator 'EQ' -NotEqualIndicator 'NE')
         $result | Should -Match 'NE'
         $result | Should -Not -Match '=='
         $result | Should -Not -Match '!='
     }
 
-    It 'should handle empty strings' {
+    It 'Should handle empty strings' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString '' -DifferenceString '')
         $result | Should -Not -Match '!='
     }
 
-    It 'should handle different length strings' {
+    It 'Should handle different length strings' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'HelloWorld')
         $result | Should -Match '31mW'
         $result | Should -Match '31mo'
@@ -103,19 +103,19 @@ Describe '-join (ConvertTo-DifferenceString' {
         $result | Should -Match '31md'
     }
 
-    It 'should handle special characters' {
+    It 'Should handle special characters' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString "Hello`n" -DifferenceString "Hello`r")
         $result | Should -Match '31m0A'
         $result | Should -Match '31m0D'
     }
 
-    It 'should use custom highlighting' {
+    It 'Should use custom highlighting' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -HighlightStart "`e[32m" -HighlightEnd "`e[0m")
         $result | Should -Match '32m65'
         $result | Should -Match '32m61'
     }
 
-    It 'should exclude labels and column header' {
+    It 'Should exclude labels and column header' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -NoLabels -NoColumnHeader)
         $result | Should -Not -Match 'Expected:'
         $result | Should -Not -Match 'But was:'
@@ -123,31 +123,43 @@ Describe '-join (ConvertTo-DifferenceString' {
         $result | Should -Not -Match 'Ascii'
     }
 
-    It 'should handle different encodings' {
+    It 'Should handle different encodings' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -EncodingType 'ASCII')
         $result | Should -Match '31m65'
         $result | Should -Match '31m61'
     }
 
-    It 'should handle null reference string' {
+    It 'Should handle null reference string' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString $null -DifferenceString 'Hallo')
         $result | Should -Match '31m48'
     }
 
-    It 'should handle null difference string' {
+    It 'Should handle null difference string' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString $null)
         $result | Should -Match '31m48'
     }
 
-    It 'should handle escaped characters' {
+    It 'Should handle escaped characters' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString "Hello`tWorld" -DifferenceString "Hello`nWorld")
         $result | Should -Match '31m09'  # Tab character
         $result | Should -Match '31m0A'  # Newline character
     }
 
-    It 'should handle multiple escaped characters' {
+    It 'Should handle multiple escaped characters' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString "Hello`r`nWorld" -DifferenceString "Hello`n`rWorld")
         $result | Should -Match "`e\[31m0D`e\[0m `e\[31m0A`e\[0m"  # Carriage return + Newline
         $result | Should -Match "`e\[31m0A`e\[0m `e\[31m0D`e\[0m"  # Newline + Carriage return
+    }
+
+    It 'Should handle longer strings' {
+         $result = ConvertTo-DifferenceString -ReferenceString 'This is a string' -DifferenceString 'This is a string that is longer'
+         $result | Should-BeBlockString -Expected @(
+            "Expected:[0m                                                               But was:[0m"
+            "----------------------------------------------------------------        ----------------------------------------------------------------"
+            "Bytes                                           Ascii                   Bytes                                           Ascii"
+            "-----                                           -----                   -----                                           -----"
+            "54 68 69 73 20 69 73 20 61 20 73 74 72 69 6E 67 This is a string   ==   54 68 69 73 20 69 73 20 61 20 73 74 72 69 6E 67 This is a string"
+            "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m    [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m    !=   [31m20[0m [31m74[0m [31m68[0m [31m61[0m [31m74[0m [31m20[0m [31m69[0m [31m73[0m [31m20[0m [31m6C[0m [31m6F[0m [31m6E[0m [31m67[0m [31m65[0m [31m72[0m    [31m [0m[31mt[0m[31mh[0m[31ma[0m[31mt[0m[31m [0m[31mi[0m[31ms[0m[31m [0m[31ml[0m[31mo[0m[31mn[0m[31mg[0m[31me[0m[31mr[0m "
+         )
     }
 }

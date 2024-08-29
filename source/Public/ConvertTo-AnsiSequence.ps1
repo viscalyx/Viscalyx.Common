@@ -44,7 +44,8 @@ function ConvertTo-AnsiSequence
     {
         if ($Value -match "^(?:`e)?\[?([0-9;]+)m?$")
         {
-            $Value = "`e[" + $Matches[1] + 'm'
+            # Cannot use `e in Windows PowerShell, so use [char]0x1b instead.
+            $Value = "$([System.Char] 0x1b)[" + $Matches[1] + 'm'
         }
     }
 
