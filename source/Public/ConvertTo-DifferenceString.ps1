@@ -312,8 +312,11 @@ function ConvertTo-DifferenceString
             $currentGroupHighlighted = $true
         }
 
-        # Replace control characters with their Unicode representations in the output
-        $refChar = $refChar`
+        <#
+            Replace control characters with their Unicode representations.
+            Cannot use `e in Windows PowerShell, so use [char]0x1b instead.
+        #>
+        $refChar = $refChar `
             -replace "`0", '␀' `
             -replace "`a", '␇' `
             -replace "`b", '␈' `
@@ -321,7 +324,7 @@ function ConvertTo-DifferenceString
             -replace "`f", '␌' `
             -replace "`r", '␍' `
             -replace "`n", '␊' `
-            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
+            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))$([System.Char] 0x1b)", '␛'
 
         $diffChar = $diffChar `
             -replace "`0", '␀' `
@@ -331,7 +334,7 @@ function ConvertTo-DifferenceString
             -replace "`f", '␌' `
             -replace "`r", '␍' `
             -replace "`n", '␊' `
-            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
+            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))$([System.Char] 0x1b)", '␛'
 
         # Add to lists
         $refHexList.Add($refHex)
