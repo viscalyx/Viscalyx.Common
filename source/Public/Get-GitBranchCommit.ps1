@@ -74,7 +74,7 @@ function Get-GitBranchCommit
     )
 
     $commitId = $null
-
+    $exitCode = 0
     $argument = @()
 
     if ($PSBoundParameters.ContainsKey('BranchName'))
@@ -93,11 +93,15 @@ function Get-GitBranchCommit
     {
         # Return only the latest commit ID.
         $commitId = git rev-parse HEAD @argument
+
+        $exitCode = $LASTEXITCODE # cSpell: ignore LASTEXITCODE
     }
     elseif ($Last)
     {
         # Return the latest X number of commits.
         $commitId = git log -n $Last --pretty=format:"%H" @argument
+
+        $exitCode = $LASTEXITCODE
     }
     elseif ($First)
     {
@@ -109,21 +113,28 @@ function Get-GitBranchCommit
         # Count the total number of commits in the branch.
         $totalCommits = git rev-list --count $BranchName
 
-        # Calculate the number of commits to skip.
-        $skipCommits = $totalCommits - $First
+        $exitCode = $LASTEXITCODE
 
-        # Return the first X number of commits.
-        $commitId = git log --skip $skipCommits --reverse -n $First --pretty=format:"%H" $BranchName
+        if ($exitCode -eq 0)
+        {
+            # Calculate the number of commits to skip.
+            $skipCommits = $totalCommits - $First
+
+            # Return the first X number of commits.
+            $commitId = git log --skip $skipCommits --reverse -n $First --pretty=format:"%H" $BranchName
+
+            $exitCode = $LASTEXITCODE
+        }
     }
     else
     {
         # Return all commit IDs.
         $commitId = git log --pretty=format:"%H" @argument
+
+        $exitCode = $LASTEXITCODE
     }
 
-    # TODO: Should handle LASTEXITCODE above too
-
-    if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
+    if ($exitCode -ne 0)
     {
         if($PSBoundParameters.ContainsKey('BranchName'))
         {
@@ -134,14 +145,14 @@ function Get-GitBranchCommit
             $errorMessage = $script:localizedData.Get_GitBranchCommit_FailedFromCurrent
         }
 
-        $PSCmdlet.ThrowTerminatingError(
-            [System.Management.Automation.ErrorRecord]::new(
-                $errorMessage,
-                'GGLBN0001', # cspell: disable-line
-                [System.Management.Automation.ErrorCategory]::ObjectNotFound,
-                $branchName
-            )
-        )
+        $errorMessageParameters = @{
+            Message = $errorMessage
+            Category = 'ObjectNotFound'
+            ErrorId = 'GGBC0001' # cspell: disable-line
+            TargetObject = $BranchName # This will be null if no branch name is provided.
+        }
+
+        Write-Error @errorMessageParameters
     }
 
     return $commitId

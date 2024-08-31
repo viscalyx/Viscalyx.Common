@@ -133,7 +133,7 @@ Describe 'New-SamplerGitHubReleaseTag' {
     }
 
     It 'Should switch back to previous branch if specified' {
-        { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -CheckoutOriginalBranch -Force } | Should -Not -Throw
+        { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -ReturnToCurrentBranch -Force } | Should -Not -Throw
     }
 
     It 'Should push tag to upstream if specified' {

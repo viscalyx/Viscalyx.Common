@@ -3,14 +3,14 @@
         Checks if the specified Git remote exists locally and throws an error if it doesn't.
 
     .DESCRIPTION
-        The `Assert-GitRemote` command checks if the remote specified in the `$RemoteName`
+        The `Assert-GitRemote` command checks if the remote specified in the `$Name`
         parameter exists locally. If the remote doesn't exist, it throws an error.
 
     .PARAMETER RemoteName
         Specifies the name of the Git remote to check.
 
     .EXAMPLE
-        PS> Assert-GitRemote -RemoteName "origin"
+        PS> Assert-GitRemote -Name "origin"
 
         This example checks if the Git remote named "origin" exists locally.
 
@@ -27,24 +27,28 @@ function Assert-GitRemote
     (
         [Parameter(Mandatory = $true, Position = 0)]
         [System.String]
-        $RemoteName
+        $Name
     )
+
+    # Change the error action preference to always stop the script if an error occurs.
+    $ErrorActionPreference = 'Stop'
 
     <#
         Check if the remote specified in $UpstreamRemoteName exists locally and
         throw an error if it doesn't.
     #>
-    $remoteExists = Test-GitRemote -RemoteName $RemoteName
+    $remoteExists = Test-GitRemote -Name $Name
 
     if (-not $remoteExists)
     {
-        $PSCmdlet.ThrowTerminatingError(
-            [System.Management.Automation.ErrorRecord]::new(
-                ($script:localizedData.New_SamplerGitHubReleaseTag_RemoteMissing -f $UpstreamRemoteName),
-                'AGR0001', # cspell: disable-line
-                [System.Management.Automation.ErrorCategory]::ObjectNotFound,
-                $DatabaseName
-            )
-        )
+
+        $errorMessageParameters = @{
+            Message = $script:localizedData.New_SamplerGitHubReleaseTag_RemoteMissing -f $Name
+            Category = 'ObjectNotFound'
+            ErrorId = 'AGR0001' # cspell: disable-line
+            TargetObject = $Name
+        }
+
+        Write-Error @errorMessageParameters
     }
 }

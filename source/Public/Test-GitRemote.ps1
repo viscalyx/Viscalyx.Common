@@ -6,11 +6,11 @@
         The Test-GitRemote command checks if the specified Git remote exists locally
         and returns a boolean value indicating its existence.
 
-    .PARAMETER RemoteName
+    .PARAMETER Name
         Specifies the name of the Git remote to be tested.
 
     .EXAMPLE
-        Test-GitRemote -RemoteName "origin"
+        Test-GitRemote -Name "origin"
 
         Returns $true if the "origin" remote exists locally, otherwise returns $false.
 
@@ -25,14 +25,10 @@ function Test-GitRemote
     (
         [Parameter(Mandatory = $true, Position = 0)]
         [System.String]
-        $RemoteName
+        $Name
     )
 
-    # Check if the remote specified in $UpstreamRemoteName exists locally and throw an error if it doesn't.
-    $remoteExists = git remote |
-        Where-Object -FilterScript {
-            $_ -eq $RemoteName
-        }
+    $remoteExists = Get-GitRemote -Name $Name
 
     $result = $false
 

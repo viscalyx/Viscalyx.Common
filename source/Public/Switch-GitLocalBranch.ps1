@@ -1,4 +1,4 @@
-<#
+0<#
     .SYNOPSIS
         Switches to the specified local Git branch.
 
@@ -17,34 +17,47 @@
 #>
 function Switch-GitLocalBranch
 {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '', Justification = 'ShouldProcess is implemented without ShouldProcess/ShouldContinue.')]
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
     param
     (
         [Parameter(Mandatory = $true, Position = 0)]
         [System.String]
-        $BranchName
+        $BranchName,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
     )
 
-
-    if ($WhatIfPreference)
+    if ($Force.IsPresent -and -not $Confirm)
     {
-        Write-Information -MessageData ('What if: Checking out local branch ''{0}''.' -f $BranchName) -InformationAction Continue
+        $ConfirmPreference = 'None'
     }
-    else
+
+    # Only check assertions if not in WhatIf mode.
+    if ($WhatIfPreference -eq $false)
+    {
+        Assert-GitLocalChange
+    }
+
+    $verboseDescriptionMessage = $script:localizedData.Switch_GitLocalBranch_ShouldProcessVerboseDescription -f $BranchName
+    $verboseWarningMessage = $script:localizedData.Switch_GitLocalBranch_ShouldProcessVerboseWarning -f $BranchName
+    $captionMessage = $script:localizedData.Switch_GitLocalBranch_ShouldProcessCaption
+
+    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
     {
         git checkout $BranchName
 
         if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
         {
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    ($script:localizedData.Switch_GitLocalBranch_FailedCheckoutLocalBranch -f $BranchName),
-                    'SGLB0001', # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $BranchName
-                )
-            )
+            $errorMessageParameters = @{
+                Message = $script:localizedData.Switch_GitLocalBranch_FailedCheckoutLocalBranch -f $BranchName
+                Category = 'InvalidOperation'
+                ErrorId = 'SGLB0001' # cspell: disable-line
+                TargetObject = $BranchName
+            }
+
+            Write-Error @errorMessageParameters
         }
     }
 }
