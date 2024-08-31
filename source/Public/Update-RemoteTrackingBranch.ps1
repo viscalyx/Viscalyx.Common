@@ -63,14 +63,14 @@ function Update-RemoteTrackingBranch
 
         if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
         {
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    ($script:localizedData.Update_RemoteTrackingBranch_FailedFetchBranchFromRemote -f ($arguments -join ' ')),
-                    'URTB0001', # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $DatabaseName
-                )
-            )
+            $errorMessageParameters = @{
+                Message = $script:localizedData.Update_RemoteTrackingBranch_FailedFetchBranchFromRemote -f ($arguments -join ' ')
+                Category = 'InvalidOperation'
+                ErrorId = 'URTB0001' # cspell: disable-line
+                TargetObject = ($BranchName + ' ' + $RemoteName)
+            }
+
+            Write-Error @errorMessageParameters
         }
     }
 }

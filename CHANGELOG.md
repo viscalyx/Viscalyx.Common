@@ -39,7 +39,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Viscalyx.Common
   - Added unit tests to run in Windows PowerShell.
 - Public commands:
+  - `Get-GitTag`
+  - `New-GitTag`
+  - `Push-GitTag`
+  - `Request-GitTag`
+  - `Switch-GitLocalBranch`
+  - `Test-GitLocalChanges`
+  - `Test-GitRemote`
+  - `Test-GitRemoteBranch`
   - `Update-GitBranch`
+  - `Update-GitLocalBranch`
+  - `Update-RemoteTrackingBranch`
 
 ### Fixed
 
@@ -178,7 +188,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ConvertTo-DifferenceString`
   - `Get-NumericalSequence`
   - `Get-PSReadLineHistory`
-  - `Invoke-PesterJob`
   - `New-SamplerGitHubReleaseTag`
   - `Out-Difference`
   - `Pop-VMLatestSnapshot`
@@ -186,4 +195,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Remove-PSHistory`
   - `Remove-PSReadLineHistory`
   - `Split-StringAtIndices`
-  - `Update-GitBranch`
