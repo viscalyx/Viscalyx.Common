@@ -25,13 +25,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Public commands:
   - `ConvertTo-AnsiSequence`
   - `ConvertTo-DifferenceString`
+  - `Get-GitTag`
   - `Get-NumericalSequence`
   - `Get-PSReadLineHistory`
+  - `New-GitTag`
   - `New-SamplerGitHubReleaseTag`
   - `Out-Difference`
   - `Pop-VMLatestSnapShot`
+  - `Push-GitTag`
   - `Remove-History`
   - `Remove-PSHistory`
   - `Remove-PSReadLineHistory`
+  - `Request-GitTag`
   - `Split-StringAtIndices`
-  - `Update-GitBranch`
+  - `Switch-GitLocalBranch`
+  - `Test-GitLocalChanges`
+  - `Test-GitRemote`
+  - `Test-GitRemoteBranch`
+  - `Update-GitLocalBranch`
+  - `Update-RemoteTrackingBranch`

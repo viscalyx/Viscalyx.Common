@@ -20,9 +20,22 @@
     .PARAMETER Rebase
         Specifies that the local branch should be rebased with the upstream branch.
 
-    .PARAMETER CheckoutOriginalBranch
+    .PARAMETER ReturnToCurrentBranch
         If specified, switches back to the original branch after performing the
         pull or rebase.
+
+    .PARAMETER SkipSwitchingBranch
+        If specified, the function will not switch to the specified branch.
+
+    .PARAMETER OnlyUpdateRemoteTrackingBranch
+        If specified, only the remote tracking branch will be updated.
+
+    .PARAMETER UseExistingTrackingBranch
+        If specified, only the existing tracking branch will be used to update the
+        local branch.
+
+    .PARAMETER Force
+        If specified, the command will not prompt for confirmation.
 
     .EXAMPLE
         Update-GitLocalBranch
@@ -51,7 +64,7 @@
         Pulls the latest changes into the current branch.
 
     .EXAMPLE
-        Update-GitLocalBranch -CheckoutOriginalBranch
+        Update-GitLocalBranch -ReturnToCurrentBranch
 
         Checks out the 'main' branch, pulls the latest changes, and switches back
         to the original branch.
@@ -59,37 +72,74 @@
 function Update-GitLocalBranch
 {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '', Justification = 'ShouldProcess is implemented correctly.')]
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium', DefaultParameterSetName = 'Default')]
     param
     (
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Default_SkipSwitchingBranch')]
+        [Parameter(ParameterSetName = 'Default_UseExistingTrackingBranch')]
         [System.String]
         $BranchName = 'main',
 
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Default_SkipSwitchingBranch')]
+        [Parameter(ParameterSetName = 'Default_UseExistingTrackingBranch')]
         [System.String]
         $UpstreamBranchName,
 
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Default_SkipSwitchingBranch')]
+        [Parameter(ParameterSetName = 'Default_UseExistingTrackingBranch')]
         [System.String]
         $RemoteName = 'origin',
 
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Default_SkipSwitchingBranch')]
+        [Parameter(ParameterSetName = 'Default_UseExistingTrackingBranch')]
         [System.Management.Automation.SwitchParameter]
         $Rebase,
 
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Default_UseExistingTrackingBranch')]
         [System.Management.Automation.SwitchParameter]
-        $CheckoutOriginalBranch
+        $ReturnToCurrentBranch,
+
+        [Parameter(ParameterSetName = 'Default_SkipSwitchingBranch')]
+        [System.Management.Automation.SwitchParameter]
+        $SkipSwitchingBranch,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Default_SkipSwitchingBranch')]
+        [System.Management.Automation.SwitchParameter]
+        $OnlyUpdateRemoteTrackingBranch,
+
+        [Parameter(ParameterSetName = 'Default_UseExistingTrackingBranch')]
+        [System.Management.Automation.SwitchParameter]
+        $UseExistingTrackingBranch,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Default_SkipSwitchingBranch')]
+        [Parameter(ParameterSetName = 'Default_UseExistingTrackingBranch')]
+        [System.Management.Automation.SwitchParameter]
+        $Force
     )
 
-    Assert-GitRemote -RemoteName $RemoteName
+    if ($Force.IsPresent -and -not $Confirm)
+    {
+        $ConfirmPreference = 'None'
+    }
+
+    # Only check assertions if not in WhatIf mode.
+    if ($WhatIfPreference -eq $false)
+    {
+        Assert-GitRemote -Name $RemoteName
+    }
+
+    $currentLocalBranchName = Get-GitLocalBranchName -Current
 
     if ($BranchName -eq '.')
     {
-        $BranchName = Get-GitLocalBranchName -Current
-
-        Write-Debug -Message ('Using the current branch ''{0}''.' -f $BranchName)
+        $BranchName = $currentLocalBranchName
     }
 
     if (-not $UpstreamBranchName)
@@ -97,50 +147,78 @@ function Update-GitLocalBranch
         $UpstreamBranchName = $BranchName
     }
 
-    if ($WhatIfPreference -eq $false)
+    if (-not $SkipSwitchingBranch.IsPresent -and $BranchName -ne $currentLocalBranchName)
     {
-        Assert-GitLocalChanges
+        # This command will also assert that there are no local changes if not in WhatIf mode.
+        Switch-GitLocalBranch -BranchName $BranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
     }
 
-    # Capture the current branch name only if CheckoutOriginalBranch is specified.
-    if ($CheckoutOriginalBranch)
+    if ($Rebase.IsPresent)
     {
-        $currentLocalBranch = Get-GitLocalBranchName -Current
-    }
-
-    # Fetch the upstream branch
-    Update-RemoteTrackingBranch -RemoteName $RemoteName -BranchName $UpstreamBranchName
-
-    Switch-GitLocalBranch -BranchName $BranchName
-
-    if ($Rebase)
-    {
-        if ($WhatIfPreference)
-        {
-            Write-Information -MessageData ('What if: Rebasing the local branch ''{0}'' using tracking branch ''{1}/{0}''.' -f $UpstreamBranchName, $RemoteName) -InformationAction Continue
-        }
-        else
-        {
-            # Rebase the local branch
-            git rebase $RemoteName/$UpstreamBranchName
-        }
+        $verboseDescriptionMessage = $script:localizedData.Update_GitLocalBranch_Rebase_ShouldProcessVerboseDescription -f $BranchName, $RemoteName, $UpstreamBranchName
+        $verboseWarningMessage = $script:localizedData.Update_GitLocalBranch_Rebase_ShouldProcessVerboseWarning -f $BranchName
+        $captionMessage = $script:localizedData.Update_GitLocalBranch_Rebase_ShouldProcessCaption
     }
     else
     {
-        if ($WhatIfPreference)
+        $verboseDescriptionMessage = $script:localizedData.Update_GitLocalBranch_Pull_ShouldProcessVerboseDescription -f $BranchName, $RemoteName, $UpstreamBranchName
+        $verboseWarningMessage = $script:localizedData.Update_GitLocalBranch_Pull_ShouldProcessVerboseWarning -f $BranchName
+        $captionMessage = $script:localizedData.Update_GitLocalBranch_Pull_ShouldProcessCaption
+    }
+
+    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    {
+        # Fetch the upstream branch
+        if (-not $UseExistingTrackingBranch.IsPresent)
         {
-            Write-Information -MessageData ('What if: Updating the local branch ''{0}'' by pulling from tracking branch ''{1}/{0}''.' -f $UpstreamBranchName, $RemoteName) -InformationAction Continue
+            # TODO: If this fails it should switch to the previous branch
+            Update-RemoteTrackingBranch -RemoteName $RemoteName -BranchName $UpstreamBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
         }
-        else
+
+        if (-not $OnlyUpdateRemoteTrackingBranch.IsPresent)
         {
-            # Run git pull with the specified remote and upstream branch
-            git pull $RemoteName $UpstreamBranchName
+            if ($Rebase.IsPresent)
+            {
+                $argument = "$RemoteName/$UpstreamBranchName"
+
+                # Rebase the local branch
+                git rebase $argument
+
+                $exitCode = $LASTEXITCODE # cSpell: ignore LASTEXITCODE
+            }
+            else
+            {
+                $argument = @($RemoteName, $UpstreamBranchName)
+
+                # Run git pull with the specified remote and upstream branch
+                git pull @argument
+
+                $exitCode = $LASTEXITCODE
+            }
+
+            if ($ReturnToCurrentBranch.IsPresent -and $BranchName -ne $currentLocalBranchName)
+            {
+                Switch-GitLocalBranch -BranchName $currentLocalBranchName -Verbose:$VerbosePreference  -ErrorAction 'Stop'
+            }
+
+            if ($exitCode -ne 0)
+            {
+                $errorMessageParameters = @{
+                    # TODO: Fix correct error message (wrong resource key below)
+                    Message = $script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchTagsFromUpstreamRemote -f $UpstreamRemoteName
+                    Category = 'InvalidOperation'
+                    ErrorId = 'UGLB0001' # cspell: disable-line
+                    TargetObject = $argument -join ' '
+                }
+
+                Write-Error @errorMessageParameters
+            }
         }
     }
 
     # Switch back to the original branch if specified
-    if ($CheckoutOriginalBranch -and $WhatIfPreference -eq $false)
+    if ($ReturnToCurrentBranch.IsPresent -and $BranchName -ne $currentLocalBranchName)
     {
-        Switch-GitLocalBranch -BranchName $currentLocalBranch
+        Switch-GitLocalBranch -BranchName $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
     }
 }
