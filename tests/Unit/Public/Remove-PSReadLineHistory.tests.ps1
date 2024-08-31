@@ -74,13 +74,12 @@ Describe 'Remove-PSReadLineHistory' {
 
             # Assert
             Should -Invoke -CommandName Set-Content -Exactly -Times 1 -Scope It -ParameterFilter {
-                # TODO: Implement a comparison function (Compare-String) to compare arrays that also calls Out-Diff when the arrays are not equal.
                 # Compare the arrays.
                 $compareResult = Compare-Object -ReferenceObject $Value -DifferenceObject $expectedContent
 
                 if ($compareResult)
                 {
-                    Out-Diff -ActualString $Value -ExpectedString $expectedContent
+                    Out-Difference -Difference $Value -Reference $expectedContent
                 }
 
                 # Compare-Object returns 0 when equal.
@@ -111,7 +110,7 @@ Describe 'Remove-PSReadLineHistory' {
 
                 if ($compareResult)
                 {
-                    Out-Diff -ActualString $Value -ExpectedString $expectedContent
+                    Out-Difference -Difference $Value -Reference $expectedContent
                 }
 
                 # Compare-Object returns 0 when equal.

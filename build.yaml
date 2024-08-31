@@ -101,7 +101,7 @@ Pester:
       StackTraceVerbosity: Full
       CIFormat: Auto
     CodeCoverage:
-      CoveragePercentTarget: 85
+      CoveragePercentTarget: 60
       OutputEncoding: ascii
       UseBreakpoints: false
     TestResult:

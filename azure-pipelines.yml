@@ -156,13 +156,47 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Windows Server Core (PowerShell Core)'
+              testRunTitle: 'Windows Server (PowerShell Core)'
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Test Artifact'
             condition: succeededOrFailed()
             inputs:
               targetPath: '$(buildFolderName)/$(testResultFolderName)/'
               artifactName: 'CodeCoverageWinPS7_$(System.JobAttempt)'
+              parallel: true
+
+      - job: test_windows_powershell
+        displayName: 'Unit Windows (Windows PowerShell)'
+        timeoutInMinutes: 0
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Build Artifact'
+            inputs:
+              buildType: 'current'
+              artifactName: $(buildArtifactName)
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
+          - task: PowerShell@2
+            name: test
+            displayName: 'Run Tests'
+            inputs:
+              filePath: './build.ps1'
+              arguments: '-tasks test'
+              pwsh: false
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'NUnit'
+              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
+              testRunTitle: 'Windows Server (Windows PowerShell)'
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Test Artifact'
+            condition: succeededOrFailed()
+            inputs:
+              targetPath: '$(buildFolderName)/$(testResultFolderName)/'
+              artifactName: 'CodeCoverageWinPS_$(System.JobAttempt)'
               parallel: true
 
       - job: test_macos
@@ -233,6 +267,12 @@ stages:
             inputs:
               buildType: 'current'
               artifactName: 'CodeCoverageWinPS7_$(System.JobAttempt)'
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)'
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Test Artifact Windows (WinPS)'
+            inputs:
+              buildType: 'current'
+              artifactName: 'CodeCoverageWinPS_$(System.JobAttempt)'
               targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)'
           - task: PowerShell@2
             name: merge
