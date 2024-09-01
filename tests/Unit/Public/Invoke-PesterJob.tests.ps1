@@ -42,8 +42,6 @@ AfterAll {
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
 }
 
-# Pester tests for Invoke-PesterJob function
-
 Describe 'Invoke-PesterJob' {
     # Mock external dependencies
     BeforeAll {
