@@ -133,10 +133,19 @@ function Invoke-PesterJob
                 #>
                 param
                 (
+                    [Parameter()]
                     $CommandName,
+
+                    [Parameter()]
                     $ParameterName,
+
+                    [Parameter()]
                     $WordToComplete,
+
+                    [Parameter()]
                     $CommandAst,
+
+                    [Parameter()]
                     $FakeBoundParameters
                 )
 
@@ -199,10 +208,19 @@ function Invoke-PesterJob
                 #>
                 param
                 (
+                    [Parameter()]
                     $CommandName,
+
+                    [Parameter()]
                     $ParameterName,
+
+                    [Parameter()]
                     $WordToComplete,
+
+                    [Parameter()]
                     $CommandAst,
+
+                    [Parameter()]
                     $FakeBoundParameters
                 )
 
