@@ -43,37 +43,37 @@ AfterAll {
 }
 
 Describe 'Get-ModuleVersion' {
-    BeforeAll {
-        Mock -CommandName Get-Module -MockWith {
-            if ($Name -eq 'ExistingModule')
-            {
-                return [PSCustomObject] @{
-                    Name        = 'ExistingModule'
-                    Version     = [System.Version] '1.0.0'
-                    PrivateData = [PSCustomObject] @{
-                        PSData = [PSCustomObject] @{
-                            Prerelease = $null
+    Context 'When the module is passed as a string and exists' {
+        BeforeAll {
+            Mock -CommandName Get-Module -MockWith {
+                if ($Name -eq 'ExistingModule')
+                {
+                    return [PSCustomObject] @{
+                        Name        = 'ExistingModule'
+                        Version     = [System.Version] '1.0.0'
+                        PrivateData = [PSCustomObject] @{
+                            PSData = [PSCustomObject] @{
+                                Prerelease = 'preview0001'
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                throw "Cannot find the module '$Name'."
+                else
+                {
+                    throw "Cannot find the module '$Name'."
+                }
             }
         }
-    }
 
-    Context 'When the module is passed as a string and exists' {
         It 'Should return the module version' {
             $result = Get-ModuleVersion -Module 'ExistingModule'
-            $result | Should -Be '1.0.0'
+            $result | Should -Be '1.0.0-preview0001'
         }
     }
 
     Context 'When the module is passed as a string and does not exist' {
         It 'Should throw an error' {
-            { Get-ModuleVersion -Module 'NonExistingModule' } | Should -Throw
+            { Get-ModuleVersion -Module 'NonExistingModule' -ErrorAction 'Stop' } | Should -Throw -ExpectedMessage "Cannot find the module 'NonExistingModule'. Make sure it is loaded into the session."
         }
     }
 
@@ -84,6 +84,12 @@ Describe 'Get-ModuleVersion' {
 
             $result = Get-ModuleVersion -Module $moduleInfo
             $result | Should -Be $moduleInfo.Version.ToString()
+        }
+    }
+
+    Context 'When the module is passed as an invalid type' {
+        It 'Should throw an error' {
+            { Get-ModuleVersion -Module 123 -ErrorAction 'Stop' } | Should -Throw -ExpectedMessage "Invalid parameter type. The parameter 'Module' must be either a string or a PSModuleInfo object."
         }
     }
 }
