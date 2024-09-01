@@ -467,6 +467,7 @@ function Invoke-PesterJob
         }
     }
 
+    # TODO: Move the scriptblock to a private function so it can be unit tested
     Start-Job -ScriptBlock {
         [CmdletBinding()]
         param

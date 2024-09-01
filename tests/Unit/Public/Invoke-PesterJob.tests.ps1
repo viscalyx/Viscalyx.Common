@@ -54,7 +54,6 @@ Describe 'Invoke-PesterJob' {
         }
 
         Mock -CommandName Write-Information
-        Mock -CommandName Get-Module
         Mock -CommandName Start-Job -MockWith { return $mockJob }
         Mock -CommandName Receive-Job
         Mock -CommandName Get-Location -MockWith { return @{ Path = Join-Path -Path $TestDrive -ChildPath 'MockPath' } }
@@ -72,6 +71,10 @@ Describe 'Invoke-PesterJob' {
     }
 
     Context 'When passing invalid parameter values' {
+        BeforeAll {
+            Mock -CommandName Get-Module
+        }
+
         It 'Should throw error if BuildScriptPath does not exist' {
             Mock -CommandName Test-Path -MockWith { return $false }
 
@@ -120,6 +123,7 @@ Describe 'Invoke-PesterJob' {
 
     Context 'When using Pester v4' {
         BeforeAll {
+            Mock -CommandName Get-Module -MockWith { return @{ Version = [version] '4.10.1' } }
             Mock -CommandName Get-ModuleVersion -MockWith { return '4.10.1' }
             Mock -CommandName Import-Module -MockWith { return @{ Version = [version]'4.10.1' } }
         }
@@ -129,6 +133,28 @@ Describe 'Invoke-PesterJob' {
                 Invoke-PesterJob
 
                 Should -Invoke -CommandName Get-Location -Times 2
+            }
+        }
+
+        Context 'When passing RootPath parameter' {
+            It 'Should use passed RootPath' {
+                $params = @{
+                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    RootPath = $TestDrive
+                }
+
+                Invoke-PesterJob @params
+            }
+        }
+
+        Context 'When passing Tag parameter' {
+            It 'Should use passed RootPath' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    Tag  = 'Unit'
+                }
+
+                Invoke-PesterJob @params
             }
         }
 
@@ -228,6 +254,7 @@ Describe 'Invoke-PesterJob' {
 
     Context 'When using Pester v5' {
         BeforeAll {
+            Mock -CommandName Get-Module -MockWith { return @{ Version = [version] '5.4.0' } }
             Mock -CommandName Get-ModuleVersion -MockWith { return '5.4.0' }
             Mock -CommandName Import-Module -MockWith { return @{ Version = [version] '5.4.0' } }
         }
@@ -243,8 +270,19 @@ Describe 'Invoke-PesterJob' {
         Context 'When passing RootPath parameter' {
             It 'Should use passed RootPath' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     RootPath = $TestDrive
+                }
+
+                Invoke-PesterJob @params
+            }
+        }
+
+        Context 'When passing Tag parameter' {
+            It 'Should use passed RootPath' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    Tag  = 'Unit'
                 }
 
                 Invoke-PesterJob @params
