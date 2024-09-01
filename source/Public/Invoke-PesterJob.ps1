@@ -117,6 +117,7 @@
 #>
 function Invoke-PesterJob
 {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('AvoidWriteErrorStop', '', Justification = 'If $PSCmdlet.ThrowTerminatingError were used, the error would not stop any command that would call Invoke-PesterJob.')]
     [Alias('ipj')]
     [CmdletBinding()]
     param
