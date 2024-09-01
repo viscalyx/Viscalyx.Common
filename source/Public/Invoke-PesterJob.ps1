@@ -163,18 +163,22 @@ function Invoke-PesterJob
                     }
                 }
             })]
+        [ValidateNotNullOrEmpty()]
         [System.String[]]
         $Path = (Get-Location).Path,
 
         [Parameter()]
+        [ValidateNotNullOrEmpty()]
         [System.String]
         $RootPath = (Get-Location).Path,
 
         [Parameter()]
+        [ValidateNotNullOrEmpty()]
         [System.String[]]
         $Tag,
 
         [Parameter()]
+        [ValidateNotNullOrEmpty()]
         [System.String]
         $ModuleName,
 
@@ -183,7 +187,7 @@ function Invoke-PesterJob
         [ValidateSet('Normal', 'Detailed', 'None', 'Diagnostic', 'Minimal')]
         $Output,
 
-        [Parameter()]
+        [Parameter(Position = 1)]
         [ArgumentCompleter(
             {
                 <#
@@ -235,6 +239,7 @@ function Invoke-PesterJob
                     }
                 }
             })]
+        [ValidateNotNullOrEmpty()]
         [System.String[]]
         $CodeCoveragePath,
 
@@ -394,7 +399,13 @@ function Invoke-PesterJob
     # Turn off code coverage if the user has specified that they don't want it
     if ($SkipCodeCoverage.IsPresent)
     {
-        $pesterConfig.CodeCoverage.Enabled = $false
+        # Pester v4: By not passing code paths the code coverage is disabled.
+
+        # Pester v5: By setting the Enabled property to false the code coverage is disabled.
+        if ($importedPesterModule.Version.Major -ge 5)
+        {
+            $pesterConfig.CodeCoverage.Enabled = $false
+        }
     }
     else
     {
@@ -407,17 +418,35 @@ function Invoke-PesterJob
 
     if ($PassThru.IsPresent)
     {
-        $pesterConfig.Run.PassThru = $true
+        if ($importedPesterModule.Version.Major -eq 4)
+        {
+            $pesterConfig.PassThru = $true
+        }
+        else
+        {
+            $pesterConfig.Run.PassThru = $true
+        }
     }
 
     if ($SkipRun.IsPresent)
     {
-        $pesterConfig.Run.SkipRun = $true
+        # This is only supported in Pester v5 or higher.
+        if ($importedPesterModule.Version.Major -ge 5)
+        {
+            $pesterConfig.Run.SkipRun = $true
+        }
     }
 
     if ($PSBoundParameters.ContainsKey('Tag'))
     {
-        $pesterConfig.Filter.Tag = $Tag
+        if ($importedPesterModule.Version.Major -eq 4)
+        {
+            $pesterConfig.Tag = $Tag
+        }
+        else
+        {
+            $pesterConfig.Filter.Tag = $Tag
+        }
     }
 
     Start-Job -ScriptBlock {
