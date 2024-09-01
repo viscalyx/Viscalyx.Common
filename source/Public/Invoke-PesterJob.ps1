@@ -291,9 +291,7 @@ function Invoke-PesterJob
 
         [Parameter()]
         [System.Collections.Hashtable]
-        $BuildScriptParameter = @{
-            Task = 'noop'
-        }
+        $BuildScriptParameter = @{ Task = 'noop' }
     )
 
     if (-not $PSBoundParameters.ContainsKey('BuildScriptPath'))
