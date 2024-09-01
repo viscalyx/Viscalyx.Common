@@ -253,6 +253,7 @@ Describe 'Invoke-PesterJob' {
     Context 'When using Pester v5' {
         BeforeAll {
             Mock -CommandName Get-Module -MockWith { return @{ Version = [version] '5.4.0' } }
+            Mock -CommandName Get-SamplerProjectName -MockWith { return 'MockModuleName' }
             Mock -CommandName Get-ModuleVersion -MockWith { return '5.4.0' }
             Mock -CommandName Import-Module -MockWith { return @{ Version = [version] '5.4.0' } }
         }
