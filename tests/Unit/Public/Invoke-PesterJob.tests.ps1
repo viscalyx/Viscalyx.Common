@@ -123,7 +123,7 @@ Describe 'Invoke-PesterJob' {
 
     Context 'When using Pester v4' {
         BeforeAll {
-            Mock -CommandName Get-Module -MockWith { return @{ Version = [version] '4.10.1' } }
+            Mock -CommandName Get-Module # Mocked with nothing, to mimic not finding Sampler module
             Mock -CommandName Get-ModuleVersion -MockWith { return '4.10.1' }
             Mock -CommandName Import-Module -MockWith { return @{ Version = [version]'4.10.1' } }
         }
