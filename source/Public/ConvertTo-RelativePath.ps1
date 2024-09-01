@@ -17,11 +17,7 @@
         location obtained from Get-Location.
 
     .EXAMPLE
-        $convertToRelativePathParameters = @{
-            AbsolutePath = '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1'
-            CurrentLocation = "/source/Viscalyx.Common"
-        }
-        ConvertTo-RelativePath @convertToRelativePathParameters
+        ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' -CurrentLocation "/source/Viscalyx.Common"
 
         Returns "./source/Public/ConvertTo-RelativePath.ps1", which is the
         relative path of the given absolute path based on the current location.
