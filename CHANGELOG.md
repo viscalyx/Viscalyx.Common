@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Public commands:
+  - `Invoke-PesterJob`
+  - `Get-ModuleVersion`
+  - `ConvertTo-RelativePath`
+
 ## [0.2.0] - 2024-08-25
 
 ### Added
@@ -14,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ConvertTo-DifferenceString`
   - `Get-NumericalSequence`
   - `Get-PSReadLineHistory`
+  - `Invoke-PesterJob`
   - `New-SamplerGitHubReleaseTag`
   - `Out-Difference`
   - `Pop-VMLatestSnapShot`
