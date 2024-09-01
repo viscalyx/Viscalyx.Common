@@ -483,14 +483,20 @@ function Invoke-PesterJob
 
             [Parameter(Position = 2)]
             [Version]
-            $PesterVersion
+            $PesterVersion,
+
+            [Parameter(Position = 3)]
+            [System.String]
+            $BuildScriptPath,
+
+            [Parameter(Position = 4)]
+            [System.Collections.Hashtable]
+            $BuildScriptParameter
         )
 
         Write-Information -MessageData 'Running build task ''noop'' inside the job to setup the test pipeline.' -InformationAction 'Continue'
 
-        # TODO: Use BuildScriptPath and BuildScriptParameter here
-        .\build.ps1 -Task noop
-        #$VerbosePreference = 'Continue'
+        & $BuildScriptPath @buildScriptParameter
 
         if ($ShowError.IsPresent)
         {
@@ -516,6 +522,8 @@ function Invoke-PesterJob
         $pesterConfig
         $ShowError.IsPresent
         $importedPesterModule.Version
+        $BuildScriptPath
+        $BuildScriptParameter
     ) |
         Receive-Job -AutoRemoveJob -Wait
 }
