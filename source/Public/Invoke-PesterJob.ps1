@@ -357,16 +357,13 @@ function Invoke-PesterJob
 
     if (-not $PSBoundParameters.ContainsKey('CodeCoveragePath'))
     {
-        <#
-            TODO: If it is not a Sampler project, then the user must provide the
-                  path to the module to test. But it should be possible to also
-                  use default coverage paths for the module to test.
-        #>
+        # TODO: Should be possible to use default coverage paths for a module that is not based on Sampler.
         if ($isSamplerProject)
         {
             $BuiltModuleBase = Get-SamplerBuiltModuleBase -OutputDirectory "$RootPath/output" -BuiltModuleSubdirectory 'builtModule' -ModuleName $ModuleName
 
             # TODO: This does not take into account any .ps1 files in the module.
+            # TODO: This does not take into account any other .psm1 files in the module, e.g. MOF-based DSC resources.
             $CodeCoveragePath = '{0}/*/{1}.psm1' -f $BuiltModuleBase, $ModuleName
         }
     }
@@ -468,28 +465,27 @@ function Invoke-PesterJob
         }
     }
 
-    # TODO: Move the scriptblock to a private function so it can be unit tested
     Start-Job -ScriptBlock {
         [CmdletBinding()]
         param
         (
-            [Parameter(Position = 0)]
-            [Object]
+            [Parameter(Mandatory = $true, Position = 0)]
+            [System.Object]
             $PesterConfiguration,
 
-            [Parameter(Position = 1)]
-            [Switch]
+            [Parameter(Mandatory = $true, Position = 1)]
+            [System.Management.Automation.SwitchParameter]
             $ShowError,
 
-            [Parameter(Position = 2)]
-            [Version]
+            [Parameter(Mandatory = $true, Position = 2)]
+            [System.Version]
             $PesterVersion,
 
-            [Parameter(Position = 3)]
+            [Parameter(Mandatory = $true, Position = 3)]
             [System.String]
             $BuildScriptPath,
 
-            [Parameter(Position = 4)]
+            [Parameter(Mandatory = $true, Position = 4)]
             [System.Collections.Hashtable]
             $BuildScriptParameter
         )
