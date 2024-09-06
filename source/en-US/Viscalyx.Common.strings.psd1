@@ -34,6 +34,13 @@ ConvertFrom-StringData @'
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Convert_PesterSyntax_ShouldProcessCaption = Convert script file
 
+    ## Rename-GitLocalBranch
+    Rename_GitLocalBranch_FailedToRename = Failed to rename branch '{0}' to '{1}'. Make sure the local repository is accessible.
+    Rename_GitLocalBranch_FailedFetch = Failed to fetch from remote '{0}'. Make sure the remote exists and is accessible.
+    Rename_GitLocalBranch_FailedSetUpstreamTracking = Failed to set upstream tracking for branch '{0}' against remote '{1}'. Make sure the local repository is accessible.
+    Rename_GitLocalBranch_FailedSetDefaultBranchForRemote = Failed to set '{0}' as the default branch for remote '{1}'. Make sure the local repository is accessible.
+    Rename_GitLocalBranch_RenamedBranch = Successfully renamed branch '{0}' to '{1}'.
+
     ## New-GitTag
     New_GitTag_ShouldProcessVerboseDescription = Creating tag '{0}'.
     New_GitTag_ShouldProcessVerboseWarning = Are you sure you want to create tag '{0}'?
