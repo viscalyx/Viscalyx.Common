@@ -7,11 +7,11 @@
         Git branch. It checks if the branch exists and performs the checkout operation.
         If the checkout fails, it throws an error.
 
-    .PARAMETER BranchName
+    .PARAMETER Name
         The name of the branch to switch to.
 
     .EXAMPLE
-        Switch-GitLocalBranch -BranchName "feature/branch"
+        Switch-GitLocalBranch -Name "feature/branch"
 
         This example switches to the "feature/branch" local Git branch.
 #>
@@ -22,7 +22,7 @@ function Switch-GitLocalBranch
     (
         [Parameter(Mandatory = $true, Position = 0)]
         [System.String]
-        $BranchName,
+        $Name,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -40,21 +40,21 @@ function Switch-GitLocalBranch
         Assert-GitLocalChange
     }
 
-    $verboseDescriptionMessage = $script:localizedData.Switch_GitLocalBranch_ShouldProcessVerboseDescription -f $BranchName
-    $verboseWarningMessage = $script:localizedData.Switch_GitLocalBranch_ShouldProcessVerboseWarning -f $BranchName
+    $verboseDescriptionMessage = $script:localizedData.Switch_GitLocalBranch_ShouldProcessVerboseDescription -f $Name
+    $verboseWarningMessage = $script:localizedData.Switch_GitLocalBranch_ShouldProcessVerboseWarning -f $Name
     $captionMessage = $script:localizedData.Switch_GitLocalBranch_ShouldProcessCaption
 
     if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
     {
-        git checkout $BranchName
+        git checkout $Name
 
         if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
         {
             $errorMessageParameters = @{
-                Message = $script:localizedData.Switch_GitLocalBranch_FailedCheckoutLocalBranch -f $BranchName
+                Message = $script:localizedData.Switch_GitLocalBranch_FailedCheckoutLocalBranch -f $Name
                 Category = 'InvalidOperation'
                 ErrorId = 'SGLB0001' # cspell: disable-line
-                TargetObject = $BranchName
+                TargetObject = $Name
             }
 
             Write-Error @errorMessageParameters

@@ -102,7 +102,7 @@ function New-SamplerGitHubReleaseTag
     if ($DefaultBranchName -ne $currentLocalBranchName)
     {
         # This command will also assert that there are no local changes if not in WhatIf mode.
-        Switch-GitLocalBranch -BranchName $DefaultBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+        Switch-GitLocalBranch -Name $DefaultBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
 
         $switchedBranch = $true
     }
@@ -119,7 +119,7 @@ function New-SamplerGitHubReleaseTag
         if ($switchedBranch)
         {
             # This command will also assert that there are no local changes if not in WhatIf mode.
-            Switch-GitLocalBranch -BranchName $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+            Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
         }
 
         Write-Error -ErrorRecord $_ -ErrorAction 'Stop'
@@ -134,7 +134,7 @@ function New-SamplerGitHubReleaseTag
     {
         if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
         {
-            Switch-GitLocalBranch -BranchName $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+            Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
         }
 
         Write-Error -ErrorRecord $_ -ErrorAction 'Stop'
@@ -184,7 +184,7 @@ function New-SamplerGitHubReleaseTag
         {
             if ($switchedBranch)
             {
-                Switch-GitLocalBranch -BranchName $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+                Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
             }
 
             Write-Error -ErrorRecord $_ -ErrorAction 'Stop'
@@ -237,7 +237,7 @@ function New-SamplerGitHubReleaseTag
         {
             if ($switchedBranch)
             {
-                Switch-GitLocalBranch -BranchName $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+                Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
             }
 
             Write-Error -ErrorRecord $_ -ErrorAction 'Stop'
@@ -246,6 +246,6 @@ function New-SamplerGitHubReleaseTag
 
     if ($switchedBranch)
     {
-        Switch-GitLocalBranch -BranchName $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+        Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
     }
 }
