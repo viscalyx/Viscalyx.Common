@@ -181,10 +181,14 @@ function Update-GitLocalBranch
             {
                 $argument = "$RemoteName/$UpstreamBranchName"
 
+                # TODO: Should call new command `Start-GitRebase`
                 # Rebase the local branch
                 git rebase $argument
 
                 $exitCode = $LASTEXITCODE # cSpell: ignore LASTEXITCODE
+
+                # TODO: Handle when error is rebase conflict resolution
+                Write-Verbose -Message "Rebase exit code: $exitCode" -Verbose
             }
             else
             {
@@ -204,8 +208,8 @@ function Update-GitLocalBranch
             if ($exitCode -ne 0)
             {
                 $errorMessageParameters = @{
-                    # TODO: Fix correct error message (wrong resource key below)
-                    Message = $script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchTagsFromUpstreamRemote -f $UpstreamRemoteName
+                    Message = $script:localizedData.Update_GitLocalBranch_FailedRebase -f $RemoteName, $UpstreamBranchName
+
                     Category = 'InvalidOperation'
                     ErrorId = 'UGLB0001' # cspell: disable-line
                     TargetObject = $argument -join ' '
