@@ -109,6 +109,9 @@ Describe 'New-SamplerGitHubReleaseTag' {
 
         AfterAll {
             $script:MockLastExitCode = 0
+
+            # Reset the LASTEXITCODE to 0 after all the tests
+            Set-Variable -Name 'LASTEXITCODE' -Value $script:MockLastExitCode -Scope Global
         }
 
         It 'Should throw if branch does not exist' {
