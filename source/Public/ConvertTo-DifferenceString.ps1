@@ -156,13 +156,14 @@ function ConvertTo-DifferenceString
     $ColumnHeaderAnsi = ConvertTo-AnsiSequence -Value $ColumnHeaderAnsi
     $ColumnHeaderResetAnsi = ConvertTo-AnsiSequence -Value $ColumnHeaderResetAnsi
 
-    # Handle empty string or single character indicator
+    # Precompute padding the indicators outside the loop
     $NotEqualIndicator = $NotEqualIndicator.PadRight(2)
     $EqualIndicator = $EqualIndicator.PadRight(2)
 
     # Convert the strings to byte arrays using the specified encoding
-    $referenceBytes = ([System.Text.Encoding]::$EncodingType).GetBytes($ReferenceString)
-    $differenceBytes = ([System.Text.Encoding]::$EncodingType).GetBytes($DifferenceString)
+    $encoding = [System.Text.Encoding]::$EncodingType
+    $referenceBytes = $encoding.GetBytes($ReferenceString)
+    $differenceBytes = $encoding.GetBytes($DifferenceString)
 
     # Determine the maximum length of the two byte arrays
     $maxLength = [Math]::Max($referenceBytes.Length, $differenceBytes.Length)
@@ -195,7 +196,18 @@ function ConvertTo-DifferenceString
         {
             $refByte = $referenceBytes[$i]
             $refHex = '{0:X2}' -f $refByte
-            $refChar = if ($refByte -lt 32) { [char]($refByte + 0x2400) } elseif ($refByte -eq 127) { [char]0x2421 } else { [char]$refByte }
+            $refChar = if ($refByte -lt 32)
+            {
+                [System.Char] ($refByte + 0x2400)
+            }
+            elseif ($refByte -eq 127)
+            {
+                [System.Char] 0x2421
+            }
+            else
+            {
+                [System.Char] $refByte
+            }
         }
         else
         {
@@ -208,7 +220,18 @@ function ConvertTo-DifferenceString
         {
             $diffByte = $differenceBytes[$i]
             $diffHex = '{0:X2}' -f $diffByte
-            $diffChar = if ($diffByte -lt 32) { [char]($diffByte + 0x2400) } elseif ($diffByte -eq 127) { [char]0x2421 } else { [char]$diffByte }
+            $diffChar = if ($diffByte -lt 32)
+            {
+                [System.Char] ($diffByte + 0x2400)
+            }
+            elseif ($diffByte -eq 127)
+            {
+                [System.Char] 0x2421
+            }
+            else
+            {
+                [System.Char] $diffByte
+            }
         }
         else
         {
