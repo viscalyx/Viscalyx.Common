@@ -149,6 +149,7 @@ function ConvertTo-DifferenceString
         $EncodingType = 'UTF8'
     )
 
+    # Get actual ANSI escape sequences if they weren't.
     $HighlightStart = ConvertTo-AnsiSequence -Value $HighlightStart
     $HighlightEnd = ConvertTo-AnsiSequence -Value $HighlightEnd
     $ReferenceLabelAnsi = ConvertTo-AnsiSequence -Value $ReferenceLabelAnsi
@@ -156,7 +157,7 @@ function ConvertTo-DifferenceString
     $ColumnHeaderAnsi = ConvertTo-AnsiSequence -Value $ColumnHeaderAnsi
     $ColumnHeaderResetAnsi = ConvertTo-AnsiSequence -Value $ColumnHeaderResetAnsi
 
-    # Precompute padding the indicators outside the loop
+    # Pre-pad indicators
     $NotEqualIndicator = $NotEqualIndicator.PadRight(2)
     $EqualIndicator = $EqualIndicator.PadRight(2)
 
