@@ -6,12 +6,6 @@
 #>
 
 ConvertFrom-StringData @'
-    ## Remove-History
-    Convert_PesterSyntax_ShouldProcessVerboseDescription = Converting the script file '{0}'.
-    Convert_PesterSyntax_ShouldProcessVerboseWarning = Are you sure you want to convert the script file '{0}'?
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    Convert_PesterSyntax_ShouldProcessCaption = Convert script file
-
     ## New-SamplerGitHubReleaseTag
     New_SamplerGitHubReleaseTag_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding.
     New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote = Failed to fetch branch '{0}' from the remote '{1}'. Make sure the branch exists in the remote git repository and the remote is accessible.
