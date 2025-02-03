@@ -189,6 +189,8 @@ function ConvertTo-DifferenceString
         "$($ColumnHeaderAnsi)-----                                           -----                   -----                                           -----$($ColumnHeaderResetAnsi)"
     }
 
+    $isHighlighted = $false
+
     # Loop through each byte in the arrays up to the maximum length
     for ($i = 0; $i -lt $maxLength; $i++)
     {
@@ -249,10 +251,6 @@ function ConvertTo-DifferenceString
             $diffChar = "$($HighlightStart)$diffChar$($HighlightEnd)"
 
             $isHighlighted = $true
-        }
-        else
-        {
-            $isHighlighted = $false
         }
 
         # Add to arrays
