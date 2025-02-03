@@ -103,10 +103,15 @@ Describe '-join (ConvertTo-DifferenceString' {
         $result | Should -Match '31md'
     }
 
-    It 'Should handle special characters' {
+    It 'Should handle CR and LF special characters' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString "Hello`n" -DifferenceString "Hello`r")
         $result | Should -Match '31m0A'
         $result | Should -Match '31m0D'
+    }
+
+    It 'Should handle DEL special characters' {
+        $result = -join (ConvertTo-DifferenceString -ReferenceString ('Hello' + [char] 127) -DifferenceString ('Hello' + [char] 127))
+        $result | Should -Match ([System.Char] 0x2421)
     }
 
     It 'Should use custom highlighting' {
