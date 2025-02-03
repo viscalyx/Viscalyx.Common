@@ -79,7 +79,6 @@
 #>
 function ConvertTo-DifferenceString
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseBOMForUnicodeEncodedFile', '', Justification = 'This file is not intended to be saved as a Unicode-encoded file even though it has unicode characters, if that is a problem that can be re-evaluated.')]
     [CmdletBinding()]
     [OutputType([System.String])]
     param
@@ -150,6 +149,7 @@ function ConvertTo-DifferenceString
         $EncodingType = 'UTF8'
     )
 
+    # Get actual ANSI escape sequences if they weren't.
     $HighlightStart = ConvertTo-AnsiSequence -Value $HighlightStart
     $HighlightEnd = ConvertTo-AnsiSequence -Value $HighlightEnd
     $ReferenceLabelAnsi = ConvertTo-AnsiSequence -Value $ReferenceLabelAnsi
@@ -157,13 +157,14 @@ function ConvertTo-DifferenceString
     $ColumnHeaderAnsi = ConvertTo-AnsiSequence -Value $ColumnHeaderAnsi
     $ColumnHeaderResetAnsi = ConvertTo-AnsiSequence -Value $ColumnHeaderResetAnsi
 
-    # Handle empty string or single character indicator
+    # Pre-pad indicators
     $NotEqualIndicator = $NotEqualIndicator.PadRight(2)
     $EqualIndicator = $EqualIndicator.PadRight(2)
 
     # Convert the strings to byte arrays using the specified encoding
-    $referenceBytes = ([System.Text.Encoding]::$EncodingType).GetBytes($ReferenceString)
-    $differenceBytes = ([System.Text.Encoding]::$EncodingType).GetBytes($DifferenceString)
+    $encoding = [System.Text.Encoding]::$EncodingType
+    $referenceBytes = $encoding.GetBytes($ReferenceString)
+    $differenceBytes = $encoding.GetBytes($DifferenceString)
 
     # Determine the maximum length of the two byte arrays
     $maxLength = [Math]::Max($referenceBytes.Length, $differenceBytes.Length)
@@ -173,10 +174,6 @@ function ConvertTo-DifferenceString
     $refCharArray = @()
     $diffHexArray = @()
     $diffCharArray = @()
-
-    # Escape $HighlightStart and $HighlightEnd for regex matching
-    $escapedHighlightStart = [regex]::Escape($HighlightStart)
-    $escapedHighlightEnd = [regex]::Escape($HighlightEnd)
 
     # Output the labels if NoLabels is not specified
     if (-not $NoLabels)
@@ -192,6 +189,8 @@ function ConvertTo-DifferenceString
         "$($ColumnHeaderAnsi)-----                                           -----                   -----                                           -----$($ColumnHeaderResetAnsi)"
     }
 
+    $isHighlighted = $false
+
     # Loop through each byte in the arrays up to the maximum length
     for ($i = 0; $i -lt $maxLength; $i++)
     {
@@ -200,7 +199,18 @@ function ConvertTo-DifferenceString
         {
             $refByte = $referenceBytes[$i]
             $refHex = '{0:X2}' -f $refByte
-            $refChar = [char]$refByte
+            $refChar = if ($refByte -lt 32)
+            {
+                [System.Char] ($refByte + 0x2400)
+            }
+            elseif ($refByte -eq 127)
+            {
+                [System.Char] 0x2421
+            }
+            else
+            {
+                [System.Char] $refByte
+            }
         }
         else
         {
@@ -213,7 +223,18 @@ function ConvertTo-DifferenceString
         {
             $diffByte = $differenceBytes[$i]
             $diffHex = '{0:X2}' -f $diffByte
-            $diffChar = [char]$diffByte
+            $diffChar = if ($diffByte -lt 32)
+            {
+                [System.Char] ($diffByte + 0x2400)
+            }
+            elseif ($diffByte -eq 127)
+            {
+                [System.Char] 0x2421
+            }
+            else
+            {
+                [System.Char] $diffByte
+            }
         }
         else
         {
@@ -228,28 +249,9 @@ function ConvertTo-DifferenceString
             $refChar = "$($HighlightStart)$refChar$($HighlightEnd)"
             $diffHex = "$($HighlightStart)$diffHex$($HighlightEnd)"
             $diffChar = "$($HighlightStart)$diffChar$($HighlightEnd)"
+
+            $isHighlighted = $true
         }
-
-        # Replace control characters with their Unicode representations in the output
-        $refChar = $refChar`
-            -replace "`0", '␀' `
-            -replace "`a", '␇' `
-            -replace "`b", '␈' `
-            -replace "`t", '␉' `
-            -replace "`f", '␌' `
-            -replace "`r", '␍' `
-            -replace "`n", '␊' `
-            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
-
-        $diffChar = $diffChar `
-            -replace "`0", '␀' `
-            -replace "`a", '␇' `
-            -replace "`b", '␈' `
-            -replace "`t", '␉' `
-            -replace "`f", '␌' `
-            -replace "`r", '␍' `
-            -replace "`n", '␊' `
-            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))`e", '␛'
 
         # Add to arrays
         $refHexArray += $refHex
@@ -283,8 +285,8 @@ function ConvertTo-DifferenceString
             $diffHexLine = ($diffHexArray -join ' ')
             $diffCharLine = ($diffCharArray -join '')
 
-            # Determine if the line was highlighted
-            $indicator = if ($refHexLine -match $escapedHighlightStart -or $diffHexLine -match $escapedHighlightStart)
+            # Output indicator depending if the line was highlighted or not.
+            $indicator = if ($isHighlighted)
             {
                 $NotEqualIndicator
             }
