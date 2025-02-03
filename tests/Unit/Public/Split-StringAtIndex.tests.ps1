@@ -44,19 +44,19 @@ AfterAll {
 
 Describe 'Split-StringAtIndex' {
     Context 'Using StartIndex and EndIndex parameters' {
-        It 'should split the string correctly with valid indices' {
+        It 'Should split the string correctly with valid indices' {
             $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 4
 
             $result | Should-BeEquivalent @('Hello', ', World!')
         }
 
-        It 'should handle indices at the end of the string' {
+        It 'Should handle indices at the end of the string' {
             $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 7 -EndIndex 11
 
             $result | Should-BeEquivalent @('Hello, ', 'World', '!')
         }
 
-        It 'should return the whole string if indices cover the entire string' {
+        It 'Should return the whole string if indices cover the entire string' {
             $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 12
 
             $result | Should-BeEquivalent @('Hello, World!')
@@ -64,7 +64,7 @@ Describe 'Split-StringAtIndex' {
     }
 
     Context 'Using pipeline input with IndexObject' {
-        It 'should split the string correctly with valid index objects' {
+        It 'Should split the string correctly with valid index objects' {
             $indexObjects = @(@{Start = 0; End = 4}, @{Start = 7; End = 11})
 
             $result = $indexObjects | Split-StringAtIndex -InputString "Hello, World!"
@@ -72,7 +72,7 @@ Describe 'Split-StringAtIndex' {
             $result | Should-BeEquivalent @('Hello', ', ', 'World', '!')
         }
 
-        It 'should handle multiple index objects' {
+        It 'Should handle multiple index objects' {
             $indexObjects = @(@{Start = 0; End = 2}, @{Start = 4; End = $null}, @{Start = 8; End = 10})
 
             # cSpell:ignore abcdefghijk
@@ -83,17 +83,17 @@ Describe 'Split-StringAtIndex' {
     }
 
     Context 'Edge cases' {
-        It 'should return the whole string if no indices are provided' {
+        It 'Should return the whole string if no indices are provided' {
             $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 12
 
             $result | Should-BeEquivalent @('Hello, World!')
         }
 
-        It 'should handle empty input string' {
+        It 'Should handle empty input string' {
             {  Split-StringAtIndex -InputString "" } | Should -Throw
         }
 
-        It 'should throw an error if indices are out of bounds' {
+        It 'Should throw an error if indices are out of bounds' {
             { Split-StringAtIndex -InputString "Hello" -StartIndex 10 -EndIndex 15 } | Should -Throw
         }
     }
