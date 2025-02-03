@@ -160,6 +160,7 @@ Describe '-join (ConvertTo-DifferenceString' {
         $largeString1 = 'a' * 10000
         $largeString2 = 'a' * 9999 + 'b'
 
-        Measure-Command { ConvertTo-DifferenceString -ReferenceString $largeString1 -DifferenceString $largeString2 } | Should-BeFasterThan '1.5s' -Because 'Large strings should be processed efficiently, and should not take more than 1.5 seconds.'
+        # TODO: When Because works in Should-BeFasterThan, uncomment the part on the following line.
+        Measure-Command { ConvertTo-DifferenceString -ReferenceString $largeString1 -DifferenceString $largeString2 } | Should-BeFasterThan '1.5s' #-Because 'Large strings should be processed efficiently, and should not take more than 1.5 seconds.'
     }
 }
