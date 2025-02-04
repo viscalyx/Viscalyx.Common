@@ -164,4 +164,20 @@ Describe '-join (ConvertTo-DifferenceString' {
     #     # TODO: When Because works in Should-BeFasterThan, uncomment the part on the following line.
     #     Measure-Command { ConvertTo-DifferenceString -ReferenceString $largeString1 -DifferenceString $largeString2 } | Should-BeFasterThan '1.5s' #-Because 'Large strings should be processed efficiently, and should not take more than 1.5 seconds.'
     # }
+
+    Context 'NoHexOutput functionality' {
+        It 'Should output only ascii characters when NoHexOutput is specified' {
+            $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello World' -DifferenceString 'Hello World' -NoHexOutput)
+            # Ensure no hex values appear (e.g. two-digit hex groups).
+            $result | Should -Not -Match '\b[0-9A-F]{2}\b'
+            # Ensure that the ascii portion of the string is present.
+            $result | Should -Match 'Hello World'
+        }
+        It 'Should use larger grouping (64 characters) when NoHexOutput is specified' {
+            $longStr = 'A' * 70
+            $result = -join (ConvertTo-DifferenceString -ReferenceString $longStr -DifferenceString $longStr -NoHexOutput)
+            $result | Should -Match 'A{64}   ==   A{64}'
+            ($result -split '\n').Count | Should -Be 1
+        }
+    }
 }
