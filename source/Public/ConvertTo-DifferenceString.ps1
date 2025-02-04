@@ -176,7 +176,14 @@ function ConvertTo-DifferenceString
     $maxLength = [Math]::Max($refLength, $diffLength)
 
     # Use a larger group size when hex output is disabled
-    $groupSize = if ($NoHexOutput) { 64 } else { 16 }
+    $groupSize = if ($NoHexOutput)
+    {
+        64
+    }
+    else
+    {
+        16
+    }
 
     # Output the labels if NoLabels is not specified
     if (-not $NoLabels)
@@ -371,7 +378,14 @@ function ConvertTo-DifferenceString
                 }
                 $refChars = $refCharArray -join ''
                 $diffChars = $diffCharArray -join ''
-                $indicator = if ($currentGroupHighlighted) { $NotEqualIndicator } else { $EqualIndicator }
+                $indicator = if ($currentGroupHighlighted)
+                {
+                    $NotEqualIndicator
+                }
+                else
+                {
+                    $EqualIndicator
+                }
                 '{0}   {1}   {2}' -f $refChars, $indicator, $diffChars
             }
         }
