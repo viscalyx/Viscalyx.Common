@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     to their corresponding Unicode representations in the Control Pictures
     block to output printable versions.
   - Optimize code and improve performance.
+  - Added parameter `NoHexOutput`.
+- `Out-Difference`
+  - Added parameter `NoHexOutput`.
 
 ## [0.3.0] - 2024-09-02
 
