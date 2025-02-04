@@ -146,7 +146,11 @@ function ConvertTo-DifferenceString
         [Parameter()]
         [ValidateSet('ASCII', 'BigEndianUnicode', 'Default', 'Unicode', 'UTF32', 'UTF7', 'UTF8')]
         [System.String]
-        $EncodingType = 'UTF8'
+        $EncodingType = 'UTF8',
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $NoHexOutput
     )
 
     # Get actual ANSI escape sequences if they weren't.
@@ -171,11 +175,8 @@ function ConvertTo-DifferenceString
     $diffLength = $differenceBytes.Length
     $maxLength = [Math]::Max($refLength, $diffLength)
 
-    # Initialize arrays to hold hex values and characters
-    $refHexArray = @()
-    $refCharArray = @()
-    $diffHexArray = @()
-    $diffCharArray = @()
+    # Use a larger group size when hex output is disabled
+    $groupSize = if ($NoHexOutput) { 64 } else { 16 }
 
     # Output the labels if NoLabels is not specified
     if (-not $NoLabels)
@@ -187,17 +188,56 @@ function ConvertTo-DifferenceString
     # Output the column header once with dashes underline if NoColumnHeader is not specified
     if (-not $NoColumnHeader)
     {
-        "$($ColumnHeaderAnsi)Bytes                                           Ascii                   Bytes                                           Ascii$($ColumnHeaderResetAnsi)"
-        "$($ColumnHeaderAnsi)-----                                           -----                   -----                                           -----$($ColumnHeaderResetAnsi)"
+        if ($NoHexOutput)
+        {
+            # New header when hex column is disabled
+            "$($ColumnHeaderAnsi)Ascii$(' ' * 67)Ascii$($ColumnHeaderResetAnsi)"
+            "$($ColumnHeaderAnsi)" + ('-' * 64) + (' ' * 8) + ('-' * 64) + "$($ColumnHeaderResetAnsi)"
+        }
+        else
+        {
+            "$($ColumnHeaderAnsi)Bytes                                           Ascii                   Bytes                                           Ascii$($ColumnHeaderResetAnsi)"
+            "$($ColumnHeaderAnsi)-----                                           -----                   -----                                           -----$($ColumnHeaderResetAnsi)"
+        }
     }
+
+    if ($NoHexOutput)
+    {
+        # Initialize arrays for ascii only
+        $refCharArray = @()
+        $diffCharArray = @()
+    }
+    else
+    {
+        # Initialize arrays for hex and ascii
+        $refHexArray = @()
+        $refCharArray = @()
+        $diffHexArray = @()
+        $diffCharArray = @()
+    }
+
+    $currentGroupHighlighted = $false
 
     # Loop through each byte in the arrays up to the maximum length
     for ($i = 0; $i -lt $maxLength; $i++)
     {
-        # At the beginning of a new group of 16, reset the highlight flag
-        if (($i % 16) -eq 0)
+        # At the beginning of a new group, reset the highlight flag
+        if (($i % $groupSize) -eq 0)
         {
             $currentGroupHighlighted = $false
+
+            if (-not $NoHexOutput)
+            {
+                $refHexArray = @()
+                $refCharArray = @()
+                $diffHexArray = @()
+                $diffCharArray = @()
+            }
+            else
+            {
+                $refCharArray = @()
+                $diffCharArray = @()
+            }
         }
 
         # Get the byte and corresponding values for the reference string
@@ -261,59 +301,79 @@ function ConvertTo-DifferenceString
             $currentGroupHighlighted = $true
         }
 
-        # Add to arrays
-        $refHexArray += $refHex
-        $refCharArray += $refChar
-        $diffHexArray += $diffHex
-        $diffCharArray += $diffChar
-
-        # When a group of 16 is completed or at the end...
-        if ((($i + 1) % 16) -eq 0 -or $i -eq $maxLength - 1)
+        if (-not $NoHexOutput)
         {
-            # Pad arrays to ensure they have 16 elements using for loops
-            for ($j = $refHexArray.Count; $j -lt 16; $j++)
-            {
-                $refHexArray += '  '
-            }
+            # Add to arrays
+            $refHexArray += $refHex
+            $refCharArray += $refChar
+            $diffHexArray += $diffHex
+            $diffCharArray += $diffChar
+        }
+        else
+        {
+            $refCharArray += $refChar
+            $diffCharArray += $diffChar
+        }
 
-            for ($j = $refCharArray.Count; $j -lt 16; $j++)
+        # When a group is completed or at the end...
+        if ((($i + 1) % $groupSize) -eq 0 -or $i -eq $maxLength - 1)
+        {
+            if (-not $NoHexOutput)
             {
-                $refCharArray += ' '
-            }
+                # Pad arrays to ensure they have the correct number of elements using for loops
+                for ($j = $refHexArray.Count; $j -lt $groupSize; $j++)
+                {
+                    $refHexArray += '  '
+                }
 
-            for ($j = $diffHexArray.Count; $j -lt 16; $j++)
-            {
-                $diffHexArray += '  '
-            }
+                for ($j = $refCharArray.Count; $j -lt $groupSize; $j++)
+                {
+                    $refCharArray += ' '
+                }
 
-            for ($j = $diffCharArray.Count; $j -lt 16; $j++)
-            {
-                $diffCharArray += ' '
-            }
+                for ($j = $diffHexArray.Count; $j -lt $groupSize; $j++)
+                {
+                    $diffHexArray += '  '
+                }
 
-            $refHexLine = $refHexArray -join ' '
-            $refCharLine = $refCharArray -join ''
-            $diffHexLine = $diffHexArray -join ' '
-            $diffCharLine = $diffCharArray -join ''
+                for ($j = $diffCharArray.Count; $j -lt $groupSize; $j++)
+                {
+                    $diffCharArray += ' '
+                }
 
-            # Use the precomputed flag for this group
-            $indicator = if ($currentGroupHighlighted)
-            {
-                $NotEqualIndicator
+                $refHexLine = $refHexArray -join ' '
+                $refCharLine = $refCharArray -join ''
+                $diffHexLine = $diffHexArray -join ' '
+                $diffCharLine = $diffCharArray -join ''
+
+                # Use the precomputed flag for this group
+                $indicator = if ($currentGroupHighlighted)
+                {
+                    $NotEqualIndicator
+                }
+                else
+                {
+                    $EqualIndicator
+                }
+
+                # Output the results in the specified format
+                '{0} {1}   {2}   {3} {4}' -f $refHexLine, $refCharLine, $indicator, $diffHexLine, $diffCharLine
             }
             else
             {
-                $EqualIndicator
+                for ($j = $refCharArray.Count; $j -lt $groupSize; $j++)
+                {
+                    $refCharArray += ' '
+                }
+                for ($j = $diffCharArray.Count; $j -lt $groupSize; $j++)
+                {
+                    $diffCharArray += ' '
+                }
+                $refChars = $refCharArray -join ''
+                $diffChars = $diffCharArray -join ''
+                $indicator = if ($currentGroupHighlighted) { $NotEqualIndicator } else { $EqualIndicator }
+                '{0}   {1}   {2}' -f $refChars, $indicator, $diffChars
             }
-
-            # Output the results in the specified format
-            '{0} {1}   {2}   {3} {4}' -f $refHexLine, $refCharLine, $indicator, $diffHexLine, $diffCharLine
-
-            # Clear arrays for the next group of 16 bytes
-            $refHexArray = @()
-            $refCharArray = @()
-            $diffHexArray = @()
-            $diffCharArray = @()
         }
     }
 }
