@@ -59,7 +59,7 @@
         Specifies the character used to concatenate the strings. Default is a new line character.
 
     .PARAMETER NoHexOutput
-        Indicates whether to omit the hex columns and output only the character groups.
+        Specifies whether to omit the hex columns and output only the character groups.
 
     .EXAMPLE
         $reference = "apple", "banana", "cherry"

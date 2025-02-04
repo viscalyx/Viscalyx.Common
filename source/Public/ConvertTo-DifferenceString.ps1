@@ -59,6 +59,10 @@
         Specifies the encoding type to use for converting the strings to byte arrays.
         Default is 'UTF8'.
 
+    .PARAMETER NoHexOutput
+        Specifies whether to omit the hex columns and output only the character
+        groups.
+
     .EXAMPLE
         PS> ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo'
 
