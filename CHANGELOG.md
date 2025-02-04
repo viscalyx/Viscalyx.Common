@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improve how control characters (ASCII values 0-31 and 127) are converted
     to their corresponding Unicode representations in the Control Pictures
     block to output printable versions.
+  - Optimize code and improve performance.
 
 ## [0.3.0] - 2024-09-02
 

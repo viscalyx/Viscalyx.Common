@@ -166,8 +166,10 @@ function ConvertTo-DifferenceString
     $referenceBytes = $encoding.GetBytes($ReferenceString)
     $differenceBytes = $encoding.GetBytes($DifferenceString)
 
-    # Determine the maximum length of the two byte arrays
-    $maxLength = [Math]::Max($referenceBytes.Length, $differenceBytes.Length)
+    # Precompute lengths to avoid repeated property lookups
+    $refLength = $referenceBytes.Length
+    $diffLength = $differenceBytes.Length
+    $maxLength = [Math]::Max($refLength, $diffLength)
 
     # Initialize arrays to hold hex values and characters
     $refHexArray = @()
@@ -189,13 +191,17 @@ function ConvertTo-DifferenceString
         "$($ColumnHeaderAnsi)-----                                           -----                   -----                                           -----$($ColumnHeaderResetAnsi)"
     }
 
-    $isHighlighted = $false
-
     # Loop through each byte in the arrays up to the maximum length
     for ($i = 0; $i -lt $maxLength; $i++)
     {
-        # Get the byte and character for the reference string
-        if ($i -lt $referenceBytes.Length)
+        # At the beginning of a new group of 16, reset the highlight flag
+        if (($i % 16) -eq 0)
+        {
+            $currentGroupHighlighted = $false
+        }
+
+        # Get the byte and corresponding values for the reference string
+        if ($i -lt $refLength)
         {
             $refByte = $referenceBytes[$i]
             $refHex = '{0:X2}' -f $refByte
@@ -214,12 +220,13 @@ function ConvertTo-DifferenceString
         }
         else
         {
+            $refByte = -1
             $refHex = '  '
             $refChar = ' '
         }
 
-        # Get the byte and character for the difference string
-        if ($i -lt $differenceBytes.Length)
+        # Get the byte and corresponding values for the difference string
+        if ($i -lt $diffLength)
         {
             $diffByte = $differenceBytes[$i]
             $diffHex = '{0:X2}' -f $diffByte
@@ -238,19 +245,20 @@ function ConvertTo-DifferenceString
         }
         else
         {
+            $diffByte = -1
             $diffHex = '  '
             $diffChar = ' '
         }
 
-        # Highlight differences
-        if ($refHex -ne $diffHex)
+        # Highlight differences and set the group's flag if any difference is found
+        if ($refByte -ne $diffByte)
         {
-            $refHex = "$($HighlightStart)$refHex$($HighlightEnd)"
-            $refChar = "$($HighlightStart)$refChar$($HighlightEnd)"
-            $diffHex = "$($HighlightStart)$diffHex$($HighlightEnd)"
-            $diffChar = "$($HighlightStart)$diffChar$($HighlightEnd)"
+            $refHex = "$HighlightStart$refHex$HighlightEnd"
+            $refChar = "$HighlightStart$refChar$HighlightEnd"
+            $diffHex = "$HighlightStart$diffHex$HighlightEnd"
+            $diffChar = "$HighlightStart$diffChar$HighlightEnd"
 
-            $isHighlighted = $true
+            $currentGroupHighlighted = $true
         }
 
         # Add to arrays
@@ -259,34 +267,37 @@ function ConvertTo-DifferenceString
         $diffHexArray += $diffHex
         $diffCharArray += $diffChar
 
-        # Output the results in groups of 16
-        if (($i + 1) % 16 -eq 0 -or $i -eq $maxLength - 1)
+        # When a group of 16 is completed or at the end...
+        if ((($i + 1) % 16) -eq 0 -or $i -eq $maxLength - 1)
         {
-            # Pad arrays to ensure they have 16 elements
-            while ($refHexArray.Count -lt 16)
+            # Pad arrays to ensure they have 16 elements using for loops
+            for ($j = $refHexArray.Count; $j -lt 16; $j++)
             {
                 $refHexArray += '  '
             }
-            while ($refCharArray.Count -lt 16)
+
+            for ($j = $refCharArray.Count; $j -lt 16; $j++)
             {
                 $refCharArray += ' '
             }
-            while ($diffHexArray.Count -lt 16)
+
+            for ($j = $diffHexArray.Count; $j -lt 16; $j++)
             {
                 $diffHexArray += '  '
             }
-            while ($diffCharArray.Count -lt 16)
+
+            for ($j = $diffCharArray.Count; $j -lt 16; $j++)
             {
                 $diffCharArray += ' '
             }
 
-            $refHexLine = ($refHexArray -join ' ')
-            $refCharLine = ($refCharArray -join '')
-            $diffHexLine = ($diffHexArray -join ' ')
-            $diffCharLine = ($diffCharArray -join '')
+            $refHexLine = $refHexArray -join ' '
+            $refCharLine = $refCharArray -join ''
+            $diffHexLine = $diffHexArray -join ' '
+            $diffCharLine = $diffCharArray -join ''
 
-            # Output indicator depending if the line was highlighted or not.
-            $indicator = if ($isHighlighted)
+            # Use the precomputed flag for this group
+            $indicator = if ($currentGroupHighlighted)
             {
                 $NotEqualIndicator
             }
@@ -298,7 +309,7 @@ function ConvertTo-DifferenceString
             # Output the results in the specified format
             '{0} {1}   {2}   {3} {4}' -f $refHexLine, $refCharLine, $indicator, $diffHexLine, $diffCharLine
 
-            # Clear arrays for the next group of 16
+            # Clear arrays for the next group of 16 bytes
             $refHexArray = @()
             $refCharArray = @()
             $diffHexArray = @()
