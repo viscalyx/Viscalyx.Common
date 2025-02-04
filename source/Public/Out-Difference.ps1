@@ -58,10 +58,13 @@
     .PARAMETER ConcatenateChar
         Specifies the character used to concatenate the strings. Default is a new line character.
 
+    .PARAMETER NoHexOutput
+        Specifies whether to omit the hex columns and output only the character groups.
+
     .EXAMPLE
         $reference = "apple", "banana", "cherry"
         $difference = "apple", "orange", "cherry"
-        Out-Difference -Reference $reference -Difference $difference -EqualIndicator '' -ReferenceLabel 'Reference:' -DifferenceLabel 'Difference:' -ConcatenateArray -ConcatenateChar ''
+        Out-Difference -Reference $reference -Difference $difference -EqualIndicator '' -ReferenceLabel 'Reference:' -DifferenceLabel 'Difference:' -ConcatenateArray -ConcatenateChar '' -NoHexOutput
 
     .INPUTS
         None. You cannot pipe input to this function.
@@ -154,7 +157,11 @@ function Out-Difference
 
         [Parameter()]
         [System.String]
-        $ConcatenateChar = [System.Environment]::NewLine
+        $ConcatenateChar = [System.Environment]::NewLine,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $NoHexOutput
     )
 
     if ($null -eq $ConcatenateChar)

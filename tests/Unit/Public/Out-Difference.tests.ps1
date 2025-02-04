@@ -565,5 +565,20 @@ Describe 'Out-Difference' {
         }
     }
 
+    Context 'When NoHexOutput is specified' {
+        It 'Should output only ascii character groups without hex columns' {
+            $longStr = 'A' * 70
+            $result = Out-Difference -Reference $longStr -Difference $longStr -NoHexOutput
+            $result | Should-BeBlockString @(
+                "Expected:`e[0m                                                               But was:`e[0m"
+                "----------------------------------------------------------------        ----------------------------------------------------------------"
+                "Ascii                                                                   Ascii"
+                "----------------------------------------------------------------        ----------------------------------------------------------------"
+                "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA   ==   AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                "AAAAAA                                                             ==   AAAAAA                                                          "
+            )
+        }
+    }
+
     # cSpell: enable
 }
