@@ -1,0 +1,11 @@
+[
+    {
+        "ModuleName": "ModuleBuilder",
+        "ModuleVersion": "1.0.0",
+        "ScriptFileName": "source/Public/Start-Patch.ps1",
+        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "StartOffset": 0,
+        "EndOffset": 10,
+        "PatchContent": "First line of patched content\n    Second line with 4 spaces indent\n        Third line with 8 spaces indent"
+    }
+]

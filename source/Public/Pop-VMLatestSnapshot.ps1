@@ -3,18 +3,18 @@
         Sets the latest snapshot of a virtual machine and starts it.
 
     .DESCRIPTION
-        The Pop-VMLatestSnapShot command sets the latest snapshot of a virtual
+        The Pop-VMLatestSnapshot command sets the latest snapshot of a virtual
         machine specified by the $ServerName parameter and starts it.
 
     .PARAMETER ServerName
         Specifies the name of the server for which to set the latest snapshot.
 
     .EXAMPLE
-        Pop-VMLatestSnapShot -ServerName 'VM1'
+        Pop-VMLatestSnapshot -ServerName 'VM1'
 
         Sets the latest snapshot of the virtual machine named "VM1" and starts it.
 #>
-function Pop-VMLatestSnapShot
+function Pop-VMLatestSnapshot
 {
     param
     (
