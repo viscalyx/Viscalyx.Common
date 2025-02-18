@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Install-ModulePatch` that can be used to patch PowerShell modules prior
+  to being released.
+
 ### Changed
 
 - `ConvertTo-DifferenceString`
