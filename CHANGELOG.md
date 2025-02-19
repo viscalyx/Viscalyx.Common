@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `Install-ModulePatch` that can be used to patch PowerShell modules prior
   to being released.
+- `Get-ModuleFileSha` that outputs the SHA256 for each PowerShell script
+   file in a specific PowerShell module.
 
 ### Changed
 
