@@ -133,4 +133,81 @@ Describe "Assert-PatchValidity" {
                 Should -Throw ("Hash validation failed for script file: $TestDrive{0}Modules{0}TestModule{0}TestScript.ps1. Expected: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef, Actual: abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890" -f [System.IO.Path]::DirectorySeparatorChar)
         }
     }
+
+    It "Should throw correct error for module version mismatch" {
+        Mock Get-Module {
+            return @{
+                ModuleBase = "$TestDrive/Modules/TestModule"
+                Version = "2.0.0" # Different version
+            }
+        }
+
+        InModuleScope -ScriptBlock {
+            $patchEntry = @{
+                ModuleName = "TestModule"
+                ModuleVersion = "1.0.0"
+                ScriptFileName = "TestScript.ps1"
+                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+            }
+
+            { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
+                Should -Throw "Module version mismatch: TestModule 1.0.0"
+        }
+    }
+
+    It "Should throw correct error for script file not found" {
+        Mock Get-Module {
+            return @{
+                ModuleBase = "$TestDrive/Modules/TestModule"
+                Version = "1.0.0"
+            }
+        }
+
+        Mock Test-Path {
+            return $false
+        }
+
+        InModuleScope -ScriptBlock {
+            $patchEntry = @{
+                ModuleName = "TestModule"
+                ModuleVersion = "1.0.0"
+                ScriptFileName = "TestScript.ps1"
+                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+            }
+
+            { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
+                Should -Throw ("Script file not found: $TestDrive{0}Modules{0}TestModule{0}TestScript.ps1" -f [System.IO.Path]::DirectorySeparatorChar)
+        }
+    }
+
+    It "Should throw correct error for hash validation failure" {
+        Mock Get-Module {
+            return @{
+                ModuleBase = "$TestDrive/Modules/TestModule"
+                Version = "1.0.0"
+            }
+        }
+
+        Mock Test-Path {
+            return $true
+        }
+
+        Mock Get-FileHash {
+            return @{
+                Hash = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+            }
+        }
+
+        InModuleScope -ScriptBlock {
+            $patchEntry = @{
+                ModuleName = "TestModule"
+                ModuleVersion = "1.0.0"
+                ScriptFileName = "TestScript.ps1"
+                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+            }
+
+            { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
+                Should -Throw ("Hash validation failed for script file: $TestDrive{0}Modules{0}TestModule{0}TestScript.ps1. Expected: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef, Actual: abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890" -f [System.IO.Path]::DirectorySeparatorChar)
+        }
+    }
 }
