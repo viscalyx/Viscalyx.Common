@@ -111,7 +111,7 @@ Describe 'Get-ModuleFileSha' {
 
         It 'Should throw version mismatch error' {
             { Get-ModuleFileSha -Name 'TestModule' -Version '1.0.0' -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage 'Module not found: TestModule 1.0.0'
+                Should -Throw -ExpectedMessage 'Module with specified version not found: TestModule 1.0.0'
         }
     }
 

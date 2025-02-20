@@ -55,77 +55,90 @@ function Get-ModuleFileSha
         $Path
     )
 
-    process
+    $modulePath = if ($PSCmdlet.ParameterSetName -eq 'ModuleName')
     {
-        $modulePath = if ($PSCmdlet.ParameterSetName -eq 'ModuleName')
-        {
-            $availableModule = Get-Module -Name $Name -ListAvailable
+        $availableModule = Get-Module -Name $Name -ListAvailable
 
+        if ($Version)
+        {
+            $filteredModule = $null
+
+            foreach ($currentModule in $availableModule)
+            {
+                $moduleVersion = Get-ModuleVersion -Module $currentModule
+
+                if ($moduleVersion -eq $Version)
+                {
+                    $filteredModule = $currentModule
+
+                    break
+                }
+            }
+
+            $availableModule = $filteredModule
+        }
+
+        if (-not $availableModule)
+        {
             if ($Version)
             {
-                $filteredModule = $null
-
-                foreach ($currentModule in $availableModule)
-                {
-                    $moduleVersion = Get-ModuleVersion -Module $currentModule
-
-                    if ($moduleVersion -eq $Version)
-                    {
-                        $filteredModule = $currentModule
-
-                        break
-                    }
-                }
-
-                $availableModule = $filteredModule
+                $errorMessage = $script:localizedData.Get_ModuleFileSha_MissingModuleVersion -f $Name, $Version
             }
-
-            if (-not $availableModule)
+            else
             {
-                if ($Version)
-                {
-                    $errorMessage += "Module not found: $Name $Version"
-                }
-                else
-                {
-                    $errorMessage = "Module not found: $Name"
-                }
-
-                throw $errorMessage
+                $errorMessage = $script:localizedData.Get_ModuleFileSha_MissingModule -f $Name
             }
 
-            # Will return multiple paths if more than one module is found.
-            $availableModule.ModuleBase
-        }
-        else
-        {
-            if (-not (Test-Path -Path $Path))
-            {
-                $errorMessage = "Module path not found: $Path"
-
-                throw $errorMessage
+            $writeErrorParameters = @{
+                Message      = $errorMessage
+                Category     = 'ObjectNotFound'
+                ErrorId      = 'GMFS0001' # cSpell: disable-line
+                TargetObject = $Name
             }
 
-            [System.IO.Path]::GetFullPath($Path)
+            Write-Error @writeErrorParameters
+
+            return
         }
 
-        $fileExtensions = @('*.ps1', '*.psm1', '*.psd1')
-
-        foreach ($path in $modulePath)
+        # Will return multiple paths if more than one module is found.
+        $availableModule.ModuleBase
+    }
+    else
+    {
+        if (-not (Test-Path -Path $Path))
         {
-            $moduleFiles = Get-ChildItem -Path $path -Recurse -Include $fileExtensions
+            $writeErrorParameters = @{
+                Message      = $script:localizedData.Get_ModuleFileSha_ModulePathNotFound -f $Path
+                Category     = 'ObjectNotFound'
+                ErrorId      = 'GMFS0002' # cSpell: disable-line
+                TargetObject = $Name
+            }
 
-            foreach ($file in $moduleFiles)
-            {
-                $fileHash = Get-FileHash -Path $file.FullName -Algorithm SHA256
+            Write-Error @writeErrorParameters
 
-                [PSCustomObject]@{
-                    # Output the relative path
-                    ModuleBase = $path
-                    RelativePath = $file.FullName.Substring($path.Length + 1)
-                    FileName = $file.Name
-                    HashSHA  = $fileHash.Hash
-                }
+            return
+        }
+
+        [System.IO.Path]::GetFullPath($Path)
+    }
+
+    $fileExtensions = @('*.ps1', '*.psm1', '*.psd1')
+
+    foreach ($path in $modulePath)
+    {
+        $moduleFiles = Get-ChildItem -Path $path -Recurse -Include $fileExtensions
+
+        foreach ($file in $moduleFiles)
+        {
+            $fileHash = Get-FileHash -Path $file.FullName -Algorithm SHA256
+
+            [PSCustomObject]@{
+                # Output the relative path
+                ModuleBase = $path
+                RelativePath = $file.FullName.Substring($path.Length + 1)
+                FileName = $file.Name
+                HashSHA  = $fileHash.Hash
             }
         }
     }

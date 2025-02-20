@@ -67,4 +67,9 @@ ConvertFrom-StringData @'
     Assert_PatchFile_MissingHashSHA = Patch entry is missing 'HashSHA'.
     Assert_PatchFile_MissingOffset = Patch entry is missing 'StartOffset' or 'EndOffset'.
     Assert_PatchFile_MissingPatchContent = Patch entry is missing 'PatchContent'.
+
+    ## Get-ModuleFileSha
+    Get_ModuleFileSha_MissingModule = Module not found: {0}
+    Get_ModuleFileSha_MissingModuleVersion = Module with specified version not found: {0} {1}
+    Get_ModuleFileSha_ModulePathNotFound = Module path not found: {0}
 '@
