@@ -73,21 +73,51 @@ function Install-ModulePatch
     {
         $patchFileContent = if ($PSCmdlet.ParameterSetName -eq 'Path')
         {
+            Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_Path -f $Path)
+
             Get-PatchFileContentFromPath -Path $Path -ErrorAction 'Stop'
         }
         else
         {
+            Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_URI -f $URI)
+
             Get-PatchFileContentFromURI -URI $URI -ErrorAction 'Stop'
         }
+
+        Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchFileContent -f ($patchFileContent | ConvertTo-Json -Compress))
 
         Assert-PatchFile -PatchFileContent $patchFileContent
 
         $patchFileContent = $patchFileContent |
             Sort-Object -Property StartOffset -Descending
 
+        # Initialize progress bar
+        $progressId = 1
+        $progressActivity = $script:localizedData.Install_ModulePatch_Progress_Activity
+        $progressStatus = $script:localizedData.Install_ModulePatch_Progress_Status
+        $progressCurrentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation
+
+        # Show progress bar
+        Write-Progress -Id $progressId -Activity $progressActivity -Status $progressStatus -PercentComplete 0
+
+        $totalPatches = $patchFileContent.Count
+        $patchCounter = 0
+
         foreach ($patchEntry in $patchFileContent)
         {
+            $patchCounter++
+            $progressPercentComplete = ($patchCounter / $totalPatches) * 100
+            $currentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation -f $patchEntry.ModuleName, $patchEntry.ModuleVersion, $patchEntry.ScriptFileName
+
+            Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchEntry -f ($patchEntry | ConvertTo-Json -Compress))
+
+            # Update progress bar
+            Write-Progress -Id $progressId -Activity $progressActivity -Status "$progressStatus - $currentOperation" -PercentComplete $progressPercentComplete
+
             Merge-Patch -PatchEntry $patchEntry -ErrorAction 'Stop'
         }
+
+        # Clear progress bar
+        Write-Progress -Id $progressId -Activity $progressActivity -Completed
     }
 }

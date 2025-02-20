@@ -50,7 +50,7 @@ function Merge-Patch
         return
     }
 
-    $scriptContent = Get-Content -Path $modulePath -Raw
+    $scriptContent = Get-Content -Path $modulePath -Raw -ErrorAction 'Stop'
 
     $startOffset = $PatchEntry.StartOffset
     $endOffset = $PatchEntry.EndOffset
@@ -71,5 +71,5 @@ function Merge-Patch
 
     $patchedContent = $scriptContent.Substring(0, $startOffset) + $PatchEntry.PatchContent + $scriptContent.Substring($endOffset)
 
-    Set-Content -Path $modulePath -Value $patchedContent
+    Set-Content -Path $modulePath -Value $patchedContent -ErrorAction 'Stop'
 }

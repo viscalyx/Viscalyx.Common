@@ -53,6 +53,13 @@ ConvertFrom-StringData @'
     Install_ModulePatch_PatchFilePathNotFound = The module patch file at location '{0}' does not exist.
     Install_ModulePatch_ScriptFileNotFound = The script file '{0}' does not exist.
     Install_ModulePatch_InvalidStartOrEndOffset = Start or end offset ({0}-{1}) in patch entry does not exist in the script file.
+    Install_ModulePatch_Debug_Path = Patch file path: '{0}'.
+    Install_ModulePatch_Debug_URI = Patch file URI: '{0}'.
+    Install_ModulePatch_Debug_PatchFileContent = Patch file content: '{0}'.
+    Install_ModulePatch_Debug_PatchEntry = Processing patch entry: '{0}'.
+    Install_ModulePatch_Progress_Activity = Applying Module Patches
+    Install_ModulePatch_Progress_Status = Starting patch process...
+    Install_ModulePatch_Progress_CurrentOperation = Processing patch entry: {0} {1} {2}
 
     ## Assert-PatchValidity
     Assert_PatchValidity_ModuleNotFound = Module not found: {0} {1}
