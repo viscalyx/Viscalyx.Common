@@ -45,7 +45,7 @@ function Get-PatchFileContentFromURI
         Write-Error @writeErrorParameters
     }
 
-    $patchFileContent = Get-PatchFileContent -JsonContent $jsonContent
+    $patchFileContent = Get-PatchFileContent -JsonContent $jsonContent -ErrorAction 'Stop'
 
     return $patchFileContent
 }

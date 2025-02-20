@@ -39,11 +39,13 @@ function Get-PatchFileContentFromPath
         }
 
         Write-Error @writeErrorParameters
+
+        return
     }
 
     $jsonContent = Get-Content -Path $Path -Raw
 
-    $patchFileContent = Get-PatchFileContent -JsonContent $jsonContent
+    $patchFileContent = Get-PatchFileContent -JsonContent $jsonContent -ErrorAction 'Stop'
 
     return $patchFileContent
 }

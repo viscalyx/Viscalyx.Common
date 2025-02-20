@@ -73,11 +73,11 @@ function Install-ModulePatch
     {
         $patchFileContent = if ($PSCmdlet.ParameterSetName -eq 'Path')
         {
-            Get-PatchFileContentFromPath -Path $Path
+            Get-PatchFileContentFromPath -Path $Path -ErrorAction 'Stop'
         }
         else
         {
-            Get-PatchFileContentFromURI -URI $URI
+            Get-PatchFileContentFromURI -URI $URI -ErrorAction 'Stop'
         }
 
         Assert-PatchFile -PatchFileContent $patchFileContent
@@ -87,7 +87,7 @@ function Install-ModulePatch
 
         foreach ($patchEntry in $patchFileContent)
         {
-            Merge-Patch -PatchEntry $patchEntry
+            Merge-Patch -PatchEntry $patchEntry -ErrorAction 'Stop'
         }
     }
 }

@@ -84,9 +84,10 @@ Describe 'Get-PatchFileContentFromPath' {
 
             {
                 InModuleScope -ScriptBlock {
-                    Get-PatchFileContentFromPath -Path "$TestDrive/patches/TestModule_1.0.0_patch.json"
+                    { Get-PatchFileContentFromPath -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop' } |
+                        Should -Throw -ExpectedMessage ("Patch file not found at path: $TestDrive{0}patches{0}TestModule_1.0.0_patch.json" -f [System.IO.Path]::DirectorySeparatorChar)
                 }
-            } | Should -Throw -ExpectedMessage ("Patch file not found at path: $TestDrive{0}patches{0}TestModule_1.0.0_patch.json" -f [System.IO.Path]::DirectorySeparatorChar)
+            }
         }
     }
 }

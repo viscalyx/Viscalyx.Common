@@ -49,9 +49,9 @@ Describe 'Assert-PatchFile' {
 
             Mock -CommandName Get-Module -MockWith {
                 return [PSCustomObject] @{
-                    Name        = 'TestModule'
-                    Version     = [System.Version] '1.0.0'
-                    ModuleBase  = "$TestDrive/Modules/TestModule"
+                    Name       = 'TestModule'
+                    Version    = [System.Version] '1.0.0'
+                    ModuleBase = "$TestDrive/Modules/TestModule"
                 }
             }
 
@@ -76,16 +76,15 @@ Describe 'Assert-PatchFile' {
 ]
 '@
 
-                Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json)
+                Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop'
             }
         }
     }
 
     Context 'When patch file is invalid' {
         It 'Should throw error for missing ModuleName' {
-            {
-                InModuleScope -ScriptBlock {
-                    $patchFileContent = @'
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
 [
     {
         "ModuleVersion": "1.0.0",
@@ -97,15 +96,14 @@ Describe 'Assert-PatchFile' {
     }
 ]
 '@
-                    Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json)
-                }
-            } | Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleName'."
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleName'."
+            }
         }
 
-        It 'Should throw error for missing ModuleVersion' {
-            {
-                InModuleScope -ScriptBlock {
-                    $patchFileContent = @'
+        It 'Should throw correct error for missing ModuleVersion' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
 [
     {
         "ModuleName": "TestModule",
@@ -118,15 +116,14 @@ Describe 'Assert-PatchFile' {
 ]
 '@
 
-                    Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json)
-                }
-            } | Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleVersion'."
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleVersion'."
+            }
         }
 
-        It 'Should throw error for missing ScriptFileName' {
-            {
-                InModuleScope -ScriptBlock {
-                    $patchFileContent = @'
+        It 'Should throw correct error for missing ScriptFileName' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
 [
     {
         "ModuleName": "TestModule",
@@ -139,15 +136,14 @@ Describe 'Assert-PatchFile' {
 ]
 '@
 
-                    Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json)
-                }
-            } | Should -Throw -ExpectedMessage "Patch entry is missing 'ScriptFileName'."
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ScriptFileName'."
+            }
         }
 
-        It 'Should throw error for missing HashSHA' {
-            {
-                InModuleScope -ScriptBlock {
-                    $patchFileContent = @'
+        It 'Should throw correct error for missing HashSHA' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
 [
     {
         "ModuleName": "TestModule",
@@ -160,14 +156,14 @@ Describe 'Assert-PatchFile' {
 ]
 '@
 
-                    Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) } | Should -Throw -ExpectedMessage "Patch entry is missing 'HashSHA'."
-                }
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'HashSHA'."
+            }
         }
 
-        It 'Should throw error for missing StartOffset or EndOffset' {
-            {
-                InModuleScope -ScriptBlock {
-                    $patchFileContent = @'
+        It 'Should throw correct error for missing StartOffset or EndOffset' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
 [
     {
         "ModuleName": "TestModule",
@@ -178,15 +174,14 @@ Describe 'Assert-PatchFile' {
     }
 ]
 '@
-                    Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json)
-                }
-            } | Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'."
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'."
+            }
         }
 
-        It 'Should throw error for missing PatchContent' {
-            {
-                InModuleScope -ScriptBlock {
-                    $patchFileContent = @'
+        It 'Should throw correct error for missing PatchContent' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
 [
     {
         "ModuleName": "TestModule",
@@ -199,9 +194,27 @@ Describe 'Assert-PatchFile' {
 ]
 '@
 
-                    Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json)
-                }
-            } | Should -Throw -ExpectedMessage "Patch entry is missing 'PatchContent'."
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'PatchContent'."
+            }
+        }
+    }
+
+    Context 'Additional Edge Cases' {
+        It 'Should throw error for empty patch file' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = ' [] '
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                    Should -Throw
+            }
+        }
+
+        It 'Should throw error for invalid JSON format' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = 'Invalid JSON'
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                    Should -Throw
+            }
         }
     }
 }

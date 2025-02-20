@@ -53,4 +53,18 @@ ConvertFrom-StringData @'
     Install_ModulePatch_PatchFilePathNotFound = The module patch file at location '{0}' does not exist.
     Install_ModulePatch_ScriptFileNotFound = The script file '{0}' does not exist.
     Install_ModulePatch_InvalidStartOrEndOffset = Start or end offset ({0}-{1}) in patch entry does not exist in the script file.
+
+    ## Assert-PatchValidity
+    Assert_PatchValidity_ModuleNotFound = Module not found: {0} {1}
+    Assert_PatchValidity_ModuleVersionMismatch = Module version mismatch: {0} {1}
+    Assert_PatchValidity_ScriptFileNotFound = Script file not found: {0}
+    Assert_PatchValidity_HashValidationFailed = Hash validation failed for script file: {0}. Expected: {1}, Actual: {2}
+
+    ## Assert-PatchFile
+    Assert_PatchFile_MissingModuleName = Patch entry is missing 'ModuleName'.
+    Assert_PatchFile_MissingModuleVersion = Patch entry is missing 'ModuleVersion'.
+    Assert_PatchFile_MissingScriptFileName = Patch entry is missing 'ScriptFileName'.
+    Assert_PatchFile_MissingHashSHA = Patch entry is missing 'HashSHA'.
+    Assert_PatchFile_MissingOffset = Patch entry is missing 'StartOffset' or 'EndOffset'.
+    Assert_PatchFile_MissingPatchContent = Patch entry is missing 'PatchContent'.
 '@

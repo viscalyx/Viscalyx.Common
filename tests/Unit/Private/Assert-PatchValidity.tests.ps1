@@ -91,7 +91,8 @@ Describe "Assert-PatchValidity" {
                 HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
-            { Assert-PatchValidity -PatchEntry $patchEntry } | Should -Throw "Module not found: TestModule 1.0.0"
+            { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
+                Should -Throw "Module not found: TestModule 1.0.0"
         }
     }
 
@@ -108,7 +109,8 @@ Describe "Assert-PatchValidity" {
                 HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
-            { Assert-PatchValidity -PatchEntry $patchEntry } | Should -Throw ("Script file not found: $TestDrive{0}Modules{0}TestModule{0}TestScript.ps1" -f [System.IO.Path]::DirectorySeparatorChar)
+            { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
+                Should -Throw ("Script file not found: $TestDrive{0}Modules{0}TestModule{0}TestScript.ps1" -f [System.IO.Path]::DirectorySeparatorChar)
         }
     }
 
@@ -127,7 +129,8 @@ Describe "Assert-PatchValidity" {
                 HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
-            { Assert-PatchValidity -PatchEntry $patchEntry } | Should -Throw ("Hash validation failed for script file: $TestDrive{0}Modules{0}TestModule{0}TestScript.ps1. Expected: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef, Actual: abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890" -f [System.IO.Path]::DirectorySeparatorChar)
+            { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
+                Should -Throw ("Hash validation failed for script file: $TestDrive{0}Modules{0}TestModule{0}TestScript.ps1. Expected: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef, Actual: abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890" -f [System.IO.Path]::DirectorySeparatorChar)
         }
     }
 }

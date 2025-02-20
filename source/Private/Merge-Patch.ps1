@@ -46,6 +46,8 @@ function Merge-Patch
         }
 
         Write-Error @writeErrorParameters
+
+        return
     }
 
     $scriptContent = Get-Content -Path $modulePath -Raw
@@ -63,6 +65,8 @@ function Merge-Patch
         }
 
         Write-Error @writeErrorParameters
+
+        return
     }
 
     $patchedContent = $scriptContent.Substring(0, $startOffset) + $PatchEntry.PatchContent + $scriptContent.Substring($endOffset)
