@@ -44,4 +44,13 @@ ConvertFrom-StringData @'
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessVerboseWarning = Are you sure you want to switch back to previous local branch '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption = Switch to previous branch
+
+    ## Install-ModulePatch
+    Install_ModulePatch_ShouldProcessVerboseDescription = Apply module patch file at location '{0}'.
+    Install_ModulePatch_ShouldProcessVerboseWarning = Are you sure you want to apply the module patch at the location '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Install_ModulePatch_ShouldProcessCaption = Apply module patch
+    Install_ModulePatch_PatchFilePathNotFound = The module patch file at location '{0}' does not exist.
+    Install_ModulePatch_ScriptFileNotFound = The script file '{0}' does not exist.
+    Install_ModulePatch_InvalidStartOrEndOffset = Start or end offset ({0}-{1}) in patch entry does not exist in the script file.
 '@

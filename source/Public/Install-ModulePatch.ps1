@@ -51,28 +51,43 @@ function Install-ModulePatch
         $Force
     )
 
-    process
+    if ($Force.IsPresent -and -not $Confirm)
     {
-        if ($PSCmdlet.ShouldProcess("Applying patches from $Path or $URI"))
+        $ConfirmPreference = 'None'
+    }
+
+    $patchLocation = if ($PSCmdlet.ParameterSetName -eq 'Path')
+    {
+        $Path
+    }
+    else
+    {
+        $URI
+    }
+
+    $verboseDescriptionMessage = $script:localizedData.Install_ModulePatch_ShouldProcessVerboseDescription -f $patchLocation
+    $verboseWarningMessage = $script:localizedData.Install_ModulePatch_ShouldProcessVerboseWarning -f $patchLocation
+    $captionMessage = $script:localizedData.Install_ModulePatch_ShouldProcessCaption
+
+    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    {
+        $patchFileContent = if ($PSCmdlet.ParameterSetName -eq 'Path')
         {
-            $patchFileContent = if ($PSCmdlet.ParameterSetName -eq 'Path')
-            {
-                Get-PatchFileContentFromPath -Path $Path
-            }
-            else
-            {
-                Get-PatchFileContentFromURI -URI $URI
-            }
+            Get-PatchFileContentFromPath -Path $Path
+        }
+        else
+        {
+            Get-PatchFileContentFromURI -URI $URI
+        }
 
-            Assert-PatchFile -PatchFileContent $patchFileContent
+        Assert-PatchFile -PatchFileContent $patchFileContent
 
-            $patchFileContent = $patchFileContent |
-                Sort-Object -Property StartOffset -Descending
+        $patchFileContent = $patchFileContent |
+            Sort-Object -Property StartOffset -Descending
 
-            foreach ($patchEntry in $patchFileContent)
-            {
-                Merge-Patch -PatchEntry $patchEntry
-            }
+        foreach ($patchEntry in $patchFileContent)
+        {
+            Merge-Patch -PatchEntry $patchEntry
         }
     }
 }

@@ -44,7 +44,7 @@ AfterAll {
 
 Describe 'Install-ModulePatch' {
     Context 'When patch file is valid' {
-        It 'Should apply patches from local file' {
+        BeforeAll {
             $patchFileContent = @'
 [
     {
@@ -59,220 +59,32 @@ Describe 'Install-ModulePatch' {
 ]
 '@
 
-            Mock -CommandName Get-Content -MockWith { $patchFileContent }
-            Mock -CommandName Get-Module -MockWith {
-                return [PSCustomObject] @{
-                    Name        = 'TestModule'
-                    Version     = [System.Version] '1.0.0'
-                    ModuleBase  = 'C:\Modules\TestModule'
-                }
-            }
-            Mock -CommandName Get-FileHash -MockWith {
-                return [PSCustomObject] @{
-                    Hash = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-                }
-            }
-            Mock -CommandName Set-Content
+            Mock -CommandName Assert-PatchFile
+            Mock -CommandName Merge-Patch
 
-            Install-ModulePatch -Path 'C:\patches\TestModule_1.0.0_patch.json' -Force
+            Mock -CommandName Get-PatchFileContentFromPath -MockWith {
+                $patchFileContent
+            }
 
-            Assert-MockCalled -CommandName Get-Content -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Get-Module -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Get-FileHash -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Set-Content -Exactly 1 -Scope It
+            Mock -CommandName Get-PatchFileContentFromURI -MockWith {
+                $patchFileContent
+            }
+        }
+
+        It 'Should apply patches from local file' {
+            Install-ModulePatch -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop'
+
+            Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 0 -Scope It
+            Should -Invoke -CommandName Get-PatchFileContentFromPath -Exactly 1 -Scope It
+            Should -Invoke -CommandName Merge-Patch -Exactly 1 -Scope It
         }
 
         It 'Should apply patches from URL' {
-            $patchFileContent = @'
-[
-    {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
-    }
-]
-'@
+            Install-ModulePatch -Force -URI 'https://gist.githubusercontent.com/user/gistid/raw/TestModule_1.0.0_patch.json' -ErrorAction 'Stop'
 
-            Mock -CommandName Invoke-RestMethod -MockWith { $patchFileContent }
-            Mock -CommandName Get-Module -MockWith {
-                return [PSCustomObject] @{
-                    Name        = 'TestModule'
-                    Version     = [System.Version] '1.0.0'
-                    ModuleBase  = 'C:\Modules\TestModule'
-                }
-            }
-            Mock -CommandName Get-FileHash -MockWith {
-                return [PSCustomObject] @{
-                    Hash = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-                }
-            }
-            Mock -CommandName Set-Content
-
-            Install-ModulePatch -URI 'https://gist.githubusercontent.com/user/gistid/raw/TestModule_1.0.0_patch.json' -Force
-
-            Assert-MockCalled -CommandName Invoke-RestMethod -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Get-Module -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Get-FileHash -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Set-Content -Exactly 1 -Scope It
-        }
-    }
-
-    Context 'When patch file is invalid' {
-        It 'Should throw error for missing ModuleName' {
-            $patchFileContent = @'
-[
-    {
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
-    }
-]
-'@
-
-            Mock -CommandName Get-Content -MockWith { $patchFileContent }
-
-            { Install-ModulePatch -Path 'C:\patches\TestModule_1.0.0_patch.json' -Force } | Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleName'."
-        }
-
-        It 'Should throw error for missing ModuleVersion' {
-            $patchFileContent = @'
-[
-    {
-        "ModuleName": "TestModule",
-        "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
-    }
-]
-'@
-
-            Mock -CommandName Get-Content -MockWith { $patchFileContent }
-
-            { Install-ModulePatch -Path 'C:\patches\TestModule_1.0.0_patch.json' -Force } | Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleVersion'."
-        }
-
-        It 'Should throw error for missing ScriptFileName' {
-            $patchFileContent = @'
-[
-    {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
-    }
-]
-'@
-
-            Mock -CommandName Get-Content -MockWith { $patchFileContent }
-
-            { Install-ModulePatch -Path 'C:\patches\TestModule_1.0.0_patch.json' -Force } | Should -Throw -ExpectedMessage "Patch entry is missing 'ScriptFileName'."
-        }
-
-        It 'Should throw error for missing HashSHA' {
-            $patchFileContent = @'
-[
-    {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
-    }
-]
-'@
-
-            Mock -CommandName Get-Content -MockWith { $patchFileContent }
-
-            { Install-ModulePatch -Path 'C:\patches\TestModule_1.0.0_patch.json' -Force } | Should -Throw -ExpectedMessage "Patch entry is missing 'HashSHA'."
-        }
-
-        It 'Should throw error for missing StartOffset or EndOffset' {
-            $patchFileContent = @'
-[
-    {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "PatchContent": "PatchedContent"
-    }
-]
-'@
-
-            Mock -CommandName Get-Content -MockWith { $patchFileContent }
-
-            { Install-ModulePatch -Path 'C:\patches\TestModule_1.0.0_patch.json' -Force } | Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'."
-        }
-
-        It 'Should throw error for missing PatchContent' {
-            $patchFileContent = @'
-[
-    {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10
-    }
-]
-'@
-
-            Mock -CommandName Get-Content -MockWith { $patchFileContent }
-
-            { Install-ModulePatch -Path 'C:\patches\TestModule_1.0.0_patch.json' -Force } | Should -Throw -ExpectedMessage "Patch entry is missing 'PatchContent'."
-        }
-    }
-
-    Context 'When Force parameter is used' {
-        It 'Should apply patches without confirmation' {
-            $patchFileContent = @'
-[
-    {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
-    }
-]
-'@
-
-            Mock -CommandName Get-Content -MockWith { $patchFileContent }
-            Mock -CommandName Get-Module -MockWith {
-                return [PSCustomObject] @{
-                    Name        = 'TestModule'
-                    Version     = [System.Version] '1.0.0'
-                    ModuleBase  = 'C:\Modules\TestModule'
-                }
-            }
-            Mock -CommandName Get-FileHash -MockWith {
-                return [PSCustomObject] @{
-                    Hash = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-                }
-            }
-            Mock -CommandName Set-Content
-
-            Install-ModulePatch -Path 'C:\patches\TestModule_1.0.0_patch.json' -Force
-
-            Assert-MockCalled -CommandName Get-Content -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Get-Module -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Get-FileHash -Exactly 1 -Scope It
-            Assert-MockCalled -CommandName Set-Content -Exactly 1 -Scope It
+            Should -Invoke -CommandName Get-PatchFileContentFromPath -Exactly 0 -Scope It
+            Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 1 -Scope It
+            Should -Invoke -CommandName Merge-Patch -Exactly 1 -Scope It
         }
     }
 }
