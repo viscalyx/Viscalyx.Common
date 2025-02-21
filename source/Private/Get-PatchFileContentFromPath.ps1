@@ -35,7 +35,7 @@ function Get-PatchFileContentFromPath
             Message      = $script:localizedData.Install_ModulePatch_PatchFilePathNotFound -f $Path
             Category     = 'ObjectNotFound'
             ErrorId      = 'GPFCFP0001' # cSpell: disable-line
-            TargetObject = $Path
+            TargetObject = $Path -replace '[\\/]', [System.IO.Path]::DirectorySeparatorChar
         }
 
         Write-Error @writeErrorParameters
