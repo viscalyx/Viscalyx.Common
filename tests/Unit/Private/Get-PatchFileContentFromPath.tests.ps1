@@ -82,11 +82,9 @@ Describe 'Get-PatchFileContentFromPath' {
         It 'Should throw error for missing patch file' {
             Mock -CommandName Test-Path -MockWith { $false }
 
-            {
-                InModuleScope -ScriptBlock {
-                    { Get-PatchFileContentFromPath -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop' } |
-                        Should -Throw -ExpectedMessage ("Patch file not found at path: $TestDrive{0}patches{0}TestModule_1.0.0_patch.json" -f [System.IO.Path]::DirectorySeparatorChar)
-                }
+            InModuleScope -ScriptBlock {
+                { Get-PatchFileContentFromPath -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage ("The module patch file at location '$TestDrive{0}patches{0}TestModule_1.0.0_patch.json' does not exist." -f [System.IO.Path]::DirectorySeparatorChar)
             }
         }
     }

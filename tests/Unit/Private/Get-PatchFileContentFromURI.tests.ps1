@@ -79,14 +79,12 @@ Describe 'Get-PatchFileContentFromURI' {
 
     Context 'When patch file does not exist at URI' {
         It 'Should throw error for missing patch file' {
-            Mock -CommandName Invoke-RestMethod -MockWith { throw "404 Not Found" }
+            Mock -CommandName Invoke-RestMethod -MockWith { throw '404 Not Found' }
 
-            {
-                InModuleScope -ScriptBlock {
-                    { Get-PatchFileContentFromURI -URI 'https://gist.githubusercontent.com/user/gistid/raw/TestModule_1.0.0_patch.json' -ErrorAction 'Stop' } |
-                        Should -Throw -ExpectedMessage "Failed to fetch patch file from URI: https://gist.githubusercontent.com/user/gistid/raw/TestModule_1.0.0_patch.json. Error: 404 Not Found"
-                }
-             }
+            InModuleScope -ScriptBlock {
+                { Get-PatchFileContentFromURI -URI 'https://gist.githubusercontent.com/user/gistid/raw/TestModule_1.0.0_patch.json' -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage 'System.Management.Automation.RuntimeException: 404 Not Found'
+            }
         }
     }
 }

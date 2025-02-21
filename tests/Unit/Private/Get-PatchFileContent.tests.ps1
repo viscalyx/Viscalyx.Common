@@ -76,20 +76,16 @@ Describe 'Get-PatchFileContent' {
 
     Context 'When JSON content is invalid' {
         It 'Should throw error for invalid JSON content' {
-            {
-                InModuleScope -ScriptBlock {
-                    { Get-PatchFileContent -JsonContent 'Invalid JSON Content' -ErrorAction 'Stop' } |
-                        Should -Throw -ErrorId 'GPFC0001,Get-PatchFileContent' # cSpell: disable-line
-                }
+            InModuleScope -ScriptBlock {
+                { Get-PatchFileContent -JsonContent 'Invalid JSON Content' -ErrorAction 'Stop' } |
+                    Should -Throw -ErrorId 'GPFC0001,Get-PatchFileContent' # cSpell: disable-line
             }
         }
 
         It 'Should throw error for empty JSON content' {
-            {
-                InModuleScope -ScriptBlock {
-                    { Get-PatchFileContent -JsonContent '' -ErrorAction 'Stop' } |
-                        Should -Throw -ErrorId 'GPFC0001,Get-PatchFileContent' # cSpell: disable-line
-                }
+            InModuleScope -ScriptBlock {
+                { Get-PatchFileContent -JsonContent '' -ErrorAction 'Stop' } |
+                    Should -Throw -ErrorId 'GPFC0001,Get-PatchFileContent' # cSpell: disable-line
             }
         }
     }
