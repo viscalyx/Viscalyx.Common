@@ -173,8 +173,8 @@ Describe 'Get-ModuleFileSha' {
             $result.HashSHA[2]  | Should -Be 'TestHash123'
 
             $result.RelativePath | Should -Contain 'TestModule.psm1'
-            $result.RelativePath | Should -Contain 'Public/Test.ps1'
-            $result.RelativePath | Should -Contain 'Private/Helper.ps1'
+            $result.RelativePath | Should -Contain ('Public{0}Test.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
+            $result.RelativePath | Should -Contain ('Private{0}Helper.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
             $result.RelativePath | Should -Not -Match [regex]::Escape($script:testModuleRelativeBase)
 
             $result.FileName | Should -Contain 'TestModule.psm1'
