@@ -78,6 +78,5 @@ ConvertFrom-StringData @'
     ## Get-ModuleFileSha
     Get_ModuleFileSha_MissingModule = Module not found: {0}
     Get_ModuleFileSha_MissingModuleVersion = Module with specified version not found: {0} {1}
-    Get_ModuleFileSha_ModulePathNotFound = Module path not found: {0}
     Get_ModuleFileSha_PathMustBeDirectory = The specified path must be a directory, the root of a module including its version folder, e.g. './Viscalyx.Common/1.0.0'.
 '@

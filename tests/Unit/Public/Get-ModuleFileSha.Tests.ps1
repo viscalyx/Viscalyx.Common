@@ -134,7 +134,7 @@ Describe 'Get-ModuleFileSha' {
 
         It 'Should throw when path does not exist' {
             { Get-ModuleFileSha -Path 'NonExistentPath' -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage 'Module path not found: NonExistentPath'
+                Should -Throw -ExpectedMessage "Cannot validate argument on parameter 'Path'. The specified path must be a directory, the root of a module including its version folder, e.g. './Viscalyx.Common/1.0.0'."
         }
     }
 
