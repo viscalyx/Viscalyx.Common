@@ -51,6 +51,22 @@ function Get-ModuleFileSha
         $Version,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Path')]
+        [ValidateScript({
+            if (-not (Test-Path -Path $_ -PathType Container))
+            {
+                # $writeErrorParameters = @{
+                #     Message      = $script:localizedData.Get_ModuleFileSha_PathMustBeDirectory
+                #     Category     = 'InvalidArgument'
+                #     ErrorId      = 'GMFS0003' # cSpell: disable-line
+                #     TargetObject = $Name
+                # }
+
+                # Write-Error @writeErrorParameters -ErrorAction 'Stop'
+                throw $script:localizedData.Get_ModuleFileSha_PathMustBeDirectory
+            }
+
+            return $true
+        })]
         [System.String]
         $Path
     )

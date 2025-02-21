@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to being released.
 - `Get-ModuleFileSha` that outputs the SHA256 for each PowerShell script
    file in a specific PowerShell module.
+- `Get-TextOffset` that returns the start and end offset of the specified
+  text from within the specified file.
 
 ### Changed
 
