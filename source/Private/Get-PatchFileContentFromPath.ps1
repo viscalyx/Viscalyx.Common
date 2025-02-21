@@ -29,13 +29,15 @@ function Get-PatchFileContentFromPath
         $Path
     )
 
-    if (-not (Test-Path -Path $Path))
+    $normalizedPath = $Path -replace '[\\/]', [System.IO.Path]::DirectorySeparatorChar
+
+    if (-not (Test-Path -Path $normalizedPath))
     {
         $writeErrorParameters = @{
-            Message      = $script:localizedData.Install_ModulePatch_PatchFilePathNotFound -f $Path
+            Message      = $script:localizedData.Install_ModulePatch_PatchFilePathNotFound -f $normalizedPath
             Category     = 'ObjectNotFound'
             ErrorId      = 'GPFCFP0001' # cSpell: disable-line
-            TargetObject = $Path -replace '[\\/]', [System.IO.Path]::DirectorySeparatorChar
+            TargetObject = $normalizedPath
         }
 
         Write-Error @writeErrorParameters
@@ -43,7 +45,7 @@ function Get-PatchFileContentFromPath
         return
     }
 
-    $jsonContent = Get-Content -Path $Path -Raw
+    $jsonContent = Get-Content -Path $normalizedPath -Raw
 
     $patchFileContent = Get-PatchFileContent -JsonContent $jsonContent -ErrorAction 'Stop'
 
