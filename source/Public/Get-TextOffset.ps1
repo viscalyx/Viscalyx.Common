@@ -7,10 +7,10 @@
         Returns the start and end offsets of the text within the file.
 
     .PARAMETER FilePath
-        The path to the file.
+        Specifies the path to the file.
 
     .PARAMETER TextToFind
-        The text to search for within the file.
+        Specifies the text to search for within the file.
 
     .EXAMPLE
         Get-TextOffset -FilePath 'C:\path\to\your\script.ps1' -TextToFind 'if ($condition) {'
