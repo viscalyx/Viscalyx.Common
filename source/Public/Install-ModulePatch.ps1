@@ -95,7 +95,6 @@ function Install-ModulePatch
         $progressId = 1
         $progressActivity = $script:localizedData.Install_ModulePatch_Progress_Activity
         $progressStatus = $script:localizedData.Install_ModulePatch_Progress_Status
-        $progressCurrentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation
 
         # Show progress bar
         Write-Progress -Id $progressId -Activity $progressActivity -Status $progressStatus -PercentComplete 0
@@ -107,12 +106,12 @@ function Install-ModulePatch
         {
             $patchCounter++
             $progressPercentComplete = ($patchCounter / $totalPatches) * 100
-            $currentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation -f $patchEntry.ModuleName, $patchEntry.ModuleVersion, $patchEntry.ScriptFileName
+            $progressCurrentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation -f $patchEntry.ModuleName, $patchEntry.ModuleVersion, $patchEntry.ScriptFileName
 
             Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchEntry -f ($patchEntry | ConvertTo-Json -Compress))
 
             # Update progress bar
-            Write-Progress -Id $progressId -Activity $progressActivity -Status "$progressStatus - $currentOperation" -PercentComplete $progressPercentComplete
+            Write-Progress -Id $progressId -Activity $progressActivity -Status "$progressStatus - $progressCurrentOperation" -PercentComplete $progressPercentComplete
 
             Merge-Patch -PatchEntry $patchEntry -ErrorAction 'Stop'
         }
