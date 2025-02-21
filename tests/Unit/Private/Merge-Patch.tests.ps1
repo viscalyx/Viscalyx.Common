@@ -113,7 +113,7 @@ Describe 'Merge-Patch' {
         ) {
             InModuleScope -Parameters $_ -ScriptBlock {
                 { Merge-Patch -PatchEntry $PatchEntry -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage ("The script file '$TestDrive/TestScript.ps1' does not exist." -f [System.IO.Path]::DirectorySeparatorChar)
+                    Should -Throw -ExpectedMessage ("The script file '$TestDrive{0}TestScript.ps1' does not exist." -f [System.IO.Path]::DirectorySeparatorChar)
             }
         }
     }
