@@ -46,7 +46,6 @@ function Get-TextOffset
             ScriptFile  = $FilePath
             StartOffset = $startIndex
             EndOffset   = $endIndex
-            JsonText    = (($TextToFind -replace '(["\\])', '\$1') -replace '\n', '\n') -replace '\t', '\t'
         }
     }
     else

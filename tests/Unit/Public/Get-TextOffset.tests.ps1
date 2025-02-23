@@ -67,7 +67,6 @@ The text includes multiple lines.
             $result.ScriptFile | Should -Be $testFilePath
             $result.StartOffset | Should -Be 10
             $result.EndOffset | Should -Be 19
-            $result.JsonText | Should -Be 'test file'
         }
     }
 
@@ -95,24 +94,12 @@ The text includes multiple lines.
         }
     }
 
-    Context 'When the text contains special characters' {
-        It 'Should correctly escape special characters in JsonText' {
-            $textToFind = '"\\\n\t'
-            @'
-"\\\n\t
-'@ | Out-File -FilePath $testFilePath -Encoding UTF8
-            $result = Get-TextOffset -FilePath $testFilePath -TextToFind $textToFind
-            $result.JsonText | Should -Be '\"\\\\\\n\\t'
-        }
-    }
-
     Context 'When the text contains carriage returns and newlines' {
         It 'Should normalize line endings and find the text' {
             $textToFind = "It contains some text.`r`n"
             $result = Get-TextOffset -FilePath $testFilePath -TextToFind $textToFind
             $result.StartOffset | Should -Be 21
             $result.EndOffset | Should -Be 44
-            $result.JsonText | Should -Be 'It contains some text.\n'
         }
     }
 }
