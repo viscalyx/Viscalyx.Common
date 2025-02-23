@@ -1,17 +1,17 @@
 # Patching PowerShell Modules
 
 PowerShell modules are a fantastic way to organize and share reusable code.
-However, sometimes you might need to make a small change to a module without
-directly modifying its original source (perhaps because it's a third-party
-module). This is where patching comes in handy. This article will guide you
-through the process of patching a PowerShell module, using `ModuleBuilder`
-as an example.
+However, there are times when you might need to make a small change to a module
+without directly modifying its original source. This is especially useful when
+dealing with third-party modules. This article guides you through patching a
+PowerShell module, using `ModuleBuilder` as an example.
 
 > [!CAUTION]
 > This patching technique is intended as a temporary solution, primarily for
 > development or pipeline environments, until the module's next official
 > release. Always verify the contents of every patch file, even from trusted
-> sources, before applying it to a module.
+> sources before applying it to a module. Applying a patch to a signed module
+> will invalidate the signature.
 
 ## What is Module Patching?
 
@@ -45,7 +45,7 @@ without altering the original files directly. This is useful for:
 ## Step 1: Identifying the Changes
 
 Let's say we want to modify `ModuleBuilder` to fix a parse error that occurs
-in Window PowerShell when ModuleBuilder handles SemVer versions. Specifically,
+in Window PowerShell when `ModuleBuilder` handles SemVer versions. Specifically,
 we need to adjust how the module parses the version string.
 
 First, locate the `ModuleBuilder.psm1` file. You can find the path using:
