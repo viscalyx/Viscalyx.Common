@@ -50,7 +50,7 @@ Describe 'Merge-Patch' {
                     ModuleName = 'TestModule'
                     ModuleVersion = '1.0.0'
                     ScriptFileName = 'TestScript.ps1'
-                    HashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+                    OriginalHashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
                     StartOffset = 20
                     EndOffset = 30
                     PatchContent = 'PatchedContent1'
@@ -104,7 +104,7 @@ Describe 'Merge-Patch' {
                     ModuleName = 'TestModule'
                     ModuleVersion = '1.0.0'
                     ScriptFileName = 'TestScript.ps1'
-                    HashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+                    HashSOriginalHashSHAHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
                     StartOffset = 20
                     EndOffset = 30
                     PatchContent = 'PatchedContent1'
@@ -140,7 +140,7 @@ Describe 'Merge-Patch' {
                     ModuleName = 'TestModule'
                     ModuleVersion = '1.0.0'
                     ScriptFileName = 'TestScript.ps1'
-                    HashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+                    OriginalHashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
                     StartOffset = -1
                     EndOffset = 30
                     PatchContent = 'PatchedContent1'
@@ -152,7 +152,7 @@ Describe 'Merge-Patch' {
                     ModuleName = 'TestModule'
                     ModuleVersion = '1.0.0'
                     ScriptFileName = 'TestScript.ps1'
-                    HashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+                    OriginalHashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
                     StartOffset = 20
                     EndOffset = 1000
                     PatchContent = 'PatchedContent1'
@@ -164,7 +164,7 @@ Describe 'Merge-Patch' {
                     ModuleName = 'TestModule'
                     ModuleVersion = '1.0.0'
                     ScriptFileName = 'TestScript.ps1'
-                    HashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+                    HashOriginalHashSHASHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
                     StartOffset = 30
                     EndOffset = 20
                     PatchContent = 'PatchedContent1'

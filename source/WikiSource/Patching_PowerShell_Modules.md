@@ -138,13 +138,13 @@ $patchCode = '@{
 
 # Use an ordered hashtable so that the JSON output has the same order.
 $patchObject = [ordered] @{
-    ModuleName    = "ModuleBuilder"
-    ModuleVersion = "3.1.7"
-    ScriptFileName = "ModuleBuilder.psm1"
-    HashSHA       = $hash256
-    StartOffset   = $codeOffset.StartOffset
-    EndOffset     = $codeOffset.EndOffset
-    PatchContent  = $patchCode
+    ModuleName      = "ModuleBuilder"
+    ModuleVersion   = "3.1.7"
+    ScriptFileName  = "ModuleBuilder.psm1"
+    OriginalHashSHA = $hash256
+    StartOffset     = $codeOffset.StartOffset
+    EndOffset       = $codeOffset.EndOffset
+    PatchContent    = $patchCode
 }
 
 # Ensuring it's treated as an array. This works in both PowerShell 5.1 and 7.x.
@@ -162,7 +162,7 @@ Here's an example `ModuleBuilder_3.1.7_patch.json` file:
         "ModuleName": "ModuleBuilder",
         "ModuleVersion": "3.1.7",
         "ScriptFileName": "ModuleBuilder.psm1",
-        "HashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+        "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
         "StartOffset": 21167,
         "EndOffset": 21484,
         "PatchContent": "@{\n            Version       = if (($V = $BuildInfo.SemVer.Split(\"+\")[0].Split(\"-\", 2)[0])) {\n
@@ -179,7 +179,7 @@ Here's an example `ModuleBuilder_3.1.7_patch.json` file:
 - **ScriptFileName**: The name of the script file to patch, this can use
   the relative path from module base (e.g. `ModuleBuilder.psm1`, or
   `en-US/localized.strings.psd1`).
-- **HashSHA**: The SHA256 hash of the *original* content of the entire
+- **OriginalHashSHA**: The SHA256 hash of the *original* content of the entire
   script file (e.g. `ModuleBuilder.psm1`, or `en-US/localized.strings.psd1`).
 - **StartOffset**: The starting character position of the text to replace (e.g. 21167).
 - **EndOffset**: The ending character position of the text to replace (e.g. 21484).

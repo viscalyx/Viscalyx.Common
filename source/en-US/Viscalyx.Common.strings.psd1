@@ -71,7 +71,7 @@ ConvertFrom-StringData @'
     Assert_PatchFile_MissingModuleName = Patch entry is missing 'ModuleName'.
     Assert_PatchFile_MissingModuleVersion = Patch entry is missing 'ModuleVersion'.
     Assert_PatchFile_MissingScriptFileName = Patch entry is missing 'ScriptFileName'.
-    Assert_PatchFile_MissingHashSHA = Patch entry is missing 'HashSHA'.
+    Assert_PatchFile_MissingOriginalHashSHA = Patch entry is missing 'OriginalHashSHA'.
     Assert_PatchFile_MissingOffset = Patch entry is missing 'StartOffset' or 'EndOffset'.
     Assert_PatchFile_MissingPatchContent = Patch entry is missing 'PatchContent'.
 

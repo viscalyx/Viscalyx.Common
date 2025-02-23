@@ -51,7 +51,7 @@ Describe 'Get-PatchFileContentFromURI' {
         "ModuleName": "TestModule",
         "ModuleVersion": "1.0.0",
         "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
         "StartOffset": 0,
         "EndOffset": 10,
         "PatchContent": "PatchedContent"
@@ -70,7 +70,7 @@ Describe 'Get-PatchFileContentFromURI' {
             $result.ModuleName | Should -Be 'TestModule'
             $result.ModuleVersion | Should -Be '1.0.0'
             $result.ScriptFileName | Should -Be 'TestScript.ps1'
-            $result.HashSHA | Should -Be '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+            $result.OriginalHashSHA | Should -Be '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
             $result.StartOffset | Should -Be 0
             $result.EndOffset | Should -Be 10
             $result.PatchContent | Should -Be 'PatchedContent'

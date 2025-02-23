@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    file in a specific PowerShell module.
 - `Get-TextOffset` that returns the start and end offset of the specified
   text from within the specified file.
+- `Test-FileHash` that returns whether a file has the expected hash.
 
 ### Changed
 

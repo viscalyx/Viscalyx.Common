@@ -68,7 +68,8 @@ Describe 'Assert-PatchFile' {
         "ModuleName": "TestModule",
         "ModuleVersion": "1.0.0",
         "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "PatchedHashSHA": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
         "StartOffset": 0,
         "EndOffset": 10,
         "PatchContent": "PatchedContent"
@@ -89,7 +90,7 @@ Describe 'Assert-PatchFile' {
     {
         "ModuleVersion": "1.0.0",
         "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
         "StartOffset": 0,
         "EndOffset": 10,
         "PatchContent": "PatchedContent"
@@ -108,7 +109,7 @@ Describe 'Assert-PatchFile' {
     {
         "ModuleName": "TestModule",
         "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
         "StartOffset": 0,
         "EndOffset": 10,
         "PatchContent": "PatchedContent"
@@ -128,7 +129,7 @@ Describe 'Assert-PatchFile' {
     {
         "ModuleName": "TestModule",
         "ModuleVersion": "1.0.0",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
         "StartOffset": 0,
         "EndOffset": 10,
         "PatchContent": "PatchedContent"
@@ -141,7 +142,7 @@ Describe 'Assert-PatchFile' {
             }
         }
 
-        It 'Should throw correct error for missing HashSHA' {
+        It 'Should throw correct error for missing OriginalHashSHA' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = @'
 [
@@ -157,7 +158,7 @@ Describe 'Assert-PatchFile' {
 '@
 
                 { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'HashSHA'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'OriginalHashSHA'."
             }
         }
 
@@ -169,7 +170,7 @@ Describe 'Assert-PatchFile' {
         "ModuleName": "TestModule",
         "ModuleVersion": "1.0.0",
         "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
         "PatchContent": "PatchedContent"
     }
 ]
@@ -187,7 +188,7 @@ Describe 'Assert-PatchFile' {
         "ModuleName": "TestModule",
         "ModuleVersion": "1.0.0",
         "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
         "StartOffset": 0,
         "EndOffset": 10
     }

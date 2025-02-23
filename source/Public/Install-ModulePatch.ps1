@@ -1,37 +1,37 @@
 <#
-.SYNOPSIS
-    Applies patches to PowerShell modules based on a patch file.
+    .SYNOPSIS
+        Applies patches to PowerShell modules based on a patch file.
 
-.DESCRIPTION
-    The Install-ModulePatch command reads a patch file, validates its content, and applies patches to PowerShell modules.
-    The patch file can be provided as a local file path or a URL. The command verifies the module version and hash,
-    and replaces the content according to the patch file. It supports multiple patch entries in a single patch file,
-    applying them in descending order of StartOffset.
+    .DESCRIPTION
+        The Install-ModulePatch command reads a patch file, validates its content, and applies patches to PowerShell modules.
+        The patch file can be provided as a local file path or a URL. The command verifies the module version and hash,
+        and replaces the content according to the patch file. It supports multiple patch entries in a single patch file,
+        applying them in descending order of StartOffset.
 
-.PARAMETER Path
-    Specifies the path to the patch file.
+    .PARAMETER Path
+        Specifies the path to the patch file.
 
-.PARAMETER URI
-    Specifies the URL of the patch file.
+    .PARAMETER URI
+        Specifies the URL of the patch file.
 
-.PARAMETER Force
-    Overrides the confirmation dialogs.
+    .PARAMETER Force
+        Overrides the confirmation dialogs.
 
-.EXAMPLE
-    Install-ModulePatch -Path "C:\patches\MyModule_1.0.0_patch.json"
+    .EXAMPLE
+        Install-ModulePatch -Path "C:\patches\MyModule_1.0.0_patch.json"
 
-    Applies the patches specified in the patch file located at "C:\patches\MyModule_1.0.0_patch.json".
+        Applies the patches specified in the patch file located at "C:\patches\MyModule_1.0.0_patch.json".
 
-.EXAMPLE
-    Install-ModulePatch -URI "https://gist.githubusercontent.com/user/gistid/raw/MyModule_1.0.0_patch.json"
+    .EXAMPLE
+        Install-ModulePatch -URI "https://gist.githubusercontent.com/user/gistid/raw/MyModule_1.0.0_patch.json"
 
-    Applies the patches specified in the patch file located at the specified URL.
+        Applies the patches specified in the patch file located at the specified URL.
 
-.INPUTS
-    None. You cannot pipe input to this function.
+    .INPUTS
+        None. You cannot pipe input to this function.
 
-.OUTPUTS
-    None. The function does not generate any output.
+    .OUTPUTS
+        None. The function does not generate any output.
 #>
 function Install-ModulePatch
 {
@@ -48,7 +48,11 @@ function Install-ModulePatch
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
-        $Force
+        $Force,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $SkipHashCheck
     )
 
     if ($Force.IsPresent -and -not $Confirm)
@@ -114,9 +118,34 @@ function Install-ModulePatch
             Write-Progress -Id $progressId -Activity $progressActivity -Status "$progressStatus - $progressCurrentOperation" -PercentComplete $progressPercentComplete
 
             Merge-Patch -PatchEntry $patchEntry -ErrorAction 'Stop'
+
+            # Should we skip hash check?
+            if (-not $SkipHashCheck.IsPresent)
+            {
+                # # Verify the SHA256 hash of the patched file
+                # $moduleScriptFilePath = Join-Path -Path (Get-Module -Name $patchEntry.ModuleName -ListAvailable).ModuleBase -ChildPath $patchEntry.ScriptFileName
+                # $patchedFileHash = Test-FileHash -Path $moduleScriptFilePath -Algorithm 'SHA256' -ExpectedHash $patchEntry.PatchedHashSHA
+
+                # if (-not $patchedFileHash -and -not $SkipHashCheck)
+                # {
+                #     $errorMessage = $script:localizedData.Install_ModulePatch_Error_HashMismatch -f $patchEntry.ModuleName, $patchEntry.ModuleVersion, $patchEntry.ScriptFileName
+
+                #     throw $errorMessage
+                # }
+                # else
+                # {
+                #     Write-Debug -Message "$($patchEntry.ScriptFileName) at $($patchEntry.StartOffset) has been patched successfully, and hash matches."
+                # }
+            }
+            # else
+            # {
+            #     Write-Debug -Message "$($patchEntry.ScriptFileName) at $($patchEntry.StartOffset) has been patched successfully, but hash check was skipped."
+            # }
         }
 
         # Clear progress bar
         Write-Progress -Id $progressId -Activity $progressActivity -Completed
+
+        Write-Debug -Message "Patching completed successfully."
     }
 }

@@ -45,7 +45,7 @@ AfterAll {
 Describe "Assert-PatchValidity" {
     BeforeAll {
         # Mock Get-Module to return a module with the correct version
-        Mock Get-Module {
+        Mock -CommandName Get-Module -MockWith{
             return @{
                 ModuleBase = "$TestDrive/Modules/TestModule"
                 Version = "1.0.0"
@@ -53,15 +53,19 @@ Describe "Assert-PatchValidity" {
         }
 
         # Mock Test-Path to return true for the script file existence check
-        Mock Test-Path {
+        Mock -CommandName Test-Path -MockWith {
             return $true
         }
 
         # Mock Get-FileHash to return the expected hash
-        Mock Get-FileHash {
+        Mock -CommandName Get-FileHash -MockWith {
             return @{
                 Hash = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
+        }
+
+        Mock -CommandName Get-ModuleVersion -MockWith {
+            return '1.0.0'
         }
     }
 
@@ -71,7 +75,7 @@ Describe "Assert-PatchValidity" {
                 ModuleName = "TestModule"
                 ModuleVersion = "1.0.0"
                 ScriptFileName = "TestScript.ps1"
-                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+                OriginalHashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
             Assert-PatchValidity -PatchEntry $patchEntry
@@ -79,8 +83,12 @@ Describe "Assert-PatchValidity" {
     }
 
     It "Should throw correct error for module version mismatch" {
-        Mock Get-Module {
+        Mock -CommandName Get-Module -MockWith {
             return $null
+        }
+
+        Mock -CommandName Get-ModuleVersion -MockWith {
+            return '1.0.0'
         }
 
         InModuleScope -ScriptBlock {
@@ -88,7 +96,7 @@ Describe "Assert-PatchValidity" {
                 ModuleName = "TestModule"
                 ModuleVersion = "1.0.0"
                 ScriptFileName = "TestScript.ps1"
-                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+                OriginalHashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
             { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
@@ -97,8 +105,12 @@ Describe "Assert-PatchValidity" {
     }
 
     It "Should throw correct error for script file not found" {
-        Mock Test-Path {
+        Mock -CommandName Test-Path -MockWith {
             return $false
+        }
+
+        Mock -CommandName Get-ModuleVersion -MockWith {
+            return '1.0.0'
         }
 
         InModuleScope -ScriptBlock {
@@ -106,7 +118,7 @@ Describe "Assert-PatchValidity" {
                 ModuleName = "TestModule"
                 ModuleVersion = "1.0.0"
                 ScriptFileName = "TestScript.ps1"
-                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+                OriginalHashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
             { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
@@ -115,10 +127,14 @@ Describe "Assert-PatchValidity" {
     }
 
     It "Should throw correct error for hash validation failure" {
-        Mock Get-FileHash {
+        Mock -CommandName Get-FileHash -MockWith {
             return @{
                 Hash = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
             }
+        }
+
+        Mock -CommandName Get-ModuleVersion -MockWith {
+            return '1.0.0'
         }
 
         InModuleScope -ScriptBlock {
@@ -126,7 +142,7 @@ Describe "Assert-PatchValidity" {
                 ModuleName = "TestModule"
                 ModuleVersion = "1.0.0"
                 ScriptFileName = "TestScript.ps1"
-                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+                OriginalHashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
             { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
@@ -135,11 +151,15 @@ Describe "Assert-PatchValidity" {
     }
 
     It "Should throw correct error for module version mismatch" {
-        Mock Get-Module {
+        Mock -CommandName Get-Module -MockWith {
             return @{
                 ModuleBase = "$TestDrive/Modules/TestModule"
                 Version = "2.0.0" # Different version
             }
+        }
+
+        Mock -CommandName Get-ModuleVersion -MockWith {
+            return '2.0.0'
         }
 
         InModuleScope -ScriptBlock {
@@ -147,7 +167,7 @@ Describe "Assert-PatchValidity" {
                 ModuleName = "TestModule"
                 ModuleVersion = "1.0.0"
                 ScriptFileName = "TestScript.ps1"
-                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+                OriginalHashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
             { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
@@ -156,15 +176,19 @@ Describe "Assert-PatchValidity" {
     }
 
     It "Should throw correct error for script file not found" {
-        Mock Get-Module {
+        Mock -CommandName Get-Module -MockWith {
             return @{
                 ModuleBase = "$TestDrive/Modules/TestModule"
                 Version = "1.0.0"
             }
         }
 
-        Mock Test-Path {
+        Mock -CommandName Test-Path -MockWith {
             return $false
+        }
+
+        Mock -CommandName Get-ModuleVersion -MockWith {
+            return '1.0.0'
         }
 
         InModuleScope -ScriptBlock {
@@ -172,7 +196,7 @@ Describe "Assert-PatchValidity" {
                 ModuleName = "TestModule"
                 ModuleVersion = "1.0.0"
                 ScriptFileName = "TestScript.ps1"
-                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+                OriginalHashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
             { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |
@@ -181,21 +205,25 @@ Describe "Assert-PatchValidity" {
     }
 
     It "Should throw correct error for hash validation failure" {
-        Mock Get-Module {
+        Mock -CommandName Get-Module -MockWith {
             return @{
                 ModuleBase = "$TestDrive/Modules/TestModule"
                 Version = "1.0.0"
             }
         }
 
-        Mock Test-Path {
+        Mock -CommandName Test-Path -MockWith {
             return $true
         }
 
-        Mock Get-FileHash {
+        Mock -CommandName Get-FileHash -MockWith {
             return @{
                 Hash = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
             }
+        }
+
+        Mock -CommandName Get-ModuleVersion -MockWith {
+            return '1.0.0'
         }
 
         InModuleScope -ScriptBlock {
@@ -203,7 +231,7 @@ Describe "Assert-PatchValidity" {
                 ModuleName = "TestModule"
                 ModuleVersion = "1.0.0"
                 ScriptFileName = "TestScript.ps1"
-                HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+                OriginalHashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
             }
 
             { Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop' } |

@@ -75,10 +75,10 @@ function Assert-PatchFile
             continue
         }
 
-        if (-not $patchEntry.HashSHA)
+        if (-not $patchEntry.OriginalHashSHA)
         {
             $writeErrorParameters = @{
-                Message      = $script:localizedData.Assert_PatchFile_MissingHashSHA
+                Message      = $script:localizedData.Assert_PatchFile_MissingOriginalHashSHA
                 Category     = 'InvalidData'
                 ErrorId      = 'APF0004' # cSpell: disable-line
                 TargetObject = $PatchEntry

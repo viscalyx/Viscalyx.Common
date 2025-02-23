@@ -51,7 +51,7 @@ Describe 'Install-ModulePatch' {
         "ModuleName": "TestModule",
         "ModuleVersion": "1.0.0",
         "ScriptFileName": "TestScript.ps1",
-        "HashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
         "StartOffset": 0,
         "EndOffset": 10,
         "PatchContent": "PatchedContent"

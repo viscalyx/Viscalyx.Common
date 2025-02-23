@@ -34,7 +34,9 @@ function Merge-Patch
         $PatchEntry
     )
 
-    $modulePath = Join-Path -Path (Get-Module -Name $PatchEntry.ModuleName).ModuleBase -ChildPath $PatchEntry.ScriptFileName
+    $moduleBase = (Get-Module -Name $PatchEntry.ModuleName -ListAvailable).ModuleBase
+
+    $modulePath = Join-Path -Path $moduleBase -ChildPath $PatchEntry.ScriptFileName
 
     if (-not (Test-Path -Path $modulePath))
     {

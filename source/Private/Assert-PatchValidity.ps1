@@ -15,7 +15,8 @@
             ModuleName = "TestModule"
             ModuleVersion = "1.0.0"
             ScriptFileName = "TestScript.ps1"
-            HashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+            OriginalHashSHA = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+            PatchedHashSHA = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
         }
         Assert-PatchValidity -PatchEntry $patchEntry
 
@@ -52,7 +53,7 @@ function Assert-PatchValidity
         return
     }
 
-    $moduleVersion = Get-ModuleVersion -Module $PatchEntry.ModuleName
+    $moduleVersion = Get-ModuleVersion -Module $module
 
     if ($moduleVersion -ne $PatchEntry.ModuleVersion)
     {
@@ -86,10 +87,10 @@ function Assert-PatchValidity
 
     $computedHash = (Get-FileHash -Path $modulePath -Algorithm SHA256).Hash
 
-    if ($computedHash -ne $PatchEntry.HashSHA)
+    if ($computedHash -ne $PatchEntry.OriginalHashSHA)
     {
         $writeErrorParameters = @{
-            Message      = $script:localizedData.Assert_PatchValidity_HashValidationFailed -f $modulePath, $PatchEntry.HashSHA, $computedHash
+            Message      = $script:localizedData.Assert_PatchValidity_HashValidationFailed -f $modulePath, $PatchEntry.OriginalHashSHA, $computedHash
             Category     = 'InvalidData'
             ErrorId      = 'APV0004' # cSpell: disable-line
             TargetObject = $PatchEntry.ScriptFileName

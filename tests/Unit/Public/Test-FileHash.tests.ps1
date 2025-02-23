@@ -42,44 +42,27 @@ AfterAll {
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
 }
 
-Describe 'Get-PatchFileContent' {
-    Context 'When JSON content is valid' {
-        It 'Should convert JSON content to PowerShell object' {
-            $result = InModuleScope -ScriptBlock {
-                $jsonContent = @'
-[
-    {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
+Describe 'Test-FileHash' {
+    BeforeAll {
+        # Create a temporary file for testing
+        $mockTestFile = Join-Path -Path $TestDrive -ChildPath 'TestFile.txt'
+
+        Set-Content -Path $mockTestFile -Value 'Test content'
+        $mockHash = Get-FileHash -Path $mockTestFile -Algorithm 'SHA256' | Select-Object -ExpandProperty 'Hash'
     }
-]
-'@
 
-                Get-PatchFileContent -JsonContent $jsonContent
-            }
+    Context 'When the file exists and the hash matches' {
+        It 'Should return $true' {
+            $result = Test-FileHash -Path $mockTestFile -Algorithm 'SHA256' -ExpectedHash $mockHash
 
-            $result | Should -BeOfType ([PSCustomObject])
-            $result.ModuleName | Should -Be 'TestModule'
-            $result.ModuleVersion | Should -Be '1.0.0'
-            $result.ScriptFileName | Should -Be 'TestScript.ps1'
-            $result.OriginalHashSHA | Should -Be '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-            $result.StartOffset | Should -Be 0
-            $result.EndOffset | Should -Be 10
-            $result.PatchContent | Should -Be 'PatchedContent'
+            $result | Should -BeTrue
         }
     }
 
-    Context 'When JSON content is invalid' {
-        It 'Should throw error for invalid JSON content' {
-            InModuleScope -ScriptBlock {
-                { Get-PatchFileContent -JsonContent 'Invalid JSON Content' -ErrorAction 'Stop' } |
-                    Should -Throw -ErrorId 'GPFC0001,Get-PatchFileContent' # cSpell: disable-line
-            }
+    Context 'When the file exists and the hash does not match' {
+        It 'Should return $false' {
+            $result = Test-FileHash -Path $mockTestFile -Algorithm 'SHA256' -ExpectedHash 'incorrect hash'
+            $result | Should -BeFalse
         }
     }
 }
