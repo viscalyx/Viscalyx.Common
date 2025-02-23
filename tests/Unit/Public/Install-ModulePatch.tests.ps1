@@ -99,6 +99,14 @@ Describe 'Install-ModulePatch' {
             Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 1 -Scope It
             Should -Invoke -CommandName Merge-Patch -Exactly 1 -Scope It
         }
+
+        It 'Should be able to skip hash validation' {
+            Install-ModulePatch -SkipHashValidation -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop'
+
+            Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 0 -Scope It
+            Should -Invoke -CommandName Get-PatchFileContentFromPath -Exactly 1 -Scope It
+            Should -Invoke -CommandName Merge-Patch -Exactly 1 -Scope It
+        }
     }
 
     Context 'When module does not exist' {

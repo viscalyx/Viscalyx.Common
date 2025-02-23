@@ -91,7 +91,7 @@ function Install-ModulePatch
             Get-PatchFileContentFromURI -URI $URI -ErrorAction 'Stop'
         }
 
-        Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchFileContent -f ($patchFileContent | ConvertTo-Json -Compress))
+        Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchFileContent -f ($patchFileContent | ConvertTo-Json -Depth 10 -Compress))
 
         Assert-PatchFile -PatchFileContent $patchFileContent
 
@@ -139,7 +139,7 @@ function Install-ModulePatch
                 $progressPercentComplete = ($patchCounter / $totalPatches) * 100
                 $progressCurrentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation -f $patchFileContent.ModuleName, $patchFileContent.ModuleVersion, $moduleFile.ScriptFileName
 
-                Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchEntry -f ($patchEntry | ConvertTo-Json -Compress))
+                Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchEntry -f ($patchEntry | ConvertTo-Json -Depth 10 -Compress))
 
                 # Update progress bar
                 Write-Progress -Id $progressId -Activity $progressActivity -Status "$progressStatus - $progressCurrentOperation" -PercentComplete $progressPercentComplete
