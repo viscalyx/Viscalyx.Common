@@ -1,23 +1,23 @@
 <#
     .SYNOPSIS
-        Applies patches to PowerShell modules based on a patch file.
+        Applies a patch to a file.
 
     .DESCRIPTION
-        The Merge-Patch function reads a patch file, validates its content, and applies patches to PowerShell modules.
-        The patch file can be provided as a local file path or a URL. The function verifies the module version and hash,
-        and replaces the content according to the patch file. It supports multiple patch entries in a single patch file,
-        applying them in descending order of StartOffset.
+        The `Merge-Patch` function applies a patch to a file based on the provided
+        patch entry. It reads the content of the file, applies the patch, and writes
+        the patched content back to the file.
+
+    .PARAMETER FilePath
+        Specifies the path to the file to be patched.
 
     .PARAMETER PatchEntry
-        Specifies the patch entry to apply.
+        Specifies the patch entry to apply. The patch entry should contain the
+        `StartOffset`, `EndOffset`, and `PatchContent` properties.
 
     .EXAMPLE
-        $patchFileContent = Get-Content -Path "C:\patches\MyModule_1.0.0_patch.json" -Raw | ConvertFrom-Json
-        foreach ($patchEntry in $patchFileContent) {
-            Merge-Patch -PatchEntry $patchEntry
-        }
+        Merge-Patch -FilePath "C:\path\to\myfile.txt" -PatchEntry $patchEntry
 
-        Applies the patches specified in the patch file content.
+        Applies the patch specified in `$patchEntry` to the file "C:\path\to\myfile.txt".
 
     .INPUTS
         None. You cannot pipe input to this function.
@@ -30,29 +30,16 @@ function Merge-Patch
     param
     (
         [Parameter(Mandatory = $true)]
+        [System.String]
+        $FilePath,
+
+        [Parameter(Mandatory = $true)]
         [System.Object]
         $PatchEntry
     )
 
-    $moduleBase = (Get-Module -Name $PatchEntry.ModuleName -ListAvailable).ModuleBase
-
-    $modulePath = Join-Path -Path $moduleBase -ChildPath $PatchEntry.ScriptFileName
-
-    if (-not (Test-Path -Path $modulePath))
-    {
-        $writeErrorParameters = @{
-            Message      = $script:localizedData.Install_ModulePatch_ScriptFileNotFound -f $modulePath
-            Category     = 'ObjectNotFound'
-            ErrorId      = 'GPFCFP0001' # cSpell: disable-line
-            TargetObject = $modulePath
-        }
-
-        Write-Error @writeErrorParameters
-
-        return
-    }
-
-    $scriptContent = Get-Content -Path $modulePath -Raw -ErrorAction 'Stop'
+    # TODO: Get-Content and Set-Content should be moved out to Install-ModulePatch so that we read and write once, and also can rollback on error.
+    $scriptContent = Get-Content -Path $FilePath -Raw -ErrorAction 'Stop'
 
     $startOffset = $PatchEntry.StartOffset
     $endOffset = $PatchEntry.EndOffset
@@ -60,10 +47,10 @@ function Merge-Patch
     if ($startOffset -lt 0 -or $endOffset -gt $scriptContent.Length -or $startOffset -ge $endOffset)
     {
         $writeErrorParameters = @{
-            Message      = $script:localizedData.Install_ModulePatch_InvalidStartOrEndOffset -f $startOffset, $endOffset
+            Message      = $script:localizedData.Merge_Patch_InvalidStartOrEndOffset -f $startOffset, $endOffset
             Category     = 'InvalidArgument'
-            ErrorId      = 'GPFCFP0001' # cSpell: disable-line
-            TargetObject = $modulePath
+            ErrorId      = 'MP0001' # cSpell: disable-line
+            TargetObject = $FilePath
         }
 
         Write-Error @writeErrorParameters
@@ -73,5 +60,7 @@ function Merge-Patch
 
     $patchedContent = $scriptContent.Substring(0, $startOffset) + $PatchEntry.PatchContent + $scriptContent.Substring($endOffset)
 
-    Set-Content -Path $modulePath -Value $patchedContent -ErrorAction 'Stop'
+    Set-Content -Path $FilePath -Value $patchedContent -ErrorAction 'Stop'
+
+    Write-Debug -Message "Successfully patched $FilePath at $($patchEntry.StartOffset)"
 }

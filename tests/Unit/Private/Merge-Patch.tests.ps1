@@ -44,37 +44,25 @@ AfterAll {
 
 Describe 'Merge-Patch' {
     Context 'When patch file is valid' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                'This is the script file content'
+            }
+
+            Mock -CommandName Set-Content
+        }
+
         It 'Should apply a patch' -ForEach @(
             @{
                 PatchEntry = @{
-                    ModuleName = 'TestModule'
-                    ModuleVersion = '1.0.0'
-                    ScriptFileName = 'TestScript.ps1'
-                    OriginalHashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
                     StartOffset = 20
                     EndOffset = 30
                     PatchContent = 'PatchedContent1'
                 }
             }
          ) {
-            Mock -CommandName Get-Module -MockWith {
-                @{
-                    ModuleBase = $TestDrive
-                }
-            }
-
-            Mock -CommandName Test-Path -MockWith {
-                $true
-            }
-
-            Mock -CommandName Get-Content -MockWith {
-                'This is the script file content'
-            }
-
-            Mock -CommandName Set-Content
-
             InModuleScope -Parameters $_ -ScriptBlock {
-                Merge-Patch -PatchEntry $PatchEntry
+                Merge-Patch -FilePath "$TestDrive/TestScript.ps1" -PatchEntry $PatchEntry
             }
 
             Should -Invoke -CommandName Get-Content -Exactly 1 -Scope It
@@ -82,65 +70,18 @@ Describe 'Merge-Patch' {
         }
     }
 
-    Context 'When script file is not found' {
-        BeforeAll {
-            Mock -CommandName Get-Module -MockWith {
-                @{
-                    ModuleBase = $TestDrive
-                }
-            }
-
-            Mock -CommandName Test-Path -MockWith {
-                $false
-            }
-
-            # Create the file TestScript.ps1 in $TestDrive
-            Set-Content -Path "$TestDrive/TestScript.ps1" -Value 'Initial content of the script.'
-        }
-
-        It 'Should write an error and return' -TestCases @(
-            @{
-                PatchEntry = @{
-                    ModuleName = 'TestModule'
-                    ModuleVersion = '1.0.0'
-                    ScriptFileName = 'TestScript.ps1'
-                    HashSOriginalHashSHAHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-                    StartOffset = 20
-                    EndOffset = 30
-                    PatchContent = 'PatchedContent1'
-                }
-            }
-        ) {
-            InModuleScope -Parameters $_ -ScriptBlock {
-                { Merge-Patch -PatchEntry $PatchEntry -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage ("The script file '$TestDrive{0}TestScript.ps1' does not exist." -f [System.IO.Path]::DirectorySeparatorChar)
-            }
-        }
-    }
-
     Context 'When start or end offset is invalid' {
         BeforeAll {
-            Mock -CommandName Get-Module -MockWith {
-                @{
-                    ModuleBase = $TestDrive
-                }
+            Mock -CommandName Get-Content -MockWith {
+                'This is the script file content'
             }
 
-            Mock -CommandName Test-Path -MockWith {
-                $true
-            }
-
-            # Create the file TestScript.ps1 in $TestDrive
-            Set-Content -Path "$TestDrive/TestScript.ps1" -Value 'Initial content of the script.'
+            Mock -CommandName Set-Content
         }
 
         It 'Should write an error and return' -TestCases @(
             @{
                 PatchEntry = @{
-                    ModuleName = 'TestModule'
-                    ModuleVersion = '1.0.0'
-                    ScriptFileName = 'TestScript.ps1'
-                    OriginalHashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
                     StartOffset = -1
                     EndOffset = 30
                     PatchContent = 'PatchedContent1'
@@ -149,10 +90,6 @@ Describe 'Merge-Patch' {
             },
             @{
                 PatchEntry = @{
-                    ModuleName = 'TestModule'
-                    ModuleVersion = '1.0.0'
-                    ScriptFileName = 'TestScript.ps1'
-                    OriginalHashSHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
                     StartOffset = 20
                     EndOffset = 1000
                     PatchContent = 'PatchedContent1'
@@ -161,10 +98,6 @@ Describe 'Merge-Patch' {
             },
             @{
                 PatchEntry = @{
-                    ModuleName = 'TestModule'
-                    ModuleVersion = '1.0.0'
-                    ScriptFileName = 'TestScript.ps1'
-                    HashOriginalHashSHASHA = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
                     StartOffset = 30
                     EndOffset = 20
                     PatchContent = 'PatchedContent1'
@@ -173,7 +106,7 @@ Describe 'Merge-Patch' {
             }
         ) {
             InModuleScope -Parameters $_ -ScriptBlock {
-                { Merge-Patch -PatchEntry $PatchEntry -ErrorAction 'Stop' } |
+                { Merge-Patch -FilePath "$TestDrive/TestScript.ps1" -PatchEntry $PatchEntry -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage $ExpectedMessage
             }
         }

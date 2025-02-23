@@ -32,7 +32,7 @@ function Get-PatchFileContent
 
     try
     {
-        $patchFileContent = $JsonContent | ConvertFrom-Json -ErrorAction 'Stop'
+        $patchFileContent = $JsonContent | ConvertFrom-Json -Depth 10 -ErrorAction 'Stop'
 
         return $patchFileContent
     }

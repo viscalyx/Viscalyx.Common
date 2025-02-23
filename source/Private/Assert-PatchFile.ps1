@@ -33,41 +33,58 @@ function Assert-PatchFile
         $PatchFileContent
     )
 
-    foreach ($patchEntry in $PatchFileContent)
+    if (-not $PatchFileContent.ModuleName)
     {
-        if (-not $patchEntry.ModuleName)
-        {
-            $writeErrorParameters = @{
-                Message      = $script:localizedData.Assert_PatchFile_MissingModuleName
-                Category     = 'InvalidData'
-                ErrorId      = 'APF0001' # cSpell: disable-line
-                TargetObject = $PatchEntry
-            }
-
-            Write-Error @writeErrorParameters
-
-            continue
+        $writeErrorParameters = @{
+            Message      = $script:localizedData.Assert_PatchFile_MissingModuleName
+            Category     = 'InvalidData'
+            ErrorId      = 'APF0001' # cSpell: disable-line
+            TargetObject = $PatchFileContent
         }
 
-        if (-not $patchEntry.ModuleVersion)
-        {
-            $writeErrorParameters = @{
-                Message      = $script:localizedData.Assert_PatchFile_MissingModuleVersion
-                Category     = 'InvalidData'
-                ErrorId      = 'APF0002' # cSpell: disable-line
-                TargetObject = $PatchEntry
-            }
-            Write-Error @writeErrorParameters
-            continue
+        Write-Error @writeErrorParameters
+
+        continue
+    }
+
+    if (-not $PatchFileContent.ModuleVersion)
+    {
+        $writeErrorParameters = @{
+            Message      = $script:localizedData.Assert_PatchFile_MissingModuleVersion
+            Category     = 'InvalidData'
+            ErrorId      = 'APF0002' # cSpell: disable-line
+            TargetObject = $PatchFileContent
         }
 
-        if (-not $patchEntry.ScriptFileName)
+        Write-Error @writeErrorParameters
+
+        continue
+    }
+
+    # Should have the property ModuleFiles
+    if (-not $PatchFileContent.ModuleFiles)
+    {
+        $writeErrorParameters = @{
+            Message      = $script:localizedData.Assert_PatchFile_MissingModuleFiles
+            Category     = 'InvalidData'
+            ErrorId      = 'APF0003' # cSpell: disable-line
+            TargetObject = $PatchFileContent
+        }
+
+        Write-Error @writeErrorParameters
+
+        continue
+    }
+
+    foreach ($scriptFile in $PatchFileContent.ModuleFiles)
+    {
+        if (-not $scriptFile.ScriptFileName)
         {
             $writeErrorParameters = @{
                 Message      = $script:localizedData.Assert_PatchFile_MissingScriptFileName
                 Category     = 'InvalidData'
-                ErrorId      = 'APF0003' # cSpell: disable-line
-                TargetObject = $PatchEntry
+                ErrorId      = 'APF0004' # cSpell: disable-line
+                TargetObject = $scriptFile
             }
 
             Write-Error @writeErrorParameters
@@ -75,27 +92,13 @@ function Assert-PatchFile
             continue
         }
 
-        if (-not $patchEntry.OriginalHashSHA)
+        if (-not $scriptFile.OriginalHashSHA)
         {
             $writeErrorParameters = @{
                 Message      = $script:localizedData.Assert_PatchFile_MissingOriginalHashSHA
                 Category     = 'InvalidData'
-                ErrorId      = 'APF0004' # cSpell: disable-line
-                TargetObject = $PatchEntry
-            }
-
-            Write-Error @writeErrorParameters
-
-            continue
-        }
-
-        if ($null -eq $patchEntry.StartOffset -or $null -eq $patchEntry.EndOffset)
-        {
-            $writeErrorParameters = @{
-                Message      = $script:localizedData.Assert_PatchFile_MissingOffset
-                Category     = 'InvalidData'
                 ErrorId      = 'APF0005' # cSpell: disable-line
-                TargetObject = $PatchEntry
+                TargetObject = $scriptFile
             }
 
             Write-Error @writeErrorParameters
@@ -103,13 +106,13 @@ function Assert-PatchFile
             continue
         }
 
-        if (-not $patchEntry.PatchContent)
+        if (-not $scriptFile.ValidationHashSHA)
         {
             $writeErrorParameters = @{
-                Message      = $script:localizedData.Assert_PatchFile_MissingPatchContent
+                Message      = $script:localizedData.Assert_PatchFile_MissingValidationHashSHA
                 Category     = 'InvalidData'
                 ErrorId      = 'APF0006' # cSpell: disable-line
-                TargetObject = $PatchEntry
+                TargetObject = $scriptFile
             }
 
             Write-Error @writeErrorParameters
@@ -117,6 +120,50 @@ function Assert-PatchFile
             continue
         }
 
-        Assert-PatchValidity -PatchEntry $patchEntry -ErrorAction 'Stop'
+        # Should have the property FilePatches
+        if (-not $scriptFile.FilePatches)
+        {
+            $writeErrorParameters = @{
+                Message      = $script:localizedData.Assert_PatchFile_MissingFilePatches
+                Category     = 'InvalidData'
+                ErrorId      = 'APF0007' # cSpell: disable-line
+                TargetObject = $scriptFile
+            }
+
+            Write-Error @writeErrorParameters
+
+            continue
+        }
+
+        foreach ($patchEntry in $scriptFile.FilePatches)
+        {
+            if ($null -eq $patchEntry.StartOffset -or $null -eq $patchEntry.EndOffset)
+            {
+                $writeErrorParameters = @{
+                    Message      = $script:localizedData.Assert_PatchFile_MissingOffset
+                    Category     = 'InvalidData'
+                    ErrorId      = 'APF0008' # cSpell: disable-line
+                    TargetObject = $patchEntry
+                }
+
+                Write-Error @writeErrorParameters
+
+                continue
+            }
+
+            if (-not $patchEntry.PatchContent)
+            {
+                $writeErrorParameters = @{
+                    Message      = $script:localizedData.Assert_PatchFile_MissingPatchContent
+                    Category     = 'InvalidData'
+                    ErrorId      = 'APF0009' # cSpell: disable-line
+                    TargetObject = $patchEntry
+                }
+
+                Write-Error @writeErrorParameters
+
+                continue
+            }
+        }
     }
 }

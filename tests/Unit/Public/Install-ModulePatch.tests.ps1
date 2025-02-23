@@ -46,28 +46,41 @@ Describe 'Install-ModulePatch' {
     Context 'When patch file is valid' {
         BeforeAll {
             $patchFileContent = @'
-[
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
     {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
     }
-]
+  ]
+}
 '@
 
             Mock -CommandName Assert-PatchFile
+            Mock -CommandName Assert-ScriptFileValidity
             Mock -CommandName Merge-Patch
+            Mock -CommandName Get-ModuleByVersion -MockWith {
+                return @{
+                    ModuleBase = "$TestDrive/Modules/TestModule"
+                }
+            }
 
             Mock -CommandName Get-PatchFileContentFromPath -MockWith {
-                $patchFileContent
+                $patchFileContent | ConvertFrom-Json -Depth 10
             }
 
             Mock -CommandName Get-PatchFileContentFromURI -MockWith {
-                $patchFileContent
+                $patchFileContent | ConvertFrom-Json -Depth 10
             }
         }
 

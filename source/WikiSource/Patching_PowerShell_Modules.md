@@ -141,14 +141,18 @@ $patchCode = '@{
 $patchObject = [ordered] @{
     ModuleName      = 'ModuleBuilder'
     ModuleVersion   = "3.1.7"
-    OriginalHashSHA = $hash256
-    PatchedHashSHA  = 'NEW_HASH_HERE' # Replace with the actual hash of the patched file
-    ModulePatches   = @(
+    ModuleFiles     = @(
         @{
             ScriptFileName = 'ModuleBuilder.psm1'
-            StartOffset    = $codeOffset.StartOffset
-            EndOffset      = $codeOffset.EndOffset
-            PatchContent   = $patchCode
+            OriginalHashSHA = $hash256
+            ValidationHashSHA  = 'NEW_HASH_HERE' # Replace with the actual hash of the patched file
+            FilePatches   = @(
+                @{
+                    StartOffset    = $codeOffset.StartOffset
+                    EndOffset      = $codeOffset.EndOffset
+                    PatchContent   = $patchCode
+                }
+            )
         }
     )
 }
@@ -163,38 +167,44 @@ Here's an example `ModuleBuilder_3.1.7_patch.json` file:
 
 <!-- markdownlint-disable MD013 - Line length -->
 ```json
-[
+{
+  "ModuleName": "ModuleBuilder",
+  "ModuleVersion": "3.1.7",
+  "ModuleFiles": [
     {
-        "ModuleName": "ModuleBuilder",
-        "ModuleVersion": "3.1.7",
-        "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-        "PatchedHashSHA": "NEW_HASH_HERE",
-        "ModulePatches": [
-            {
-                "ScriptFileName": "ModuleBuilder.psm1",
-                "StartOffset": 21167,
-                "EndOffset": 21484,
-                "PatchContent": "@{\n            Version       = if (($V = $BuildInfo.SemVer.Split(\"+\")[0].Split(\"-\", 2)[0])) {\n                [version]$V\n            }\n            Prerelease    = $BuildInfo.SemVer.Split(\"+\")[0].Split(\"-\", 2)[1]\n            BuildMetadata = $BuildInfo.SemVer.Split(\"+\", 2)[1]\n        }"
-            }
-        ]
+      "ScriptFileName": "ModuleBuilder.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 21167,
+          "EndOffset": 21484,
+          "PatchContent": "@{\n            Prerelease    = $BuildInfo.SemVer.Split(\"+\")[0].Split(\"-\", 2)[1]\n            BuildMetadata = $BuildInfo.SemVer.Split(\"+\", 2)[1]\n            Version       = if (($V = $BuildInfo.SemVer.Split(\"+\")[0].Split(\"-\", 2)[0])) {\n                [version]$V\n            }\n        }"
+        }
+      ]
     }
-]
+  ]
+}
 ```
 <!-- markdownlint-enable MD013 - Line length -->
 
 - **ModuleName**: The name of the module (e.g. `ModuleBuilder`).
 - **ModuleVersion**: The version of the module (e.g. `3.1.7`).
-- **OriginalHashSHA**: The SHA256 hash of the *original* content of the entire
-  script file (e.g. `ModuleBuilder.psm1`, or `en-US/localized.strings.psd1`).
-- **PatchedHashSHA**: The SHA256 hash of the *patched* content of the entire
-  script file (e.g. `ModuleBuilder.psm1`, or `en-US/localized.strings.psd1`).
-- **ModulePatches**: An array of patches to apply to the module.
+- **ModuleFiles**: An array of all the files that have patches
   - **ScriptFileName**: The name of the script file to patch, this can use
     the relative path from module base (e.g. `ModuleBuilder.psm1`, or
     `en-US/localized.strings.psd1`).
-  - **StartOffset**: The starting character position of the text to replace (e.g. 21167).
-  - **EndOffset**: The ending character position of the text to replace (e.g. 21484).
-  - **PatchContent**: The new (patch) content that will be replace the original content.
+  - **OriginalHashSHA**: The SHA256 hash of the *original* content of the entire
+    script file (e.g. `ModuleBuilder.psm1`, or `en-US/localized.strings.psd1`).
+  - **ValidationHashSHA**: The SHA256 hash of the *patched* content of the entire
+    script file (e.g. `ModuleBuilder.psm1`, or `en-US/localized.strings.psd1`).
+  - **FilePatches**: An array of patches to apply to the script file.
+    - **StartOffset**: The starting character position of the text to replace
+      (e.g. 21167).
+    - **EndOffset**: The ending character position of the text to replace
+      (e.g. 21484).
+    - **PatchContent**: The new (patch) content that will be replace the
+      original content.
 
 > [!IMPORTANT]
 > The JSON file can contain multiple entries for the same script file or

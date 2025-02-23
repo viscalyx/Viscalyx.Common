@@ -45,39 +45,29 @@ AfterAll {
 Describe 'Assert-PatchFile' {
     Context 'When patch file is valid' {
         It 'Should validate patch file structure and data' {
-            Mock -CommandName Assert-PatchValidity
-
-            Mock -CommandName Get-Module -MockWith {
-                return [PSCustomObject] @{
-                    Name       = 'TestModule'
-                    Version    = [System.Version] '1.0.0'
-                    ModuleBase = "$TestDrive/Modules/TestModule"
-                }
-            }
-
-            Mock -CommandName Get-FileHash -MockWith {
-                return [PSCustomObject] @{
-                    Hash = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-                }
-            }
-
             InModuleScope -ScriptBlock {
                 $patchFileContent = @'
-[
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
     {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "PatchedHashSHA": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
     }
-]
+  ]
+}
 '@
 
-                Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop'
+                Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop'
             }
         }
     }
@@ -86,18 +76,25 @@ Describe 'Assert-PatchFile' {
         It 'Should throw error for missing ModuleName' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = @'
-[
+{
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
     {
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
     }
-]
+  ]
+}
 '@
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleName'."
             }
         }
@@ -105,39 +102,67 @@ Describe 'Assert-PatchFile' {
         It 'Should throw correct error for missing ModuleVersion' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = @'
-[
+{
+  "ModuleName": "TestModule",
+  "ModuleFiles": [
     {
-        "ModuleName": "TestModule",
-        "ScriptFileName": "TestScript.ps1",
-        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
     }
-]
+  ]
+}
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleVersion'."
+            }
+        }
+
+        It 'Should throw correct error for missing ModuleFiles' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+}
+'@
+
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleFiles'."
             }
         }
 
         It 'Should throw correct error for missing ScriptFileName' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = @'
-[
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
     {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
     }
-]
+  ]
+}
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'ScriptFileName'."
             }
         }
@@ -145,37 +170,126 @@ Describe 'Assert-PatchFile' {
         It 'Should throw correct error for missing OriginalHashSHA' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = @'
-[
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
     {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "StartOffset": 0,
-        "EndOffset": 10,
-        "PatchContent": "PatchedContent"
+      "ScriptFileName": "TestModule.psm1",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
     }
-]
+  ]
+}
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'OriginalHashSHA'."
             }
         }
 
-        It 'Should throw correct error for missing StartOffset or EndOffset' {
+        It 'Should throw correct error for missing ValidationHashSHA' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = @'
-[
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
     {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "PatchContent": "PatchedContent"
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
     }
-]
+  ]
+}
 '@
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ValidationHashSHA'."
+            }
+        }
+
+        It 'Should throw correct error for missing FilePatches' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
+    {
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+    }
+  ]
+}
+'@
+
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'FilePatches'."
+            }
+        }
+
+        It 'Should throw correct error for missing StartOffset' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
+    {
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
+    }
+  ]
+}
+'@
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'."
+            }
+        }
+
+        It 'Should throw correct error for missing EndOffset' {
+            InModuleScope -ScriptBlock {
+                $patchFileContent = @'
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
+    {
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "PatchContent": "@{}"
+        }
+      ]
+    }
+  ]
+}
+'@
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'."
             }
         }
@@ -183,19 +297,26 @@ Describe 'Assert-PatchFile' {
         It 'Should throw correct error for missing PatchContent' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = @'
-[
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
     {
-        "ModuleName": "TestModule",
-        "ModuleVersion": "1.0.0",
-        "ScriptFileName": "TestScript.ps1",
-        "OriginalHashSHA": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "StartOffset": 0,
-        "EndOffset": 10
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20
+        }
+      ]
     }
-]
+  ]
+}
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'PatchContent'."
             }
         }
@@ -205,7 +326,7 @@ Describe 'Assert-PatchFile' {
         It 'Should throw error for empty patch file' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = ' [] '
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw
             }
         }
@@ -213,7 +334,7 @@ Describe 'Assert-PatchFile' {
         It 'Should throw error for invalid JSON format' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = 'Invalid JSON'
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw
             }
         }

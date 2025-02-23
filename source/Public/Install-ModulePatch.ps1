@@ -17,6 +17,9 @@
     .PARAMETER Force
         Overrides the confirmation dialogs.
 
+    .PARAMETER SkipHashValidation
+        Skips the hash validation after patching are completed.
+
     .EXAMPLE
         Install-ModulePatch -Path "C:\patches\MyModule_1.0.0_patch.json"
 
@@ -52,7 +55,7 @@ function Install-ModulePatch
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
-        $SkipHashCheck
+        $SkipHashValidation
     )
 
     if ($Force.IsPresent -and -not $Confirm)
@@ -92,41 +95,69 @@ function Install-ModulePatch
 
         Assert-PatchFile -PatchFileContent $patchFileContent
 
-        $patchFileContent = $patchFileContent |
-            Sort-Object -Property StartOffset -Descending
+        $module = Get-ModuleByVersion -Name $patchFileContent.ModuleName -Version $patchFileContent.ModuleVersion
 
-        # Initialize progress bar
-        $progressId = 1
-        $progressActivity = $script:localizedData.Install_ModulePatch_Progress_Activity
-        $progressStatus = $script:localizedData.Install_ModulePatch_Progress_Status
-
-        # Show progress bar
-        Write-Progress -Id $progressId -Activity $progressActivity -Status $progressStatus -PercentComplete 0
-
-        $totalPatches = $patchFileContent.Count
-        $patchCounter = 0
-
-        foreach ($patchEntry in $patchFileContent)
+        if (-not $module)
         {
-            $patchCounter++
-            $progressPercentComplete = ($patchCounter / $totalPatches) * 100
-            $progressCurrentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation -f $patchEntry.ModuleName, $patchEntry.ModuleVersion, $patchEntry.ScriptFileName
+            $writeErrorParameters = @{
+                Message      = $script:localizedData.Install_ModulePatch_MissingModule -f $patchFileContent.ModuleName, $patchFileContent.ModuleVersion
+                Category     = 'ObjectNotFound'
+                ErrorId      = 'IMP0001' # cSpell: disable-line
+                TargetObject = $patchFileContent.ModuleName
+            }
 
-            Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchEntry -f ($patchEntry | ConvertTo-Json -Compress))
+            Write-Error @writeErrorParameters
 
-            # Update progress bar
-            Write-Progress -Id $progressId -Activity $progressActivity -Status "$progressStatus - $progressCurrentOperation" -PercentComplete $progressPercentComplete
+            return
+        }
 
-            Merge-Patch -PatchEntry $patchEntry -ErrorAction 'Stop'
+        foreach ($moduleFile in $patchFileContent.ModuleFiles)
+        {
+            $scriptFilePath = Join-Path -Path $module.ModuleBase -ChildPath $moduleFile.ScriptFileName
+
+            Assert-ScriptFileValidity -FilePath $scriptFilePath -Hash $moduleFile.OriginalHashSHA -ErrorAction 'Stop'
+
+            Write-Debug -Message "Successfully validated script file: $scriptFilePath"
+
+            # Initialize progress bar
+            $progressId = 1
+            $progressActivity = $script:localizedData.Install_ModulePatch_Progress_Activity
+            $progressStatus = $script:localizedData.Install_ModulePatch_Progress_Status
+
+            # Show progress bar
+            Write-Progress -Id $progressId -Activity $progressActivity -Status $progressStatus -PercentComplete 0
+
+            $patchFileEntries = $moduleFile.FilePatches |
+                Sort-Object -Property 'StartOffset' -Descending
+
+            $totalPatches = $patchFileEntries.Count
+            $patchCounter = 0
+
+            foreach ($patchEntry in $patchFileEntries)
+            {
+                $patchCounter++
+                $progressPercentComplete = ($patchCounter / $totalPatches) * 100
+                $progressCurrentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation -f $patchFileContent.ModuleName, $patchFileContent.ModuleVersion, $moduleFile.ScriptFileName
+
+                Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchEntry -f ($patchEntry | ConvertTo-Json -Compress))
+
+                # Update progress bar
+                Write-Progress -Id $progressId -Activity $progressActivity -Status "$progressStatus - $progressCurrentOperation" -PercentComplete $progressPercentComplete
+
+                Merge-Patch -FilePath $scriptFilePath -PatchEntry $patchEntry -ErrorAction 'Stop'
+            }
+
+            # Clear progress bar
+            Write-Progress -Id $progressId -Activity $progressActivity -Completed
 
             # Should we skip hash check?
-            if (-not $SkipHashCheck.IsPresent)
+            if (-not $SkipHashValidation.IsPresent)
             {
                 # # Verify the SHA256 hash of the patched file
                 # $moduleScriptFilePath = Join-Path -Path (Get-Module -Name $patchEntry.ModuleName -ListAvailable).ModuleBase -ChildPath $patchEntry.ScriptFileName
-                # $patchedFileHash = Test-FileHash -Path $moduleScriptFilePath -Algorithm 'SHA256' -ExpectedHash $patchEntry.PatchedHashSHA
+                # $hasNewFileHash = Test-FileHash -Path $moduleScriptFilePath -Algorithm 'SHA256' -ExpectedHash $patchEntry.ValidationHashSHA
 
-                # if (-not $patchedFileHash -and -not $SkipHashCheck)
+                # if (-not $hasNewFileHash)
                 # {
                 #     $errorMessage = $script:localizedData.Install_ModulePatch_Error_HashMismatch -f $patchEntry.ModuleName, $patchEntry.ModuleVersion, $patchEntry.ScriptFileName
 
@@ -137,15 +168,12 @@ function Install-ModulePatch
                 #     Write-Debug -Message "$($patchEntry.ScriptFileName) at $($patchEntry.StartOffset) has been patched successfully, and hash matches."
                 # }
             }
-            # else
-            # {
-            #     Write-Debug -Message "$($patchEntry.ScriptFileName) at $($patchEntry.StartOffset) has been patched successfully, but hash check was skipped."
-            # }
+            else
+            {
+                Write-Debug -Message "$scriptFilePath has been patched successfully, but hash validation was skipped."
+            }
         }
 
-        # Clear progress bar
-        Write-Progress -Id $progressId -Activity $progressActivity -Completed
-
-        Write-Debug -Message "Patching completed successfully."
+        Write-Debug -Message 'Patching completed successfully.'
     }
 }
