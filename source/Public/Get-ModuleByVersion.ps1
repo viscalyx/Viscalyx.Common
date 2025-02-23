@@ -16,7 +16,7 @@
         The version of the module to retrieve.
 
     .EXAMPLE
-        Get-ModuleByVersion -ModuleName 'MyModule' -Version '1.0.0'
+        Get-ModuleByVersion -Name 'MyModule' -Version '1.0.0'
 
         Retrieves the module 'MyModule' with version '1.0.0' and returns the module
         object.
