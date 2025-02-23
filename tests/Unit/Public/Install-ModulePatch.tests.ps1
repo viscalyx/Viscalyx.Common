@@ -100,4 +100,44 @@ Describe 'Install-ModulePatch' {
             Should -Invoke -CommandName Merge-Patch -Exactly 1 -Scope It
         }
     }
+
+    Context 'When module does not exist' {
+        BeforeAll {
+            $patchFileContent = @'
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
+    {
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
+    }
+  ]
+}
+'@
+
+            Mock -CommandName Assert-PatchFile
+            Mock -CommandName Assert-ScriptFileValidity
+            Mock -CommandName Get-ModuleByVersion -MockWith {
+                return $null
+            }
+
+            Mock -CommandName Get-PatchFileContentFromPath -MockWith {
+                $patchFileContent | ConvertFrom-Json -Depth 10
+            }
+        }
+
+        It 'Should throw the correct error' {
+            { Install-ModulePatch -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop' } |
+                Should -Throw -ExpectedMessage "Module 'TestModule' version '1.1.1' not found."
+        }
+    }
 }

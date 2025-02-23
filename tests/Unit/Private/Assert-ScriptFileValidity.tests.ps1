@@ -43,13 +43,11 @@ AfterAll {
 }
 
 Describe "Assert-ScriptFileValidity" {
-    BeforeAll {
+    It "Should validate module version and existence" {
         Mock -CommandName Test-Path -MockWith {
             return $true
         }
-    }
 
-    It "Should validate module version and existence" {
         Mock -CommandName Test-FileHash -MockWith {
             return $true
         }
@@ -60,6 +58,10 @@ Describe "Assert-ScriptFileValidity" {
     }
 
     It "Should validate module version and existence" {
+        Mock -CommandName Test-Path -MockWith {
+            return $true
+        }
+
         Mock -CommandName Test-FileHash -MockWith {
             return $false
         }
@@ -67,6 +69,17 @@ Describe "Assert-ScriptFileValidity" {
         InModuleScope Viscalyx.Common {
             { Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop' } |
                 Should -Throw -ExpectedMessage 'Hash validation failed for script file: TestScript.ps1. Expected: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+        }
+    }
+
+    It "Should validate module version and existence" {
+        Mock -CommandName Test-Path -MockWith {
+            return $false
+        }
+
+        InModuleScope Viscalyx.Common {
+            { Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop' } |
+                Should -Throw -ExpectedMessage 'Script file not found: TestScript.ps1'
         }
     }
 }
