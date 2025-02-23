@@ -1,12 +1,14 @@
-[
-  {
-    "ModuleName": "ModuleBuilder",
-    "ModuleVersion": "3.1.7",
-    "ScriptFileName": "ModuleBuilder.psm1",
-    "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-    "PatchedHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
-    "StartOffset": 21167,
-    "EndOffset": 21484,
-    "PatchContent": "@{\n            Prerelease    = $BuildInfo.SemVer.Split(\"+\")[0].Split(\"-\", 2)[1]\n            BuildMetadata = $BuildInfo.SemVer.Split(\"+\", 2)[1]\n            Version       = if (($V = $BuildInfo.SemVer.Split(\"+\")[0].Split(\"-\", 2)[0])) {\n                [version]$V\n            }\n        }",
-  }
-]
+{
+  "ModuleName": "ModuleBuilder",
+  "ModuleVersion": "3.1.7",
+  "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+  "PatchedHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+  "ModulePatches": [
+    {
+      "ScriptFileName": "ModuleBuilder.psm1",
+      "StartOffset": 21167,
+      "EndOffset": 21484,
+      "PatchContent": "@{\n            Prerelease    = $BuildInfo.SemVer.Split(\"+\")[0].Split(\"-\", 2)[1]\n            BuildMetadata = $BuildInfo.SemVer.Split(\"+\", 2)[1]\n            Version       = if (($V = $BuildInfo.SemVer.Split(\"+\")[0].Split(\"-\", 2)[0])) {\n                [version]$V\n            }\n        }"
+    }
+  ]
+}
