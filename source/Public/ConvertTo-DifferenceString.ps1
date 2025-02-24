@@ -179,15 +179,15 @@ function ConvertTo-DifferenceString
     $diffLength = $differenceBytes.Length
     $maxLength = [System.Math]::Max($refLength, $diffLength)
 
-    # Initialize lists to hold hex values and characters
-    $refHexList = [System.Collections.Generic.List[string]]::new()
-    $refCharList = [System.Collections.Generic.List[string]]::new()
-    $diffHexList = [System.Collections.Generic.List[string]]::new()
-    $diffCharList = [System.Collections.Generic.List[string]]::new()
-
-    # Escape $HighlightStart and $HighlightEnd for regex matching
-    $escapedHighlightStart = [regex]::Escape($HighlightStart)
-    $escapedHighlightEnd = [regex]::Escape($HighlightEnd)
+    # Use a larger group size when hex output is disabled
+    $groupSize = if ($NoHexOutput)
+    {
+        64
+    }
+    else
+    {
+        16
+    }
 
     # Calculate spacing to align labels with columns (left column = 64 chars, spacing = 8 chars)
     $leftColumnWidth = 64
@@ -378,64 +378,24 @@ function ConvertTo-DifferenceString
             $currentGroupHighlighted = $true
         }
 
-        <#
-            Replace control characters with their Unicode representations.
-            Cannot use `e in Windows PowerShell, so use [char]0x1b instead.
-        #>
-        $refChar = $refChar `
-            -replace "`0", '␀' `
-            -replace "`a", '␇' `
-            -replace "`b", '␈' `
-            -replace "`t", '␉' `
-            -replace "`f", '␌' `
-            -replace "`r", '␍' `
-            -replace "`n", '␊' `
-            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))$([System.Char] 0x1b)", '␛'
-
-        $diffChar = $diffChar `
-            -replace "`0", '␀' `
-            -replace "`a", '␇' `
-            -replace "`b", '␈' `
-            -replace "`t", '␉' `
-            -replace "`f", '␌' `
-            -replace "`r", '␍' `
-            -replace "`n", '␊' `
-            -replace "(?!$($escapedHighlightStart))(?!$($escapedHighlightEnd))$([System.Char] 0x1b)", '␛'
-
-        # Add to lists
-        $refHexList.Add($refHex)
-        $refCharList.Add($refChar)
-        $diffHexList.Add($diffHex)
-        $diffCharList.Add($diffChar)
-
-        # Output the results in groups of 16
-        if (($i + 1) % 16 -eq 0 -or $i -eq $maxLength - 1)
+        if (-not $NoHexOutput)
         {
-            # Pad lists to ensure they have 16 elements
-            while ($refHexList.Count -lt 16)
-            {
-                $refHexList.Add('  ')
-            }
-            while ($refCharList.Count -lt 16)
-            {
-                $refCharList.Add(' ')
-            }
-            while ($diffHexList.Count -lt 16)
-            {
-                $diffHexList.Add('  ')
-            }
-            while ($diffCharList.Count -lt 16)
-            {
-                $diffCharList.Add(' ')
-            }
+            # Add to arrays
+            $refHexArray += $refHex
+            $refCharArray += $refChar
+            $diffHexArray += $diffHex
+            $diffCharArray += $diffChar
+        }
+        else
+        {
+            $refCharArray += $refChar
+            $diffCharArray += $diffChar
+        }
 
-            $refHexLine = ($refHexList -join ' ')
-            $refCharLine = ($refCharList -join '')
-            $diffHexLine = ($diffHexList -join ' ')
-            $diffCharLine = ($diffCharList -join '')
-
-            # Determine if the line was highlighted
-            $indicator = if ($refHexLine -match $escapedHighlightStart -or $diffHexLine -match $escapedHighlightStart)
+        # When a group is completed or at the end...
+        if ((($i + 1) % $groupSize) -eq 0 -or $i -eq $maxLength - 1)
+        {
+            if (-not $NoHexOutput)
             {
                 # Pad arrays to ensure they have the correct number of elements using for loops
                 for ($j = $refHexArray.Count; $j -lt $groupSize; $j++)
@@ -498,15 +458,6 @@ function ConvertTo-DifferenceString
                 }
                 '{0}   {1}   {2}' -f $refChars, $indicator, $diffChars
             }
-
-            # Output the results in the specified format
-            '{0} {1}   {2}   {3} {4}' -f $refHexLine, $refCharLine, $indicator, $diffHexLine, $diffCharLine
-
-            # Clear lists for the next group of 16
-            $refHexList.Clear()
-            $refCharList.Clear()
-            $diffHexList.Clear()
-            $diffCharList.Clear()
         }
     }
 }
