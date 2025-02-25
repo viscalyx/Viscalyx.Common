@@ -11,7 +11,7 @@
     .PARAMETER Path
         Specifies the path to the patch file.
 
-    .PARAMETER URI
+    .PARAMETER Uri
         Specifies the URL of the patch file.
 
     .PARAMETER Force
@@ -26,7 +26,7 @@
         Applies the patches specified in the patch file located at "C:\patches\MyModule_1.0.0_patch.json".
 
     .EXAMPLE
-        Install-ModulePatch -URI "https://gist.githubusercontent.com/user/gistid/raw/MyModule_1.0.0_patch.json"
+        Install-ModulePatch -Uri "https://gist.githubusercontent.com/user/gistid/raw/MyModule_1.0.0_patch.json"
 
         Applies the patches specified in the patch file located at the specified URL.
 
@@ -47,7 +47,7 @@ function Install-ModulePatch
 
         [Parameter(Mandatory = $true, ParameterSetName = 'URI')]
         [System.Uri]
-        $URI,
+        $Uri,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -69,7 +69,7 @@ function Install-ModulePatch
     }
     else
     {
-        $URI
+        $Uri
     }
 
     $verboseDescriptionMessage = $script:localizedData.Install_ModulePatch_ShouldProcessVerboseDescription -f $patchLocation
@@ -86,9 +86,9 @@ function Install-ModulePatch
         }
         else
         {
-            Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_URI -f $URI)
+            Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_URI -f $Uri)
 
-            Get-PatchFileContentFromURI -URI $URI -ErrorAction 'Stop'
+            Get-PatchFileContentFromURI -Uri $Uri -ErrorAction 'Stop'
         }
 
         Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchFileContent -f ($patchFileContent | ConvertTo-Json -Depth 10 -Compress))
