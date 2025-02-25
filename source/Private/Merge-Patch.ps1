@@ -47,7 +47,7 @@ function Merge-Patch
     if ($startOffset -lt 0 -or $endOffset -gt $scriptContent.Length -or $startOffset -ge $endOffset)
     {
         $writeErrorParameters = @{
-            Message      = $script:localizedData.Merge_Patch_InvalidStartOrEndOffset -f $startOffset, $endOffset
+            Message      = $script:localizedData.Merge_Patch_InvalidStartOrEndOffset -f $startOffset, $endOffset, $FilePath
             Category     = 'InvalidArgument'
             ErrorId      = 'MP0001' # cSpell: disable-line
             TargetObject = $FilePath
@@ -62,5 +62,5 @@ function Merge-Patch
 
     Set-Content -Path $FilePath -Value $patchedContent -ErrorAction 'Stop'
 
-    Write-Debug -Message "Successfully patched $FilePath at $($patchEntry.StartOffset)"
+    Write-Debug -Message ($script:localizedData.Merge_Patch_SuccessfullyPatched -f $FilePath, $PatchEntry.StartOffset)
 }

@@ -67,7 +67,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
 
-                Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop'
+                Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop'
             }
         }
     }
@@ -94,7 +94,7 @@ Describe 'Assert-PatchFile' {
   ]
 }
 '@
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleName'."
             }
         }
@@ -121,7 +121,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleVersion'."
             }
         }
@@ -135,7 +135,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleFiles'."
             }
         }
@@ -162,7 +162,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'ScriptFileName'."
             }
         }
@@ -189,7 +189,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'OriginalHashSHA'."
             }
         }
@@ -216,7 +216,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'ValidationHashSHA'."
             }
         }
@@ -237,7 +237,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'FilePatches'."
             }
         }
@@ -263,7 +263,7 @@ Describe 'Assert-PatchFile' {
   ]
 }
 '@
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'."
             }
         }
@@ -289,7 +289,7 @@ Describe 'Assert-PatchFile' {
   ]
 }
 '@
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'."
             }
         }
@@ -316,7 +316,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
 
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw -ExpectedMessage "Patch entry is missing 'PatchContent'."
             }
         }
@@ -326,7 +326,7 @@ Describe 'Assert-PatchFile' {
         It 'Should throw error for empty patch file' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = ' [] '
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw
             }
         }
@@ -334,7 +334,7 @@ Describe 'Assert-PatchFile' {
         It 'Should throw error for invalid JSON format' {
             InModuleScope -ScriptBlock {
                 $patchFileContent = 'Invalid JSON'
-                { Assert-PatchFile -PatchFileContent ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
+                { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json -Depth 10) -ErrorAction 'Stop' } |
                     Should -Throw
             }
         }

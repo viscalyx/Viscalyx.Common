@@ -93,7 +93,7 @@ function Install-ModulePatch
 
         Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchFileContent -f ($patchFileContent | ConvertTo-Json -Depth 10 -Compress))
 
-        Assert-PatchFile -PatchFileContent $patchFileContent
+        Assert-PatchFile -PatchFileObject $patchFileContent
 
         $module = Get-ModuleByVersion -Name $patchFileContent.ModuleName -Version $patchFileContent.ModuleVersion
 

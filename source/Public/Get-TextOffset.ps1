@@ -50,7 +50,7 @@ function Get-TextOffset
     }
     else
     {
-        Write-Warning "Text '$TextToFind' not found in the file '$FilePath'."
+        Write-Warning ($script:localizedData.TextNotFoundWarning -f $TextToFind, $FilePath)
     }
 
     return $result

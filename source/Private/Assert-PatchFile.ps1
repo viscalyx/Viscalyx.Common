@@ -29,17 +29,17 @@ function Assert-PatchFile
     param
     (
         [Parameter(Mandatory = $true)]
-        [System.Object]
-        $PatchFileContent
+        [PSCustomObject]
+        $PatchFileObject
     )
 
-    if (-not $PatchFileContent.ModuleName)
+    if (-not $PatchFileObject.ModuleName)
     {
         $writeErrorParameters = @{
             Message      = $script:localizedData.Assert_PatchFile_MissingModuleName
             Category     = 'InvalidData'
             ErrorId      = 'APF0001' # cSpell: disable-line
-            TargetObject = $PatchFileContent
+            TargetObject = $PatchFileObject
         }
 
         Write-Error @writeErrorParameters
@@ -47,13 +47,13 @@ function Assert-PatchFile
         continue
     }
 
-    if (-not $PatchFileContent.ModuleVersion)
+    if (-not $PatchFileObject.ModuleVersion)
     {
         $writeErrorParameters = @{
             Message      = $script:localizedData.Assert_PatchFile_MissingModuleVersion
             Category     = 'InvalidData'
             ErrorId      = 'APF0002' # cSpell: disable-line
-            TargetObject = $PatchFileContent
+            TargetObject = $PatchFileObject
         }
 
         Write-Error @writeErrorParameters
@@ -62,13 +62,13 @@ function Assert-PatchFile
     }
 
     # Should have the property ModuleFiles
-    if (-not $PatchFileContent.ModuleFiles)
+    if (-not $PatchFileObject.ModuleFiles)
     {
         $writeErrorParameters = @{
             Message      = $script:localizedData.Assert_PatchFile_MissingModuleFiles
             Category     = 'InvalidData'
             ErrorId      = 'APF0003' # cSpell: disable-line
-            TargetObject = $PatchFileContent
+            TargetObject = $PatchFileObject
         }
 
         Write-Error @writeErrorParameters
@@ -76,7 +76,7 @@ function Assert-PatchFile
         continue
     }
 
-    foreach ($scriptFile in $PatchFileContent.ModuleFiles)
+    foreach ($scriptFile in $PatchFileObject.ModuleFiles)
     {
         if (-not $scriptFile.ScriptFileName)
         {

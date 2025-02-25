@@ -65,6 +65,8 @@ ConvertFrom-StringData @'
 
     ## Merge-Patch
     Merge_Patch_InvalidStartOrEndOffset = Start or end offset ({0}-{1}) in patch entry does not exist in the script file.
+    Merge_Patch_InvalidStartOrEndOffset = "Invalid StartOffset '{0}' or EndOffset '{1}' for file '{2}'."
+    Merge_Patch_SuccessfullyPatched = "Successfully patched file '{0}' at start offset {1}."
 
     ## Assert-ScriptFileValidity
     Assert_ScriptFileValidity_ScriptFileNotFound = Script file not found: {0}
@@ -89,4 +91,7 @@ ConvertFrom-StringData @'
     ## Test-FileHash
     TestFileHash_CalculatingHash = 'Calculating hash for file: {0} using algorithm: {1}'
     TestFileHash_ComparingHash = 'Comparing file hash: {0} with expected hash: {1}'
+
+    ## Get-TextOffset
+    TextNotFoundWarning = "Text '{0}' not found in the file '{1}'."
 '@
