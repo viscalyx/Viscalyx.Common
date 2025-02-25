@@ -20,18 +20,18 @@
     .OUTPUTS
         System.Object. The function returns the content of the patch file as a JSON object.
 #>
-function Get-PatchFileContentFromURI
+function Get-PatchFileContentFromUri
 {
     param
     (
         [Parameter(Mandatory = $true)]
         [System.Uri]
-        $URI
+        $Uri
     )
 
     try
     {
-        $jsonContent = Invoke-RestMethod -Uri $URI
+        $response = Invoke-WebRequest -Uri $Uri -UseBasicParsing -ErrorAction 'Stop'
     }
     catch
     {
@@ -39,13 +39,15 @@ function Get-PatchFileContentFromURI
             Message      = $_.Exception.ToString()
             Category     = 'ConnectionError'
             ErrorId      = 'GPFCFU0001' # cSpell: disable-line
-            TargetObject = $URI
+            TargetObject = $Uri
         }
 
         Write-Error @writeErrorParameters
+
+        return $null
     }
 
-    $patchFileContent = Get-PatchFileContent -JsonContent $jsonContent -ErrorAction 'Stop'
+    $patchFileContent = Get-PatchFileContent -JsonContent $response.Content -ErrorAction 'Stop'
 
     return $patchFileContent
 }
