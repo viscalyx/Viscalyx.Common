@@ -95,5 +95,16 @@ Describe 'Get-PatchFileContentFromURI' {
                     Should -Throw -ExpectedMessage 'System.Management.Automation.RuntimeException: 404 Not Found'
             }
         }
+
+        It 'Should return $null if error is caught and ErrorAction is "SilentlyContinue"' {
+            Mock -CommandName Invoke-WebRequest -MockWith {
+                throw '404 Not Found'
+            }
+
+            InModuleScope -ScriptBlock {
+                $result = Get-PatchFileContentFromURI -URI 'https://gist.githubusercontent.com/user/gistid/raw/TestModule_1.0.0_patch.json' -ErrorAction 'SilentlyContinue'
+                $result | Should-BeNull
+            }
+        }
     }
 }

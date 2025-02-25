@@ -87,5 +87,14 @@ Describe 'Get-PatchFileContentFromPath' {
                     Should -Throw -ExpectedMessage ("The module patch file at location '$TestDrive{0}patches{0}TestModule_1.0.0_patch.json' does not exist." -f [System.IO.Path]::DirectorySeparatorChar)
             }
         }
+
+        It 'Should return $null if error is caught and ErrorAction is "SilentlyContinue"' {
+            Mock -CommandName Test-Path -MockWith { $false }
+
+            InModuleScope -ScriptBlock {
+                $result = Get-PatchFileContentFromPath -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'SilentlyContinue'
+                $result | Should-BeNull
+            }
+        }
     }
 }

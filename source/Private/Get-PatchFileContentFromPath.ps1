@@ -42,7 +42,7 @@ function Get-PatchFileContentFromPath
 
         Write-Error @writeErrorParameters
 
-        return
+        return $null
     }
 
     $jsonContent = Get-Content -Path $normalizedPath -Raw
