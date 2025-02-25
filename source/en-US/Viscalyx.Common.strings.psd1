@@ -82,4 +82,8 @@ ConvertFrom-StringData @'
     Get_ModuleFileSha_MissingModule = Module not found: {0}
     Get_ModuleFileSha_MissingModuleVersion = Module with specified version not found: {0} {1}
     Get_ModuleFileSha_PathMustBeDirectory = The specified path must be a directory, the root of a module including its version folder, e.g. './Viscalyx.Common/1.0.0'.
+
+    ## Test-FileHash
+    TestFileHash_CalculatingHash = 'Calculating hash for file: {0} using algorithm: {1}'
+    TestFileHash_ComparingHash = 'Comparing file hash: {0} with expected hash: {1}'
 '@

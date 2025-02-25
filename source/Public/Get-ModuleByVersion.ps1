@@ -9,7 +9,7 @@
         provided. If the module with the specified version is found, it returns the
         module object; otherwise, it returns $null.
 
-    .PARAMETER ModuleName
+    .PARAMETER Name
         The name of the module to retrieve.
 
     .PARAMETER Version
