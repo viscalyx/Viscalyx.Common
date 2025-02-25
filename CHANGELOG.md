@@ -5,6 +5,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Viscalyx.Common
+  - Added unit tests to run in Windows PowerShell.
+- Public commands:
+  - `Assert-GitLocalChange`
+  - `Assert-GitRemote`
+  - `ConvertTo-RelativePath`
+  - `Disable-CursorShortcutCode`
+  - `Get-GitBranchCommit`
+  - `Get-GitLocalBranchName`
+  - `Get-GitRemote`
+  - `Get-GitRemoteBranch`
+  - `Get-GitTag`
+  - `New-GitTag`
+  - `Push-GitTag`
+  - `Rename-GitLocalBranch`
+  - `Request-GitTag`
+  - `Switch-GitLocalBranch`
+  - `Test-GitLocalChanges`
+  - `Test-GitRemote`
+  - `Test-GitRemoteBranch`
+  - `Update-GitLocalBranch`
+  - `Update-RemoteTrackingBranch`
+
 ### Changed
 
 - `ConvertTo-DifferenceString`
@@ -13,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     block to output printable versions.
   - Optimize code and improve performance.
   - Added parameter `NoHexOutput`.
+- `ConvertTo-AnsiSequence`
+  - Make it render ANSI sequences in Windows PowerShell.
 - `Out-Difference`
   - Added parameter `NoHexOutput`.
 
@@ -34,7 +61,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ConvertTo-DifferenceString`
   - `Get-NumericalSequence`
   - `Get-PSReadLineHistory`
-  - `Invoke-PesterJob`
   - `New-SamplerGitHubReleaseTag`
   - `Out-Difference`
   - `Pop-VMLatestSnapShot`

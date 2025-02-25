@@ -109,6 +109,9 @@ Describe 'New-SamplerGitHubReleaseTag' {
 
         AfterAll {
             $script:MockLastExitCode = 0
+
+            # Reset the LASTEXITCODE to 0 after all the tests
+            Set-Variable -Name 'LASTEXITCODE' -Value $script:MockLastExitCode -Scope Global
         }
 
         It 'Should throw if branch does not exist' {
@@ -133,7 +136,7 @@ Describe 'New-SamplerGitHubReleaseTag' {
     }
 
     It 'Should switch back to previous branch if specified' {
-        { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -SwitchBackToPreviousBranch -Force } | Should -Not -Throw
+        { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -ReturnToCurrentBranch -Force } | Should -Not -Throw
     }
 
     It 'Should push tag to upstream if specified' {
