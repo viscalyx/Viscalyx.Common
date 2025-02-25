@@ -162,6 +162,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     block to output printable versions.
   - Optimize code and improve performance.
   - Added parameter `NoHexOutput`.
+- `ConvertTo-AnsiSequence`
+  - Make it render ANSI sequences in Windows PowerShell.
 - `Out-Difference`
   - Added parameter `NoHexOutput`.
 
