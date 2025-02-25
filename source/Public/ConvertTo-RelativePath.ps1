@@ -57,7 +57,10 @@ function ConvertTo-RelativePath
 
         if ($relativePath.StartsWith($CurrentLocation))
         {
-            $relativePath = $relativePath.Substring($CurrentLocation.Length).Insert(0, '.')
+            # Convert the directory separator characters to the current system's directory separator character.
+            $relativePath = [System.IO.Path]::GetFullPath($AbsolutePath)
+
+            $relativePath = [System.IO.Path]::GetRelativePath($CurrentLocation, $AbsolutePath).Insert(0, '.{0}' -f [System.IO.Path]::DirectorySeparatorChar)
         }
 
         return $relativePath
