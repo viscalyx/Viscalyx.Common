@@ -117,8 +117,6 @@ function Install-ModulePatch
 
             Assert-ScriptFileValidity -FilePath $scriptFilePath -Hash $moduleFile.OriginalHashSHA -ErrorAction 'Stop'
 
-            Write-Debug -Message "Successfully validated script file: $scriptFilePath"
-
             # Initialize progress bar
             $progressId = 1
             $progressActivity = $script:localizedData.Install_ModulePatch_Progress_Activity
@@ -153,27 +151,31 @@ function Install-ModulePatch
             # Should we skip hash check?
             if (-not $SkipHashValidation.IsPresent)
             {
-                # # Verify the SHA256 hash of the patched file
-                # $moduleScriptFilePath = Join-Path -Path (Get-Module -Name $patchEntry.ModuleName -ListAvailable).ModuleBase -ChildPath $patchEntry.ScriptFileName
-                # $hasNewFileHash = Test-FileHash -Path $moduleScriptFilePath -Algorithm 'SHA256' -ExpectedHash $patchEntry.ValidationHashSHA
+                # Verify the SHA256 hash of the patched file
+                $hasNewFileHash = Test-FileHash -Path $scriptFilePath -Algorithm 'SHA256' -ExpectedHash $moduleFile.ValidationHashSHA
 
-                # if (-not $hasNewFileHash)
-                # {
-                #     $errorMessage = $script:localizedData.Install_ModulePatch_Error_HashMismatch -f $patchEntry.ModuleName, $patchEntry.ModuleVersion, $patchEntry.ScriptFileName
+                if (-not $hasNewFileHash)
+                {
+                    $writeErrorParameters = @{
+                        Message      = $script:localizedData.Install_ModulePatch_Error_HashMismatch -f $scriptFilePath
+                        Category     = 'InvalidData'
+                        ErrorId      = 'IMP0002' # cSpell: disable-line
+                        TargetObject = $patchFileContent.ModuleName
+                    }
 
-                #     throw $errorMessage
-                # }
-                # else
-                # {
-                #     Write-Debug -Message "$($patchEntry.ScriptFileName) at $($patchEntry.StartOffset) has been patched successfully, and hash matches."
-                # }
+                    Write-Error @writeErrorParameters
+
+                    return $null
+                }
+                else
+                {
+                    Write-Debug -Message ($script:localizedData.Install_ModulePatch_Patch_Success -f $scriptFilePath)
+                }
             }
             else
             {
-                Write-Debug -Message "$scriptFilePath has been patched successfully, but hash validation was skipped."
+                Write-Debug -Message ($script:localizedData.Install_ModulePatch_Patch_SuccessHashValidationSkipped -f $scriptFilePath)
             }
         }
-
-        Write-Debug -Message 'Patching completed successfully.'
     }
 }
