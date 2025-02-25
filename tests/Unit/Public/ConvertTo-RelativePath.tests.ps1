@@ -73,16 +73,25 @@ Describe 'ConvertTo-RelativePath' {
 
     It 'Should convert absolute path to relative path when CurrentLocation is provided' {
         $result = ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
-        $result | Should -Be './source/Public/ConvertTo-RelativePath.ps1'
+        $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
     It 'Should convert absolute path to relative path using Get-Location when CurrentLocation is not provided' {
         $result = ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1'
-        $result | Should -Be './source/Public/ConvertTo-RelativePath.ps1'
+        $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
-    It 'Should return the absolute path if it does not start with CurrentLocation' {
-        $result = ConvertTo-RelativePath -AbsolutePath '/other/path/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
-        $result | Should -Be '/other/path/ConvertTo-RelativePath.ps1'
+    Context 'When passing a path on Linux or MacOS that does not start with CurrentLocation' -Skip:($PSEdition -eq 'Desktop' -or $IsWindows) {
+        It 'Should return the absolute path as it was passed' {
+            $result = ConvertTo-RelativePath -AbsolutePath '/other/path/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
+            $result | Should -Be ('{0}other{0}path{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
+        }
+    }
+
+    Context 'When passing a path on Windows that does not start with CurrentLocation' -Skip:($IsLinux -or $IsMacOS) {
+        It 'Should return the absolute path as it was passed' {
+            $result = ConvertTo-RelativePath -AbsolutePath '/other/path/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
+            $result | Should -Be '/other/path/ConvertTo-RelativePath.ps1'
+        }
     }
 }
