@@ -82,6 +82,10 @@ Describe 'Install-ModulePatch' {
             Mock -CommandName Get-PatchFileContentFromURI -MockWith {
                 $patchFileContent | ConvertFrom-Json -Depth 10
             }
+
+            Mock -CommandName Test-FileHash -MockWith {
+                return $true
+            }
         }
 
         It 'Should apply patches from local file' {
@@ -102,6 +106,60 @@ Describe 'Install-ModulePatch' {
 
         It 'Should be able to skip hash validation' {
             Install-ModulePatch -SkipHashValidation -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop'
+
+            Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 0 -Scope It
+            Should -Invoke -CommandName Get-PatchFileContentFromPath -Exactly 1 -Scope It
+            Should -Invoke -CommandName Merge-Patch -Exactly 1 -Scope It
+        }
+    }
+
+    Context 'When validation hash does not match' {
+        BeforeAll {
+            $patchFileContent = @'
+{
+  "ModuleName": "TestModule",
+  "ModuleVersion": "1.1.1",
+  "ModuleFiles": [
+    {
+      "ScriptFileName": "TestModule.psm1",
+      "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
+      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "FilePatches": [
+        {
+          "StartOffset": 10,
+          "EndOffset": 20,
+          "PatchContent": "@{}"
+        }
+      ]
+    }
+  ]
+}
+'@
+
+            Mock -CommandName Assert-PatchFile
+            Mock -CommandName Assert-ScriptFileValidity
+            Mock -CommandName Merge-Patch
+            Mock -CommandName Get-ModuleByVersion -MockWith {
+                return @{
+                    ModuleBase = "$TestDrive/Modules/TestModule"
+                }
+            }
+
+            Mock -CommandName Get-PatchFileContentFromPath -MockWith {
+                $patchFileContent | ConvertFrom-Json -Depth 10
+            }
+
+            Mock -CommandName Get-PatchFileContentFromURI -MockWith {
+                $patchFileContent | ConvertFrom-Json -Depth 10
+            }
+
+            Mock -CommandName Test-FileHash -MockWith {
+                return $false
+            }
+        }
+
+        It 'Should apply patches from local file' {
+            Install-ModulePatch -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'SilentlyContinue'
 
             Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 0 -Scope It
             Should -Invoke -CommandName Get-PatchFileContentFromPath -Exactly 1 -Scope It
