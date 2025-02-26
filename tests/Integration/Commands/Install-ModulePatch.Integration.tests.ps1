@@ -48,7 +48,7 @@ Describe 'Install-ModulePatch' {
         Install-Module -Name 'ModuleBuilder' -RequiredVersion 3.1.7 -Scope CurrentUser -Force
 
         # Get the path to the patch file
-        $patchPath = Join-Path -Path $PSScriptRoot -ChildPath '../../patches/ModuleBuilder_3.1.7_patch.json'
+        $patchPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../patches/ModuleBuilder_3.1.7_patch.json'
 
         # Run Install-ModulePatch
         Install-ModulePatch -Path $patchPath -Force
