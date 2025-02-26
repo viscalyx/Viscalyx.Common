@@ -34,7 +34,7 @@ function Get-PatchFileContent
     {
         $convertFromJsonParameters = if ($IsCoreCLR)
         {
-             @{
+            @{
                 InputObject = $JsonContent
                 Depth       = 10
                 ErrorAction = 'Stop'
