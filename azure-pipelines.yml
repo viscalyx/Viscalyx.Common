@@ -219,7 +219,7 @@ stages:
               script: |
                 ./build.ps1 -Task noop
                 Import-Module -Name Viscalyx.Common
-                Install-ModulePatch -Uri https://raw.githubusercontent.com/viscalyx/Viscalyx.Common/refs/heads/main/patches/ModuleBuilder_3.1.7_patch.json -Force -Debug -Confirm:$false
+                Install-ModulePatch -Uri https://raw.githubusercontent.com/viscalyx/Viscalyx.Common/refs/heads/main/patches/ModuleBuilder_3.1.7_patch.json -Force -Verbose
               pwsh: $(PWSH)
           - task: PowerShell@2
             name: test
