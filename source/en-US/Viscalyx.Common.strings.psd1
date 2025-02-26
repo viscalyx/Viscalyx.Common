@@ -57,7 +57,7 @@ ConvertFrom-StringData @'
     Install_ModulePatch_Debug_PatchEntry = Processing patch entry: '{0}'.
     Install_ModulePatch_Progress_Activity = Applying Module Patches
     Install_ModulePatch_Progress_Status = Starting patch process...
-    Install_ModulePatch_Progress_CurrentOperation = Processing patch entry: {0} {1} {2}
+    Install_ModulePatch_Progress_CurrentOperation = Processing script file '{0}' at start offset {1}.
     Install_ModulePatch_MissingModule = Module '{0}' version '{1}' not found.
     Install_ModulePatch_Error_HashMismatch = Hash validation failed for script file '{0}' after patching.
     Install_ModulePatch_Patch_Success = Successfully patched script file '{0}'.

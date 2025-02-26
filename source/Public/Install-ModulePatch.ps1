@@ -135,7 +135,7 @@ function Install-ModulePatch
             {
                 $patchCounter++
                 $progressPercentComplete = ($patchCounter / $totalPatches) * 100
-                $progressCurrentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation -f $patchFileContent.ModuleName, $patchFileContent.ModuleVersion, $moduleFile.ScriptFileName
+                $progressCurrentOperation = $script:localizedData.Install_ModulePatch_Progress_CurrentOperation -f $moduleFile.ScriptFileName, $patchEntry.StartOffset
 
                 Write-Debug -Message ($script:localizedData.Install_ModulePatch_Debug_PatchEntry -f ($patchEntry | ConvertTo-Json -Depth 10 -Compress))
 

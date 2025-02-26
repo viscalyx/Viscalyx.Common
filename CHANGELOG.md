@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Install-ModulePatch`
   - Fix a private command that used command parameters that is not available
     in Windows PowerShell.
+  - Fixed progress counter text.
 
 ## [0.4.0] - 2025-02-26
 
