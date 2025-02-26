@@ -218,7 +218,6 @@ stages:
               targetType: 'inline'
               script: |
                 ./build.ps1 -Task noop
-                Install-Module -Name Viscalyx.Common -Scope CurrentUser -Force
                 Import-Module -Name Viscalyx.Common
                 Install-ModulePatch -Uri https://raw.githubusercontent.com/viscalyx/Viscalyx.Common/refs/heads/main/patches/ModuleBuilder_3.1.7_patch.json -Force
               pwsh: $(PWSH)
