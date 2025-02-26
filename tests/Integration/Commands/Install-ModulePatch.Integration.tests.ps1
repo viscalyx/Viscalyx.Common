@@ -31,6 +31,12 @@ BeforeAll {
     $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
     $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
     $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+
+    # Save the original PSModulePath
+    $script:originalPSModulePath = $env:PSModulePath
+
+    # Add $TestDrive to the beginning of PSModulePath
+    $env:PSModulePath = "$TestDrive;$env:PSModulePath"
 }
 
 AfterAll {
@@ -40,20 +46,31 @@ AfterAll {
 
     # Unload the module being tested so that it doesn't impact any other tests.
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+
+    # Restore the original PSModulePath
+    $env:PSModulePath = $script:originalPSModulePath
 }
 
 Describe 'Install-ModulePatch' {
-    It 'Should correctly patch ModuleBuilder v3.1.7' {
-        # Install ModuleBuilder 3.1.7 to current user scope
-        Install-Module -Name 'ModuleBuilder' -RequiredVersion 3.1.7 -Scope CurrentUser -Force
+    BeforeAll {
+        # Save the original PSModulePath
+        $script:originalPSModulePath = $env:PSModulePath
 
-        # Get the path to the patch file
+        # Add $TestDrive to the beginning of PSModulePath
+        $env:PSModulePath = "{0}{1}{2}" -f $TestDrive, [System.IO.Path]::PathSeparator, $env:PSModulePath
+    }
+
+    AfterAll {
+        # Restore the original PSModulePath
+        $env:PSModulePath = $script:originalPSModulePath
+    }
+
+    It 'Should correctly patch ModuleBuilder v3.1.7' {
+        Save-Module -Name 'ModuleBuilder' -RequiredVersion 3.1.7 -Path $TestDrive -Force
+
         $patchPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../patches/ModuleBuilder_3.1.7_patch.json'
 
         # Run Install-ModulePatch
         Install-ModulePatch -Path $patchPath -Force
-
-        # Uninstall ModuleBuilder
-        Uninstall-Module -Name 'ModuleBuilder' -AllVersions -Force
     }
 }
