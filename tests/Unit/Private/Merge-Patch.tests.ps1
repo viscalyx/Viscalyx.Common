@@ -80,13 +80,18 @@ Describe 'Merge-Patch' {
         }
 
         It 'Should write an error and return' -TestCases @(
+            <#
+                Expected message contains a wildcard because of the $TestDrive variable
+                in the path which is different on each run and is not available during
+                the discovery phase.
+            #>
             @{
                 PatchEntry = @{
                     StartOffset = -1
                     EndOffset = 30
                     PatchContent = 'PatchedContent1'
                 }
-                ExpectedMessage = 'Start or end offset (-1-30) in patch entry does not exist in the script file.'
+                ExpectedMessage = "Start or end offset (-1-30) in patch entry does not exist in the script file '*/TestScript.ps1'."
             },
             @{
                 PatchEntry = @{
@@ -94,7 +99,7 @@ Describe 'Merge-Patch' {
                     EndOffset = 1000
                     PatchContent = 'PatchedContent1'
                 }
-                ExpectedMessage = 'Start or end offset (20-1000) in patch entry does not exist in the script file.'
+                ExpectedMessage = "Start or end offset (20-1000) in patch entry does not exist in the script file '*/TestScript.ps1'."
             },
             @{
                 PatchEntry = @{
@@ -102,7 +107,7 @@ Describe 'Merge-Patch' {
                     EndOffset = 20
                     PatchContent = 'PatchedContent1'
                 }
-                ExpectedMessage = 'Start or end offset (30-20) in patch entry does not exist in the script file.'
+                ExpectedMessage = "Start or end offset (30-20) in patch entry does not exist in the script file '*/TestScript.ps1'."
             }
         ) {
             InModuleScope -Parameters $_ -ScriptBlock {
