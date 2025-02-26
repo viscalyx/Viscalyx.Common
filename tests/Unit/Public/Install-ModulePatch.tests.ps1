@@ -76,11 +76,11 @@ Describe 'Install-ModulePatch' {
             }
 
             Mock -CommandName Get-PatchFileContentFromPath -MockWith {
-                $patchFileContent | ConvertFrom-Json -Depth 10
+                $patchFileContent | ConvertFrom-Json
             }
 
             Mock -CommandName Get-PatchFileContentFromURI -MockWith {
-                $patchFileContent | ConvertFrom-Json -Depth 10
+                $patchFileContent | ConvertFrom-Json
             }
 
             Mock -CommandName Test-FileHash -MockWith {
@@ -146,11 +146,11 @@ Describe 'Install-ModulePatch' {
             }
 
             Mock -CommandName Get-PatchFileContentFromPath -MockWith {
-                $patchFileContent | ConvertFrom-Json -Depth 10
+                $patchFileContent | ConvertFrom-Json
             }
 
             Mock -CommandName Get-PatchFileContentFromURI -MockWith {
-                $patchFileContent | ConvertFrom-Json -Depth 10
+                $patchFileContent | ConvertFrom-Json
             }
 
             Mock -CommandName Test-FileHash -MockWith {
@@ -197,7 +197,7 @@ Describe 'Install-ModulePatch' {
             }
 
             Mock -CommandName Get-PatchFileContentFromPath -MockWith {
-                $patchFileContent | ConvertFrom-Json -Depth 10
+                $patchFileContent | ConvertFrom-Json
             }
         }
 
