@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix documentation naming in GitHub repository Wiki.
 - `Install-ModulePatch`
   - Fix a private command that used command parameters that is not available
     in Windows PowerShell.
