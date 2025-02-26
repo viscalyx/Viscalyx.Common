@@ -44,4 +44,53 @@ ConvertFrom-StringData @'
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessVerboseWarning = Are you sure you want to switch back to previous local branch '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption = Switch to previous branch
+
+    ## Install-ModulePatch
+    Install_ModulePatch_ShouldProcessVerboseDescription = Apply module patch file at location '{0}'.
+    Install_ModulePatch_ShouldProcessVerboseWarning = Are you sure you want to apply the module patch at the location '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Install_ModulePatch_ShouldProcessCaption = Apply module patch
+    Install_ModulePatch_PatchFilePathNotFound = The module patch file at location '{0}' does not exist.
+    Install_ModulePatch_Debug_Path = Patch file path: '{0}'.
+    Install_ModulePatch_Debug_URI = Patch file URI: '{0}'.
+    Install_ModulePatch_Debug_PatchFileContent = Patch file content: '{0}'.
+    Install_ModulePatch_Debug_PatchEntry = Processing patch entry: '{0}'.
+    Install_ModulePatch_Progress_Activity = Applying Module Patches
+    Install_ModulePatch_Progress_Status = Starting patch process...
+    Install_ModulePatch_Progress_CurrentOperation = Processing patch entry: {0} {1} {2}
+    Install_ModulePatch_MissingModule = Module '{0}' version '{1}' not found.
+    Install_ModulePatch_Error_HashMismatch = Hash validation failed for script file '{0}' after patching.
+    Install_ModulePatch_Patch_Success = Successfully patched script file '{0}'.
+    Install_ModulePatch_Patch_SuccessHashValidationSkipped = Successfully patched script file '{0}', but hash validation was skipped.
+
+    ## Merge-Patch
+    Merge_Patch_InvalidStartOrEndOffset = Start or end offset ({0}-{1}) in patch entry does not exist in the script file '{2}'.
+    Merge_Patch_SuccessfullyPatched = Successfully patched file '{0}' at start offset {1}.
+
+    ## Assert-ScriptFileValidity
+    Assert_ScriptFileValidity_ScriptFileNotFound = Script file not found: {0}
+    Assert_ScriptFileValidity_HashValidationFailed = Hash validation failed for script file: {0}. Expected: {1}
+
+    ## Assert-PatchFile
+    Assert_PatchFile_MissingModuleName = Patch entry is missing 'ModuleName'.
+    Assert_PatchFile_MissingModuleVersion = Patch entry is missing 'ModuleVersion'.
+    Assert_PatchFile_MissingModuleFiles = Patch entry is missing 'ModuleFiles'.
+    Assert_PatchFile_MissingScriptFileName = Patch entry is missing 'ScriptFileName'.
+    Assert_PatchFile_MissingOriginalHashSHA = Patch entry is missing 'OriginalHashSHA'.
+    Assert_PatchFile_MissingValidationHashSHA = Patch entry is missing 'ValidationHashSHA'.
+    Assert_PatchFile_MissingFilePatches = Patch entry is missing 'FilePatches'.
+    Assert_PatchFile_MissingOffset = Patch entry is missing 'StartOffset' or 'EndOffset'.
+    Assert_PatchFile_MissingPatchContent = Patch entry is missing 'PatchContent'.
+
+    ## Get-ModuleFileSha
+    Get_ModuleFileSha_MissingModule = Module not found: {0}
+    Get_ModuleFileSha_MissingModuleVersion = Module with specified version not found: {0} {1}
+    Get_ModuleFileSha_PathMustBeDirectory = The specified path must be a directory, the root of a module including its version folder, e.g. './Viscalyx.Common/1.0.0'.
+
+    ## Test-FileHash
+    TestFileHash_CalculatingHash = Calculating hash for file: {0} using algorithm: {1}
+    TestFileHash_ComparingHash = Comparing file hash: {0} with expected hash: {1}
+
+    ## Get-TextOffset
+    TextNotFoundWarning = Text '{0}' not found in the file '{1}'.
 '@

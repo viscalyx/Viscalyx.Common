@@ -5,6 +5,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Install-ModulePatch` that can be used to patch PowerShell modules prior
+  to being released.
+- `Get-ModuleFileSha` that outputs the SHA256 for each PowerShell script
+   file in a specific PowerShell module.
+- `Get-TextOffset` that returns the start and end offset of the specified
+  text from within the specified file.
+- `Test-FileHash` that returns whether a file has the expected hash.
+- `Get-ModuleByVersion` that returns an installed module with the specific
+  version.
+
 ### Changed
 
 - `ConvertTo-DifferenceString`
