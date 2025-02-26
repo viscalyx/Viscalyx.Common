@@ -5,6 +5,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Also run unit tests on Windows PowerShell.
+
+### Fixed
+
+- `Install-ModulePatch`
+  - Fix a private command that used command parameters that is not available
+    in Windows PowerShell.
+
 ## [0.4.0] - 2025-02-26
 
 ### Added

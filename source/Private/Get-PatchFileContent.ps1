@@ -32,7 +32,23 @@ function Get-PatchFileContent
 
     try
     {
-        $patchFileContent = $JsonContent | ConvertFrom-Json -Depth 10 -ErrorAction 'Stop'
+        $convertFromJsonParameters = if ($IsCoreCLR)
+        {
+             @{
+                InputObject = $JsonContent
+                Depth       = 10
+                ErrorAction = 'Stop'
+            }
+        }
+        else
+        {
+            @{
+                InputObject = $JsonContent
+                ErrorAction = 'Stop'
+            }
+        }
+
+        $patchFileContent = ConvertFrom-Json @convertFromJsonParameters
 
         return $patchFileContent
     }
