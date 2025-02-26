@@ -43,5 +43,17 @@ AfterAll {
 }
 
 Describe 'Install-ModulePatch' {
+    It 'Should correctly patch ModuleBuilder v3.1.7' {
+        # Install ModuleBuilder 3.1.7 to current user scope
+        Install-Module -Name 'ModuleBuilder' -RequiredVersion 3.1.7 -Scope CurrentUser -Force
 
+        # Get the path to the patch file
+        $patchPath = Join-Path -Path $PSScriptRoot -ChildPath '../../patches/ModuleBuilder_3.1.7_patch.json'
+
+        # Run Install-ModulePatch
+        Install-ModulePatch -Path $patchPath -Force
+
+        # Uninstall ModuleBuilder
+        Uninstall-Module -Name 'ModuleBuilder' -AllVersions -Force
+    }
 }
