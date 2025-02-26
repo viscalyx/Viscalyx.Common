@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Also run unit tests on Windows PowerShell.
+- Run unit tests on Windows PowerShell.
+- Run integration tests.
 
 ### Fixed
 
