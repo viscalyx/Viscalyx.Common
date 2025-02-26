@@ -9,14 +9,14 @@
         module version and hash against the existing module, and ensures the start and
         end offsets are within bounds.
 
-    .PARAMETER PatchFileContent
-        Specifies the content of the patch file to validate.
+    .PARAMETER PatchFileObject
+        Specifies the patch file to validate.
 
     .EXAMPLE
         $patchFileContent = Get-Content -Path "C:\patches\MyModule_1.0.0_patch.json" -Raw | ConvertFrom-Json
-        Assert-PatchFile -PatchFileContent $patchFileContent
+        Assert-PatchFile -PatchFileObject $patchFileContent
 
-        Validates the structure and data of the patch file content.
+        Validates the structure and data of the patch file object.
 
     .INPUTS
         None. You cannot pipe input to this function.
