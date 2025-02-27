@@ -54,7 +54,7 @@ Describe 'Assert-PatchFile' {
     {
       "ScriptFileName": "TestModule.psm1",
       "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"],
       "FilePatches": [
         {
           "StartOffset": 10,
@@ -82,7 +82,7 @@ Describe 'Assert-PatchFile' {
     {
       "ScriptFileName": "TestModule.psm1",
       "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"],
       "FilePatches": [
         {
           "StartOffset": 10,
@@ -108,7 +108,7 @@ Describe 'Assert-PatchFile' {
     {
       "ScriptFileName": "TestModule.psm1",
       "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"],
       "FilePatches": [
         {
           "StartOffset": 10,
@@ -131,7 +131,7 @@ Describe 'Assert-PatchFile' {
                 $patchFileContent = @'
 {
   "ModuleName": "TestModule",
-  "ModuleVersion": "1.1.1",
+  "ModuleVersion": "1.1.1"
 }
 '@
 
@@ -149,7 +149,7 @@ Describe 'Assert-PatchFile' {
   "ModuleFiles": [
     {
       "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"],
       "FilePatches": [
         {
           "StartOffset": 10,
@@ -176,7 +176,7 @@ Describe 'Assert-PatchFile' {
   "ModuleFiles": [
     {
       "ScriptFileName": "TestModule.psm1",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"],
       "FilePatches": [
         {
           "StartOffset": 10,
@@ -231,7 +231,7 @@ Describe 'Assert-PatchFile' {
     {
       "ScriptFileName": "TestModule.psm1",
       "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"]
     }
   ]
 }
@@ -252,7 +252,7 @@ Describe 'Assert-PatchFile' {
     {
       "ScriptFileName": "TestModule.psm1",
       "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"],
       "FilePatches": [
         {
           "EndOffset": 20,
@@ -278,7 +278,7 @@ Describe 'Assert-PatchFile' {
     {
       "ScriptFileName": "TestModule.psm1",
       "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"],
       "FilePatches": [
         {
           "StartOffset": 10,
@@ -304,7 +304,7 @@ Describe 'Assert-PatchFile' {
     {
       "ScriptFileName": "TestModule.psm1",
       "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"],
       "FilePatches": [
         {
           "StartOffset": 10,

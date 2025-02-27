@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Also run unit tests on Windows PowerShell.
+- Run unit tests on Windows PowerShell.
+- Run integration tests.
+- `Install-ModulePatch`
+  - Tested using integration test.
 
 ### Fixed
 
@@ -40,6 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added parameter `NoHexOutput`.
 - `Out-Difference`
   - Added parameter `NoHexOutput`.
+
+### Fixed
+
+- `ConvertTo-DifferenceString`
+  - Make it render ANSI sequences in Windows PowerShell
+  - Optimize using List\<T\> instead of using `+=` for adding to arrays.
 
 ## [0.3.0] - 2024-09-02
 

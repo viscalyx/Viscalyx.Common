@@ -47,6 +47,15 @@ stages:
               pwsh: true
             env:
               ModuleVersion: $(NuGetVersionV2)
+          - task: PowerShell@2
+            name: patch_module
+            displayName: 'Patch module ModuleBuilder'
+            inputs:
+              targetType: 'inline'
+              script: |
+                ./build.ps1 -Task noop
+                Install-ModulePatch -Path ./patches/ModuleBuilder_3.1.7_patch.json -Force
+              pwsh: true
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Build Artifact'
             inputs:
@@ -156,13 +165,47 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Windows Server Core (PowerShell Core)'
+              testRunTitle: 'Windows Server (PowerShell Core)'
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Test Artifact'
             condition: succeededOrFailed()
             inputs:
               targetPath: '$(buildFolderName)/$(testResultFolderName)/'
               artifactName: 'CodeCoverageWinPS7_$(System.JobAttempt)'
+              parallel: true
+
+      - job: test_windows_powershell
+        displayName: 'Unit Windows (Windows PowerShell)'
+        timeoutInMinutes: 0
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Build Artifact'
+            inputs:
+              buildType: 'current'
+              artifactName: $(buildArtifactName)
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
+          - task: PowerShell@2
+            name: test
+            displayName: 'Run Tests'
+            inputs:
+              filePath: './build.ps1'
+              arguments: '-tasks test'
+              pwsh: false
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'NUnit'
+              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
+              testRunTitle: 'Windows Server (Windows PowerShell)'
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Test Artifact'
+            condition: succeededOrFailed()
+            inputs:
+              targetPath: '$(buildFolderName)/$(testResultFolderName)/'
+              artifactName: 'CodeCoverageWinPS_$(System.JobAttempt)'
               parallel: true
 
       - job: test_macos
@@ -205,6 +248,7 @@ stages:
           - test_macos
           - test_linux
           - test_windows_core
+          - test_windows_powershell
         condition: succeededOrFailed()
         pool:
           vmImage: 'ubuntu-latest'
@@ -234,6 +278,12 @@ stages:
               buildType: 'current'
               artifactName: 'CodeCoverageWinPS7_$(System.JobAttempt)'
               targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)'
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Test Artifact Windows (WinPS)'
+            inputs:
+              buildType: 'current'
+              artifactName: 'CodeCoverageWinPS_$(System.JobAttempt)'
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)'
           - task: PowerShell@2
             name: merge
             displayName: 'Merge Code Coverage files'
@@ -251,70 +301,46 @@ stages:
               bash <(curl -s https://codecov.io/bash) -f "./$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml" -F unit
             displayName: 'Publish Code Coverage to Codecov.io'
 
-      # - job: Test_Integration
-      #   displayName: 'Integration'
-      #   strategy:
-      #     matrix:
-      #       WINDOWS:
-      #         JOB_VMIMAGE: 'windows-latest'
-      #       UBUNTU:
-      #         JOB_VMIMAGE: 'ubuntu-latest'
-      #       MACOS:
-      #         JOB_VMIMAGE: 'macos-latest'
-      #   pool:
-      #     vmImage: $(JOB_VMIMAGE)
-      #   timeoutInMinutes: 0
-      #   steps:
-      #     - task: DownloadPipelineArtifact@2
-      #       displayName: 'Download Build Artifact'
-      #       inputs:
-      #         buildType: 'current'
-      #         artifactName: $(buildArtifactName)
-      #         targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
-      #     - pwsh: |
-      #         ./build.ps1 -Tasks noop
-      #         New-Item -ItemType Directory -Path (Get-PSModulePath -Scope CurrentUser) -Force
-      #       name: currentUserModulePath
-      #       displayName: 'Validate CurrentUser Module Path'
-      #     - pwsh: |
-      #         & ([ScriptBlock]::Create((iwr 'bit.ly/psresourceget'))) -Force -Verbose
-      #         Get-Module -Name Microsoft.PowerShell.PSResourceGet -ListAvailable
-      #       name: bootstrapPSResourceGet
-      #       displayName: 'Bootstrap PSResourceGet'
-      #     - pwsh: |
-      #         Install-PSResource -Name 'Pester' -Version '[5.0,6.0)' -TrustRepository -ErrorAction 'Stop' -Confirm:$false -PassThru
-      #         Import-Module -Name Pester -MaximumVersion '5.*' -ErrorAction 'Stop' -PassThru
-      #         Invoke-Pester -Path '.\tests\Integration\Syntax\v5' -Output Detailed
-      #       name: validatePesterSyntax_v5
-      #       displayName: 'Validate Pester 5 Syntax'
-      #     - pwsh: |
-      #         ./build.ps1 -Tasks noop
-      #         Import-Module -Name Viscalyx.Common -PassThru
-      #         New-Item -ItemType Directory -Path './ConversionTest/v6' -Force
-      #         Convert-PesterSyntax -Path (Get-ChildItem -Path './tests/Integration/Syntax/v5') -OutputPath './ConversionTest/v6' -Force -Verbose
-      #       name: convert_v5_to_v6
-      #       displayName: 'Convert v5 syntax to v6'
-      #     - task: PublishPipelineArtifact@1
-      #       displayName: 'Publish Converted v6 Artifact'
-      #       inputs:
-      #         targetPath: './ConversionTest/v6'
-      #         artifact: 'ConvertedTests_v6_$(System.JobName)_Attempt_$(System.JobAttempt)'
-      #         publishLocation: 'pipeline'
-      #         parallel: true
-      #     - pwsh: |
-      #         Install-PSResource -Name 'Pester' -Prerelease -TrustRepository -ErrorAction 'Stop' -Confirm:$false -PassThru
-      #         Import-Module -Name Pester -MaximumVersion '6.*' -ErrorAction 'Stop' -PassThru
-      #         Invoke-Pester -Path './ConversionTest/v6' -Output Detailed
-      #       name: validatePesterSyntax_v6
-      #       displayName: 'Validate Pester 6 Syntax'
-          ## Currently there are no test result to upload since we are not using the normal test pipeline.
-          # - task: PublishTestResults@2
-          #   displayName: 'Publish Test Results'
-          #   condition: succeededOrFailed()
-          #   inputs:
-          #     testResultsFormat: 'NUnit'
-          #     testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-          #     testRunTitle: 'Integration ($(Agent.JobName))'
+      - job: Test_Integration
+        displayName: 'Integration'
+        strategy:
+          matrix:
+            WINDOWS_PWSH7:
+              JOB_VMIMAGE: 'windows-latest'
+              PWSH: true
+            WINDOWS_PWSH5:
+              JOB_VMIMAGE: 'windows-latest'
+              PWSH: false
+            UBUNTU_PWSH7:
+              JOB_VMIMAGE: 'ubuntu-latest'
+              PWSH: true
+            MACOS_PWSH7:
+              JOB_VMIMAGE: 'macos-latest'
+              PWSH: true
+        pool:
+          vmImage: $(JOB_VMIMAGE)
+        timeoutInMinutes: 0
+        steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Build Artifact'
+            inputs:
+              buildType: 'current'
+              artifactName: $(buildArtifactName)
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)'
+          - task: PowerShell@2
+            name: test
+            displayName: 'Run Integration Test'
+            inputs:
+              filePath: './build.ps1'
+              arguments: "-Tasks test -CodeCoverageThreshold 0 -PesterPath 'tests/Integration'"
+              pwsh: $(PWSH)
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'NUnit'
+              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
+              testRunTitle: 'Integration ($(Agent.JobName))'
 
   - stage: Deploy
     dependsOn: Test

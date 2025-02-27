@@ -6,7 +6,7 @@ without directly modifying its original source. This is especially useful when
 dealing with third-party modules. This article guides you through patching a
 PowerShell module, using `ModuleBuilder` as an example.
 
-> [!CAUTION]
+> [!WARNING]
 > This patching technique is intended as a temporary solution, primarily for
 > development or pipeline environments, until the module's next official
 > release. Always verify the contents of every patch file, even from trusted
@@ -78,7 +78,7 @@ $codeOffset | Format-List
 ```
 <!-- markdownlint-enable MD013 - Line length -->
 
-> [!NOTE]
+> [!IMPORTANT]
 > You have to copy the code section to find exactly as it is in the script
 > file. Regular expressions are not yet supported. Also make sure to correctly
 > escape any quotes in the string.
@@ -111,7 +111,7 @@ $hash256
 ```
 <!-- markdownlint-enable MD013 - Line length -->
 
->[!NOTE]
+>[!TIP]
 > The `Get-ModuleFileSha` command from `Viscalyx.Common`can be used to
 > output SHA256 hash for all the PowerShell script files in the specified
 > module.
@@ -145,7 +145,9 @@ $patchObject = [ordered] @{
         @{
             ScriptFileName = 'ModuleBuilder.psm1'
             OriginalHashSHA = $hash256
-            ValidationHashSHA  = 'NEW_HASH_HERE' # Replace with the actual hash of the patched file
+            ValidationHashSHA  = @(
+              'NEW_HASH_HERE' # Replace with the actual hash of the patched file
+              )
             FilePatches   = @(
                 @{
                     StartOffset    = $codeOffset.StartOffset
@@ -174,7 +176,7 @@ Here's an example `ModuleBuilder_3.1.7_patch.json` file:
     {
       "ScriptFileName": "ModuleBuilder.psm1",
       "OriginalHashSHA": "4723258D788733FACED8BF20F60DFCBAD03E7AEB659D1B9C891DD9F86FEA2E73",
-      "ValidationHashSHA": "4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B",
+      "ValidationHashSHA": ["4444D5073A54B838128FC53D61B87A40142E5181A38C593CC4BA728D6F1AD16B"],
       "FilePatches": [
         {
           "StartOffset": 21167,
@@ -196,8 +198,11 @@ Here's an example `ModuleBuilder_3.1.7_patch.json` file:
     `en-US/localized.strings.psd1`).
   - **OriginalHashSHA**: The SHA256 hash of the *original* content of the entire
     script file (e.g. `ModuleBuilder.psm1`, or `en-US/localized.strings.psd1`).
-  - **ValidationHashSHA**: The SHA256 hash of the *patched* content of the entire
-    script file (e.g. `ModuleBuilder.psm1`, or `en-US/localized.strings.psd1`).
+  - **ValidationHashSHA**: One or more SHA256 hash of the *patched* content
+    of the entire script file (e.g. `ModuleBuilder.psm1`, or `en-US/localized.strings.psd1`).
+    *The reason for being able to have multiple entries is because the content*
+    *can differ cross-platform. Hopefully this can be resolved in a future*
+    *version.*
   - **FilePatches**: An array of patches to apply to the script file.
     - **StartOffset**: The starting character position of the text to replace
       (e.g. 21167).
@@ -206,7 +211,7 @@ Here's an example `ModuleBuilder_3.1.7_patch.json` file:
     - **PatchContent**: The new (patch) content that will be replace the
       original content.
 
-> [!IMPORTANT]
+> [!TIP]
 > The JSON file can contain multiple entries for the same script file or
 > multiple script files within the same module and version. If you need
 > to patch multiple modules or different module versions, create a separate
@@ -224,7 +229,7 @@ Install-ModulePatch -Path './patches/ModuleBuilder_3.1.7_patch.json'
 Replace the path with the actual path to your patch file. The `-Force`
 parameter can be used to bypasses the confirmation prompt.
 
-> [!NOTE]
+> [!TIP]
 > It also possible to use the parameter `-Uri` to get patches hosted on
 > web pages or web services.
 

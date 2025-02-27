@@ -49,9 +49,23 @@ function Get-PSReadLineHistory
 
     if ($Pattern)
     {
+        $selectStringParameters = @{}
+
+        if ($PSEdition -eq 'Core')
+        {
+            $selectStringParameters = @{
+                Raw = $true
+            }
+        }
+
         $historyContent = $historyContent |
             Select-Object -SkipLast 1 |
-            Select-String -Pattern $Pattern -Raw
+            Select-String -Pattern $Pattern @selectStringParameters
+
+        if ($PSEdition -eq 'Desktop')
+        {
+            $historyContent = $historyContent.Line
+        }
     }
 
     $historyContent

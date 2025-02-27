@@ -31,6 +31,12 @@ BeforeAll {
     $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
     $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
     $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+
+    # Save the original PSModulePath
+    $script:originalPSModulePath = $env:PSModulePath
+
+    # Add $TestDrive to the beginning of PSModulePath
+    $env:PSModulePath = "$TestDrive;$env:PSModulePath"
 }
 
 AfterAll {
@@ -40,46 +46,31 @@ AfterAll {
 
     # Unload the module being tested so that it doesn't impact any other tests.
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+
+    # Restore the original PSModulePath
+    $env:PSModulePath = $script:originalPSModulePath
 }
 
-Describe 'ConvertTo-AnsiSequence' {
-    It 'Should return the same value if no ANSI sequence is present' {
-        $result = ConvertTo-AnsiSequence -Value 'Hello'
-        $result | Should-BeString 'Hello'
+Describe 'Install-ModulePatch' {
+    BeforeAll {
+        # Save the original PSModulePath
+        $script:originalPSModulePath = $env:PSModulePath
+
+        # Add $TestDrive to the beginning of PSModulePath
+        $env:PSModulePath = "{0}{1}{2}" -f $TestDrive, [System.IO.Path]::PathSeparator, $env:PSModulePath
     }
 
-    It 'Should convert partial ANSI sequence to full ANSI sequence' {
-        $result = ConvertTo-AnsiSequence -Value '[31'
-        $result | Should-BeString "$([System.Char] 0x1b)[31m"
+    AfterAll {
+        # Restore the original PSModulePath
+        $env:PSModulePath = $script:originalPSModulePath
     }
 
-    It 'Should convert complete ANSI sequence correctly' {
-        $result = ConvertTo-AnsiSequence -Value "$([System.Char] 0x1b)[32m"
-        $result | Should-BeString "$([System.Char] 0x1b)[32m"
-    }
+    It 'Should correctly patch ModuleBuilder v3.1.7' {
+        Save-Module -Name 'ModuleBuilder' -RequiredVersion 3.1.7 -Path $TestDrive -Force
 
-    It 'Should handle multiple ANSI codes' {
-        $result = ConvertTo-AnsiSequence -Value '[31;1'
-        $result | Should-BeString "$([System.Char] 0x1b)[31;1m"
-    }
+        $patchPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../patches/ModuleBuilder_3.1.7_patch.json'
 
-    It 'Should handle number only' {
-        $result = ConvertTo-AnsiSequence -Value '31'
-        $result | Should-BeString "$([System.Char] 0x1b)[31m"
-    }
-
-    It 'Should handle numbers separated by semicolon' {
-        $result = ConvertTo-AnsiSequence -Value '31;1'
-        $result | Should-BeString "$([System.Char] 0x1b)[31;1m"
-    }
-
-    It 'Should handle number suffixed with m-character' {
-        $result = ConvertTo-AnsiSequence -Value '31m'
-        $result | Should-BeString "$([System.Char] 0x1b)[31m"
-    }
-
-    It 'Should handle numbers separated by semicolon and suffixed with m-character' {
-        $result = ConvertTo-AnsiSequence -Value '31;3;5m'
-        $result | Should-BeString "$([System.Char] 0x1b)[31;3;5m"
+        # Run Install-ModulePatch
+        Install-ModulePatch -Path $patchPath -Force -ErrorAction 'Stop'
     }
 }
