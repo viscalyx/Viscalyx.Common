@@ -152,8 +152,18 @@ function Install-ModulePatch
             # Should we skip hash check?
             if (-not $SkipHashValidation.IsPresent)
             {
-                # Verify the SHA256 hash of the patched file
-                $hasNewFileHash = Test-FileHash -Path $scriptFilePath -Algorithm 'SHA256' -ExpectedHash $moduleFile.ValidationHashSHA
+                $hasNewFileHash = $false
+
+                foreach ($validationHash in $moduleFile.ValidationHashSHA)
+                {
+                    # Verify the SHA256 hash of the patched file
+                    $hasNewFileHash = Test-FileHash -Path $scriptFilePath -Algorithm 'SHA256' -ExpectedHash $validationHash
+
+                    if ($hasNewFileHash)
+                    {
+                        break
+                    }
+                }
 
                 if (-not $hasNewFileHash)
                 {
@@ -168,10 +178,8 @@ function Install-ModulePatch
 
                     return $null
                 }
-                else
-                {
-                    Write-Debug -Message ($script:localizedData.Install_ModulePatch_Patch_Success -f $scriptFilePath)
-                }
+
+                Write-Debug -Message ($script:localizedData.Install_ModulePatch_Patch_Success -f $scriptFilePath)
             }
             else
             {

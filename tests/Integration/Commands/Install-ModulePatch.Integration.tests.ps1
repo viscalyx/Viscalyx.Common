@@ -71,6 +71,6 @@ Describe 'Install-ModulePatch' {
         $patchPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../patches/ModuleBuilder_3.1.7_patch.json'
 
         # Run Install-ModulePatch
-        Install-ModulePatch -Path $patchPath -Force
+        Install-ModulePatch -Path $patchPath -Force -ErrorAction 'Stop'
     }
 }
