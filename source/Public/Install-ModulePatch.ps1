@@ -128,7 +128,7 @@ function Install-ModulePatch
             $patchFileEntries = $moduleFile.FilePatches |
                 Sort-Object -Property 'StartOffset' -Descending
 
-            $totalPatches = $patchFileEntries.Count
+            $totalPatches = @($patchFileEntries).Count
             $patchCounter = 0
 
             foreach ($patchEntry in $patchFileEntries)

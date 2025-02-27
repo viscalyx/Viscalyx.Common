@@ -50,36 +50,36 @@ Describe 'ConvertTo-AnsiSequence' {
 
     It 'Should convert partial ANSI sequence to full ANSI sequence' {
         $result = ConvertTo-AnsiSequence -Value '[31'
-        $result | Should-BeString "`e[31m"
+        $result | Should-BeString "$([System.Char] 0x1b)[31m"
     }
 
     It 'Should convert complete ANSI sequence correctly' {
-        $result = ConvertTo-AnsiSequence -Value "`e[32m"
-        $result | Should-BeString "`e[32m"
+        $result = ConvertTo-AnsiSequence -Value "$([System.Char] 0x1b)[32m"
+        $result | Should-BeString "$([System.Char] 0x1b)[32m"
     }
 
     It 'Should handle multiple ANSI codes' {
         $result = ConvertTo-AnsiSequence -Value '[31;1'
-        $result | Should-BeString "`e[31;1m"
+        $result | Should-BeString "$([System.Char] 0x1b)[31;1m"
     }
 
     It 'Should handle number only' {
         $result = ConvertTo-AnsiSequence -Value '31'
-        $result | Should-BeString "`e[31m"
+        $result | Should-BeString "$([System.Char] 0x1b)[31m"
     }
 
     It 'Should handle numbers separated by semicolon' {
         $result = ConvertTo-AnsiSequence -Value '31;1'
-        $result | Should-BeString "`e[31;1m"
+        $result | Should-BeString "$([System.Char] 0x1b)[31;1m"
     }
 
     It 'Should handle number suffixed with m-character' {
         $result = ConvertTo-AnsiSequence -Value '31m'
-        $result | Should-BeString "`e[31m"
+        $result | Should-BeString "$([System.Char] 0x1b)[31m"
     }
 
     It 'Should handle numbers separated by semicolon and suffixed with m-character' {
         $result = ConvertTo-AnsiSequence -Value '31;3;5m'
-        $result | Should-BeString "`e[31;3;5m"
+        $result | Should-BeString "$([System.Char] 0x1b)[31;3;5m"
     }
 }
