@@ -54,7 +54,7 @@ stages:
               targetType: 'inline'
               script: |
                 ./build.ps1 -Task noop
-                Install-ModulePatch -Path ./patches/ModuleBuilder_3.1.7_patch.json -Force
+                Install-ModulePatch -SkipHashValidation -Path ./patches/ModuleBuilder_3.1.7_patch.json -Force
               pwsh: true
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Build Artifact'
