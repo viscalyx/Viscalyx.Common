@@ -43,6 +43,10 @@ AfterAll {
 }
 
 Describe 'ConvertTo-AnsiSequence' {
+    BeforeAll {
+        $esc = [System.Char] 0x1b
+    }
+
     It 'Should return the same value if no ANSI sequence is present' {
         $result = ConvertTo-AnsiSequence -Value 'Hello'
         $result | Should-BeString 'Hello'
@@ -50,36 +54,36 @@ Describe 'ConvertTo-AnsiSequence' {
 
     It 'Should convert partial ANSI sequence to full ANSI sequence' {
         $result = ConvertTo-AnsiSequence -Value '[31'
-        $result | Should-BeString "$([System.Char] 0x1b)[31m"
+        $result | Should-BeString "$($esc)[31m"
     }
 
     It 'Should convert complete ANSI sequence correctly' {
-        $result = ConvertTo-AnsiSequence -Value "$([System.Char] 0x1b)[32m"
-        $result | Should-BeString "$([System.Char] 0x1b)[32m"
+        $result = ConvertTo-AnsiSequence -Value "$($esc)[32m"
+        $result | Should-BeString "$($esc)[32m"
     }
 
     It 'Should handle multiple ANSI codes' {
         $result = ConvertTo-AnsiSequence -Value '[31;1'
-        $result | Should-BeString "$([System.Char] 0x1b)[31;1m"
+        $result | Should-BeString "$($esc)[31;1m"
     }
 
     It 'Should handle number only' {
         $result = ConvertTo-AnsiSequence -Value '31'
-        $result | Should-BeString "$([System.Char] 0x1b)[31m"
+        $result | Should-BeString "$($esc)[31m"
     }
 
     It 'Should handle numbers separated by semicolon' {
         $result = ConvertTo-AnsiSequence -Value '31;1'
-        $result | Should-BeString "$([System.Char] 0x1b)[31;1m"
+        $result | Should-BeString "$($esc)[31;1m"
     }
 
     It 'Should handle number suffixed with m-character' {
         $result = ConvertTo-AnsiSequence -Value '31m'
-        $result | Should-BeString "$([System.Char] 0x1b)[31m"
+        $result | Should-BeString "$($esc)[31m"
     }
 
     It 'Should handle numbers separated by semicolon and suffixed with m-character' {
         $result = ConvertTo-AnsiSequence -Value '31;3;5m'
-        $result | Should-BeString "$([System.Char] 0x1b)[31;3;5m"
+        $result | Should-BeString "$($esc)[31;3;5m"
     }
 }
