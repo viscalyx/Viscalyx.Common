@@ -43,6 +43,10 @@ AfterAll {
 }
 
 Describe '-join (ConvertTo-DifferenceString' {
+    BeforeAll {
+        $esc = [System.Char] 0x1b
+    }
+
     It 'Should use custom labels' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -ReferenceLabel 'Ref:' -DifferenceLabel 'Diff:')
         $result | Should -Match 'Ref:'
@@ -110,7 +114,7 @@ Describe '-join (ConvertTo-DifferenceString' {
     }
 
     It 'Should use custom highlighting' {
-        $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -HighlightStart "$([System.Char] 0x1b)[32m" -HighlightEnd "$([System.Char] 0x1b)[0m")
+        $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -HighlightStart "$($esc)[32m" -HighlightEnd "$($esc)[0m")
         $result | Should -Match '32m65'
         $result | Should -Match '32m61'
     }
@@ -147,8 +151,8 @@ Describe '-join (ConvertTo-DifferenceString' {
 
     It 'Should handle multiple escaped characters' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString "Hello`r`nWorld" -DifferenceString "Hello`n`rWorld")
-        $result | Should -Match "$([System.Char] 0x1b)\[31m0D$([System.Char] 0x1b)\[0m $([System.Char] 0x1b)\[31m0A$([System.Char] 0x1b)\[0m"  # Carriage return + Newline
-        $result | Should -Match "$([System.Char] 0x1b)\[31m0A$([System.Char] 0x1b)\[0m $([System.Char] 0x1b)\[31m0D$([System.Char] 0x1b)\[0m"  # Newline + Carriage return
+        $result | Should -Match "$($esc)\[31m0D$($esc)\[0m $($esc)\[31m0A$($esc)\[0m"  # Carriage return + Newline
+        $result | Should -Match "$($esc)\[31m0A$($esc)\[0m $($esc)\[31m0D$($esc)\[0m"  # Newline + Carriage return
     }
 
     It 'Should handle longer strings' {
