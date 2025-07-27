@@ -33,7 +33,8 @@
         "PSDSC",
         "Viscalyx",
         "analyzersettings",
-        "CODEOWNERS"
+        "CODEOWNERS",
+        "UEFI"
     ],
     "cSpell.ignorePaths": [
         ".git",
