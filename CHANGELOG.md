@@ -5,6 +5,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Assert-IPv4Address` that validates if a string is a valid IPv4 address,
+  including format checking and value range validation (0-255 for each octet).
+  Also validates that octets do not have leading zeros.
+- `Get-LinkLayerAddress` (alias `Get-MacAddress`) that retrieves the MAC
+  address for an IP address on the local subnet/VLAN. Works cross-platform
+  across Windows, Linux, and macOS.
+- `Resolve-DnsName` that resolves a DNS host name to a single IPv4 address
+  using the cross-platform .NET System.Net.Dns class, providing compatibility
+  when the built-in Resolve-DnsName cmdlet is not available.
+- `Send-WakeOnLan` (alias `Send-WOL`) that sends a Wake-on-LAN magic packet
+  to wake up a remote computer. Supports various MAC address formats and
+  custom broadcast addresses and ports.
+
 ### Fixed
 
 - Improved handling escape character in tests.

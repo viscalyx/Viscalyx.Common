@@ -93,4 +93,42 @@ ConvertFrom-StringData @'
 
     ## Get-TextOffset
     TextNotFoundWarning = Text '{0}' not found in the file '{1}'.
+
+    ## Assert-IPv4Address
+    Assert_IPv4Address_ValidatingAddress = Validating IPv4 address format for '{0}'.
+    Assert_IPv4Address_ValidationSuccessful = IPv4 address '{0}' is valid.
+    Assert_IPv4Address_InvalidFormatException = The input '{0}' is not a valid IPv4 address format.
+    Assert_IPv4Address_OctetOutOfRangeException = Octet '{0}' in address '{1}' is out of valid range (0-255).
+    Assert_IPv4Address_InvalidLeadingZeroException = Octet '{0}' in address '{1}' contains invalid leading zero.
+    Assert_IPv4Address_OctetConversionFailedException = Failed to convert octet '{0}' to integer in address '{1}'.
+
+    ## Resolve-DnsName
+    Resolve_DnsName_AttemptingResolution = Attempting to resolve DNS name '{0}'.
+    Resolve_DnsName_ResolutionSuccessful = Successfully resolved '{0}' to '{1}'.
+    Resolve_DnsName_NoIPv4Found = No IPv4 addresses found for '{0}'.
+    Resolve_DnsName_ResolutionException = DNS resolution for '{0}' failed with exception: {1}
+    Resolve_DnsName_ResolutionFailed = DNS resolution failed for '{0}'. {1}
+    Resolve_DnsName_NoIPv4AddressFound = No IPv4 addresses found for '{0}'.
+
+    ## Send-WakeOnLan
+    Send_WakeOnLan_SendingPacket = Sending Wake-on-LAN packet to MAC address '{0}' via broadcast '{1}' on port {2}.
+    Send_WakeOnLan_PacketSent = Wake-on-LAN packet sent successfully.
+    Send_WakeOnLan_InvalidMacAddress = Invalid MAC address format '{0}'. Expected format: 'XX:XX:XX:XX:XX:XX' or 'XX-XX-XX-XX-XX-XX'.
+    Send_WakeOnLan_CreatingPacket = Creating Wake-on-LAN magic packet with MAC address '{0}'.
+    Send_WakeOnLan_ShouldProcessVerboseDescription = Send Wake-on-LAN packet to MAC address '{0}' via broadcast '{1}' on port {2}.
+    Send_WakeOnLan_ShouldProcessVerboseWarning = Are you sure you want to send a Wake-on-LAN packet to MAC address '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Send_WakeOnLan_ShouldProcessCaption = Send Wake-on-LAN packet
+
+    ## Get-LinkLayerAddress
+    Get_LinkLayerAddress_RefreshingArpEntry = Refreshing ARP entry for IP address '{0}'.
+    Get_LinkLayerAddress_QueryingArpTable = Querying ARP table for IP address '{0}'.
+    Get_LinkLayerAddress_UsingGetNetNeighbor = Using Get-NetNeighbor cmdlet to retrieve neighbor information.
+    Get_LinkLayerAddress_UsingArpCommand = Using arp command to retrieve ARP table information.
+    Get_LinkLayerAddress_UsingIpCommand = Using ip command to retrieve neighbor table information.
+    Get_LinkLayerAddress_FoundMacAddress = Found MAC address '{1}' for IP address '{0}'.
+    Get_LinkLayerAddress_ArpCommandFailed = ARP command failed with error: {0}
+    Get_LinkLayerAddress_IpCommandFailed = IP command failed with error: {0}
+    Get_LinkLayerAddress_CouldNotFindMac = Could not find a MAC address for '{0}'. Ensure the IP address is on the same subnet and the computer is powered on and reachable.
+    Get_LinkLayerAddress_InvalidIPAddress = Invalid IP address format '{0}'. Expected format: 'XXX.XXX.XXX.XXX'.
 '@

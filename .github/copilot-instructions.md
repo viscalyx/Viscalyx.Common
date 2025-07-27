@@ -79,6 +79,11 @@ The duplication helps with readability and understanding of the test cases,
 and to be able to keep the test setup and teardown as close to the test
 case (`It`-block) as possible.
 
+To use `-ForEach` on `Context`- or `It`-blocks the values that should be looped
+must be in a `BeforeDiscovery`-block for Pester to find in in the discovery phase.
+There can be several `BeforeDiscovery`-blocks in a test file, so we can keep the
+values for the particular test context separate.
+
 ### Unit tests
 
 Never test, mock or use `Should -Invoke` for `Write-Verbose` and `Write-Debug`
