@@ -398,7 +398,7 @@ function Invoke-PesterJob
         if (-not $isSamplerProject)
         {
             $moduleBuilderModule = Get-Module -Name 'ModuleBuilder' -ListAvailable -ErrorAction 'SilentlyContinue'
-            
+
             if (-not $moduleBuilderModule)
             {
                 $PSCmdlet.ThrowTerminatingError(
@@ -603,8 +603,8 @@ function Invoke-PesterJob
         # Apply filter if specified
         if ($PSBoundParameters.ContainsKey('CoverageFilterName'))
         {
-            $commandsMissed = $commandsMissed | Where-Object -FilterScript { 
-                $_.Function -like $CoverageFilterName -or $_.Class -like $CoverageFilterName 
+            $commandsMissed = $commandsMissed | Where-Object -FilterScript {
+                $_.Function -like $CoverageFilterName -or $_.Class -like $CoverageFilterName
             }
         }
 
