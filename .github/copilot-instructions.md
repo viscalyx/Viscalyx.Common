@@ -1,0 +1,12 @@
+# Project Instructions
+
+## Requirements
+- Always follow the instructions in this repository.
+
+## Build & Test Workflow Requirements
+- Run PowerShell script files from repository root
+- Setup build and test environment (once per `pwsh` session): `./build.ps1 -Tasks noop`
+- Build project before running tests: `./build.ps1 -Tasks build`
+- Run tests without coverage (wildcards allowed): `Invoke-PesterJob -Path '{tests filepath}' -SkipCodeCoverage`
+- Run QA tests: `Invoke-PesterJob -Path 'tests/QA' -SkipCodeCoverage`
+- Never run integration tests locally

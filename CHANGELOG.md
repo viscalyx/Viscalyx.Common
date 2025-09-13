@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved handling escape character in tests.
 - Fix build configuration due to changes in DscResource.DocGenerator.
 
+### Changed
+
+- Editor: Update VS Code settings to set default terminal
+  profiles and enable Copilot instruction files.
+- Tooling: Add task arguments and improve `test` and `build`
+  task configuration for reproducible runs.
+
 ## [0.4.1] - 2025-02-27
 
 ### Changed
