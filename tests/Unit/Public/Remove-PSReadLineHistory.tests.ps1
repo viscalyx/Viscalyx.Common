@@ -70,7 +70,7 @@ Describe 'Remove-PSReadLineHistory' {
             )
 
             # Act
-            Viscalyx.Common\Remove-PSReadLineHistory -Pattern $pattern -Confirm:$false
+            $null = Viscalyx.Common\Remove-PSReadLineHistory -Pattern $pattern -Confirm:$false
 
             # Assert
             Should -Invoke -CommandName Set-Content -Exactly -Times 1 -Scope It -ParameterFilter {
@@ -101,7 +101,7 @@ Describe 'Remove-PSReadLineHistory' {
             )
 
             # Act
-            Viscalyx.Common\Remove-PSReadLineHistory -Pattern $pattern -EscapeRegularExpression -Confirm:$false
+            $null = Viscalyx.Common\Remove-PSReadLineHistory -Pattern $pattern -EscapeRegularExpression -Confirm:$false
 
             # Assert
             Should -Invoke -CommandName Set-Content -Exactly -Times 1 -Scope It -ParameterFilter {
@@ -133,7 +133,7 @@ Describe 'Remove-PSReadLineHistory' {
             )
 
             # Act
-            Viscalyx.Common\Remove-PSReadLineHistory -Pattern $pattern -Confirm:$false
+            $null = Viscalyx.Common\Remove-PSReadLineHistory -Pattern $pattern -Confirm:$false
 
             # Assert
             Should -Invoke -CommandName Set-Content -Exactly -Times 0 -Scope It

@@ -68,7 +68,7 @@ Describe 'Remove-PSHistory' {
 
     It 'Should removes history entries matching the pattern' {
         # Act
-        Viscalyx.Common\Remove-PSHistory -Pattern 'file.*\.txt' -Confirm:$false
+        $null = Viscalyx.Common\Remove-PSHistory -Pattern 'file.*\.txt' -Confirm:$false
 
         # Assert
         Should -Invoke -CommandName Clear-History -Exactly -Times 2 -Scope It
@@ -78,7 +78,7 @@ Describe 'Remove-PSHistory' {
 
     It 'Should not remove history entries if no match is found' {
         # Act
-        Viscalyx.Common\Remove-PSHistory -Pattern 'NonExistentPattern' -Confirm:$false
+        $null = Viscalyx.Common\Remove-PSHistory -Pattern 'NonExistentPattern' -Confirm:$false
 
         # Assert
         Should -Invoke -CommandName Clear-History -Times 0 -Scope It
@@ -86,7 +86,7 @@ Describe 'Remove-PSHistory' {
 
     It 'Should treat pattern as a literal string when EscapeRegularExpression is specified' {
         # Act
-        Viscalyx.Common\Remove-PSHistory -Pattern 'file1.txt' -EscapeRegularExpression -Confirm:$false
+        $null = Viscalyx.Common\Remove-PSHistory -Pattern 'file1.txt' -EscapeRegularExpression -Confirm:$false
 
         # Assert
         Should -Invoke -CommandName Clear-History -Exactly 1 -Scope It
