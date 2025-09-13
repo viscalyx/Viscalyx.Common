@@ -42,6 +42,24 @@ AfterAll {
 }
 
 Describe 'Get-ModuleFileSha' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = 'ModuleName'
+            ExpectedParameterSetString = '-Name <string> [-Version <string>] [<CommonParameters>]'
+        }
+        @{
+            Name = 'Path'
+            ExpectedParameterSetString = '-Path <string> [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Get-ModuleFileSha').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     BeforeAll {
         # Create test module structure
         $script:testModuleBase = Join-Path -Path $TestDrive -ChildPath 'TestModule'

@@ -43,6 +43,20 @@ AfterAll {
 }
 
 Describe 'Invoke-PesterJob' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     # Mock external dependencies
     BeforeAll {
         New-Item -Path $TestDrive -ItemType Directory -Name 'MockPath' | Out-Null

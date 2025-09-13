@@ -43,6 +43,20 @@ AfterAll {
 }
 
 Describe 'Get-ModuleByVersion' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[-Name] <string> [-Version] <string> [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Get-ModuleByVersion').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     Context 'When the module exists with the specified version' {
         BeforeAll {
             Mock -CommandName Get-Module -MockWith {

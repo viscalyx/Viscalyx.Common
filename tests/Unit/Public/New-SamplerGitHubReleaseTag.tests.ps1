@@ -43,6 +43,20 @@ AfterAll {
 }
 
 Describe 'New-SamplerGitHubReleaseTag' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[[-DefaultBranchName] <string>] [[-UpstreamRemoteName] <string>] [[-ReleaseTag] <string>] [-SwitchBackToPreviousBranch] [-Force] [-PushTag] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'New-SamplerGitHubReleaseTag').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     BeforeAll {
         $script:MockLastExitCode = 0
 

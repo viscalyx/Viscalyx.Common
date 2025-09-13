@@ -48,6 +48,20 @@ Describe 'ConvertTo-RelativePath' {
         Mock -CommandName Get-Location -MockWith { @{ Path = '/source/Viscalyx.Common' } }
     }
 
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[-AbsolutePath] <string> [[-CurrentLocation] <string>] [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'ConvertTo-RelativePath').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     It 'Should convert absolute path to relative path when CurrentLocation is provided' {
         $result = ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
         $result | Should -Be './source/Public/ConvertTo-RelativePath.ps1'

@@ -43,6 +43,24 @@ AfterAll {
 }
 
 Describe 'Install-ModulePatch' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = 'Path'
+            ExpectedParameterSetString = '-Path <string> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        }
+        @{
+            Name = 'URI'
+            ExpectedParameterSetString = '-Uri <uri> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Install-ModulePatch').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     Context 'When patch file is valid' {
         BeforeAll {
             $patchFileContent = @'

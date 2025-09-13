@@ -43,6 +43,24 @@ AfterAll {
 }
 
 Describe 'Split-StringAtIndex' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = 'PipelineInput'
+            ExpectedParameterSetString = '-IndexObject <psobject> -InputString <string> [<CommonParameters>]'
+        }
+        @{
+            Name = 'StartEndInput'
+            ExpectedParameterSetString = '-InputString <string> -StartIndex <uint> -EndIndex <uint> [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Split-StringAtIndex').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     Context 'Using StartIndex and EndIndex parameters' {
         It 'Should split the string correctly with valid indices' {
             $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 4

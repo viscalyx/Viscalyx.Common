@@ -43,6 +43,20 @@ AfterAll {
 }
 
 Describe 'ConvertTo-DifferenceString' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[-ReferenceString] <string> [-DifferenceString] <string> [[-EqualIndicator] <string>] [[-NotEqualIndicator] <string>] [[-HighlightStart] <string>] [[-HighlightEnd] <string>] [[-ReferenceLabel] <string>] [[-DifferenceLabel] <string>] [[-ReferenceLabelAnsi] <string>] [[-DifferenceLabelAnsi] <string>] [[-ColumnHeaderAnsi] <string>] [[-ColumnHeaderResetAnsi] <string>] [[-EncodingType] <string>] [-NoColumnHeader] [-NoLabels] [-NoHexOutput] [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'ConvertTo-DifferenceString').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     BeforeAll {
         $esc = [System.Char] 0x1b
     }

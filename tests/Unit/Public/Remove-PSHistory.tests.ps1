@@ -43,6 +43,20 @@ AfterAll {
 }
 
 Describe 'Remove-PSHistory' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[-Pattern] <string> [-EscapeRegularExpression] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Remove-PSHistory').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     BeforeEach {
         # Mock Get-History to return a predefined set of history entries
         Mock -CommandName Get-History -MockWith {

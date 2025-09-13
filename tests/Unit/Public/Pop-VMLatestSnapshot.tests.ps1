@@ -43,6 +43,20 @@ AfterAll {
 }
 
 Describe 'Pop-VMLatestSnapShot' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[-ServerName] <string> [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Pop-VMLatestSnapshot').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     BeforeAll {
         # Setting up stubs for Hyper-V commands.
         InModuleScope -ScriptBlock {

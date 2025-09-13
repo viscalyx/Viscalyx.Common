@@ -43,6 +43,20 @@ AfterAll {
 }
 
 Describe 'Get-PSReadLineHistory' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[[-Pattern] <string>] [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Get-PSReadLineHistory').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     BeforeAll {
         # Mock Get-PSReadLineOption to return a custom history path
         Mock -CommandName Get-PSReadLineOption -MockWith {

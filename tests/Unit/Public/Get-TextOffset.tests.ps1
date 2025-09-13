@@ -59,6 +59,20 @@ The text includes multiple lines.
         Remove-Item -Path $testFilePath -Force
     }
 
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[-FilePath] <string> [-TextToFind] <string> [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Get-TextOffset').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     Context 'When the text is found in the file' {
         It 'Should return the correct start and end offsets' {
             $textToFind = 'test file'
