@@ -6,6 +6,9 @@
 *.psm1 text eol=lf
 *.psd1 text eol=lf
 
+# Exception: This test file needs UTF-8 BOM for Windows PowerShell Unicode support
+tests/Unit/Public/Out-Difference.tests.ps1 text eol=lf working-tree-encoding=UTF-8
+
 # Common PS ancillary files
 *.ps1xml text eol=lf
 *.pssc text eol=lf
