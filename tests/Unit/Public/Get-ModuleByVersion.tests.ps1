@@ -85,7 +85,7 @@ Describe 'Get-ModuleByVersion' {
             }
         }
 
-        It 'Should return the module object' {
+        It 'Should return $null when the specified version is not found' {
             $result = Get-ModuleByVersion -Name 'ExistingModule' -Version '2.0.0'
 
             $result | Should-BeNull
@@ -100,7 +100,7 @@ Describe 'Get-ModuleByVersion' {
             }
         }
 
-        It 'Should return the module object' {
+        It 'Should return $null when the module does not exist' {
             $result = Get-ModuleByVersion -Name 'ExistingModule' -Version '1.0.0'
 
             $result | Should-BeNull
