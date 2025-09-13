@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     module unless running in a Sampler project environment.
   - Added new parameter `CoverageFilterName` to filter code coverage results 
     by function or class name when using EnableSourceLineMapping. Supports
-    wildcard patterns for flexible filtering of missed coverage lines.
+    wildcard patterns and accepts arrays of filter patterns for flexible 
+    filtering of missed coverage lines.
 
 ### Fixed
 

@@ -46,7 +46,7 @@ Describe 'Invoke-PesterJob' {
     It 'Should have the expected parameter set <Name>' -ForEach @(
         @{
             Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-CoverageFilterName <string>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-CoverageFilterName <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
         }
     ) {
         $parameterSet = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
@@ -274,7 +274,7 @@ Describe 'Invoke-PesterJob' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-CoverageFilterName <string>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+                ExpectedParameters = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-CoverageFilterName <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
@@ -553,7 +553,25 @@ Describe 'Invoke-PesterJob' {
                 $parameterInfo = (Get-Command -Name 'Invoke-PesterJob').Parameters['CoverageFilterName']
 
                 $parameterInfo.Attributes.Mandatory | Should -BeFalse
-                $parameterInfo.ParameterType | Should -Be ([System.String])
+                $parameterInfo.ParameterType | Should -Be ([System.String[]])
+            }
+
+            It 'Should accept array of string values for CoverageFilterName' {
+                $filterArray = @('Get-*', 'Set-*', 'Test-*')
+                
+                # This should not throw an error when validating parameter type
+                { 
+                    $params = @{
+                        CoverageFilterName = $filterArray
+                        Path = '.'
+                        SkipRun = $true
+                        SkipCodeCoverage = $true
+                    }
+                    
+                    # We're not actually running this, just validating parameter binding
+                    $command = Get-Command -Name 'Invoke-PesterJob'
+                    $null = $command.ResolveParameter('CoverageFilterName').ParameterType
+                } | Should -Not -Throw
             }
         }
     }

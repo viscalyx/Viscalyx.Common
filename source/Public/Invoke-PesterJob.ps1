@@ -59,8 +59,8 @@
         to be available.
 
     .PARAMETER CoverageFilterName
-        Specifies a filter pattern for code coverage results when EnableSourceLineMapping
-        is used. The pattern supports wildcards and is used to filter commands by
+        Specifies one or more filter patterns for code coverage results when EnableSourceLineMapping
+        is used. The patterns support wildcards and are used to filter commands by
         function or class name. If not specified, all missed lines are returned.
 
     .PARAMETER ShowError
@@ -130,6 +130,14 @@
         mapping enabled. After running, automatically processes and returns all
         commands that were missed for functions or classes matching 'Get-Something'
         with a reference to the SourceLineNumber in SourceFile.
+
+    .EXAMPLE
+        Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping -CoverageFilterName @('Get-*', 'Set-*')
+
+        Runs Pester tests located in the 'tests/Unit' folder with source line
+        mapping enabled. After running, automatically processes and returns all
+        commands that were missed for functions or classes matching either 'Get-*'
+        or 'Set-*' patterns with a reference to the SourceLineNumber in SourceFile.
 
     .EXAMPLE
         Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping
@@ -313,7 +321,7 @@ function Invoke-PesterJob
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [System.String]
+        [System.String[]]
         $CoverageFilterName,
 
         [Parameter()]
@@ -604,7 +612,19 @@ function Invoke-PesterJob
         if ($PSBoundParameters.ContainsKey('CoverageFilterName'))
         {
             $commandsMissed = $commandsMissed | Where-Object -FilterScript {
-                $_.Function -like $CoverageFilterName -or $_.Class -like $CoverageFilterName
+                $currentItem = $_
+                $matchFound = $false
+                
+                foreach ($pattern in $CoverageFilterName)
+                {
+                    if ($currentItem.Function -like $pattern -or $currentItem.Class -like $pattern)
+                    {
+                        $matchFound = $true
+                        break
+                    }
+                }
+                
+                $matchFound
             }
         }
 
