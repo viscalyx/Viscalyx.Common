@@ -87,7 +87,7 @@ Describe 'Get-ModuleFileSha' {
 
     Context 'When the module does not exist' {
         BeforeAll {
-            Mock -CommandName Get-Module -MockWith { return $null }
+            Mock -CommandName Get-Module
         }
 
         It 'Should throw the correct error' {
