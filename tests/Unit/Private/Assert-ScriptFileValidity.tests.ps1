@@ -52,7 +52,7 @@ Describe "Assert-ScriptFileValidity" {
             return $true
         }
 
-        InModuleScope Viscalyx.Common {
+        InModuleScope -ScriptBlock {
             Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop'
         }
     }
@@ -66,7 +66,7 @@ Describe "Assert-ScriptFileValidity" {
             return $false
         }
 
-        InModuleScope Viscalyx.Common {
+        InModuleScope -ScriptBlock {
             { Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop' } |
                 Should -Throw -ExpectedMessage 'Hash validation failed for script file: TestScript.ps1. Expected: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
         }
@@ -77,7 +77,7 @@ Describe "Assert-ScriptFileValidity" {
             return $false
         }
 
-        InModuleScope Viscalyx.Common {
+        InModuleScope -ScriptBlock {
             { Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop' } |
                 Should -Throw -ExpectedMessage 'Script file not found: TestScript.ps1'
         }
