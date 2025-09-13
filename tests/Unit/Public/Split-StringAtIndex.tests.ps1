@@ -50,7 +50,12 @@ Describe 'Split-StringAtIndex' {
         }
         @{
             Name = 'StartEndInput'
-            ExpectedParameterSetString = '-InputString <string> -StartIndex <uint> -EndIndex <uint> [<CommonParameters>]'
+            # Windows PowerShell shows uint32, PowerShell 7+ shows uint
+            ExpectedParameterSetString = if ($PSVersionTable.PSVersion.Major -le 5) {
+                '-InputString <string> -StartIndex <uint32> -EndIndex <uint32> [<CommonParameters>]'
+            } else {
+                '-InputString <string> -StartIndex <uint> -EndIndex <uint> [<CommonParameters>]'
+            }
         }
     ) {
         $parameterSet = (Get-Command -Name 'Split-StringAtIndex').ParameterSets |
