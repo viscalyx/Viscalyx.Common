@@ -78,8 +78,10 @@ Describe "Assert-ScriptFileValidity" {
         }
 
         InModuleScope -ScriptBlock {
+            $expectedMessage = $script:localizedData.Assert_ScriptFileValidity_ScriptFileNotFound -f 'TestScript.ps1'
+
             { Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage 'Script file not found: TestScript.ps1'
+                Should -Throw -ExpectedMessage $expectedMessage
         }
     }
 }
