@@ -596,7 +596,7 @@ function Invoke-PesterJob
         Receive-Job -AutoRemoveJob -Wait
 
     # Process source line mapping if enabled
-    if ($EnableSourceLineMapping.IsPresent -and $pesterResult -and $pesterResult.CodeCoverage -and $pesterResult.CodeCoverage.CommandsMissed)
+    if ($EnableSourceLineMapping.IsPresent -and -not $SkipCodeCoverage.IsPresent -and $pesterResult -and $pesterResult.CodeCoverage -and $pesterResult.CodeCoverage.CommandsMissed)
     {
         $commandsMissed = $pesterResult.CodeCoverage.CommandsMissed
 
