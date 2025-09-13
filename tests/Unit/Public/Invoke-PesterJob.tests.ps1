@@ -213,7 +213,7 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should pass Pester result object if PassThru is present' {
                 $params = @{
-                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     PassThru = $true
                 }
 
@@ -226,7 +226,7 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should not show detailed error information as the default' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
                 $null = Invoke-PesterJob @params
@@ -238,7 +238,7 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should show detailed error information if ShowError is present' {
                 $params = @{
-                    Path      = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path      = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     ShowError = $true
                 }
 
@@ -253,7 +253,7 @@ Describe 'Invoke-PesterJob' {
         Context 'Job Execution' {
             It 'Should start a job and receive the result' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
                 $null = Invoke-PesterJob @params
@@ -360,7 +360,7 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should pass Pester result object if PassThru is present' {
                 $params = @{
-                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     PassThru = $true
                 }
 
@@ -373,7 +373,7 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should not show detailed error information as the default' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
                 $null = Invoke-PesterJob @params
@@ -385,7 +385,7 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should show detailed error information if ShowError is present' {
                 $params = @{
-                    Path      = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path      = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     ShowError = $true
                 }
 
@@ -398,7 +398,7 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should skip running tests if SkipRun is present' {
                 $params = @{
-                    Path    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path    = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     SkipRun = $true
                 }
                 $null = Invoke-PesterJob @params
@@ -412,7 +412,7 @@ Describe 'Invoke-PesterJob' {
         Context 'Job Execution' {
             It 'Should start a job and receive the result' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
                 $null = Invoke-PesterJob @params
