@@ -337,7 +337,7 @@ Describe 'Invoke-PesterJob' {
 
                 $null = Invoke-PesterJob @params
 
-                # Minimal verbosity is not supported in Pester v5, it set to Normal if used.
+                # None verbosity is supported in Pester v5.
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Output.Verbosity.Value -eq 'None'
                 }
