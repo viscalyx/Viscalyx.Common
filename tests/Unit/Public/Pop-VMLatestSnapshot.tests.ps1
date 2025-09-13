@@ -112,7 +112,7 @@ Describe 'Pop-VMLatestSnapShot' {
     }
 
     It 'Should call the correct mock with the correct ServerName' {
-        Pop-VMLatestSnapShot -ServerName 'VM1'
+        $null = Pop-VMLatestSnapShot -ServerName 'VM1'
 
         Should -Invoke -CommandName Get-VM -ParameterFilter {
             $Name -eq 'VM1'

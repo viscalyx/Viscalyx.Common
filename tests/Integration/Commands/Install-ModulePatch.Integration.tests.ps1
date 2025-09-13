@@ -66,11 +66,11 @@ Describe 'Install-ModulePatch' {
     }
 
     It 'Should correctly patch ModuleBuilder v3.1.7' {
-        Save-Module -Name 'ModuleBuilder' -RequiredVersion 3.1.7 -Path $TestDrive -Force -ErrorAction 'Stop'
+        $null = Save-Module -Name 'ModuleBuilder' -RequiredVersion 3.1.7 -Path $TestDrive -Force -ErrorAction 'Stop'
 
         $patchPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../patches/ModuleBuilder_3.1.7_patch.json'
 
         # Run Install-ModulePatch
-        Install-ModulePatch -Path $patchPath -Force -ErrorAction 'Stop'
+        $null = Install-ModulePatch -Path $patchPath -Force -ErrorAction 'Stop'
     }
 }

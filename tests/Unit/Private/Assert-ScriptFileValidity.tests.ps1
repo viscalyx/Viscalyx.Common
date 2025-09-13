@@ -53,7 +53,7 @@ Describe "Assert-ScriptFileValidity" {
         }
 
         $null = InModuleScope -ScriptBlock {
-            Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop'
+            $null = Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop'
         }
     }
 

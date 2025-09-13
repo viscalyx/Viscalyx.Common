@@ -13,7 +13,7 @@ BeforeDiscovery {
 
     $script:moduleName = $ProjectName
 
-    Remove-Module -Name $script:moduleName -Force -ErrorAction SilentlyContinue
+    $null = Remove-Module -Name $script:moduleName -Force -ErrorAction SilentlyContinue
 
     $mut = Get-Module -Name $script:moduleName -ListAvailable |
         Select-Object -First 1 |
@@ -240,4 +240,3 @@ Describe 'Help for module' -Tags 'helpQuality' {
         }
     }
 }
-

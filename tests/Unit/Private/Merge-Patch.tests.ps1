@@ -62,7 +62,7 @@ Describe 'Merge-Patch' {
             }
          ) {
             InModuleScope -Parameters $_ -ScriptBlock {
-                Merge-Patch -FilePath "$TestDrive/TestScript.ps1" -PatchEntry $PatchEntry
+                $null = Merge-Patch -FilePath "$TestDrive/TestScript.ps1" -PatchEntry $PatchEntry
             }
 
             Should -Invoke -CommandName Get-Content -Exactly 1 -Scope It
