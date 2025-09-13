@@ -1,4 +1,4 @@
-[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
 param ()
 
 BeforeDiscovery {
@@ -6,14 +6,14 @@ BeforeDiscovery {
     {
         if (-not (Get-Module -Name 'DscResource.Test'))
         {
-            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            # Assumes dependencies have been resolved, so if this module is not available, run 'noop' task.
             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
             {
                 # Redirect all streams to $null, except the error stream (stream 2)
                 & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
             }
 
-            # If the dependencies has not been resolved, this will throw an error.
+            # If the dependencies have not been resolved, this will throw an error.
             Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
         }
     }
@@ -24,13 +24,13 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:dscModuleName = 'Viscalyx.Common'
+    $script:moduleName = 'Viscalyx.Common'
 
-    Import-Module -Name $script:dscModuleName
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 
-    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
 }
 
 AfterAll {
@@ -39,11 +39,11 @@ AfterAll {
     $PSDefaultParameterValues.Remove('Should:ModuleName')
 
     # Unload the module being tested so that it doesn't impact any other tests.
-    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
 Describe "Assert-ScriptFileValidity" {
-    It "Should validate module version and existence" {
+    It "Should succeed when the file exists and the hash matches" {
         Mock -CommandName Test-Path -MockWith {
             return $true
         }
@@ -52,12 +52,12 @@ Describe "Assert-ScriptFileValidity" {
             return $true
         }
 
-        InModuleScope Viscalyx.Common {
-            Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop'
+        $null = InModuleScope -ScriptBlock {
+            $null = Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop'
         }
     }
 
-    It "Should validate module version and existence" {
+    It "Should throw when the hash does not match" {
         Mock -CommandName Test-Path -MockWith {
             return $true
         }
@@ -66,20 +66,24 @@ Describe "Assert-ScriptFileValidity" {
             return $false
         }
 
-        InModuleScope Viscalyx.Common {
+        InModuleScope -ScriptBlock {
+            $expectedMessage = $script:localizedData.Assert_ScriptFileValidity_HashValidationFailed -f 'TestScript.ps1', '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+
             { Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage 'Hash validation failed for script file: TestScript.ps1. Expected: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+                Should -Throw -ExpectedMessage $expectedMessage
         }
     }
 
-    It "Should validate module version and existence" {
+    It "Should throw when the script file does not exist" {
         Mock -CommandName Test-Path -MockWith {
             return $false
         }
 
-        InModuleScope Viscalyx.Common {
+        InModuleScope -ScriptBlock {
+            $expectedMessage = $script:localizedData.Assert_ScriptFileValidity_ScriptFileNotFound -f 'TestScript.ps1'
+
             { Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage 'Script file not found: TestScript.ps1'
+                Should -Throw -ExpectedMessage $expectedMessage
         }
     }
 }

@@ -1,4 +1,4 @@
-[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
 param ()
 
 BeforeDiscovery {
@@ -6,14 +6,14 @@ BeforeDiscovery {
     {
         if (-not (Get-Module -Name 'DscResource.Test'))
         {
-            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            # Assumes dependencies have been resolved, so if this module is not available, run 'noop' task.
             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
             {
                 # Redirect all streams to $null, except the error stream (stream 2)
                 & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
             }
 
-            # If the dependencies has not been resolved, this will throw an error.
+            # If the dependencies have not been resolved, this will throw an error.
             Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
         }
     }
@@ -24,13 +24,13 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:dscModuleName = 'Viscalyx.Common'
+    $script:moduleName = 'Viscalyx.Common'
 
-    Import-Module -Name $script:dscModuleName
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 
-    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
 }
 
 AfterAll {
@@ -39,10 +39,24 @@ AfterAll {
     $PSDefaultParameterValues.Remove('Should:ModuleName')
 
     # Unload the module being tested so that it doesn't impact any other tests.
-    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
 Describe 'Invoke-PesterJob' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     # Mock external dependencies
     BeforeAll {
         New-Item -Path $TestDrive -ItemType Directory -Name 'MockPath' | Out-Null
@@ -128,7 +142,7 @@ Describe 'Invoke-PesterJob' {
 
         Context 'When using default parameter values' {
             It 'Should use current location for Path and RootPath' {
-                Invoke-PesterJob
+                $null = Invoke-PesterJob
 
                 Should -Invoke -CommandName Get-Location -Times 2
             }
@@ -141,7 +155,7 @@ Describe 'Invoke-PesterJob' {
                     RootPath = $TestDrive
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
             }
         }
 
@@ -152,7 +166,7 @@ Describe 'Invoke-PesterJob' {
                     Tag  = 'Unit'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
             }
         }
 
@@ -162,7 +176,7 @@ Describe 'Invoke-PesterJob' {
                     Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Show -eq 'All'
@@ -175,7 +189,7 @@ Describe 'Invoke-PesterJob' {
                     Output = 'Minimal'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Show -eq 'Minimal'
@@ -190,7 +204,7 @@ Describe 'Invoke-PesterJob' {
                     SkipCodeCoverage = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Keys -notcontains 'CodeCoverage'
@@ -199,11 +213,11 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should pass Pester result object if PassThru is present' {
                 $params = @{
-                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     PassThru = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Keys -contains 'PassThru'
@@ -212,10 +226,10 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should not show detailed error information as the default' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[1] -eq $false
@@ -224,11 +238,11 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should show detailed error information if ShowError is present' {
                 $params = @{
-                    Path      = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path      = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     ShowError = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[1] -eq $true
@@ -239,10 +253,10 @@ Describe 'Invoke-PesterJob' {
         Context 'Job Execution' {
             It 'Should start a job and receive the result' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job
                 Should -Invoke -CommandName Receive-Job
@@ -260,7 +274,7 @@ Describe 'Invoke-PesterJob' {
 
         Context 'When using default parameter values' {
             It 'Should use current location for Path and RootPath' {
-                Invoke-PesterJob
+                $null = Invoke-PesterJob
 
                 Should -Invoke -CommandName Get-Location -Times 2
             }
@@ -273,7 +287,7 @@ Describe 'Invoke-PesterJob' {
                     RootPath = $TestDrive
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
             }
         }
 
@@ -284,7 +298,7 @@ Describe 'Invoke-PesterJob' {
                     Tag  = 'Unit'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
             }
         }
 
@@ -294,7 +308,7 @@ Describe 'Invoke-PesterJob' {
                     Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Output.Verbosity.Value -eq 'Detailed'
@@ -307,7 +321,7 @@ Describe 'Invoke-PesterJob' {
                     Output = 'Minimal'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 # Minimal verbosity is not supported in Pester v5, it set to Normal if used.
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
@@ -321,9 +335,9 @@ Describe 'Invoke-PesterJob' {
                     Output = 'None'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
-                # Minimal verbosity is not supported in Pester v5, it set to Normal if used.
+                # None verbosity is supported in Pester v5.
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Output.Verbosity.Value -eq 'None'
                 }
@@ -337,7 +351,7 @@ Describe 'Invoke-PesterJob' {
                     SkipCodeCoverage = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].CodeCoverage.Enabled.Value -eq $false
@@ -346,11 +360,11 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should pass Pester result object if PassThru is present' {
                 $params = @{
-                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     PassThru = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Run.PassThru.Value -eq $true
@@ -359,10 +373,10 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should not show detailed error information as the default' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[1] -eq $false
@@ -371,11 +385,11 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should show detailed error information if ShowError is present' {
                 $params = @{
-                    Path      = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path      = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     ShowError = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[1] -eq $true
@@ -384,10 +398,10 @@ Describe 'Invoke-PesterJob' {
 
             It 'Should skip running tests if SkipRun is present' {
                 $params = @{
-                    Path    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path    = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     SkipRun = $true
                 }
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Run.SkipRun.Value -eq $true
@@ -398,10 +412,10 @@ Describe 'Invoke-PesterJob' {
         Context 'Job Execution' {
             It 'Should start a job and receive the result' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job
                 Should -Invoke -CommandName Receive-Job
