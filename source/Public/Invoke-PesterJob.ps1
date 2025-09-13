@@ -332,7 +332,7 @@ function Invoke-PesterJob
                 Write-Information -MessageData 'Could not import Pester. Running build script to make sure required modules is available in session. This can take a few seconds.' -InformationAction 'Continue'
 
                 # Redirect all streams to $null, except the error stream (stream 2)
-                & $BuildScriptPath @buildScriptParameter 2>&1 4>&1 5>&1 6>&1 > $null
+                & $BuildScriptPath @buildScriptParameter 3>&1 4>&1 5>&1 6>&1 > $null
             }
             else
             {
