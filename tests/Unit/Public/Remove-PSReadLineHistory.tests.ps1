@@ -82,7 +82,7 @@ Describe 'Remove-PSReadLineHistory' {
                     Out-Difference -Difference $Value -Reference $expectedContent | Write-Verbose -Verbose
                 }
 
-                # Compare-Object returns 0 when equal.
+                # Compare-Object returns $null (no output) when equal.
                 -not $compareResult
             }
         }
