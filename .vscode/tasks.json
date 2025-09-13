@@ -40,17 +40,11 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "&${cwd}/build.ps1",
+            "command": "& '${cwd}/build.ps1' -AutoRestore -Tasks build -UseModuleFast",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "args": [
-                "-AutoRestore",
-                "-UseModuleFast",
-                "-Tasks",
-                "build"
-            ],
             "presentation": {
                 "echo": true,
                 "reveal": "always",
@@ -59,6 +53,7 @@
                 "clear": false
             },
             "runOptions": {
+
                 "runOn": "default"
             },
             "problemMatcher": [
@@ -92,7 +87,7 @@
         {
             "label": "test",
             "type": "shell",
-            "command": "./build.ps1 -Task noop;Invoke-PesterJob -Path './tests/Unit/Classes','./tests/Unit/Private','./tests/Unit/Public','./tests/QA' -SkipCodeCoverage",
+            "command": "./build.ps1 -Tasks noop;Invoke-PesterJob -Path './tests/Unit/Classes','./tests/Unit/Private','./tests/Unit/Public','./tests/QA' -SkipCodeCoverage",
             "group": {
                 "kind": "test",
                 "isDefault": true
@@ -136,7 +131,7 @@
         {
             "label": "test-with-coverage",
             "type": "shell",
-            "command": "./build.ps1 -Task noop;Invoke-PesterJob -Path './tests/Unit/Classes','./tests/Unit/Private','./tests/Unit/Public','./tests/QA'",
+            "command": "./build.ps1 -Tasks noop;Invoke-PesterJob -Path './tests/Unit/Classes','./tests/Unit/Private','./tests/Unit/Public','./tests/QA'",
             "group": {
                 "kind": "test",
                 "isDefault": false
