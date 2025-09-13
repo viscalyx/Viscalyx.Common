@@ -50,6 +50,14 @@
     .PARAMETER PassThru
         Indicates whether to pass the Pester result object through.
 
+    .PARAMETER EnableSourceLineMapping
+        Indicates whether to enable source line mapping for code coverage results.
+        When enabled, this feature maps code coverage lines from the built module
+        files back to their corresponding lines in the source files using ModuleBuilder's
+        Convert-LineNumber command. This also automatically enables the PassThru
+        parameter as it is required for this feature. Requires ModuleBuilder module
+        to be available.
+
     .PARAMETER ShowError
         Indicates whether to display detailed error information. When using this
         to debug a test it is recommended to run as few tests as possible, or just
@@ -110,10 +118,26 @@
         Runs the discovery phase on all the Pester tests files located in the
         'tests/Unit' folder and outputs the Pester result object.
 
+    .EXAMPLE
+        $pesterResult = Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping
+        $pesterResult.CodeCoverage.CommandsMissed |
+            Where-Object -FilterScript { $_.Function -like 'Get-Something' } |
+            Convert-LineNumber -PassThru |
+            Select-Object -Property Class, Function, Command, SourceLineNumber, SourceFile
+
+        Runs Pester tests located in the 'tests/Unit' folder with source line
+        mapping enabled. After running, gets all commands that were missed with
+        a reference to the SourceLineNumber in SourceFile for the 'Get-Something'
+        command.
+
     .NOTES
         This function requires the Pester module to be imported. If the module is
         not available, it will attempt to run the build script to ensure the
         required modules are available in the session.
+
+        When EnableSourceLineMapping is used, the ModuleBuilder module is required
+        unless running in a Sampler project environment where it is assumed to be
+        available.
 #>
 function Invoke-PesterJob
 {
@@ -276,6 +300,10 @@ function Invoke-PesterJob
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
+        $EnableSourceLineMapping,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
         $ShowError,
 
         [Parameter()]
@@ -342,6 +370,34 @@ function Invoke-PesterJob
     } until ($importedPesterModule)
 
     Write-Information -MessageData ('Using imported Pester v{0}.' -f $pesterModuleVersion) -InformationAction 'Continue'
+
+    # Check for EnableSourceLineMapping requirements
+    if ($EnableSourceLineMapping.IsPresent)
+    {
+        # Auto-enable PassThru as it's required for source line mapping
+        if (-not $PassThru.IsPresent)
+        {
+            $PassThru = $true
+        }
+
+        # Check for ModuleBuilder availability if not a Sampler project
+        if (-not $isSamplerProject)
+        {
+            $moduleBuilderModule = Get-Module -Name 'ModuleBuilder' -ListAvailable -ErrorAction 'SilentlyContinue'
+            
+            if (-not $moduleBuilderModule)
+            {
+                $PSCmdlet.ThrowTerminatingError(
+                    [System.Management.Automation.ErrorRecord]::new(
+                        [System.InvalidOperationException]::new($script:localizedData.Invoke_PesterJob_ModuleBuilderRequired),
+                        'ModuleBuilderNotFound',
+                        [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                        'ModuleBuilder'
+                    )
+                )
+            }
+        }
+    }
 
     if (-not $PSBoundParameters.ContainsKey('ModuleName'))
     {

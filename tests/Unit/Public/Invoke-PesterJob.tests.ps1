@@ -250,6 +250,36 @@ Describe 'Invoke-PesterJob' {
         }
     }
 
+    Context 'When testing parameter sets' {
+        BeforeAll {
+            Mock -CommandName Get-Module # Mocked with nothing, to mimic not finding Sampler module
+            Mock -CommandName Get-ModuleVersion -MockWith { return '5.4.0' }
+            Mock -CommandName Import-Module -MockWith { return @{ Version = [version] '5.4.0' } }
+        }
+
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
+        }
+
+        It 'Should have EnableSourceLineMapping as a non-mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Invoke-PesterJob').Parameters['EnableSourceLineMapping']
+            $parameterInfo.Attributes.Mandatory | Should -BeFalse
+            $parameterInfo.ParameterType.FullName | Should -Be 'System.Management.Automation.SwitchParameter'
+        }
+    }
+
     Context 'When using Pester v5' {
         BeforeAll {
             Mock -CommandName Get-Module -MockWith { return @{ Version = [version] '5.4.0' } }
@@ -405,6 +435,102 @@ Describe 'Invoke-PesterJob' {
 
                 Should -Invoke -CommandName Start-Job
                 Should -Invoke -CommandName Receive-Job
+            }
+        }
+
+        Context 'When using EnableSourceLineMapping parameter' {
+            Context 'When in a Sampler project' {
+                BeforeAll {
+                    # Mock Get-Module to return Sampler module to simulate Sampler project
+                    Mock -CommandName Get-Module -MockWith { 
+                        param($Name)
+                        if ($Name -eq 'Sampler') {
+                            return @{ Name = 'Sampler'; Version = [version] '0.118.3' }
+                        }
+                        elseif ($Name -eq 'Pester') {
+                            return @{ Version = [version] '5.4.0' }
+                        }
+                        return $null
+                    }
+                }
+
+                It 'Should auto-enable PassThru when EnableSourceLineMapping is used' {
+                    $params = @{
+                        Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        EnableSourceLineMapping = $true
+                    }
+
+                    Invoke-PesterJob @params
+
+                    Should -Invoke -CommandName Start-Job -ParameterFilter {
+                        $ArgumentList[0].Run.PassThru.Value -eq $true
+                    }
+                }
+
+                It 'Should not require ModuleBuilder check in Sampler project' {
+                    $params = @{
+                        Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        EnableSourceLineMapping = $true
+                    }
+
+                    { Invoke-PesterJob @params } | Should -Not -Throw
+                }
+            }
+
+            Context 'When not in a Sampler project' {
+                BeforeAll {
+                    # Mock Get-Module to return no Sampler module but with ModuleBuilder available
+                    Mock -CommandName Get-Module -MockWith { 
+                        param($Name, $ListAvailable)
+                        if ($Name -eq 'Sampler') {
+                            return $null
+                        }
+                        elseif ($Name -eq 'Pester') {
+                            return @{ Version = [version] '5.4.0' }
+                        }
+                        elseif ($Name -eq 'ModuleBuilder' -and $ListAvailable) {
+                            return @{ Name = 'ModuleBuilder'; Version = [version] '3.0.0' }
+                        }
+                        return $null
+                    }
+                }
+
+                It 'Should not throw when ModuleBuilder is available' {
+                    $params = @{
+                        Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        EnableSourceLineMapping = $true
+                    }
+
+                    { Invoke-PesterJob @params } | Should -Not -Throw
+                }
+            }
+
+            Context 'When not in a Sampler project and ModuleBuilder is not available' {
+                BeforeAll {
+                    # Mock Get-Module to return no Sampler module and no ModuleBuilder
+                    Mock -CommandName Get-Module -MockWith { 
+                        param($Name, $ListAvailable)
+                        if ($Name -eq 'Sampler') {
+                            return $null
+                        }
+                        elseif ($Name -eq 'Pester') {
+                            return @{ Version = [version] '5.4.0' }
+                        }
+                        elseif ($Name -eq 'ModuleBuilder') {
+                            return $null
+                        }
+                        return $null
+                    }
+                }
+
+                It 'Should throw error when ModuleBuilder is not available' {
+                    $params = @{
+                        Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        EnableSourceLineMapping = $true
+                    }
+
+                    { Invoke-PesterJob @params } | Should -Throw -ErrorId 'ModuleBuilderNotFound,Invoke-PesterJob'
+                }
             }
         }
     }

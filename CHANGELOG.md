@@ -5,6 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Invoke-PesterJob`
+  - Added new switch parameter `EnableSourceLineMapping` to map code coverage
+    lines from built module files back to their corresponding source files
+    using ModuleBuilder's Convert-LineNumber command. When enabled, this
+    parameter automatically enables PassThru and requires ModuleBuilder
+    module unless running in a Sampler project environment.
+
 ### Fixed
 
 - Improved handling escape character in tests.

@@ -93,4 +93,7 @@ ConvertFrom-StringData @'
 
     ## Get-TextOffset
     TextNotFoundWarning = Text '{0}' not found in the file '{1}'.
+
+    ## Invoke-PesterJob
+    Invoke_PesterJob_ModuleBuilderRequired = The ModuleBuilder module is required for source line mapping but is not available. Please install the ModuleBuilder module or run the command in a Sampler project environment. (IPJ0001)
 '@
