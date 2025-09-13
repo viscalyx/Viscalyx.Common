@@ -113,4 +113,3 @@ Describe 'Pop-VMLatestSnapShot' {
         Should -Invoke -CommandName Start-VM -Exactly -Times 1 -Scope It
     }
 }
-

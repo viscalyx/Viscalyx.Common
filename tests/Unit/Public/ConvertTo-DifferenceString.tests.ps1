@@ -167,4 +167,3 @@ Describe '-join (ConvertTo-DifferenceString' {
          )
     }
 }
-

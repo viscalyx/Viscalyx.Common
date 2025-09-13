@@ -93,4 +93,3 @@ Describe 'Remove-PSHistory' {
         Should -Invoke -CommandName Clear-History -ParameterFilter { $Id -eq 2 } -Exactly 1 -Scope It
     }
 }
-

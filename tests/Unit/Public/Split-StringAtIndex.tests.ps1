@@ -98,4 +98,3 @@ Describe 'Split-StringAtIndex' {
         }
     }
 }
-

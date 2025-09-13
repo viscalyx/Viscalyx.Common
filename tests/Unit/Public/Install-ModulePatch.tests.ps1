@@ -207,4 +207,3 @@ Describe 'Install-ModulePatch' {
         }
     }
 }
-

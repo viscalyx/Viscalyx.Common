@@ -63,4 +63,3 @@ Describe 'ConvertTo-RelativePath' {
         $result | Should -Be '/other/path/ConvertTo-RelativePath.ps1'
     }
 }
-

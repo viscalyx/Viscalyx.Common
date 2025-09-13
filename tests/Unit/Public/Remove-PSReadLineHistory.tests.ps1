@@ -140,4 +140,3 @@ Describe 'Remove-PSReadLineHistory' {
         }
     }
 }
-

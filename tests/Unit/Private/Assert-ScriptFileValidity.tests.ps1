@@ -83,4 +83,3 @@ Describe "Assert-ScriptFileValidity" {
         }
     }
 }
-

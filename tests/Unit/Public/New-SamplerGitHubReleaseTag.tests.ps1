@@ -140,4 +140,3 @@ Describe 'New-SamplerGitHubReleaseTag' {
         { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -PushTag -Force } | Should -Not -Throw
     }
 }
-

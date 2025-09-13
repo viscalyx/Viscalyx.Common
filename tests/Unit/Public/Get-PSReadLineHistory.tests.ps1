@@ -92,4 +92,3 @@ Describe 'Get-PSReadLineHistory' {
         $result | Should-BeEquivalent $expected
     }
 }
-

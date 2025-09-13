@@ -87,4 +87,3 @@ Describe 'ConvertTo-AnsiSequence' {
         $result | Should-BeString "$($esc)[31;3;5m"
     }
 }
-

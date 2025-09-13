@@ -87,4 +87,3 @@ Describe "Get-NumericalSequence" {
         $result | Should-BeEquivalent $expected
     }
 }
-
