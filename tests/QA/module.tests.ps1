@@ -102,7 +102,7 @@ Describe 'General module control' -Tags 'FunctionalQuality' {
     It 'Should remove without error' {
         { Remove-Module -Name $script:moduleName -ErrorAction Stop } | Should -Not -Throw
 
-        Get-Module $script:moduleName | Should -BeNullOrEmpty
+        Get-Module -Name $script:moduleName | Should -BeNullOrEmpty
     }
 }
 
