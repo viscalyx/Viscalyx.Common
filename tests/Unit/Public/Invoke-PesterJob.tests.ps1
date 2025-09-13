@@ -46,7 +46,7 @@ Describe 'Invoke-PesterJob' {
     It 'Should have the expected parameter set <Name>' -ForEach @(
         @{
             Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-CoverageFilterName <string>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
         }
     ) {
         $parameterSet = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
@@ -274,7 +274,7 @@ Describe 'Invoke-PesterJob' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+                ExpectedParameters = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-CoverageFilterName <string>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
@@ -545,6 +545,15 @@ Describe 'Invoke-PesterJob' {
 
                     { Invoke-PesterJob @params } | Should -Throw -ErrorId 'ModuleBuilderNotFound,Invoke-PesterJob'
                 }
+            }
+        }
+
+        Context 'When using CoverageFilterName parameter' {
+            It 'Should have CoverageFilterName as a non-mandatory parameter' {
+                $parameterInfo = (Get-Command -Name 'Invoke-PesterJob').Parameters['CoverageFilterName']
+
+                $parameterInfo.Attributes.Mandatory | Should -BeFalse
+                $parameterInfo.ParameterType | Should -Be ([System.String])
             }
         }
     }

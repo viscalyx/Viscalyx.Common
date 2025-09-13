@@ -58,6 +58,11 @@
         parameter as it is required for this feature. Requires ModuleBuilder module
         to be available.
 
+    .PARAMETER CoverageFilterName
+        Specifies a filter pattern for code coverage results when EnableSourceLineMapping
+        is used. The pattern supports wildcards and is used to filter commands by
+        function or class name. If not specified, all missed lines are returned.
+
     .PARAMETER ShowError
         Indicates whether to display detailed error information. When using this
         to debug a test it is recommended to run as few tests as possible, or just
@@ -119,16 +124,20 @@
         'tests/Unit' folder and outputs the Pester result object.
 
     .EXAMPLE
-        $pesterResult = Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping
-        $pesterResult.CodeCoverage.CommandsMissed |
-            Where-Object -FilterScript { $_.Function -like 'Get-Something' } |
-            Convert-LineNumber -PassThru |
-            Select-Object -Property Class, Function, Command, SourceLineNumber, SourceFile
+        Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping -CoverageFilterName 'Get-Something'
 
         Runs Pester tests located in the 'tests/Unit' folder with source line
-        mapping enabled. After running, gets all commands that were missed with
-        a reference to the SourceLineNumber in SourceFile for the 'Get-Something'
-        command.
+        mapping enabled. After running, automatically processes and returns all
+        commands that were missed for functions or classes matching 'Get-Something'
+        with a reference to the SourceLineNumber in SourceFile.
+
+    .EXAMPLE
+        Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping
+
+        Runs Pester tests located in the 'tests/Unit' folder with source line
+        mapping enabled. After running, automatically processes and returns all
+        commands that were missed with a reference to the SourceLineNumber in
+        SourceFile for all functions and classes.
 
     .NOTES
         This function requires the Pester module to be imported. If the module is
@@ -301,6 +310,11 @@ function Invoke-PesterJob
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $EnableSourceLineMapping,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $CoverageFilterName,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -523,7 +537,7 @@ function Invoke-PesterJob
         }
     }
 
-    Start-Job -ScriptBlock {
+    $pesterResult = Start-Job -ScriptBlock {
         [CmdletBinding()]
         param
         (
@@ -580,4 +594,28 @@ function Invoke-PesterJob
         $BuildScriptParameter
     ) |
         Receive-Job -AutoRemoveJob -Wait
+
+    # Process source line mapping if enabled
+    if ($EnableSourceLineMapping.IsPresent -and $pesterResult -and $pesterResult.CodeCoverage -and $pesterResult.CodeCoverage.CommandsMissed)
+    {
+        $commandsMissed = $pesterResult.CodeCoverage.CommandsMissed
+
+        # Apply filter if specified
+        if ($PSBoundParameters.ContainsKey('CoverageFilterName'))
+        {
+            $commandsMissed = $commandsMissed | Where-Object -FilterScript { 
+                $_.Function -like $CoverageFilterName -or $_.Class -like $CoverageFilterName 
+            }
+        }
+
+        # Convert line numbers and return the processed result
+        $commandsMissed |
+            Convert-LineNumber -PassThru |
+            Select-Object -Property Class, Function, Command, SourceLineNumber, SourceFile
+    }
+    else
+    {
+        # Return the original result when not using source line mapping
+        $pesterResult
+    }
 }
