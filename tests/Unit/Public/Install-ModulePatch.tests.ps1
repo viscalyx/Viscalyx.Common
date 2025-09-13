@@ -107,7 +107,7 @@ Describe 'Install-ModulePatch' {
         }
 
         It 'Should apply patches from local file' {
-            Install-ModulePatch -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop'
+            $null = Install-ModulePatch -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop'
 
             Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 0 -Scope It
             Should -Invoke -CommandName Get-PatchFileContentFromPath -Exactly 1 -Scope It
@@ -115,7 +115,7 @@ Describe 'Install-ModulePatch' {
         }
 
         It 'Should apply patches from URL' {
-            Install-ModulePatch -Force -URI 'https://gist.githubusercontent.com/user/gistid/raw/TestModule_1.0.0_patch.json' -ErrorAction 'Stop'
+            $null = Install-ModulePatch -Force -URI 'https://gist.githubusercontent.com/user/gistid/raw/TestModule_1.0.0_patch.json' -ErrorAction 'Stop'
 
             Should -Invoke -CommandName Get-PatchFileContentFromPath -Exactly 0 -Scope It
             Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 1 -Scope It
@@ -123,7 +123,7 @@ Describe 'Install-ModulePatch' {
         }
 
         It 'Should be able to skip hash validation' {
-            Install-ModulePatch -SkipHashValidation -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop'
+            $null = Install-ModulePatch -SkipHashValidation -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop'
 
             Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 0 -Scope It
             Should -Invoke -CommandName Get-PatchFileContentFromPath -Exactly 1 -Scope It
@@ -177,7 +177,7 @@ Describe 'Install-ModulePatch' {
         }
 
         It 'Should apply patches from local file' {
-            Install-ModulePatch -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'SilentlyContinue'
+            $null = Install-ModulePatch -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'SilentlyContinue'
 
             Should -Invoke -CommandName Get-PatchFileContentFromURI -Exactly 0 -Scope It
             Should -Invoke -CommandName Get-PatchFileContentFromPath -Exactly 1 -Scope It

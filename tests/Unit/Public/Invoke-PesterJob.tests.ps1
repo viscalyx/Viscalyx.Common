@@ -142,7 +142,7 @@ Describe 'Invoke-PesterJob' {
 
         Context 'When using default parameter values' {
             It 'Should use current location for Path and RootPath' {
-                Invoke-PesterJob
+                $null = Invoke-PesterJob
 
                 Should -Invoke -CommandName Get-Location -Times 2
             }
@@ -155,7 +155,7 @@ Describe 'Invoke-PesterJob' {
                     RootPath = $TestDrive
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
             }
         }
 
@@ -189,7 +189,7 @@ Describe 'Invoke-PesterJob' {
                     Output = 'Minimal'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Show -eq 'Minimal'
@@ -204,7 +204,7 @@ Describe 'Invoke-PesterJob' {
                     SkipCodeCoverage = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Keys -notcontains 'CodeCoverage'
@@ -217,7 +217,7 @@ Describe 'Invoke-PesterJob' {
                     PassThru = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Keys -contains 'PassThru'
@@ -229,7 +229,7 @@ Describe 'Invoke-PesterJob' {
                     Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[1] -eq $false
@@ -242,7 +242,7 @@ Describe 'Invoke-PesterJob' {
                     ShowError = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[1] -eq $true
@@ -256,7 +256,7 @@ Describe 'Invoke-PesterJob' {
                     Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job
                 Should -Invoke -CommandName Receive-Job
@@ -274,7 +274,7 @@ Describe 'Invoke-PesterJob' {
 
         Context 'When using default parameter values' {
             It 'Should use current location for Path and RootPath' {
-                Invoke-PesterJob
+                $null = Invoke-PesterJob
 
                 Should -Invoke -CommandName Get-Location -Times 2
             }
@@ -287,7 +287,7 @@ Describe 'Invoke-PesterJob' {
                     RootPath = $TestDrive
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
             }
         }
 
@@ -298,7 +298,7 @@ Describe 'Invoke-PesterJob' {
                     Tag  = 'Unit'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
             }
         }
 
@@ -308,7 +308,7 @@ Describe 'Invoke-PesterJob' {
                     Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Output.Verbosity.Value -eq 'Detailed'
@@ -321,7 +321,7 @@ Describe 'Invoke-PesterJob' {
                     Output = 'Minimal'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 # Minimal verbosity is not supported in Pester v5, it set to Normal if used.
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
@@ -335,7 +335,7 @@ Describe 'Invoke-PesterJob' {
                     Output = 'None'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 # Minimal verbosity is not supported in Pester v5, it set to Normal if used.
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
@@ -351,7 +351,7 @@ Describe 'Invoke-PesterJob' {
                     SkipCodeCoverage = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].CodeCoverage.Enabled.Value -eq $false
@@ -364,7 +364,7 @@ Describe 'Invoke-PesterJob' {
                     PassThru = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Run.PassThru.Value -eq $true
@@ -376,7 +376,7 @@ Describe 'Invoke-PesterJob' {
                     Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[1] -eq $false
@@ -389,7 +389,7 @@ Describe 'Invoke-PesterJob' {
                     ShowError = $true
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[1] -eq $true
@@ -401,7 +401,7 @@ Describe 'Invoke-PesterJob' {
                     Path    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                     SkipRun = $true
                 }
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Run.SkipRun.Value -eq $true
@@ -415,7 +415,7 @@ Describe 'Invoke-PesterJob' {
                     Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job
                 Should -Invoke -CommandName Receive-Job
