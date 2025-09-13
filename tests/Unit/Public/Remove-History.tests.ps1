@@ -53,7 +53,7 @@ Describe 'Remove-History' {
         $pattern = ".*\.txt"
 
         # Act
-        Viscalyx.Common\Remove-History -Pattern $pattern
+        $null = Viscalyx.Common\Remove-History -Pattern $pattern
 
         # Assert
         Should -Invoke -CommandName Remove-PSReadLineHistory -Exactly -Times 1 -Scope It -ParameterFilter {
@@ -70,7 +70,7 @@ Describe 'Remove-History' {
         $pattern = './build.ps1'
 
         # Act
-        Viscalyx.Common\Remove-History -Pattern $pattern -EscapeRegularExpression
+        $null = Viscalyx.Common\Remove-History -Pattern $pattern -EscapeRegularExpression
 
         # Assert
         Should -Invoke -CommandName Remove-PSReadLineHistory -Exactly -Times 1 -Scope It -ParameterFilter {
