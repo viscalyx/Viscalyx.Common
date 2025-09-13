@@ -52,7 +52,7 @@ Describe "Assert-ScriptFileValidity" {
             return $true
         }
 
-        InModuleScope -ScriptBlock {
+        $null = InModuleScope -ScriptBlock {
             Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop'
         }
     }
@@ -67,8 +67,10 @@ Describe "Assert-ScriptFileValidity" {
         }
 
         InModuleScope -ScriptBlock {
+            $expectedMessage = $script:localizedData.Assert_ScriptFileValidity_HashValidationFailed -f 'TestScript.ps1', '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+
             { Assert-ScriptFileValidity -FilePath 'TestScript.ps1' -Hash '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage 'Hash validation failed for script file: TestScript.ps1. Expected: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+                Should -Throw -ExpectedMessage $expectedMessage
         }
     }
 
