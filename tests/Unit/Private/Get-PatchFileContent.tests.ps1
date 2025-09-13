@@ -60,7 +60,7 @@ Describe 'Get-PatchFileContent' {
 ]
 '@
 
-                Get-PatchFileContent -JsonContent $jsonContent
+                $result = Get-PatchFileContent -JsonContent $jsonContent
             }
 
             $result | Should -BeOfType ([PSCustomObject])

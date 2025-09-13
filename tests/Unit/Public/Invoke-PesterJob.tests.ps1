@@ -166,7 +166,7 @@ Describe 'Invoke-PesterJob' {
                     Tag  = 'Unit'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
             }
         }
 
@@ -176,7 +176,7 @@ Describe 'Invoke-PesterJob' {
                     Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 }
 
-                Invoke-PesterJob @params
+                $null = Invoke-PesterJob @params
 
                 Should -Invoke -CommandName Start-Job -ParameterFilter {
                     $ArgumentList[0].Show -eq 'All'
