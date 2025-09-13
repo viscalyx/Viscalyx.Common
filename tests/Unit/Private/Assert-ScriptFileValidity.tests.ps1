@@ -43,7 +43,7 @@ AfterAll {
 }
 
 Describe "Assert-ScriptFileValidity" {
-    It "Should validate module version and existence" {
+    It "Should succeed when the file exists and the hash matches" {
         Mock -CommandName Test-Path -MockWith {
             return $true
         }
@@ -57,7 +57,7 @@ Describe "Assert-ScriptFileValidity" {
         }
     }
 
-    It "Should validate module version and existence" {
+    It "Should throw when the hash does not match" {
         Mock -CommandName Test-Path -MockWith {
             return $true
         }
@@ -74,7 +74,7 @@ Describe "Assert-ScriptFileValidity" {
         }
     }
 
-    It "Should validate module version and existence" {
+    It "Should throw when the script file does not exist" {
         Mock -CommandName Test-Path -MockWith {
             return $false
         }
