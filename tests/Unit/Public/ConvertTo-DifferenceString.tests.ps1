@@ -42,7 +42,7 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe '-join (ConvertTo-DifferenceString' {
+Describe 'ConvertTo-DifferenceString' {
     BeforeAll {
         $esc = [System.Char] 0x1b
     }
