@@ -104,6 +104,6 @@ Describe 'Remove-PSHistory' {
 
         # Assert
         Should -Invoke -CommandName Clear-History -Exactly 1 -Scope It
-        Should -Invoke -CommandName Clear-History -ParameterFilter { $Id -eq 2 } -Exactly 1 -Scope It
+        Should -Invoke -CommandName Clear-History -ParameterFilter { $Id -eq 2 } -Exactly -Times 1 -Scope It
     }
 }
