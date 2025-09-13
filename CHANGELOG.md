@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Improved handling escape character in tests.
 - Fix build configuration due to changes in DscResource.DocGenerator.
-- Fix error stream redirection in all test files to preserve error stream visibility [issue #32](https://github.com/viscalyx/Viscalyx.Common/issues/32)
+- Fix error stream redirection in all test files to preserve error stream
+  visibility ([issue #32](https://github.com/viscalyx/Viscalyx.Common/issues/32)).
+- Fixed stream redirection in integration tests.
+- Improved test code quality and accuracy.
 
 ### Changed
 
