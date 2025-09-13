@@ -48,7 +48,7 @@ Describe 'Remove-History' {
         Mock -CommandName Remove-PSHistory
     }
 
-    It 'Should removes entries matching a pattern' {
+    It 'Should remove entries matching a pattern' {
         # Arrange
         $pattern = ".*\.txt"
 
