@@ -36,7 +36,7 @@ BeforeAll {
     $script:originalPSModulePath = $env:PSModulePath
 
     # Add $TestDrive to the beginning of PSModulePath
-    $env:PSModulePath = "$TestDrive;$env:PSModulePath"
+    $env:PSModulePath = "{0}{1}{2}" -f $TestDrive, [System.IO.Path]::PathSeparator, $env:PSModulePath
 }
 
 AfterAll {
