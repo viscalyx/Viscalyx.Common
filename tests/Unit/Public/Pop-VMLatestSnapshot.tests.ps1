@@ -42,7 +42,7 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe 'Pop-VMLatestSnapShot' {
+Describe 'Pop-VMLatestSnapshot' {
     It 'Should have the expected parameter set <Name>' -ForEach @(
         @{
             Name = '__AllParameterSets'
@@ -112,7 +112,7 @@ Describe 'Pop-VMLatestSnapShot' {
     }
 
     It 'Should call the correct mock with the correct ServerName' {
-        $null = Pop-VMLatestSnapShot -ServerName 'VM1'
+        $null = Pop-VMLatestSnapshot -ServerName 'VM1'
 
         Should -Invoke -CommandName Get-VM -ParameterFilter {
             $Name -eq 'VM1'

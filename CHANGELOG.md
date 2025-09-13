@@ -90,7 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Invoke-PesterJob`
   - `New-SamplerGitHubReleaseTag`
   - `Out-Difference`
-  - `Pop-VMLatestSnapShot`
+  - `Pop-VMLatestSnapshot`
   - `Remove-History`
   - `Remove-PSHistory`
   - `Remove-PSReadLineHistory`
