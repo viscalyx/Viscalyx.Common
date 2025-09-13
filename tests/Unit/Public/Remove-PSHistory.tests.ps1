@@ -66,7 +66,7 @@ Describe 'Remove-PSHistory' {
         Mock -CommandName Clear-History
     }
 
-    It 'Should removes history entries matching the pattern' {
+    It 'Should remove history entries matching the pattern' {
         # Act
         $null = Viscalyx.Common\Remove-PSHistory -Pattern 'file.*\.txt' -Confirm:$false
 
