@@ -95,11 +95,11 @@ Describe 'New-SamplerGitHubReleaseTag' {
     }
 
     It 'Should create a release tag using default parameters' {
-        { New-SamplerGitHubReleaseTag -Force } | Should -Not -Throw
+        $null = New-SamplerGitHubReleaseTag -Force
     }
 
     It 'Should create the specified release tag' {
-        { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -Confirm:$false } | Should -Not -Throw
+        $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -Confirm:$false
     }
 
     Context 'When git commands fail' {
@@ -133,10 +133,10 @@ Describe 'New-SamplerGitHubReleaseTag' {
     }
 
     It 'Should switch back to previous branch if specified' {
-        { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -SwitchBackToPreviousBranch -Force } | Should -Not -Throw
+        $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -SwitchBackToPreviousBranch -Force
     }
 
     It 'Should push tag to upstream if specified' {
-        { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -PushTag -Force } | Should -Not -Throw
+        $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -PushTag -Force
     }
 }
