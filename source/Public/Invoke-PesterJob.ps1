@@ -635,7 +635,10 @@ function Invoke-PesterJob
     }
     else
     {
-        # Return the original result when not using source line mapping
-        $pesterResult
+        if ($PassThru.IsPresent)
+        {
+            # Return the original result when not using source line mapping
+            return $pesterResult
+        }
     }
 }
