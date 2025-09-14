@@ -43,10 +43,10 @@
         using the default broadcast address and port.
 
     .EXAMPLE
-        Send-WakeOnLan -MacAddress '00-11-22-33-44-55' -Broadcast '192.168.1.255'
+        Send-WakeOnLan -LinkLayerAddress '00-11-22-33-44-55' -Broadcast '192.168.1.255'
 
         Sends a Wake-on-LAN packet to the computer with MAC address '00-11-22-33-44-55'
-        using a specific subnet broadcast address and the MacAddress alias.
+        using a specific subnet broadcast address. (Parameter has alias 'MacAddress'.)
 
     .EXAMPLE
         Send-WOL -LinkLayerAddress '001122334455' -Port 7
@@ -55,7 +55,7 @@
         MAC address '001122334455' on port 7.
 
     .EXAMPLE
-        '00:11:22:33:44:55', '00-AA-BB-CC-DD-EE' | Send-WakeOnLan -Force
+        '00:11:22:33:44:55', '00-AA-BB-CC-DD-EE' | Send-WakeOnLan -Port 9 -Force
 
         Sends Wake-on-LAN packets to multiple computers by passing MAC addresses through
         the pipeline, bypassing confirmation prompts with the Force parameter.
@@ -112,11 +112,11 @@ function Send-WakeOnLan
         # Remove any separators from the MAC address
         $cleanMacAddress = $LinkLayerAddress -replace '[-:]', ''
 
-        $verboseDescriptionMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessVerboseDescription -f $LinkLayerAddress, $Broadcast, $Port
-        $verboseWarningMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessVerboseWarning -f $LinkLayerAddress
+        $descriptionMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessVerboseDescription -f $LinkLayerAddress, $Broadcast, $Port
+        $confirmationMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessVerboseWarning -f $LinkLayerAddress
         $captionMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessCaption
 
-        if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+        if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
         {
             Write-Debug -Message ($script:localizedData.Send_WakeOnLan_CreatingPacket -f $LinkLayerAddress)
 
@@ -154,7 +154,7 @@ function Send-WakeOnLan
 
                 [void] $udpClient.Send($packet, $packet.Length)
 
-                Write-Verbose -Message $script:localizedData.Send_WakeOnLan_PacketSent
+                Write-Information -MessageData $script:localizedData.Send_WakeOnLan_PacketSent
             }
             finally
             {
