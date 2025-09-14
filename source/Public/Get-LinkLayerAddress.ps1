@@ -169,5 +169,6 @@ function Get-LinkLayerAddress
         }
 
         Write-Warning -Message ($script:localizedData.Get_LinkLayerAddress_CouldNotFindMac -f $IPAddress)
+        return $null
     }
 }
