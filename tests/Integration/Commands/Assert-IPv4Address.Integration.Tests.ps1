@@ -24,9 +24,9 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:dscModuleName = 'Viscalyx.Common'
+    $script:moduleName = 'Viscalyx.Common'
 
-    Import-Module -Name $script:dscModuleName
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 }
 
 Describe 'Assert-IPv4Address' {
@@ -96,7 +96,7 @@ Describe 'Assert-IPv4Address' {
 
     Context 'When testing command availability and help' {
         It 'Should be available as a public command' {
-            Get-Command -Name 'Assert-IPv4Address' -Module $script:dscModuleName | Should -Not -BeNullOrEmpty
+            Get-Command -Name 'Assert-IPv4Address' -Module $script:moduleName | Should -Not -BeNullOrEmpty
         }
 
         It 'Should have proper command help' {

@@ -24,13 +24,13 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:dscModuleName = 'Viscalyx.Common'
+    $script:moduleName = 'Viscalyx.Common'
 
-    Import-Module -Name $script:dscModuleName
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 
-    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
 }
 
 AfterAll {
@@ -39,14 +39,14 @@ AfterAll {
     $PSDefaultParameterValues.Remove('Should:ModuleName')
 
     # Unload the module being tested so that it doesn't impact any other tests.
-    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
 Describe 'Get-LinkLayerAddress' {
     Context 'When validating parameter input' {
         Context 'When IP address format is invalid' {
             It 'Should throw an error for invalid IP address format' {
-                { 
+                {
                     InModuleScope -ScriptBlock {
                         Get-LinkLayerAddress -IPAddress 'invalid.ip.address' -ErrorAction Stop
                     }
@@ -54,7 +54,7 @@ Describe 'Get-LinkLayerAddress' {
             }
 
             It 'Should throw an error for IP address with values over 255' {
-                { 
+                {
                     InModuleScope -ScriptBlock {
                         Get-LinkLayerAddress -IPAddress '256.1.1.1' -ErrorAction Stop
                     }
@@ -62,7 +62,7 @@ Describe 'Get-LinkLayerAddress' {
             }
 
             It 'Should throw an error for incomplete IP address' {
-                { 
+                {
                     InModuleScope -ScriptBlock {
                         Get-LinkLayerAddress -IPAddress '192.168.1' -ErrorAction Stop
                     }
@@ -291,9 +291,9 @@ Describe 'Get-LinkLayerAddress' {
 
         It 'Should process multiple IP addresses from pipeline' {
             $ipAddresses = @('192.168.1.1', '192.168.1.2')
-            
+
             { $ipAddresses | Get-LinkLayerAddress } | Should -Not -Throw
-            
+
             # Verify Test-Connection was called for each IP
             Should -Invoke -CommandName Test-Connection -Exactly 2
         }

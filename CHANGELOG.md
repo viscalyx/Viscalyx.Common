@@ -5,8 +5,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.5.0] - 2025-09-14
-
 ### Added
 
 - `Assert-IPv4Address` that validates if a string is a valid IPv4 address,
@@ -21,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Send-WakeOnLan` (alias `Send-WOL`) that sends a Wake-on-LAN magic packet
   to wake up a remote computer. Supports various MAC address formats and
   custom broadcast addresses and ports.
+
+## [0.5.0] - 2025-09-14
+
+### Added
+
 - `Invoke-PesterJob`
   - Added new switch parameter `EnableSourceLineMapping` to map code coverage
     lines from built module files back to their corresponding source files

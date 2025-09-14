@@ -54,10 +54,10 @@ BeforeDiscovery {
 
     # Specific test cases for 256 in each octet position
     $script:octet256TestCases = @(
-        @{ IPAddress = '256.168.1.1'; Position = 'first'; ExpectedError = 'AIV0002' }
-        @{ IPAddress = '192.256.1.1'; Position = 'second'; ExpectedError = 'AIV0002' }
-        @{ IPAddress = '192.168.256.1'; Position = 'third'; ExpectedError = 'AIV0002' }
-        @{ IPAddress = '192.168.1.256'; Position = 'fourth'; ExpectedError = 'AIV0002' }
+        @{ IPAddress = '256.168.1.1'; Position = 'first'; ExpectedError = 'AIV0004' }
+        @{ IPAddress = '192.256.1.1'; Position = 'second'; ExpectedError = 'AIV0004' }
+        @{ IPAddress = '192.168.256.1'; Position = 'third'; ExpectedError = 'AIV0004' }
+        @{ IPAddress = '192.168.1.256'; Position = 'fourth'; ExpectedError = 'AIV0004' }
     )
 
     $script:leadingZeroAddresses = @(
@@ -89,13 +89,13 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:dscModuleName = 'Viscalyx.Common'
+    $script:moduleName = 'Viscalyx.Common'
 
-    Import-Module -Name $script:dscModuleName
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 
-    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
 }
 
 AfterAll {
@@ -104,10 +104,33 @@ AfterAll {
     $PSDefaultParameterValues.Remove('Should:ModuleName')
 
     # Unload the module being tested so that it doesn't impact any other tests.
-    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
 Describe 'Assert-IPv4Address' {
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters = '[-IPAddress] <String> [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Assert-IPv4Address').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
+        }
+
+        It 'Should have IPAddress as a mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Assert-IPv4Address').Parameters['IPAddress']
+            $parameterInfo.Attributes.Mandatory | Should -BeTrue
+        }
+    }
+
     Context 'When validating a valid IPv4 address' {
         It 'Should not throw an exception for a valid IPv4 address' {
             {
@@ -128,7 +151,7 @@ Describe 'Assert-IPv4Address' {
         It 'Should throw InvalidResult exception for invalid format <_>' -ForEach $script:invalidFormatAddresses {
             {
                 Assert-IPv4Address -IPAddress $_
-            } | Should -Throw -ErrorId 'AIV0001,Assert-IPv4Address'
+            } | Should -Throw -ErrorId 'AIV0003,Assert-IPv4Address'
         }
     }
 
@@ -141,7 +164,7 @@ Describe 'Assert-IPv4Address' {
     }
 
     Context 'When validating IPv4 addresses with 256 in specific octet positions' {
-        It 'Should throw AIV0002 exception when <Position> octet is 256 in <IPAddress>' -ForEach $script:octet256TestCases {
+        It 'Should throw AIV0004 exception when <Position> octet is 256 in <IPAddress>' -ForEach $script:octet256TestCases {
             {
                 Assert-IPv4Address -IPAddress $_.IPAddress
             } | Should -Throw -ErrorId "$($_.ExpectedError),Assert-IPv4Address"
@@ -188,7 +211,7 @@ Describe 'Assert-IPv4Address' {
         It 'Should throw InvalidResult exception when IPAddress is whitespace only' {
             {
                 Assert-IPv4Address -IPAddress '   '
-            } | Should -Throw -ErrorId 'AIV0001,Assert-IPv4Address'
+            } | Should -Throw -ErrorId 'AIV0003,Assert-IPv4Address'
         }
     }
 }

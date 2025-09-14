@@ -24,13 +24,13 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:dscModuleName = 'Viscalyx.Common'
+    $script:moduleName = 'Viscalyx.Common'
 
-    Import-Module -Name $script:dscModuleName
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 
-    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
 }
 
 AfterAll {
@@ -39,7 +39,7 @@ AfterAll {
     $PSDefaultParameterValues.Remove('Should:ModuleName')
 
     # Unload the module being tested so that it doesn't impact any other tests.
-    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
 Describe 'Resolve-DnsName' {
@@ -97,7 +97,7 @@ Describe 'Resolve-DnsName' {
 
             $errorRecord | Should -Not -BeNullOrEmpty
             $errorRecord.CategoryInfo.Category | Should -Be 'ObjectNotFound'
-            $errorRecord.FullyQualifiedErrorId | Should -Match '^RDN000[12],Resolve-DnsName$'
+            $errorRecord.FullyQualifiedErrorId | Should -Match '^RDN000[56],Resolve-DnsName$'
         }
 
         It 'Should throw an error for invalid hostname format' {
@@ -111,7 +111,7 @@ Describe 'Resolve-DnsName' {
 
             $errorRecord | Should -Not -BeNullOrEmpty
             $errorRecord.CategoryInfo.Category | Should -Be 'ObjectNotFound'
-            $errorRecord.FullyQualifiedErrorId | Should -Match '^RDN000[12],Resolve-DnsName$'
+            $errorRecord.FullyQualifiedErrorId | Should -Match '^RDN000[56],Resolve-DnsName$'
         }
     }
 
@@ -125,8 +125,8 @@ Describe 'Resolve-DnsName' {
             }
 
             $verboseMessages | Should -Not -BeNullOrEmpty
-            $verboseMessages | Should -Contain "Attempting to resolve DNS name 'localhost'."
-            $verboseMessages | Should -Contain "Successfully resolved 'localhost' to '127.0.0.1'."
+            $verboseMessages | Should -Contain "Attempting to resolve DNS name 'localhost'. (RDN0001)"
+            $verboseMessages | Should -Contain "Successfully resolved 'localhost' to '127.0.0.1'. (RDN0002)"
         }
 
         It 'Should write verbose messages during failed resolution' {
@@ -143,7 +143,7 @@ Describe 'Resolve-DnsName' {
             }
 
             $verboseMessages | Should -Not -BeNullOrEmpty
-            $verboseMessages | Should -Contain "Attempting to resolve DNS name 'nonexistent-domain.invalid'."
+            $verboseMessages | Should -Contain "Attempting to resolve DNS name 'nonexistent-domain.invalid'. (RDN0001)"
         }
     }
 

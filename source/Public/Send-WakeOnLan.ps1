@@ -28,6 +28,14 @@
     .PARAMETER Force
         Overrides the confirmation dialog when sending the Wake-on-LAN packet.
 
+    .INPUTS
+        System.String
+
+        MAC address as string for pipeline input.
+
+    .OUTPUTS
+        None. This command does not return a value.
+
     .EXAMPLE
         Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55'
 
@@ -68,6 +76,7 @@ function Send-WakeOnLan
 {
     [Alias('Send-WOL')]
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
+    [OutputType()]
     param
     (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]

@@ -15,6 +15,16 @@
         address must be on the same subnet/VLAN as the local computer and the
         target computer must be reachable.
 
+    .INPUTS
+        System.String
+
+        IP address as string for pipeline input.
+
+    .OUTPUTS
+        System.String
+
+        MAC address in standard format (e.g., '00:11:22:33:44:55').
+
     .EXAMPLE
         Get-LinkLayerAddress -IPAddress '192.168.1.42'
 
@@ -42,6 +52,7 @@ function Get-LinkLayerAddress
 {
     [Alias('Get-MacAddress')]
     [CmdletBinding()]
+    [OutputType([System.String])]
     param
     (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]

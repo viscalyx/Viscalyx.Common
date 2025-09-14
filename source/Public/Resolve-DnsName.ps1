@@ -13,8 +13,14 @@
         parameter accepts both fully qualified domain names (FQDN) and simple
         host names. IPv4 addresses are validated and returned without resolution.
 
+    .INPUTS
+        System.String
+
+        DNS host name or IPv4 address as string.
+
     .OUTPUTS
-        [System.String]
+        System.String
+
         Returns the first IPv4 address found for the specified host name, or the
         original IPv4 address if the input was already a valid IP address. Returns
         nothing if resolution fails.
@@ -47,6 +53,7 @@
 function Resolve-DnsName
 {
     [CmdletBinding()]
+    [OutputType([System.String])]
     param
     (
         [Parameter(Mandatory = $true, Position = 0)]
@@ -78,7 +85,7 @@ function Resolve-DnsName
             $writeErrorParameters = @{
                 Message      = $script:localizedData.Resolve_DnsName_NoIPv4AddressFound -f $HostName
                 Category     = 'ObjectNotFound'
-                ErrorId      = 'RDN0002'
+                ErrorId      = 'RDN0006'
                 TargetObject = $HostName
             }
 
@@ -92,7 +99,7 @@ function Resolve-DnsName
         $writeErrorParameters = @{
             Message      = $script:localizedData.Resolve_DnsName_ResolutionFailed -f $HostName, $_.Exception.Message
             Category     = 'ObjectNotFound'
-            ErrorId      = 'RDN0001'
+            ErrorId      = 'RDN0005'
             TargetObject = $HostName
         }
 
