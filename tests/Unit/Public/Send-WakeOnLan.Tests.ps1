@@ -46,7 +46,14 @@ Describe 'Send-WakeOnLan' {
     Context 'When checking command structure' {
         It 'Should have the correct parameters in parameter set __AllParameterSets' {
             $result = (Get-Command -Name 'Send-WakeOnLan').ParameterSets[0].ToString()
-            $result | Should -Be '[-LinkLayerAddress] <string> [[-Broadcast] <string>] [[-Port] <ushort>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+
+            if ($PSVersionTable.PSVersion.Major -eq 5) {
+                # Windows PowerShell 5.1 shows <uint16> for System.UInt16 type
+                $result | Should -Be '[-LinkLayerAddress] <string> [[-Broadcast] <string>] [[-Port] <uint16>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            } else {
+                # PowerShell Core/7+ shows <ushort> for System.UInt16 type
+                $result | Should -Be '[-LinkLayerAddress] <string> [[-Broadcast] <string>] [[-Port] <ushort>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
         }
 
         It 'Should have LinkLayerAddress as a mandatory parameter' {
@@ -181,22 +188,6 @@ Describe 'Send-WakeOnLan' {
                     $packet[$packetIndex] | Should -Be $expectedMacBytes[$byteIndex]
                 }
             }
-        }
-    }
-
-    Context 'When validating parameter sets' {
-        It 'Should have the correct parameter set definition' {
-            $command = Get-Command -Name 'Send-WakeOnLan'
-            $parameterSet = $command.ParameterSets | Where-Object { $_.Name -eq '__AllParameterSets' }
-
-            $parameterSet.ToString() | Should -Be '[-LinkLayerAddress] <string> [[-Broadcast] <string>] [[-Port] <ushort>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
-        }
-
-        It 'Should have LinkLayerAddress parameter as mandatory' {
-            $command = Get-Command -Name 'Send-WakeOnLan'
-            $linkLayerAddressParam = $command.Parameters['LinkLayerAddress']
-
-            $linkLayerAddressParam.Attributes.Mandatory | Should -BeTrue
         }
     }
 
