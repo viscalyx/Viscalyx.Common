@@ -656,9 +656,30 @@ function Invoke-PesterJob
             }
         }
 
+        <#
+            Example of a command missed object:
+            ```
+            PS> $result.CodeCoverage.CommandsMissed -is [System.Collections.Generic.List`1[[System.Object]]]
+            True
+            PS> $result.CodeCoverage.CommandsMissed[0].GetType().FullName
+            System.Management.Automation.PSCustomObject
+            PS> $result.CodeCoverage.CommandsMissed[0]
+
+            File        : /Users/MyLogn/source/SqlServerDsc/output/builtModule/SqlServerDsc/0.0.1/DSCResources/DSC_SqlAG/DSC_SqlAG.psm1
+            Line        : 1
+            StartLine   : 1
+            EndLine     : 1
+            StartColumn : 40
+            EndColumn   : 116
+            Class       :
+            Function    :
+            Command     : $script:sqlServerDscHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\SqlServerDsc.Common'
+            HitCount    : 0
+            ```
+        #>
         # Convert line numbers and return the processed result
         $commandsMissed |
-            Convert-LineNumber -PassThru |
+            ConvertTo-SourceLineNumber -PassThru |
             Select-Object -Property Class, Function, Command, SourceLineNumber, SourceFile
     }
     else

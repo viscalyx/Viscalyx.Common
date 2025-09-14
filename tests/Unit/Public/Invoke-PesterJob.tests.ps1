@@ -27,6 +27,7 @@ BeforeAll {
     $script:moduleName = 'Viscalyx.Common'
 
     Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
+    Import-Module -Name 'ModuleBuilder'
 
     $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
     $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
@@ -572,6 +573,320 @@ Describe 'Invoke-PesterJob' {
                     $command = Get-Command -Name 'Invoke-PesterJob'
                     $null = $command.ResolveParameter('FilterCodeCoverageResult').ParameterType
                 } | Should -Not -Throw
+            }
+        }
+
+        Context 'When processing source line mapping with FilterCodeCoverageResult' {
+            BeforeAll {
+                # Mock Get-Module to return Sampler module to simulate Sampler project
+                Mock -CommandName Get-Module -MockWith {
+                    param($Name)
+                    if ($Name -eq 'Sampler') {
+                        return @{ Name = 'Sampler'; Version = [version] '0.118.3' }
+                    }
+                    elseif ($Name -eq 'Pester') {
+                        return @{ Version = [version] '5.4.0' }
+                    }
+                    return $null
+                }
+
+                # Create mock commands missed data in the proper Pester format
+                # These should match the structure that Pester's CodeCoverage.CommandsMissed provides
+                $script:mockCommandsMissed = @(
+                    [PSCustomObject]@{
+                        File = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
+                        Line = 10
+                        StartLine = 10
+                        EndLine = 10
+                        StartColumn = 1
+                        EndColumn = 50
+                        Class = ''
+                        Function = 'Get-Something'
+                        Command = 'Write-Verbose'
+                        HitCount = 0
+                    },
+                    [PSCustomObject]@{
+                        File = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
+                        Line = 15
+                        StartLine = 15
+                        EndLine = 15
+                        StartColumn = 1
+                        EndColumn = 50
+                        Class = 'TestClass'
+                        Function = ''
+                        Command = 'Write-Debug'
+                        HitCount = 0
+                    },
+                    [PSCustomObject]@{
+                        File = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
+                        Line = 20
+                        StartLine = 20
+                        EndLine = 20
+                        StartColumn = 1
+                        EndColumn = 50
+                        Class = ''
+                        Function = 'Set-Configuration'
+                        Command = '$variable = $value'
+                        HitCount = 0
+                    },
+                    [PSCustomObject]@{
+                        File = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
+                        Line = 25
+                        StartLine = 25
+                        EndLine = 25
+                        StartColumn = 1
+                        EndColumn = 50
+                        Class = ''
+                        Function = 'Test-HashFunction'
+                        Command = 'Get-FileHash'
+                        HitCount = 0
+                    }
+                )
+
+                # Create the necessary built module file for Convert-LineNumber to process
+                $mockBuiltModuleDir = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0'
+                $null = New-Item -Path $mockBuiltModuleDir -ItemType Directory -Force
+                $mockBuiltModuleFile = Join-Path -Path $mockBuiltModuleDir -ChildPath 'TestModule.psm1'
+                Set-Content -Path $mockBuiltModuleFile -Value @'
+function Get-Something {
+    Write-Verbose "Getting something"
+}
+
+class TestClass {
+    [void] DoSomething() {
+        Write-Debug "Debug message"
+    }
+}
+
+function Set-Configuration {
+    $variable = $value
+}
+
+function Test-HashFunction {
+    Get-FileHash -Path $file
+}
+'@
+
+                # Create source directory structure for Convert-LineNumber to map to
+                $mockSourceDir = Join-Path -Path $TestDrive -ChildPath 'source'
+                $null = New-Item -Path "$mockSourceDir/Public" -ItemType Directory -Force
+                $null = New-Item -Path "$mockSourceDir/Classes" -ItemType Directory -Force
+
+                # Create source files
+                Set-Content -Path "$mockSourceDir/Public/Get-Something.ps1" -Value 'function Get-Something { Write-Verbose "Getting something" }'
+                Set-Content -Path "$mockSourceDir/Classes/TestClass.ps1" -Value 'class TestClass { [void] DoSomething() { Write-Debug "Debug message" } }'
+                Set-Content -Path "$mockSourceDir/Public/Set-Configuration.ps1" -Value 'function Set-Configuration { $variable = $value }'
+                Set-Content -Path "$mockSourceDir/Public/Test-HashFunction.ps1" -Value 'function Test-HashFunction { Get-FileHash -Path $file }'
+
+                # Mock ConvertTo-SourceLineNumber to add SourceLineNumber and SourceFile properties
+                Mock -CommandName ConvertTo-SourceLineNumber -MockWith {
+                    param($InputObject, $PassThru)
+
+                    if ($PassThru) {
+                        # Add SourceLineNumber and SourceFile properties to each input object
+                        foreach ($item in $InputObject) {
+                            # Create a copy of the original object with additional properties
+                            $enhancedItem = $item.PSObject.Copy()
+
+                            # Map to appropriate source file based on function or class name
+                            $sourceFile = if ($item.Function -eq 'Get-Something') {
+                                Join-Path -Path $TestDrive -ChildPath 'source/Public/Get-Something.ps1'
+                            }
+                            elseif ($item.Function -eq 'Set-Configuration') {
+                                Join-Path -Path $TestDrive -ChildPath 'source/Public/Set-Configuration.ps1'
+                            }
+                            elseif ($item.Function -eq 'Test-HashFunction') {
+                                Join-Path -Path $TestDrive -ChildPath 'source/Public/Test-HashFunction.ps1'
+                            }
+                            elseif ($item.Class -eq 'TestClass') {
+                                Join-Path -Path $TestDrive -ChildPath 'source/Classes/TestClass.ps1'
+                            }
+                            else {
+                                Join-Path -Path $TestDrive -ChildPath 'source/Unknown.ps1'
+                            }
+
+                            # Add the source mapping properties
+                            $enhancedItem | Add-Member -NotePropertyName 'SourceLineNumber' -NotePropertyValue $item.Line
+                            $enhancedItem | Add-Member -NotePropertyName 'SourceFile' -NotePropertyValue $sourceFile
+
+                            Write-Output $enhancedItem
+                        }
+                    }
+                    else {
+                        # If not PassThru, return objects with only SourceLineNumber and SourceFile
+                        foreach ($item in $InputObject) {
+                            [PSCustomObject]@{
+                                SourceLineNumber = $item.Line
+                                SourceFile = if ($item.Function -eq 'Get-Something') {
+                                    Join-Path -Path $TestDrive -ChildPath 'source/Public/Get-Something.ps1'
+                                }
+                                elseif ($item.Function -eq 'Set-Configuration') {
+                                    Join-Path -Path $TestDrive -ChildPath 'source/Public/Set-Configuration.ps1'
+                                }
+                                elseif ($item.Function -eq 'Test-HashFunction') {
+                                    Join-Path -Path $TestDrive -ChildPath 'source/Public/Test-HashFunction.ps1'
+                                }
+                                elseif ($item.Class -eq 'TestClass') {
+                                    Join-Path -Path $TestDrive -ChildPath 'source/Classes/TestClass.ps1'
+                                }
+                                else {
+                                    Join-Path -Path $TestDrive -ChildPath 'source/Unknown.ps1'
+                                }
+                            }
+                        }
+                    }
+                }
+
+                # Mock Receive-Job to return the commands missed data
+                Mock -CommandName Receive-Job -MockWith {
+                    return $script:mockCommandsMissed
+                }
+            }
+
+            It 'Should filter commands by function name pattern when FilterCodeCoverageResult is specified' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping = $true
+                    FilterCodeCoverageResult = @('Get-*')
+                }
+
+                $result = Invoke-PesterJob @params
+
+                # Should return commands from classes matching 'Test*' and functions matching 'Test*'
+                $result | Should -HaveCount 1
+                $result | Where-Object { $_.Function -eq 'Get-Something' } | Should -HaveCount 1
+            }
+
+            It 'Should filter commands by class name pattern when FilterCodeCoverageResult is specified' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping = $true
+                    FilterCodeCoverageResult = @('Test*')
+                }
+
+                $result = Invoke-PesterJob @params
+
+                # Should return commands from classes matching 'Test*' and functions matching 'Test*'
+                $result | Should -HaveCount 2
+                $result | Where-Object { $_.Class -eq 'TestClass' } | Should -HaveCount 1
+                $result | Where-Object { $_.Function -eq 'Test-HashFunction' } | Should -HaveCount 1
+            }
+
+            It 'Should filter commands by multiple patterns when FilterCodeCoverageResult contains multiple values' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping = $true
+                    FilterCodeCoverageResult = @('Get-*', 'Set-*')
+                }
+
+                $result = Invoke-PesterJob @params
+
+                # Should return commands from functions matching either 'Get-*' or 'Set-*'
+                $result | Should -HaveCount 2
+                $result | Where-Object { $_.Function -eq 'Get-Something' } | Should -HaveCount 1
+                $result | Where-Object { $_.Function -eq 'Set-Configuration' } | Should -HaveCount 1
+            }
+
+            It 'Should filter commands by specific hash-related pattern' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping = $true
+                    FilterCodeCoverageResult = @('*hash*')
+                }
+
+                $result = Invoke-PesterJob @params
+
+                # Should return only commands from functions containing 'hash'
+                $result | Should -HaveCount 1
+                $result[0].Function | Should -Be 'Test-HashFunction'
+            }
+
+            It 'Should return all commands when FilterCodeCoverageResult is not specified' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping = $true
+                }
+
+                $result = Invoke-PesterJob @params
+
+                # Should return all commands since no filter is applied
+                $result | Should -HaveCount 4
+            }
+
+            It 'Should return empty result when FilterCodeCoverageResult pattern matches no commands' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping = $true
+                    FilterCodeCoverageResult = @('NonExistent-*')
+                }
+
+                $result = Invoke-PesterJob @params
+
+                # Should return no commands since pattern matches nothing
+                $result | Should -BeNullOrEmpty
+            }
+
+            It 'Should select only specific properties in the final output' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping = $true
+                    FilterCodeCoverageResult = @('Get-*')
+                }
+
+                $result = Invoke-PesterJob @params
+
+                # Verify that only the expected properties are present (based on Select-Object in the actual code)
+                $result | Should -HaveCount 1
+                $result[0].PSObject.Properties.Name | Should -Contain 'Class'
+                $result[0].PSObject.Properties.Name | Should -Contain 'Function'
+                $result[0].PSObject.Properties.Name | Should -Contain 'Command'
+                $result[0].PSObject.Properties.Name | Should -Contain 'SourceLineNumber'
+                $result[0].PSObject.Properties.Name | Should -Contain 'SourceFile'
+
+                # Verify it doesn't contain other properties from the original object
+                $result[0].PSObject.Properties.Name | Should -Not -Contain 'Line'
+                $result[0].PSObject.Properties.Name | Should -Not -Contain 'File'
+            }
+        }
+
+        Context 'When EnableSourceLineMapping is used without code coverage' {
+            BeforeAll {
+                # Mock Get-Module to return Sampler module
+                Mock -CommandName Get-Module -MockWith {
+                    param($Name)
+                    if ($Name -eq 'Sampler') {
+                        return @{ Name = 'Sampler'; Version = [version] '0.118.3' }
+                    }
+                    elseif ($Name -eq 'Pester') {
+                        return @{ Version = [version] '5.4.0' }
+                    }
+                    return $null
+                }
+
+                # Mock Receive-Job to return the Pester result object instead of commands missed
+                Mock -CommandName Receive-Job -MockWith {
+                    return [PSCustomObject]@{
+                        Result = 'Passed'
+                        TotalCount = 5
+                        PassedCount = 5
+                        FailedCount = 0
+                    }
+                }
+            }
+
+            It 'Should return original Pester result when SkipCodeCoverage is used with EnableSourceLineMapping' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping = $true
+                    SkipCodeCoverage = $true
+                    PassThru = $true
+                }
+
+                $result = Invoke-PesterJob @params
+
+                # Should return the original Pester result, not processed commands
+                $result.Result | Should -Be 'Passed'
+                $result.TotalCount | Should -Be 5
             }
         }
     }
