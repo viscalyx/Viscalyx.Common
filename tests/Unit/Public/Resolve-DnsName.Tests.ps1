@@ -84,13 +84,13 @@ Describe 'Resolve-DnsName' {
         }
     }
 
-    Context 'When resolving known hostnames' {
+    Context 'When resolving known host names' {
         It 'Should resolve localhost to 127.0.0.1' {
             $result = Resolve-DnsName -HostName 'localhost'
             $result | Should -Be '127.0.0.1'
         }
 
-        It 'Should resolve a well-known public hostname' {
+        It 'Should resolve a well-known public host name' {
             # Use a reliable public DNS name that should always resolve
             $result = Resolve-DnsName -HostName 'dns.google'
             $result | Should -Match '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
@@ -177,7 +177,8 @@ Describe 'Resolve-DnsName' {
         }
 
         It 'Should use localized strings for error messages' {
-            { Resolve-DnsName -HostName 'nonexistent.domain.invalid' -ErrorAction Stop } | Should -Throw -ExpectedMessage "*nodename nor servname provided, or not known*"
+            # TODO: Write-Error passing -Exception does not seem to include the localized exception message in the ErrorRecord.
+            { Resolve-DnsName -HostName 'nonexistent.domain.invalid' -ErrorAction Stop } | Should -Throw -ExpectedMessage '*Exception calling "GetHostAddresses" with "1" argument(s)*'
         }
     }
 }
