@@ -70,25 +70,19 @@ Describe 'Get-LinkLayerAddress' {
         Context 'When IP address format is invalid' {
             It 'Should throw an error for invalid IP address format' {
                 {
-                    InModuleScope -ScriptBlock {
-                        Get-LinkLayerAddress -IPAddress 'invalid.ip.address' -ErrorAction Stop
-                    }
+                    Get-LinkLayerAddress -IPAddress 'invalid.ip.address' -ErrorAction Stop
                 } | Should -Throw
             }
 
             It 'Should throw an error for IP address with values over 255' {
                 {
-                    InModuleScope -ScriptBlock {
-                        Get-LinkLayerAddress -IPAddress '256.1.1.1' -ErrorAction Stop
-                    }
+                    Get-LinkLayerAddress -IPAddress '256.1.1.1' -ErrorAction Stop
                 } | Should -Throw
             }
 
             It 'Should throw an error for incomplete IP address' {
                 {
-                    InModuleScope -ScriptBlock {
-                        Get-LinkLayerAddress -IPAddress '192.168.1' -ErrorAction Stop
-                    }
+                    Get-LinkLayerAddress -IPAddress '192.168.1' -ErrorAction Stop
                 } | Should -Throw
             }
         }
