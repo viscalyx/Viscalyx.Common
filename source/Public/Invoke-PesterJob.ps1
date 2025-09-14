@@ -11,8 +11,8 @@
         the current session with PowerShell classes and project specific assemblies
         which can cause issues when building the project.
 
-        It is helpful for projects based on the Sampler project template, but it can
-        also be used for other projects.
+        It is most helpful for projects based on the Sampler project template, but it
+        can also be used for other projects.
 
     .PARAMETER Path
         Specifies one or more paths to the Pester test files. If not specified, the
@@ -58,7 +58,7 @@
         parameter as it is required for this feature. Requires ModuleBuilder module
         to be available.
 
-    .PARAMETER CoverageFilterName
+    .PARAMETER FilterCodeCoverageResult
         Specifies one or more filter patterns for code coverage results when EnableSourceLineMapping
         is used. The patterns support wildcards and are used to filter commands by
         function or class name. If not specified, all missed lines are returned.
@@ -124,7 +124,7 @@
         'tests/Unit' folder and outputs the Pester result object.
 
     .EXAMPLE
-        Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping -CoverageFilterName 'Get-Something'
+        Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping -FilterCodeCoverageResult 'Get-Something'
 
         Runs Pester tests located in the 'tests/Unit' folder with source line
         mapping enabled. After running, automatically processes and returns all
@@ -132,7 +132,7 @@
         with a reference to the SourceLineNumber in SourceFile.
 
     .EXAMPLE
-        Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping -CoverageFilterName @('Get-*', 'Set-*')
+        Invoke-PesterJob -Path './tests/Unit' -EnableSourceLineMapping -FilterCodeCoverageResult @('Get-*', 'Set-*')
 
         Runs Pester tests located in the 'tests/Unit' folder with source line
         mapping enabled. After running, automatically processes and returns all
@@ -322,7 +322,7 @@ function Invoke-PesterJob
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [System.String[]]
-        $CoverageFilterName,
+        $FilterCodeCoverageResult,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -567,12 +567,16 @@ function Invoke-PesterJob
 
             [Parameter(Mandatory = $true, Position = 4)]
             [System.Collections.Hashtable]
-            $BuildScriptParameter
+            $BuildScriptParameter,
+
+            [Parameter(Mandatory = $true, Position = 5)]
+            [System.Management.Automation.SwitchParameter]
+            $EnableSourceLineMapping
         )
 
         Write-Information -MessageData 'Running build task ''noop'' inside the job to setup the test pipeline.' -InformationAction 'Continue'
 
-        & $BuildScriptPath @buildScriptParameter
+        $null = & $BuildScriptPath @buildScriptParameter
 
         if ($ShowError.IsPresent)
         {
@@ -586,7 +590,24 @@ function Invoke-PesterJob
         }
         else
         {
-            Invoke-Pester -Configuration $PesterConfiguration
+            $pesterObject = Invoke-Pester -Configuration $PesterConfiguration
+
+            <#
+                BUG: PesterObject.CodeCoverage.CommandsMissed are removed from the
+                output object when the object is streamed through Receive-Job. This
+                appears to be a bug in how Pester constructs the object and the
+                property CodeCoverage. We only get the percentage string returned.
+                This is a workaround to return the CommandsMissed property if it is
+                available.
+            #>
+            if ($EnableSourceLineMapping.IsPresent -and $pesterObject -and $pesterObject.CodeCoverage)
+            {
+                $pesterObject.CodeCoverage.CommandsMissed
+            }
+            else
+            {
+                $pesterObject
+            }
         }
 
         if ($ShowError.IsPresent)
@@ -600,22 +621,29 @@ function Invoke-PesterJob
         $importedPesterModule.Version
         $BuildScriptPath
         $BuildScriptParameter
+        $EnableSourceLineMapping
     ) |
         Receive-Job -AutoRemoveJob -Wait
 
     # Process source line mapping if enabled
-    if ($EnableSourceLineMapping.IsPresent -and -not $SkipCodeCoverage.IsPresent -and $pesterResult -and $pesterResult.CodeCoverage -and $pesterResult.CodeCoverage.CommandsMissed)
+    if ($EnableSourceLineMapping.IsPresent -and -not $SkipCodeCoverage.IsPresent -and $pesterResult)
     {
-        $commandsMissed = $pesterResult.CodeCoverage.CommandsMissed
+        <#
+            The variable $pesterResult will contain the commands missed. Normally
+            it would have been assigned to $pesterResult.CodeCoverage.CommandsMissed
+            but due to the bug mentioned above (in the job script) the variable
+            $pesterResult has already been assigned to CodeCoverage.CommandsMissed.
+        #>
+        $commandsMissed = $pesterResult
 
         # Apply filter if specified
-        if ($PSBoundParameters.ContainsKey('CoverageFilterName'))
+        if ($PSBoundParameters.ContainsKey('FilterCodeCoverageResult'))
         {
             $commandsMissed = $commandsMissed | Where-Object -FilterScript {
                 $currentItem = $_
                 $matchFound = $false
-                
-                foreach ($pattern in $CoverageFilterName)
+
+                foreach ($pattern in $FilterCodeCoverageResult)
                 {
                     if ($currentItem.Function -like $pattern -or $currentItem.Class -like $pattern)
                     {
@@ -623,7 +651,7 @@ function Invoke-PesterJob
                         break
                     }
                 }
-                
+
                 $matchFound
             }
         }

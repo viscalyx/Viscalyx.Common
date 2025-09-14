@@ -46,7 +46,7 @@ Describe 'Invoke-PesterJob' {
     It 'Should have the expected parameter set <Name>' -ForEach @(
         @{
             Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-CoverageFilterName <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
         }
     ) {
         $parameterSet = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
@@ -274,7 +274,7 @@ Describe 'Invoke-PesterJob' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-CoverageFilterName <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+                ExpectedParameters = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
@@ -456,7 +456,7 @@ Describe 'Invoke-PesterJob' {
             Context 'When in a Sampler project' {
                 BeforeAll {
                     # Mock Get-Module to return Sampler module to simulate Sampler project
-                    Mock -CommandName Get-Module -MockWith { 
+                    Mock -CommandName Get-Module -MockWith {
                         param($Name)
                         if ($Name -eq 'Sampler') {
                             return @{ Name = 'Sampler'; Version = [version] '0.118.3' }
@@ -494,7 +494,7 @@ Describe 'Invoke-PesterJob' {
             Context 'When not in a Sampler project' {
                 BeforeAll {
                     # Mock Get-Module to return no Sampler module but with ModuleBuilder available
-                    Mock -CommandName Get-Module -MockWith { 
+                    Mock -CommandName Get-Module -MockWith {
                         param($Name, $ListAvailable)
                         if ($Name -eq 'Sampler') {
                             return $null
@@ -522,7 +522,7 @@ Describe 'Invoke-PesterJob' {
             Context 'When not in a Sampler project and ModuleBuilder is not available' {
                 BeforeAll {
                     # Mock Get-Module to return no Sampler module and no ModuleBuilder
-                    Mock -CommandName Get-Module -MockWith { 
+                    Mock -CommandName Get-Module -MockWith {
                         param($Name, $ListAvailable)
                         if ($Name -eq 'Sampler') {
                             return $null
@@ -548,29 +548,29 @@ Describe 'Invoke-PesterJob' {
             }
         }
 
-        Context 'When using CoverageFilterName parameter' {
-            It 'Should have CoverageFilterName as a non-mandatory parameter' {
-                $parameterInfo = (Get-Command -Name 'Invoke-PesterJob').Parameters['CoverageFilterName']
+        Context 'When using FilterCodeCoverageResult parameter' {
+            It 'Should have FilterCodeCoverageResult as a non-mandatory parameter' {
+                $parameterInfo = (Get-Command -Name 'Invoke-PesterJob').Parameters['FilterCodeCoverageResult']
 
                 $parameterInfo.Attributes.Mandatory | Should -BeFalse
                 $parameterInfo.ParameterType | Should -Be ([System.String[]])
             }
 
-            It 'Should accept array of string values for CoverageFilterName' {
+            It 'Should accept array of string values for FilterCodeCoverageResult' {
                 $filterArray = @('Get-*', 'Set-*', 'Test-*')
-                
+
                 # This should not throw an error when validating parameter type
-                { 
+                {
                     $params = @{
-                        CoverageFilterName = $filterArray
+                        FilterCodeCoverageResult = $filterArray
                         Path = '.'
                         SkipRun = $true
                         SkipCodeCoverage = $true
                     }
-                    
+
                     # We're not actually running this, just validating parameter binding
                     $command = Get-Command -Name 'Invoke-PesterJob'
-                    $null = $command.ResolveParameter('CoverageFilterName').ParameterType
+                    $null = $command.ResolveParameter('FilterCodeCoverageResult').ParameterType
                 } | Should -Not -Throw
             }
         }
