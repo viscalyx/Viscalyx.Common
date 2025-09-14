@@ -50,6 +50,7 @@
 #>
 function Get-LinkLayerAddress
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseSyntacticallyCorrectExamples', '', Justification = 'Because the examples are syntactically correct. The rule does not seem to understand that there is pipeline input.')]
     [Alias('Get-MacAddress')]
     [CmdletBinding()]
     [OutputType([System.String])]
