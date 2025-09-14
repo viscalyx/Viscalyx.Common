@@ -105,7 +105,7 @@ Describe 'Send-WakeOnLan' {
         }
 
         It 'Should send packet with colon-separated MAC address' {
-            Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
+            $null = Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
 
             $mockUdpClient.ConnectCalled | Should -BeTrue
             $mockUdpClient.SendCalled | Should -BeTrue
@@ -117,7 +117,7 @@ Describe 'Send-WakeOnLan' {
         }
 
         It 'Should send packet with hyphen-separated MAC address' {
-            Send-WakeOnLan -LinkLayerAddress '00-11-22-33-44-55' -Force
+            $null = Send-WakeOnLan -LinkLayerAddress '00-11-22-33-44-55' -Force
 
             $mockUdpClient.ConnectCalled | Should -BeTrue
             $mockUdpClient.SendCalled | Should -BeTrue
@@ -126,7 +126,7 @@ Describe 'Send-WakeOnLan' {
         }
 
         It 'Should send packet with no-separator MAC address' {
-            Send-WakeOnLan -LinkLayerAddress '001122334455' -Force
+            $null = Send-WakeOnLan -LinkLayerAddress '001122334455' -Force
 
             $mockUdpClient.ConnectCalled | Should -BeTrue
             $mockUdpClient.SendCalled | Should -BeTrue
@@ -135,34 +135,34 @@ Describe 'Send-WakeOnLan' {
         }
 
         It 'Should send packet with custom broadcast address' {
-            Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Broadcast '192.168.1.255' -Force
+            $null = Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Broadcast '192.168.1.255' -Force
 
             $mockUdpClient.ConnectedHost | Should -Be '192.168.1.255'
             $mockUdpClient.ConnectedPort | Should -Be 9
         }
 
         It 'Should send packet with custom port' {
-            Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Port 7 -Force
+            $null = Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Port 7 -Force
 
             $mockUdpClient.ConnectedHost | Should -Be '255.255.255.255'
             $mockUdpClient.ConnectedPort | Should -Be 7
         }
 
         It 'Should work with MacAddress alias' {
-            Send-WakeOnLan -MacAddress '00:11:22:33:44:55' -Force
+            $null = Send-WakeOnLan -MacAddress '00:11:22:33:44:55' -Force
 
             $mockUdpClient.ConnectCalled | Should -BeTrue
             $mockUdpClient.SendCalled | Should -BeTrue
         }
 
         It 'Should enable broadcast on UDP client' {
-            Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
+            $null = Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
 
             $mockUdpClient.EnableBroadcast | Should -BeTrue
         }
 
         It 'Should create correct magic packet structure' {
-            Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
+            $null = Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
 
             # Magic packet should be 102 bytes: 6 bytes of 0xFF + (6 bytes MAC * 16 repetitions)
             $mockUdpClient.SentLength | Should -Be 102
@@ -205,13 +205,9 @@ Describe 'Send-WakeOnLan' {
             Mock -CommandName Write-Verbose
             Mock -CommandName Write-Debug
 
-            $script:mockCallCount = 0
-
             Mock -CommandName New-Object -ParameterFilter {
                 $TypeName -eq 'System.Net.Sockets.UdpClient'
             } -MockWith {
-                $script:mockCallCount++
-
                 $mockUdpClient = [PSCustomObject] @{
                     EnableBroadcast = $false
                     ConnectCalled = $false
@@ -263,7 +259,7 @@ Describe 'Send-WakeOnLan' {
         }
 
         It 'Should not create UDP client when using WhatIf' {
-            Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -WhatIf
+            $null = Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -WhatIf
 
             Should -Invoke -CommandName New-Object -ParameterFilter {
                 $TypeName -eq 'System.Net.Sockets.UdpClient'
@@ -303,7 +299,7 @@ Describe 'Send-WakeOnLan' {
         }
 
         It 'Should bypass confirmation when Force is specified' {
-            Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
+            $null = Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
 
             $mockUdpClient.ConnectCalled | Should -BeTrue
             $mockUdpClient.SendCalled | Should -BeTrue
@@ -413,7 +409,7 @@ Describe 'Send-WakeOnLan' {
         }
 
         It 'Should work with Send-WOL alias' {
-            Send-WOL -LinkLayerAddress '00:11:22:33:44:55' -Force
+            $null = Send-WOL -LinkLayerAddress '00:11:22:33:44:55' -Force
 
             $mockUdpClient.ConnectCalled | Should -BeTrue
             $mockUdpClient.SendCalled | Should -BeTrue
