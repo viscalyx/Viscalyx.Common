@@ -151,8 +151,15 @@ function Get-LinkLayerAddress
                 if ($text -match '(([0-9a-f]{1,2}:){5}[0-9a-f]{1,2})')
                 {
                     $mac = $Matches[1]
-                    Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $mac)
-                    return $mac
+
+                    # Normalize MAC address to canonical format (lowercase, two-digit octets)
+                    $normalizedOctets = $mac.Split(':') | ForEach-Object {
+                        $_.PadLeft(2, '0').ToLower()
+                    }
+                    $normalizedMac = $normalizedOctets -join ':'
+
+                    Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $normalizedMac)
+                    return $normalizedMac
                 }
             }
             catch
