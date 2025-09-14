@@ -53,69 +53,75 @@ function Assert-IPv4Address
 
     Write-Verbose -Message ($script:localizedData.Assert_IPv4Address_ValidatingAddress -f $IPAddress)
 
-    # Basic format check - must be four groups of 1-3 digits separated by periods
-    if ($IPAddress -notmatch '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+    if (-not (Test-IPv4Address -IPAddress $IPAddress))
     {
-        $PSCmdlet.ThrowTerminatingError(
-            [System.Management.Automation.ErrorRecord]::new(
-                [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_InvalidFormatException -f $IPAddress)),
-                'AIV0003',
-                [System.Management.Automation.ErrorCategory]::InvalidResult,
-                $IPAddress
-            )
-        )
-    }
+        # Need to determine the specific error to throw the appropriate exception
+        # Re-run the validation to get specific error details
 
-    # Split and validate each octet
-    $octets = $IPAddress -split '\.'
-
-    foreach ($octet in $octets)
-    {
-        try
-        {
-            $octetValue = [System.Int32]$octet
-
-            # Check if octet value is within valid range (0-255)
-            if ($octetValue -lt 0 -or $octetValue -gt 255)
-            {
-                $PSCmdlet.ThrowTerminatingError(
-                    [System.Management.Automation.ErrorRecord]::new(
-                        [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetOutOfRangeException -f $octet, $IPAddress)),
-                        'AIV0004',
-                        [System.Management.Automation.ErrorCategory]::InvalidResult,
-                        $IPAddress
-                    )
-                )
-            }
-
-            # Check for leading zeros (except for '0' itself)
-            if ($octet.Length -gt 1 -and $octet.StartsWith('0'))
-            {
-                $PSCmdlet.ThrowTerminatingError(
-                    [System.Management.Automation.ErrorRecord]::new(
-                        [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_InvalidLeadingZeroException -f $octet, $IPAddress)),
-                        'AIV0005',
-                        [System.Management.Automation.ErrorCategory]::InvalidResult,
-                        $IPAddress
-                    )
-                )
-            }
-        }
-        catch [System.Management.Automation.RuntimeException]
-        {
-            # Re-throw our custom exceptions
-            throw
-        }
-        catch
+        # Basic format check - must be four groups of 1-3 digits separated by periods
+        if ($IPAddress -notmatch '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
         {
             $PSCmdlet.ThrowTerminatingError(
                 [System.Management.Automation.ErrorRecord]::new(
-                    [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetConversionFailedException -f $octet, $IPAddress)),
-                    'AIV0006',
+                    [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_InvalidFormatException -f $IPAddress)),
+                    'AIV0003',
                     [System.Management.Automation.ErrorCategory]::InvalidResult,
                     $IPAddress
                 )
             )
+        }
+
+        # Split and validate each octet to find the specific error
+        $octets = $IPAddress -split '\.'
+
+        foreach ($octet in $octets)
+        {
+            try
+            {
+                $octetValue = [System.Int32] $octet
+
+                # Check if octet value is within valid range (0-255)
+                if ($octetValue -lt 0 -or $octetValue -gt 255)
+                {
+                    $PSCmdlet.ThrowTerminatingError(
+                        [System.Management.Automation.ErrorRecord]::new(
+                            [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetOutOfRangeException -f $octet, $IPAddress)),
+                            'AIV0004',
+                            [System.Management.Automation.ErrorCategory]::InvalidResult,
+                            $IPAddress
+                        )
+                    )
+                }
+
+                # Check for leading zeros (except for '0' itself)
+                if ($octet.Length -gt 1 -and $octet.StartsWith('0'))
+                {
+                    $PSCmdlet.ThrowTerminatingError(
+                        [System.Management.Automation.ErrorRecord]::new(
+                            [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_InvalidLeadingZeroException -f $octet, $IPAddress)),
+                            'AIV0005',
+                            [System.Management.Automation.ErrorCategory]::InvalidResult,
+                            $IPAddress
+                        )
+                    )
+                }
+            }
+            catch [System.Management.Automation.RuntimeException]
+            {
+                # Re-throw our custom exceptions
+                throw
+            }
+            catch
+            {
+                $PSCmdlet.ThrowTerminatingError(
+                    [System.Management.Automation.ErrorRecord]::new(
+                        [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetConversionFailedException -f $octet, $IPAddress)),
+                        'AIV0006',
+                        [System.Management.Automation.ErrorCategory]::InvalidResult,
+                        $IPAddress
+                    )
+                )
+            }
         }
     }
 

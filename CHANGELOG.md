@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Assert-IPv4Address` that validates if a string is a valid IPv4 address,
   including format checking and value range validation (0-255 for each octet).
   Also validates that octets do not have leading zeros.
+- `Test-IPv4Address` that tests if a string is a valid IPv4 address and returns
+  a boolean result. Performs the same validation as `Assert-IPv4Address` but
+  returns `$true` for valid addresses and `$false` for invalid ones instead
+  of throwing exceptions.
 - `Get-LinkLayerAddress` (alias `Get-MacAddress`) that retrieves the MAC
   address for an IP address on the local subnet/VLAN. Works cross-platform
   across Windows, Linux, and macOS.
