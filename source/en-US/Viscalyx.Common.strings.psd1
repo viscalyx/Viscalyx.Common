@@ -107,7 +107,6 @@ ConvertFrom-StringData @'
     Test_IPv4Address_InvalidFormat = The input '{0}' is not a valid IPv4 address format. (TIV0003)
     Test_IPv4Address_OctetOutOfRange = Octet '{0}' in address '{1}' is out of valid range (0-255). (TIV0004)
     Test_IPv4Address_OctetConversionFailed = Failed to convert octet '{0}' to integer in address '{1}'. (TIV0006)
-    Test_IPv4Address_UnexpectedError = Unexpected error occurred while testing address '{0}': {1} (TIV0007)
 
     ## Resolve-DnsName
     Resolve_DnsName_AttemptingResolution = Attempting to resolve DNS name '{0}'. (RDN0001)
