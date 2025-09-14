@@ -80,8 +80,6 @@ function Resolve-DnsName
         }
         else
         {
-            Write-Verbose -Message ($script:localizedData.Resolve_DnsName_NoIPv4Found -f $HostName)
-
             $writeErrorParameters = @{
                 Message      = $script:localizedData.Resolve_DnsName_NoIPv4AddressFound -f $HostName
                 Category     = 'ObjectNotFound'
