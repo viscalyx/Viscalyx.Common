@@ -131,4 +131,7 @@ ConvertFrom-StringData @'
     Get_LinkLayerAddress_IpCommandFailed = IP command failed with error: {0}
     Get_LinkLayerAddress_CouldNotFindMac = Could not find a MAC address for '{0}'. Ensure the IP address is on the same subnet and the computer is powered on and reachable.
     Get_LinkLayerAddress_InvalidIPAddress = Invalid IP address format '{0}'. Expected format: 'XXX.XXX.XXX.XXX'.
+
+    ## Invoke-PesterJob
+    Invoke_PesterJob_ModuleBuilderRequired = The ModuleBuilder module is required for source line mapping but is not available. Please install the ModuleBuilder module or run the command in a Sampler project environment. (IPJ0001)
 '@

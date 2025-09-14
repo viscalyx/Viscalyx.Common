@@ -1,4 +1,4 @@
-[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
 param ()
 
 BeforeDiscovery {
@@ -6,14 +6,14 @@ BeforeDiscovery {
     {
         if (-not (Get-Module -Name 'DscResource.Test'))
         {
-            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            # Assumes dependencies have been resolved, so if this module is not available, run 'noop' task.
             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
             {
                 # Redirect all streams to $null, except the error stream (stream 2)
-                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
             }
 
-            # If the dependencies has not been resolved, this will throw an error.
+            # If the dependencies have not been resolved, this will throw an error.
             Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
         }
     }
@@ -24,19 +24,19 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:dscModuleName = 'Viscalyx.Common'
+    $script:moduleName = 'Viscalyx.Common'
 
-    Import-Module -Name $script:dscModuleName
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 
-    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
 
     # Save the original PSModulePath
     $script:originalPSModulePath = $env:PSModulePath
 
     # Add $TestDrive to the beginning of PSModulePath
-    $env:PSModulePath = "$TestDrive;$env:PSModulePath"
+    $env:PSModulePath = "{0}{1}{2}" -f $TestDrive, [System.IO.Path]::PathSeparator, $env:PSModulePath
 }
 
 AfterAll {
@@ -45,7 +45,7 @@ AfterAll {
     $PSDefaultParameterValues.Remove('Should:ModuleName')
 
     # Unload the module being tested so that it doesn't impact any other tests.
-    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
 
     # Restore the original PSModulePath
     $env:PSModulePath = $script:originalPSModulePath
@@ -66,11 +66,11 @@ Describe 'Install-ModulePatch' {
     }
 
     It 'Should correctly patch ModuleBuilder v3.1.7' {
-        Save-Module -Name 'ModuleBuilder' -RequiredVersion 3.1.7 -Path $TestDrive -Force
+        $null = Save-Module -Name 'ModuleBuilder' -RequiredVersion 3.1.7 -Path $TestDrive -Force -ErrorAction 'Stop'
 
         $patchPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../patches/ModuleBuilder_3.1.7_patch.json'
 
         # Run Install-ModulePatch
-        Install-ModulePatch -Path $patchPath -Force -ErrorAction 'Stop'
+        $null = Install-ModulePatch -Path $patchPath -Force -ErrorAction 'Stop'
     }
 }
