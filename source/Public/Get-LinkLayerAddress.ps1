@@ -130,7 +130,7 @@ function Get-LinkLayerAddress
             {
                 $text = (ip neigh show $IPAddress 2>$null)
 
-                if ($text -match 'lladdr\s+([0-9a-f:]{17})') # cSpell: disable-line
+                if ($text -match 'lladdr\s+([0-9a-f]{2}(:[0-9a-f]{2}){5})') # cSpell: disable-line
                 {
                     $mac = $Matches[1]
                     $normalizedMac = ConvertTo-CanonicalMacAddress -MacAddress $mac
@@ -151,7 +151,7 @@ function Get-LinkLayerAddress
             {
                 $text = (arp -n $IPAddress 2>$null)
 
-                if ($text -match '(([0-9a-f]{1,2}:){5}[0-9a-f]{1,2})')
+                if ($text -match '([0-9a-f]{2}(:[0-9a-f]{2}){5})')
                 {
                     $mac = $Matches[1]
 
