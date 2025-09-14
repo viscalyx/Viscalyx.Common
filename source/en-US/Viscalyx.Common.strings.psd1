@@ -117,6 +117,7 @@ ConvertFrom-StringData @'
     ## Send-WakeOnLan
     Send_WakeOnLan_SendingPacket = Sending Wake-on-LAN packet to MAC address '{0}' via broadcast '{1}' on port {2}. (SWOL0001)
     Send_WakeOnLan_PacketSent = Wake-on-LAN packet sent successfully. (SWOL0002)
+    Send_WakeOnLan_SendFailed = Failed to send Wake-on-LAN packet. (SWOL0003)
     Send_WakeOnLan_CreatingPacket = Creating Wake-on-LAN magic packet with MAC address '{0}'. (SWOL0004)
     Send_WakeOnLan_ShouldProcessVerboseDescription = Send Wake-on-LAN packet to MAC address '{0}' via broadcast '{1}' on port {2}. (SWOL0005)
     Send_WakeOnLan_ShouldProcessVerboseWarning = Are you sure you want to send a Wake-on-LAN packet to MAC address '{0}'? (SWOL0006)

@@ -157,6 +157,17 @@ function Send-WakeOnLan
 
                 Write-Information -MessageData $script:localizedData.Send_WakeOnLan_PacketSent
             }
+            catch
+            {
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                    [System.Exception]::new($script:localizedData.Send_WakeOnLan_SendFailed, $_),
+                    'SendWakeOnLanFailed',
+                    [System.Management.Automation.ErrorCategory]::ConnectionError,
+                    $null
+                )
+
+                $PSCmdlet.ThrowTerminatingError($errorRecord)
+            }
             finally
             {
                 if ($null -ne $udpClient)
