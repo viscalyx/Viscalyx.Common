@@ -1,4 +1,4 @@
-[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
 param ()
 
 BeforeDiscovery {
@@ -6,14 +6,14 @@ BeforeDiscovery {
     {
         if (-not (Get-Module -Name 'DscResource.Test'))
         {
-            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            # Assumes dependencies have been resolved, so if this module is not available, run 'noop' task.
             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
             {
                 # Redirect all streams to $null, except the error stream (stream 2)
-                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
             }
 
-            # If the dependencies has not been resolved, this will throw an error.
+            # If the dependencies have not been resolved, this will throw an error.
             Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
         }
     }
@@ -24,13 +24,13 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:dscModuleName = 'Viscalyx.Common'
+    $script:moduleName = 'Viscalyx.Common'
 
-    Import-Module -Name $script:dscModuleName
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 
-    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
 }
 
 AfterAll {
@@ -39,21 +39,35 @@ AfterAll {
     $PSDefaultParameterValues.Remove('Should:ModuleName')
 
     # Unload the module being tested so that it doesn't impact any other tests.
-    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
 Describe 'Remove-History' {
+    It 'Should have the expected parameter set <Name>' -ForEach @(
+        @{
+            Name = '__AllParameterSets'
+            ExpectedParameterSetString = '[-Pattern] <string> [-EscapeRegularExpression] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        }
+    ) {
+        $parameterSet = (Get-Command -Name 'Remove-History').ParameterSets |
+            Where-Object -FilterScript { $_.Name -eq $Name }
+
+        $parameterSet | Should -Not -BeNullOrEmpty
+        $parameterSet.Name | Should -Be $Name
+        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+    }
+
     BeforeAll {
         Mock -CommandName Remove-PSReadLineHistory
         Mock -CommandName Remove-PSHistory
     }
 
-    It 'Should removes entries matching a pattern' {
+    It 'Should remove entries matching a pattern' {
         # Arrange
         $pattern = ".*\.txt"
 
         # Act
-        Viscalyx.Common\Remove-History -Pattern $pattern
+        $null = Viscalyx.Common\Remove-History -Pattern $pattern
 
         # Assert
         Should -Invoke -CommandName Remove-PSReadLineHistory -Exactly -Times 1 -Scope It -ParameterFilter {
@@ -70,7 +84,7 @@ Describe 'Remove-History' {
         $pattern = './build.ps1'
 
         # Act
-        Viscalyx.Common\Remove-History -Pattern $pattern -EscapeRegularExpression
+        $null = Viscalyx.Common\Remove-History -Pattern $pattern -EscapeRegularExpression
 
         # Assert
         Should -Invoke -CommandName Remove-PSReadLineHistory -Exactly -Times 1 -Scope It -ParameterFilter {

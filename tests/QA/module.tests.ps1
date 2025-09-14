@@ -13,7 +13,7 @@ BeforeDiscovery {
 
     $script:moduleName = $ProjectName
 
-    Remove-Module -Name $script:moduleName -Force -ErrorAction SilentlyContinue
+    $null = Remove-Module -Name $script:moduleName -Force -ErrorAction SilentlyContinue
 
     $mut = Get-Module -Name $script:moduleName -ListAvailable |
         Select-Object -First 1 |
@@ -102,7 +102,7 @@ Describe 'General module control' -Tags 'FunctionalQuality' {
     It 'Should remove without error' {
         { Remove-Module -Name $script:moduleName -ErrorAction Stop } | Should -Not -Throw
 
-        Get-Module $script:moduleName | Should -BeNullOrEmpty
+        Get-Module -Name $script:moduleName | Should -BeNullOrEmpty
     }
 }
 
@@ -240,4 +240,3 @@ Describe 'Help for module' -Tags 'helpQuality' {
         }
     }
 }
-
