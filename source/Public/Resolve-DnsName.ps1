@@ -92,15 +92,16 @@ function Resolve-DnsName
     }
     catch
     {
-        Write-Verbose -Message ($script:localizedData.Resolve_DnsName_ResolutionException -f $HostName, $_.Exception.Message)
-
         $writeErrorParameters = @{
-            Message      = $script:localizedData.Resolve_DnsName_ResolutionFailed -f $HostName, $_.Exception.Message
+            Message      = $script:localizedData.Resolve_DnsName_ResolutionFailed -f $HostName
             Category     = 'ObjectNotFound'
             ErrorId      = 'RDN0005'
             TargetObject = $HostName
+            Exception    = $_.Exception
         }
 
         Write-Error @writeErrorParameters
+
+        return
     }
 }

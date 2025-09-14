@@ -105,8 +105,7 @@ ConvertFrom-StringData @'
     ## Resolve-DnsName
     Resolve_DnsName_AttemptingResolution = Attempting to resolve DNS name '{0}'. (RDN0001)
     Resolve_DnsName_ResolutionSuccessful = Successfully resolved '{0}' to '{1}'. (RDN0002)
-    Resolve_DnsName_ResolutionException = DNS resolution for '{0}' failed with exception: {1} (RDN0004)
-    Resolve_DnsName_ResolutionFailed = DNS resolution failed for '{0}'. {1} (RDN0005)
+    Resolve_DnsName_ResolutionFailed = DNS resolution failed for '{0}'. (RDN0005)
     Resolve_DnsName_NoIPv4AddressFound = No IPv4 addresses found for '{0}'. (RDN0006)
 
     ## Send-WakeOnLan

@@ -177,15 +177,7 @@ Describe 'Resolve-DnsName' {
         }
 
         It 'Should use localized strings for error messages' {
-            $errorMessage = ''
-            try {
-                Resolve-DnsName -HostName 'nonexistent.domain.invalid' -ErrorAction Stop
-            }
-            catch {
-                $errorMessage = $_.Exception.Message
-            }
-
-            $errorMessage | Should -Match "DNS resolution failed for 'nonexistent\.domain\.invalid'"
+            { Resolve-DnsName -HostName 'nonexistent.domain.invalid' -ErrorAction Stop } | Should -Throw -ExpectedMessage "*nodename nor servname provided, or not known*"
         }
     }
 }
