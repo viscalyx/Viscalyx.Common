@@ -72,8 +72,8 @@ function Install-ModulePatch
         $Uri
     }
 
-    $verboseDescriptionMessage = $script:localizedData.Install_ModulePatch_ShouldProcessVerboseDescription -f $patchLocation
-    $verboseWarningMessage = $script:localizedData.Install_ModulePatch_ShouldProcessVerboseWarning -f $patchLocation
+    $verboseDescriptionMessage = $script:localizedData.Install_ModulePatch_ShouldProcessDescription -f $patchLocation
+    $verboseWarningMessage = $script:localizedData.Install_ModulePatch_ShouldProcessConfirmation -f $patchLocation
     $captionMessage = $script:localizedData.Install_ModulePatch_ShouldProcessCaption
 
     if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))

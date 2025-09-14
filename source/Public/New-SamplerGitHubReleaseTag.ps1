@@ -106,8 +106,8 @@ function New-SamplerGitHubReleaseTag
         )
     }
 
-    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseDescription -f $DefaultBranchName, $UpstreamRemoteName
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseWarning -f $DefaultBranchName, $UpstreamRemoteName
+    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessDescription -f $DefaultBranchName, $UpstreamRemoteName
+    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessConfirmation -f $DefaultBranchName, $UpstreamRemoteName
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessCaption
 
     if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
@@ -148,8 +148,8 @@ function New-SamplerGitHubReleaseTag
     $continueProcessing = $true
     $errorMessage = $null
 
-    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseDescription -f $DefaultBranchName, $UpstreamRemoteName
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseWarning -f $DefaultBranchName
+    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessDescription -f $DefaultBranchName, $UpstreamRemoteName
+    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessConfirmation -f $DefaultBranchName
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessCaption
 
     if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
@@ -208,8 +208,8 @@ function New-SamplerGitHubReleaseTag
         }
     }
 
-    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessVerboseDescription -f $UpstreamRemoteName
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessVerboseWarning -f $UpstreamRemoteName
+    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessDescription -f $UpstreamRemoteName
+    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessConfirmation -f $UpstreamRemoteName
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessCaption
 
     if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
@@ -293,15 +293,15 @@ function New-SamplerGitHubReleaseTag
 
     if ($WhatIfPreference)
     {
-        $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessVerboseDescription
+        $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessDescription
     }
     else
     {
-        $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessVerboseDescription
+        $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessDescription
     }
 
     $verboseDescriptionMessage = $messageShouldProcess -f $ReleaseTag, $DefaultBranchName, $headCommitId
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessVerboseWarning -f $ReleaseTag
+    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation -f $ReleaseTag
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessCaption
 
     if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
@@ -323,8 +323,8 @@ function New-SamplerGitHubReleaseTag
 
     if ($SwitchBackToPreviousBranch.IsPresent)
     {
-        $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessVerboseDescription -f $currentLocalBranchName
-        $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessVerboseWarning -f $currentLocalBranchName
+        $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessDescription -f $currentLocalBranchName
+        $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessConfirmation -f $currentLocalBranchName
         $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption
 
         if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))

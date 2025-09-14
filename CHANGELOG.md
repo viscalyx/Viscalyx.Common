@@ -24,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to wake up a remote computer. Supports various MAC address formats and
   custom broadcast addresses and ports.
 
+### Changed
+
+- Aligned ShouldProcess localized string key naming with DSC community convention
+  by renaming `*_ShouldProcessVerboseDescription` and `*_ShouldProcessVerboseWarning`
+  keys to `*_ShouldProcessDescription` and `*_ShouldProcessConfirmation` respectively.
+  This affects string keys in `New-SamplerGitHubReleaseTag`, `Install-ModulePatch`,
+  and `Send-WakeOnLan` commands.
+- `Remove-PSHistory` and `Remove-PSReadLineHistory` now use localized strings
+  instead of hardcoded strings for ShouldProcess prompts and status messages.
+
 ## [0.5.0] - 2025-09-14
 
 ### Added

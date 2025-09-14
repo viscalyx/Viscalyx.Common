@@ -113,8 +113,8 @@ function Send-WakeOnLan
         # Remove any separators from the MAC address
         $cleanMacAddress = $LinkLayerAddress -replace '[-:]', ''
 
-        $descriptionMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessVerboseDescription -f $LinkLayerAddress, $Broadcast, $Port
-        $confirmationMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessVerboseWarning -f $LinkLayerAddress
+        $descriptionMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessDescription -f $LinkLayerAddress, $Broadcast, $Port
+        $confirmationMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessConfirmation -f $LinkLayerAddress
         $captionMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessCaption
 
         if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))

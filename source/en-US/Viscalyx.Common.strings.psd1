@@ -19,35 +19,35 @@ ConvertFrom-StringData @'
     New_SamplerGitHubReleaseTag_LatestTagIsNotPreview = The latest tag '{0}' is not a preview tag or not a correctly formatted preview tag. Make sure the latest tag is a preview tag, or specify a release tag.
     New_SamplerGitHubReleaseTag_FailedCheckoutPreviousBranch = Failed to checkout the previous branch '{0}'.
 
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseDescription = Fetching branch '{0}' from the upstream remote '{1}'.
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseWarning = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'?
+    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessDescription = Fetching branch '{0}' from the upstream remote '{1}'.
+    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessConfirmation = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessCaption = Fetch upstream branch
 
-    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseDescription = Switching to and rebasing the local default branch '{0}' using the upstream branch '{1}/{0}'.
-    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseWarning = Are you sure you want switch to and rebase the local branch '{0}'?
+    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessDescription = Switching to and rebasing the local default branch '{0}' using the upstream branch '{1}/{0}'.
+    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessConfirmation = Are you sure you want switch to and rebase the local branch '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_Rebase_ShouldProcessCaption = Rebase the local default branch
 
-    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessVerboseDescription = Fetching the tags from (upstream) remote '{0}'.
-    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessVerboseWarning = Are you sure you want to fetch tags from remote '{0}'?
+    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessDescription = Fetching the tags from (upstream) remote '{0}'.
+    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessConfirmation = Are you sure you want to fetch tags from remote '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessCaption = Fetch tags from remote
 
-    New_SamplerGitHubReleaseTag_NewTag_ShouldProcessVerboseDescription = Creating tag '{0}' for commit '{2}' in the local branch '{1}'.
-    New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessVerboseDescription = Creating tag for commit in the local branch '{1}'. Note: Actual tag name and commit id cannot be determine during -WhatIf.
-    New_SamplerGitHubReleaseTag_NewTag_ShouldProcessVerboseWarning = Are you sure you want to create tag '{0}'?
+    New_SamplerGitHubReleaseTag_NewTag_ShouldProcessDescription = Creating tag '{0}' for commit '{2}' in the local branch '{1}'.
+    New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessDescription = Creating tag for commit in the local branch '{1}'. Note: Actual tag name and commit id cannot be determine during -WhatIf.
+    New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation = Are you sure you want to create tag '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessCaption = Create tag
 
-    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessVerboseDescription = Switching back to previous local branch '{0}'.
-    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessVerboseWarning = Are you sure you want to switch back to previous local branch '{0}'?
+    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessDescription = Switching back to previous local branch '{0}'.
+    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessConfirmation = Are you sure you want to switch back to previous local branch '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption = Switch to previous branch
 
     ## Install-ModulePatch
-    Install_ModulePatch_ShouldProcessVerboseDescription = Apply module patch file at location '{0}'.
-    Install_ModulePatch_ShouldProcessVerboseWarning = Are you sure you want to apply the module patch at the location '{0}'?
+    Install_ModulePatch_ShouldProcessDescription = Apply module patch file at location '{0}'.
+    Install_ModulePatch_ShouldProcessConfirmation = Are you sure you want to apply the module patch at the location '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Install_ModulePatch_ShouldProcessCaption = Apply module patch
     Install_ModulePatch_PatchFilePathNotFound = The module patch file at location '{0}' does not exist.
@@ -119,8 +119,8 @@ ConvertFrom-StringData @'
     Send_WakeOnLan_PacketSent = Wake-on-LAN packet sent successfully. (SWOL0002)
     Send_WakeOnLan_SendFailed = Failed to send Wake-on-LAN packet. (SWOL0003)
     Send_WakeOnLan_CreatingPacket = Creating Wake-on-LAN magic packet with MAC address '{0}'. (SWOL0004)
-    Send_WakeOnLan_ShouldProcessVerboseDescription = Send Wake-on-LAN packet to MAC address '{0}' via broadcast '{1}' on port {2}. (SWOL0005)
-    Send_WakeOnLan_ShouldProcessVerboseWarning = Are you sure you want to send a Wake-on-LAN packet to MAC address '{0}'? (SWOL0006)
+    Send_WakeOnLan_ShouldProcessDescription = Send Wake-on-LAN packet to MAC address '{0}' via broadcast '{1}' on port {2}. (SWOL0005)
+    Send_WakeOnLan_ShouldProcessConfirmation = Are you sure you want to send a Wake-on-LAN packet to MAC address '{0}'? (SWOL0006)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Send_WakeOnLan_ShouldProcessCaption = Send Wake-on-LAN packet
 
@@ -144,4 +144,20 @@ ConvertFrom-StringData @'
 
     ## Invoke-PesterJob
     Invoke_PesterJob_ModuleBuilderRequired = The ModuleBuilder module is required for source line mapping but is not available. Please install the ModuleBuilder module or run the command in a Sampler project environment. (IPJ0001)
+
+    ## Remove-PSHistory
+    Remove_PSHistory_ShouldProcessDescription = Removing content matching the pattern '{0}'. (RH0001)
+    Remove_PSHistory_ShouldProcessConfirmation = Are you sure you want to remove the content matching the pattern '{0}' from PowerShell history? (RH0002)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Remove_PSHistory_ShouldProcessCaption = Remove content matching the pattern from PowerShell history
+    Remove_PSHistory_Removed = Removed PowerShell history content matching the pattern. (RH0003)
+    Remove_PSHistory_NoMatches = No PowerShell history content matching the pattern. (RH0004)
+
+    ## Remove-PSReadLineHistory
+    Remove_PSReadLineHistory_ShouldProcessDescription = Removing content matching the pattern '{0}'. (RPSH0001)
+    Remove_PSReadLineHistory_ShouldProcessConfirmation = Are you sure you want to remove the content matching the pattern '{0}' from PSReadLine history? (RPSH0002)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Remove_PSReadLineHistory_ShouldProcessCaption = Remove content matching the pattern from PSReadLine history
+    Remove_PSReadLineHistory_Removed = Removed PSReadLine history content matching the pattern. (RPSH0003)
+    Remove_PSReadLineHistory_NoMatches = No PSReadLine history content matching the pattern. (RPSH0004)
 '@

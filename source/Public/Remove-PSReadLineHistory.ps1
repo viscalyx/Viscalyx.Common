@@ -71,23 +71,23 @@ function Remove-PSReadLineHistory
     {
         $matchingContent | Write-Verbose -Verbose
 
-        $shouldProcessVerboseDescription = 'Removing content matching the pattern ''{0}''.' -f $Pattern
-        $shouldProcessVerboseWarning = 'Are you sure you want to remove the content matching the pattern ''{0}'' from PSReadLine history?' -f $Pattern
+        $shouldProcessDescription = $script:localizedData.Remove_PSReadLineHistory_ShouldProcessDescription -f $Pattern
+        $shouldProcessConfirmation = $script:localizedData.Remove_PSReadLineHistory_ShouldProcessConfirmation -f $Pattern
         # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-        $shouldProcessCaption = 'Remove content matching the pattern from PSReadLine history'
+        $shouldProcessCaption = $script:localizedData.Remove_PSReadLineHistory_ShouldProcessCaption
 
-        if ($PSCmdlet.ShouldProcess($shouldProcessVerboseDescription, $shouldProcessVerboseWarning, $shouldProcessCaption))
+        if ($PSCmdlet.ShouldProcess($shouldProcessDescription, $shouldProcessConfirmation, $shouldProcessCaption))
         {
             Set-Content -Path $historyPath -Value (
                 $historyContent |
                     Select-String -NotMatch $Pattern
             ).Line
 
-            Write-Information -MessageData 'Removed PSReadLine history content matching the pattern.' -InformationAction Continue
+            Write-Information -MessageData ($script:localizedData.Remove_PSReadLineHistory_Removed) -InformationAction Continue
         }
     }
     else
     {
-        Write-Information -MessageData 'No PSReadLine history content matching the pattern.' -InformationAction Continue
+        Write-Information -MessageData ($script:localizedData.Remove_PSReadLineHistory_NoMatches) -InformationAction Continue
     }
 }
