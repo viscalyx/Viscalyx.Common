@@ -133,17 +133,13 @@ Describe 'Assert-IPv4Address' {
 
     Context 'When validating a valid IPv4 address' {
         It 'Should not throw an exception for a valid IPv4 address' {
-            {
-                Assert-IPv4Address -IPAddress '192.168.1.1'
-            } | Should -Not -Throw
+            $null = Assert-IPv4Address -IPAddress '192.168.1.1'
         }
     }
 
     Context 'When validating edge case valid IPv4 addresses' {
         It 'Should not throw an exception for IPv4 address <_>' -ForEach $script:validEdgeCaseAddresses {
-            {
-                Assert-IPv4Address -IPAddress $_
-            } | Should -Not -Throw
+            $null = Assert-IPv4Address -IPAddress $_
         }
     }
 
@@ -189,9 +185,7 @@ Describe 'Assert-IPv4Address' {
 
     Context 'When validating boundary values' {
         It 'Should not throw an exception for boundary value <_>' -ForEach $script:boundaryAddresses {
-            {
-                Assert-IPv4Address -IPAddress $_
-            } | Should -Not -Throw
+            $null = Assert-IPv4Address -IPAddress $_
         }
     }
 

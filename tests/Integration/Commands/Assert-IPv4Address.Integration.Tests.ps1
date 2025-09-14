@@ -45,9 +45,7 @@ Describe 'Assert-IPv4Address' {
         }
 
         It 'Should successfully validate IPv4 address <_>' -ForEach $validIPAddresses {
-            {
-                Assert-IPv4Address -IPAddress $_
-            } | Should -Not -Throw
+            $null = Assert-IPv4Address -IPAddress $_
         }
     }
 
@@ -142,9 +140,7 @@ Describe 'Assert-IPv4Address' {
 
         It 'Should handle edge case <Description>: <IPAddress>' -ForEach $edgeCaseTests {
             if ($_.ShouldPass) {
-                {
-                    Assert-IPv4Address -IPAddress $_.IPAddress
-                } | Should -Not -Throw
+                $null = Assert-IPv4Address -IPAddress $_.IPAddress
             } else {
                 {
                     Assert-IPv4Address -IPAddress $_.IPAddress

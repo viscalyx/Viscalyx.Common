@@ -88,6 +88,8 @@ function Resolve-DnsName
             }
 
             Write-Error @writeErrorParameters
+
+            return
         }
     }
     catch

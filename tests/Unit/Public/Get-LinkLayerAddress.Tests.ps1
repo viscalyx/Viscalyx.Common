@@ -94,7 +94,7 @@ Describe 'Get-LinkLayerAddress' {
             }
 
             It 'Should accept valid IP address format' {
-                { Get-LinkLayerAddress -IPAddress '192.168.1.1' } | Should -Not -Throw
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
             }
         }
     }
@@ -131,13 +131,13 @@ Describe 'Get-LinkLayerAddress' {
             }
 
             It 'Should call Test-Connection to refresh ARP entry' -Skip:(-not $IsWindows) {
-                Get-LinkLayerAddress -IPAddress '192.168.1.1'
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
 
                 Should -Invoke -CommandName Test-Connection -Exactly 1
             }
 
             It 'Should call Get-NetNeighbor with correct IP address' -Skip:(-not $IsWindows) {
-                Get-LinkLayerAddress -IPAddress '192.168.1.1'
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
 
                 Should -Invoke -CommandName Get-NetNeighbor -ParameterFilter {
                     $IPAddress -eq '192.168.1.1'
@@ -156,7 +156,7 @@ Describe 'Get-LinkLayerAddress' {
             }
 
             It 'Should write a warning when no MAC address is found' -Skip:(-not $IsWindows) {
-                Get-LinkLayerAddress -IPAddress '192.168.1.1'
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
 
                 Should -Invoke -CommandName Write-Warning -Exactly 1
             }
@@ -184,7 +184,7 @@ Describe 'Get-LinkLayerAddress' {
 
             It 'Should handle arp.exe command execution' -Skip:(-not $IsWindows) {
                 # Since we can't easily mock arp.exe, we'll just test that it doesn't crash
-                { Get-LinkLayerAddress -IPAddress '192.168.1.1' } | Should -Not -Throw
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
             }
         }
 
@@ -194,7 +194,7 @@ Describe 'Get-LinkLayerAddress' {
             }
 
             It 'Should write a warning when arp command fails' -Skip:(-not $IsWindows) {
-                Get-LinkLayerAddress -IPAddress '192.168.1.1'
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
 
                 Should -Invoke -CommandName Write-Warning -Exactly 1
             }
@@ -220,7 +220,7 @@ Describe 'Get-LinkLayerAddress' {
 
             It 'Should return the MAC address from ip command' -Skip:(-not $IsLinux) {
                 # Since we can't easily mock the ip command, we'll just test that it doesn't crash
-                { Get-LinkLayerAddress -IPAddress '192.168.1.1' } | Should -Not -Throw
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
             }
         }
 
@@ -230,7 +230,7 @@ Describe 'Get-LinkLayerAddress' {
             }
 
             It 'Should write a warning when ip command fails' -Skip:(-not $IsLinux) {
-                Get-LinkLayerAddress -IPAddress '192.168.1.1'
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
 
                 Should -Invoke -CommandName Write-Warning -Exactly 1
             }
@@ -264,22 +264,22 @@ Describe 'Get-LinkLayerAddress' {
 
             It 'Should normalize single-digit MAC address octets to two-digit uppercase format' -Skip:(-not $IsMacOS) {
                 # Since we can't easily mock the arp command, we'll just test that it doesn't crash
-                { Get-LinkLayerAddress -IPAddress '192.168.1.1' } | Should -Not -Throw
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
             }
 
             It 'Should normalize mixed single and double-digit MAC address octets' -Skip:(-not $IsMacOS) {
                 # Since we can't easily mock the arp command, we'll just test that it doesn't crash
-                { Get-LinkLayerAddress -IPAddress '192.168.1.1' } | Should -Not -Throw
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
             }
 
             It 'Should normalize uppercase MAC address to uppercase' -Skip:(-not $IsMacOS) {
                 # Since we can't easily mock the arp command, we'll just test that it doesn't crash
-                { Get-LinkLayerAddress -IPAddress '192.168.1.1' } | Should -Not -Throw
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
             }
 
             It 'Should handle already normalized MAC addresses correctly' -Skip:(-not $IsMacOS) {
                 # Since we can't easily mock the arp command, we'll just test that it doesn't crash
-                { Get-LinkLayerAddress -IPAddress '192.168.1.1' } | Should -Not -Throw
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
             }
         }
 
@@ -290,7 +290,7 @@ Describe 'Get-LinkLayerAddress' {
 
             It 'Should return the MAC address from arp command' -Skip:(-not $IsMacOS) {
                 # Since we can't easily mock the arp command, we'll just test that it doesn't crash
-                { Get-LinkLayerAddress -IPAddress '192.168.1.1' } | Should -Not -Throw
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
             }
         }
 
@@ -300,7 +300,7 @@ Describe 'Get-LinkLayerAddress' {
             }
 
             It 'Should write a warning when arp command fails' -Skip:(-not $IsMacOS) {
-                Get-LinkLayerAddress -IPAddress '192.168.1.1'
+                $null = Get-LinkLayerAddress -IPAddress '192.168.1.1'
 
                 Should -Invoke -CommandName Write-Warning -Exactly 1
             }
@@ -343,7 +343,7 @@ Describe 'Get-LinkLayerAddress' {
         It 'Should process multiple IP addresses from pipeline' {
             $ipAddresses = @('192.168.1.1', '192.168.1.2')
 
-            { $ipAddresses | Get-LinkLayerAddress } | Should -Not -Throw
+            $null = $ipAddresses | Get-LinkLayerAddress
 
             # Verify Test-Connection was called for each IP
             Should -Invoke -CommandName Test-Connection -Exactly 2
@@ -376,7 +376,7 @@ Describe 'Get-LinkLayerAddress' {
         }
 
         It 'Should work with Get-MacAddress alias' {
-            { Get-MacAddress -IPAddress '192.168.1.1' } | Should -Not -Throw
+            $null = Get-MacAddress -IPAddress '192.168.1.1'
         }
     }
 }
