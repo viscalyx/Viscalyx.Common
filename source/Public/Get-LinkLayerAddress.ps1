@@ -90,8 +90,9 @@ function Get-LinkLayerAddress
 
             if ($null -ne $mac -and $mac -ne '')
             {
-                Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $mac)
-                return $mac
+                $normalizedMac = ConvertTo-CanonicalMacAddress -MacAddress $mac
+                Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $normalizedMac)
+                return $normalizedMac
             }
         }
         elseif ($IsWindows)
@@ -110,8 +111,9 @@ function Get-LinkLayerAddress
 
                     if ($null -ne $mac -and $mac -ne '')
                     {
-                        Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $mac)
-                        return $mac
+                        $normalizedMac = ConvertTo-CanonicalMacAddress -MacAddress $mac
+                        Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $normalizedMac)
+                        return $normalizedMac
                     }
                 }
             }
@@ -131,8 +133,9 @@ function Get-LinkLayerAddress
                 if ($text -match 'lladdr\s+([0-9a-f:]{17})') # cSpell: disable-line
                 {
                     $mac = $Matches[1]
-                    Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $mac)
-                    return $mac
+                    $normalizedMac = ConvertTo-CanonicalMacAddress -MacAddress $mac
+                    Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $normalizedMac)
+                    return $normalizedMac
                 }
             }
             catch
@@ -152,11 +155,8 @@ function Get-LinkLayerAddress
                 {
                     $mac = $Matches[1]
 
-                    # Normalize MAC address to canonical format (lowercase, two-digit octets)
-                    $normalizedOctets = $mac.Split(':') | ForEach-Object {
-                        $_.PadLeft(2, '0').ToLower()
-                    }
-                    $normalizedMac = $normalizedOctets -join ':'
+                    # Normalize MAC address to canonical format
+                    $normalizedMac = ConvertTo-CanonicalMacAddress -MacAddress $mac
 
                     Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $normalizedMac)
                     return $normalizedMac

@@ -129,6 +129,12 @@ ConvertFrom-StringData @'
     Get_LinkLayerAddress_CouldNotFindMac = Could not find a MAC address for '{0}'. Ensure the IP address is on the same subnet and the computer is powered on and reachable. (GLLA0009)
     Get_LinkLayerAddress_InvalidIPAddress = Invalid IP address format '{0}'. Expected format: 'XXX.XXX.XXX.XXX'. (GLLA0010)
 
+    ## ConvertTo-CanonicalMacAddress
+    ConvertTo_CanonicalMacAddress_NormalizingMac = Normalizing MAC address '{0}' to canonical format. (CCMA0001)
+    ConvertTo_CanonicalMacAddress_InvalidLength = MAC address '{0}' has invalid length '{1}', expected 12 hexadecimal characters. Returning original value. (CCMA0002)
+    ConvertTo_CanonicalMacAddress_NormalizedMac = Successfully normalized MAC address from '{0}' to '{1}'. (CCMA0003)
+    ConvertTo_CanonicalMacAddress_NormalizationFailed = Failed to normalize MAC address '{0}' with error: {1}. Returning original value. (CCMA0004)
+
     ## Invoke-PesterJob
     Invoke_PesterJob_ModuleBuilderRequired = The ModuleBuilder module is required for source line mapping but is not available. Please install the ModuleBuilder module or run the command in a Sampler project environment. (IPJ0001)
 '@
