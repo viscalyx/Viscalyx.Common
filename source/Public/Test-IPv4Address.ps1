@@ -55,8 +55,8 @@ function Test-IPv4Address
 
     Write-Verbose -Message ($script:localizedData.Test_IPv4Address_ValidatingAddress -f $IPAddress)
 
-    # Basic format check - must be four groups of 1-3 digits separated by periods
-    if ($IPAddress -notmatch '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+    # Basic format check - must be four groups of digits (0 or 1-3 digits without leading zeros) separated by periods
+    if ($IPAddress -notmatch '^(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})$')
     {
         Write-Verbose -Message ($script:localizedData.Test_IPv4Address_InvalidFormat -f $IPAddress)
         return $false
@@ -75,13 +75,6 @@ function Test-IPv4Address
             if ($octetValue -lt 0 -or $octetValue -gt 255)
             {
                 Write-Verbose -Message ($script:localizedData.Test_IPv4Address_OctetOutOfRange -f $octet, $IPAddress)
-                return $false
-            }
-
-            # Check for leading zeros (except for '0' itself)
-            if ($octet.Length -gt 1 -and $octet.StartsWith('0'))
-            {
-                Write-Verbose -Message ($script:localizedData.Test_IPv4Address_InvalidLeadingZero -f $octet, $IPAddress)
                 return $false
             }
         }

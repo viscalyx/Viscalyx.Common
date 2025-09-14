@@ -180,6 +180,7 @@ Describe 'Test-IPv4Address' {
         }
 
         It 'Should return False for leading zero address <_>' -ForEach $script:leadingZeroAddresses {
+            # Note: Leading zeros are now caught early by regex validation rather than loop validation
             Test-IPv4Address -IPAddress $_ | Should -BeFalse
         }
 

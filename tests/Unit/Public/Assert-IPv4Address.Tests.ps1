@@ -168,6 +168,7 @@ Describe 'Assert-IPv4Address' {
     }
 
     Context 'When validating an IPv4 address with invalid leading zeros' {
+        # Note: Leading zeros are now caught early by regex validation (AIV0003) rather than loop validation
         It 'Should throw exception for leading zero in <_>' -ForEach $script:leadingZeroAddresses {
             {
                 Assert-IPv4Address -IPAddress $_

@@ -59,8 +59,8 @@ function Assert-IPv4Address
         # Need to determine the specific error to throw the appropriate exception
         # Re-run the validation to get specific error details
 
-        # Basic format check - must be four groups of 1-3 digits separated by periods
-        if ($IPAddress -notmatch '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+        # Basic format check - must be four groups of digits (0 or 1-3 digits without leading zeros) separated by periods
+        if ($IPAddress -notmatch '^(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})$')
         {
             $PSCmdlet.ThrowTerminatingError(
                 [System.Management.Automation.ErrorRecord]::new(
@@ -88,19 +88,6 @@ function Assert-IPv4Address
                         [System.Management.Automation.ErrorRecord]::new(
                             [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetOutOfRangeException -f $octet, $IPAddress)),
                             'AIV0004',
-                            [System.Management.Automation.ErrorCategory]::InvalidData,
-                            $IPAddress
-                        )
-                    )
-                }
-
-                # Check for leading zeros (except for '0' itself)
-                if ($octet.Length -gt 1 -and $octet.StartsWith('0'))
-                {
-                    $PSCmdlet.ThrowTerminatingError(
-                        [System.Management.Automation.ErrorRecord]::new(
-                            [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_InvalidLeadingZeroException -f $octet, $IPAddress)),
-                            'AIV0005',
                             [System.Management.Automation.ErrorCategory]::InvalidData,
                             $IPAddress
                         )
