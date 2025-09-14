@@ -42,7 +42,8 @@
     ],
     "cSpell.ignoreRegExpList": [
         "/HKCU:/g",
-        "/analyzersettings\\.psd1/g"
+        "/analyzersettings\\.psd1/g",
+        "/\\b[A-Z]+\\d{4}\\b/g"
     ],
     "[markdown]": {
         "files.trimTrailingWhitespace": true,
