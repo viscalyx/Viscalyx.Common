@@ -602,6 +602,7 @@ function Invoke-PesterJob
             #>
             if ($EnableSourceLineMapping.IsPresent -and $pesterObject -and $pesterObject.CodeCoverage)
             {
+                # TODO: Should support Pester v4 as well.
                 $pesterObject.CodeCoverage.CommandsMissed
             }
             else
