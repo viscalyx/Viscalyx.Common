@@ -5,10 +5,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Invoke-PesterJob`
+  - Added new switch parameter `EnableSourceLineMapping` to map code coverage
+    lines from built module files back to their corresponding source files
+    using ModuleBuilder's Convert-LineNumber command. When enabled, this
+    parameter automatically enables PassThru and requires ModuleBuilder
+    module unless running in a Sampler project environment.
+  - Added new parameter `FilterCodeCoverageResult` to filter code coverage results
+    by function or class name when using EnableSourceLineMapping. Supports
+    wildcard patterns and accepts arrays of filter patterns for flexible
+    filtering of missed coverage lines.
+
 ### Fixed
 
 - Improved handling escape character in tests.
 - Fix build configuration due to changes in DscResource.DocGenerator.
+- Fix error stream redirection in all test files to preserve error stream
+  visibility ([issue #32](https://github.com/viscalyx/Viscalyx.Common/issues/32)).
+- Fixed stream redirection in integration tests.
+- Improved test code quality and accuracy.
+
+### Changed
+
+- Editor: Update VS Code settings to set default terminal
+  profiles and enable Copilot instruction files.
+- Tooling: Add task arguments and improve `test` and `build`
+  task configuration for reproducible runs.
+- Bump actions/checkout from 4 to 5
 
 ## [0.4.1] - 2025-02-27
 
@@ -79,7 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Invoke-PesterJob`
   - `New-SamplerGitHubReleaseTag`
   - `Out-Difference`
-  - `Pop-VMLatestSnapShot`
+  - `Pop-VMLatestSnapshot`
   - `Remove-History`
   - `Remove-PSHistory`
   - `Remove-PSReadLineHistory`
