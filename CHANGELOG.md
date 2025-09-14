@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   profiles and enable Copilot instruction files.
 - Tooling: Add task arguments and improve `test` and `build`
   task configuration for reproducible runs.
+- Bump actions/checkout from 4 to 5
 
 ## [0.4.1] - 2025-02-27
 
