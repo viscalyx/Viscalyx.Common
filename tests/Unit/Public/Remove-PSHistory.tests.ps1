@@ -43,18 +43,16 @@ AfterAll {
 }
 
 Describe 'Remove-PSHistory' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[-Pattern] <string> [-EscapeRegularExpression] [-WhatIf] [-Confirm] [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set __AllParameterSets' {
+            $result = (Get-Command -Name 'Remove-PSHistory').ParameterSets[0].ToString()
+            $result | Should -Be '[-Pattern] <string> [-EscapeRegularExpression] [-WhatIf] [-Confirm] [<CommonParameters>]'
         }
-    ) {
-        $parameterSet = (Get-Command -Name 'Remove-PSHistory').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have Pattern as a mandatory parameter' {
+            $result = (Get-Command -Name 'Remove-PSHistory').Parameters['Pattern'].Attributes.Mandatory
+            $result | Should -Contain $true
+        }
     }
 
     BeforeEach {

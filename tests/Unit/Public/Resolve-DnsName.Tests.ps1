@@ -43,6 +43,18 @@ AfterAll {
 }
 
 Describe 'Resolve-DnsName' {
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set __AllParameterSets' {
+            $result = (Get-Command -Name 'Resolve-DnsName').ParameterSets[0].ToString()
+            $result | Should -Be '[-HostName] <string> [<CommonParameters>]'
+        }
+
+        It 'Should have HostName as a mandatory parameter' {
+            $result = (Get-Command -Name 'Resolve-DnsName').Parameters['HostName'].Attributes.Mandatory
+            $result | Should -Contain $true
+        }
+    }
+
     Context 'When testing parameter validation' {
         It 'Should not accept null or empty hostname' {
             { Resolve-DnsName -HostName $null } | Should -Throw

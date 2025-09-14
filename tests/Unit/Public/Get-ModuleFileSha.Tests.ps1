@@ -42,22 +42,38 @@ AfterAll {
 }
 
 Describe 'Get-ModuleFileSha' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = 'ModuleName'
-            ExpectedParameterSetString = '-Name <string> [-Version <string>] [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = 'ModuleName'
+                ExpectedParameters = '-Name <string> [-Version <string>] [<CommonParameters>]'
+            }
+            @{
+                ExpectedParameterSetName = 'Path'
+                ExpectedParameters = '-Path <string> [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Get-ModuleFileSha').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
-        @{
-            Name = 'Path'
-            ExpectedParameterSetString = '-Path <string> [<CommonParameters>]'
-        }
-    ) {
-        $parameterSet = (Get-Command -Name 'Get-ModuleFileSha').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have Name as a mandatory parameter in ModuleName parameter set' {
+            $parameterInfo = (Get-Command -Name 'Get-ModuleFileSha').Parameters['Name']
+            $mandatoryAttribute = $parameterInfo.Attributes | Where-Object { $_.TypeId.Name -eq 'ParameterAttribute' -and $_.ParameterSetName -eq 'ModuleName' }
+            $mandatoryAttribute.Mandatory | Should -BeTrue
+        }
+
+        It 'Should have Path as a mandatory parameter in Path parameter set' {
+            $parameterInfo = (Get-Command -Name 'Get-ModuleFileSha').Parameters['Path']
+            $mandatoryAttribute = $parameterInfo.Attributes | Where-Object { $_.TypeId.Name -eq 'ParameterAttribute' -and $_.ParameterSetName -eq 'Path' }
+            $mandatoryAttribute.Mandatory | Should -BeTrue
+        }
     }
 
     BeforeAll {

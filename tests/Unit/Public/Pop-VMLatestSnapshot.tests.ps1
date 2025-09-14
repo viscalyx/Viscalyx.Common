@@ -43,18 +43,16 @@ AfterAll {
 }
 
 Describe 'Pop-VMLatestSnapshot' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[-ServerName] <string> [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set __AllParameterSets' {
+            $result = (Get-Command -Name 'Pop-VMLatestSnapshot').ParameterSets[0].ToString()
+            $result | Should -Be '[-ServerName] <string> [<CommonParameters>]'
         }
-    ) {
-        $parameterSet = (Get-Command -Name 'Pop-VMLatestSnapshot').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have ServerName as a mandatory parameter' {
+            $result = (Get-Command -Name 'Pop-VMLatestSnapshot').Parameters['ServerName'].Attributes.Mandatory
+            $result | Should -Contain $true
+        }
     }
 
     BeforeAll {

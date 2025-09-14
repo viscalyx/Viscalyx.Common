@@ -43,18 +43,27 @@ AfterAll {
 }
 
 Describe 'Get-ModuleVersion' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[-Module] <Object> [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters = '[-Module] <Object> [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Get-ModuleVersion').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
-    ) {
-        $parameterSet = (Get-Command -Name 'Get-ModuleVersion').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have Module as a mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Get-ModuleVersion').Parameters['Module']
+            $parameterInfo.Attributes.Mandatory | Should -BeTrue
+        }
     }
 
     Context 'When the module is passed as a string and exists' {

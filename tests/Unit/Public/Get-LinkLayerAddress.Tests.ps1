@@ -43,6 +43,29 @@ AfterAll {
 }
 
 Describe 'Get-LinkLayerAddress' {
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters = '[-IPAddress] <string> [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Get-LinkLayerAddress').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
+        }
+
+        It 'Should have IPAddress as a mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Get-LinkLayerAddress').Parameters['IPAddress']
+            $parameterInfo.Attributes.Mandatory | Should -BeTrue
+        }
+    }
+
     Context 'When validating parameter input' {
         Context 'When IP address format is invalid' {
             It 'Should throw an error for invalid IP address format' {

@@ -43,6 +43,18 @@ AfterAll {
 }
 
 Describe 'Send-WakeOnLan' {
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set __AllParameterSets' {
+            $result = (Get-Command -Name 'Send-WakeOnLan').ParameterSets[0].ToString()
+            $result | Should -Be '[-LinkLayerAddress] <string> [[-Broadcast] <string>] [[-Port] <ushort>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        }
+
+        It 'Should have LinkLayerAddress as a mandatory parameter' {
+            $result = (Get-Command -Name 'Send-WakeOnLan').Parameters['LinkLayerAddress'].Attributes.Mandatory
+            $result | Should -Contain $true
+        }
+    }
+
     Context 'When sending Wake-on-LAN packet with valid parameters' {
         BeforeAll {
             Mock -CommandName Write-Verbose
@@ -162,6 +174,22 @@ Describe 'Send-WakeOnLan' {
                     $packet[$packetIndex] | Should -Be $expectedMacBytes[$byteIndex]
                 }
             }
+        }
+    }
+
+    Context 'When validating parameter sets' {
+        It 'Should have the correct parameter set definition' {
+            $command = Get-Command -Name 'Send-WakeOnLan'
+            $parameterSet = $command.ParameterSets | Where-Object { $_.Name -eq '__AllParameterSets' }
+            
+            $parameterSet.ToString() | Should -Be '[-LinkLayerAddress] <string> [[-Broadcast] <string>] [[-Port] <ushort>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        }
+
+        It 'Should have LinkLayerAddress parameter as mandatory' {
+            $command = Get-Command -Name 'Send-WakeOnLan'
+            $linkLayerAddressParam = $command.Parameters['LinkLayerAddress']
+            
+            $linkLayerAddressParam.Attributes.Mandatory | Should -Be $true
         }
     }
 

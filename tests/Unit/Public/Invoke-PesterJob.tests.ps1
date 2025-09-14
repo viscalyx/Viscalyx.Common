@@ -44,18 +44,16 @@ AfterAll {
 }
 
 Describe 'Invoke-PesterJob' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set __AllParameterSets' {
+            $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets[0].ToString()
+            $result | Should -Be '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
         }
-    ) {
-        $parameterSet = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have no mandatory parameters' {
+            $mandatoryParams = (Get-Command -Name 'Invoke-PesterJob').Parameters.Values | Where-Object { $_.Attributes.Mandatory -eq $true }
+            $mandatoryParams | Should -BeNullOrEmpty
+        }
     }
 
     # Mock external dependencies
