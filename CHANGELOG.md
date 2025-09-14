@@ -13,9 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     using ModuleBuilder's Convert-LineNumber command. When enabled, this
     parameter automatically enables PassThru and requires ModuleBuilder
     module unless running in a Sampler project environment.
-  - Added new parameter `CoverageFilterName` to filter code coverage results 
+  - Added new parameter `FilterCodeCoverageResult` to filter code coverage results
     by function or class name when using EnableSourceLineMapping. Supports
-    wildcard patterns and accepts arrays of filter patterns for flexible 
+    wildcard patterns and accepts arrays of filter patterns for flexible
     filtering of missed coverage lines.
 
 ### Fixed
