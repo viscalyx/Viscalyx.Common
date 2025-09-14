@@ -50,8 +50,8 @@ Describe 'Get-LinkLayerAddress Integration Tests' {
                 $result = Get-LinkLayerAddress -IPAddress $reachableIP
 
                 $result | Should -Not -BeNullOrEmpty
-                # MAC address should be in standard format (XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX)
-                $result | Should -Match '^([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}$'
+                # MAC address should be normalized to xx:xx:xx:xx:xx:xx (lower-case)
+                $result | Should -Match '^([0-9a-f]{2}:){5}[0-9a-f]{2}$'
             }
 
             It 'Should work with pipeline input for the reachable gateway' -Skip:($null -eq $reachableIP) {
@@ -73,7 +73,7 @@ Describe 'Get-LinkLayerAddress Integration Tests' {
             It 'Should skip integration tests if no reachable gateway is available' -Skip:($null -ne $reachableIP) {
                 # This test will only run if no reachable gateway was found
                 Write-Warning 'No reachable gateway found. Integration tests for Get-LinkLayerAddress were skipped.'
-                $true | Should -Be $true  # Always pass this test
+                $true | Should -BeTrue  # Always pass this test
             }
         }
     }
