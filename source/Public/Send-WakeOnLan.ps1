@@ -109,22 +109,8 @@ function Send-WakeOnLan
 
         Write-Verbose -Message ($script:localizedData.Send_WakeOnLan_SendingPacket -f $LinkLayerAddress, $Broadcast, $Port)
 
-        # Remove any separators from the MAC address and validate length
+        # Remove any separators from the MAC address
         $cleanMacAddress = $LinkLayerAddress -replace '[-:]', ''
-
-        if ($cleanMacAddress.Length -ne 12)
-        {
-            $errorMessage = $script:localizedData.Send_WakeOnLan_InvalidMacAddress -f $LinkLayerAddress
-
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    [System.ArgumentException]::new($errorMessage),
-                    'InvalidMacAddressFormat',
-                    [System.Management.Automation.ErrorCategory]::InvalidArgument,
-                    $LinkLayerAddress
-                )
-            )
-        }
 
         $verboseDescriptionMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessVerboseDescription -f $LinkLayerAddress, $Broadcast, $Port
         $verboseWarningMessage = $script:localizedData.Send_WakeOnLan_ShouldProcessVerboseWarning -f $LinkLayerAddress
