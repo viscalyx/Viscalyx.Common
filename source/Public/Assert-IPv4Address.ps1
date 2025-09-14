@@ -43,6 +43,7 @@
 function Assert-IPv4Address
 {
     [CmdletBinding()]
+    [OutputType()]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -65,7 +66,7 @@ function Assert-IPv4Address
                 [System.Management.Automation.ErrorRecord]::new(
                     [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_InvalidFormatException -f $IPAddress)),
                     'AIV0003',
-                    [System.Management.Automation.ErrorCategory]::InvalidResult,
+                    [System.Management.Automation.ErrorCategory]::InvalidData,
                     $IPAddress
                 )
             )
@@ -87,7 +88,7 @@ function Assert-IPv4Address
                         [System.Management.Automation.ErrorRecord]::new(
                             [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetOutOfRangeException -f $octet, $IPAddress)),
                             'AIV0004',
-                            [System.Management.Automation.ErrorCategory]::InvalidResult,
+                            [System.Management.Automation.ErrorCategory]::InvalidData,
                             $IPAddress
                         )
                     )
@@ -100,7 +101,7 @@ function Assert-IPv4Address
                         [System.Management.Automation.ErrorRecord]::new(
                             [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_InvalidLeadingZeroException -f $octet, $IPAddress)),
                             'AIV0005',
-                            [System.Management.Automation.ErrorCategory]::InvalidResult,
+                            [System.Management.Automation.ErrorCategory]::InvalidData,
                             $IPAddress
                         )
                     )
@@ -117,7 +118,7 @@ function Assert-IPv4Address
                     [System.Management.Automation.ErrorRecord]::new(
                         [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetConversionFailedException -f $octet, $IPAddress)),
                         'AIV0006',
-                        [System.Management.Automation.ErrorCategory]::InvalidResult,
+                        [System.Management.Automation.ErrorCategory]::InvalidData,
                         $IPAddress
                     )
                 )
