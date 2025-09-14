@@ -196,7 +196,7 @@ Describe 'Send-WakeOnLan' {
             $command = Get-Command -Name 'Send-WakeOnLan'
             $linkLayerAddressParam = $command.Parameters['LinkLayerAddress']
 
-            $linkLayerAddressParam.Attributes.Mandatory | Should -Be $true
+            $linkLayerAddressParam.Attributes.Mandatory | Should -BeTrue
         }
     }
 

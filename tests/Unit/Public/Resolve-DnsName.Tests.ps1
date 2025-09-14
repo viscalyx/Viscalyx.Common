@@ -156,7 +156,7 @@ Describe 'Resolve-DnsName' {
             $result = Resolve-DnsName -HostName 'dns.google'
             $result | Should -BeOfType [System.String]
             # Should not be an array - test that it's a single string, not an array
-            $result.GetType().IsArray | Should -Be $false
+            $result.GetType().IsArray | Should -BeFalse
         }
     }
 
