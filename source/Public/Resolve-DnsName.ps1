@@ -92,7 +92,7 @@ function Resolve-DnsName
             return
         }
     }
-    catch
+    catch [System.Exception]
     {
         $writeErrorParameters = @{
             Message      = $script:localizedData.Resolve_DnsName_ResolutionFailed -f $HostName

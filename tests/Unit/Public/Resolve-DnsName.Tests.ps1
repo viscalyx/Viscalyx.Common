@@ -178,7 +178,7 @@ Describe 'Resolve-DnsName' {
 
         It 'Should use localized strings for error messages' {
             # TODO: Write-Error passing -Exception does not seem to include the localized exception message in the ErrorRecord.
-            { Resolve-DnsName -HostName 'nonexistent.domain.invalid' -ErrorAction Stop } | Should -Throw -ExpectedMessage '*Exception calling "GetHostAddresses" with "1" argument(s)*'
+            { Resolve-DnsName -HostName 'nonexistent.domain.invalid' -ErrorAction Stop } | Should -Throw -ErrorId 'RDN0005,Resolve-DnsName'
         }
     }
 }

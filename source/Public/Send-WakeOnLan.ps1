@@ -157,10 +157,10 @@ function Send-WakeOnLan
 
                 Write-Information -MessageData $script:localizedData.Send_WakeOnLan_PacketSent
             }
-            catch
+            catch [System.Exception]
             {
                 $errorRecord = [System.Management.Automation.ErrorRecord]::new(
-                    [System.Exception]::new($script:localizedData.Send_WakeOnLan_SendFailed, $_),
+                    [System.Exception]::new($script:localizedData.Send_WakeOnLan_SendFailed, $_.Exception),
                     'SendWakeOnLanFailed',
                     [System.Management.Automation.ErrorCategory]::ConnectionError,
                     $null

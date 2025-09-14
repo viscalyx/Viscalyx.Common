@@ -361,7 +361,7 @@ Describe 'Send-WakeOnLan' {
         }
 
         It 'Should properly dispose UDP client even when Connect fails' {
-            { Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force } | Should -Throw -ExpectedMessage "*Network error*"
+            { Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force } | Should -Throw -ExpectedMessage "*Failed to send Wake-on-LAN packet*"
 
             $mockUdpClient.CloseCalled | Should -BeTrue
             $mockUdpClient.DisposeCalled | Should -BeTrue
