@@ -62,6 +62,7 @@ Describe 'Send-WakeOnLan' {
 
             # Mock the UDP client to avoid actual network operations
             $mockUdpClient = [PSCustomObject] @{
+                EnableBroadcast = $false
                 ConnectCalled = $false
                 SendCalled = $false
                 CloseCalled = $false
@@ -154,6 +155,12 @@ Describe 'Send-WakeOnLan' {
             $mockUdpClient.SendCalled | Should -BeTrue
         }
 
+        It 'Should enable broadcast on UDP client' {
+            Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
+
+            $mockUdpClient.EnableBroadcast | Should -BeTrue
+        }
+
         It 'Should create correct magic packet structure' {
             Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force
 
@@ -181,14 +188,14 @@ Describe 'Send-WakeOnLan' {
         It 'Should have the correct parameter set definition' {
             $command = Get-Command -Name 'Send-WakeOnLan'
             $parameterSet = $command.ParameterSets | Where-Object { $_.Name -eq '__AllParameterSets' }
-            
+
             $parameterSet.ToString() | Should -Be '[-LinkLayerAddress] <string> [[-Broadcast] <string>] [[-Port] <ushort>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
         }
 
         It 'Should have LinkLayerAddress parameter as mandatory' {
             $command = Get-Command -Name 'Send-WakeOnLan'
             $linkLayerAddressParam = $command.Parameters['LinkLayerAddress']
-            
+
             $linkLayerAddressParam.Attributes.Mandatory | Should -Be $true
         }
     }
@@ -206,6 +213,7 @@ Describe 'Send-WakeOnLan' {
                 $script:mockCallCount++
 
                 $mockUdpClient = [PSCustomObject] @{
+                    EnableBroadcast = $false
                     ConnectCalled = $false
                     SendCalled = $false
                     CloseCalled = $false
@@ -269,6 +277,7 @@ Describe 'Send-WakeOnLan' {
             Mock -CommandName Write-Debug
 
             $mockUdpClient = [PSCustomObject] @{
+                EnableBroadcast = $false
                 ConnectCalled = $false
                 SendCalled = $false
             }
@@ -336,6 +345,7 @@ Describe 'Send-WakeOnLan' {
             Mock -CommandName Write-Debug
 
             $mockUdpClient = [PSCustomObject] @{
+                EnableBroadcast = $false
                 DisposeCalled = $false
                 CloseCalled = $false
             }
@@ -377,6 +387,7 @@ Describe 'Send-WakeOnLan' {
             Mock -CommandName Write-Debug
 
             $mockUdpClient = [PSCustomObject] @{
+                EnableBroadcast = $false
                 ConnectCalled = $false
                 SendCalled = $false
             }

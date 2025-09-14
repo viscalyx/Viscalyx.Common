@@ -149,6 +149,7 @@ function Send-WakeOnLan
             try
             {
                 $udpClient = New-Object -TypeName 'System.Net.Sockets.UdpClient'
+                $udpClient.EnableBroadcast = $true
                 $udpClient.Connect($Broadcast, $Port)
 
                 [void] $udpClient.Send($packet, $packet.Length)
