@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `ConvertTo-AnsiString` that converts strings containing ANSI
+  sequences to properly escaped and terminated ANSI sequences. It adds the
+  necessary escape character and ensures all sequences end with 'm'. Handles
+  both escaped and unescaped sequences, as well as sequences that may be
+  missing the 'm' terminator.
 - `Assert-IPv4Address` that validates if a string is a valid IPv4 address,
   including format checking and value range validation (0-255 for each octet).
   Also validates that octets do not have leading zeros.
