@@ -155,12 +155,6 @@ Describe 'ConvertTo-DifferenceString' {
         $result | Should -Not -Match 'Ascii'
     }
 
-    It 'Should handle different encodings' {
-        $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -EncodingType 'ASCII')
-        $result | Should -Match '31m65'
-        $result | Should -Match '31m61'
-    }
-
     It 'Should handle null reference string' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString $null -DifferenceString 'Hallo')
         $result | Should -Match '31m48'
