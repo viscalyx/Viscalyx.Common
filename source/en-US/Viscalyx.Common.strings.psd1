@@ -45,11 +45,11 @@ ConvertFrom-StringData @'
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption = Switch to previous branch
 
-    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage = Do you want to push the tags to the upstream '{0}'?
+    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage = Do you want to push the tags to the remote repository '{0}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldContinue messages.
-    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption = Confirm
-    New_SamplerGitHubReleaseTag_TagCreatedAndPushed = Tag '{0}' was created and pushed to upstream '{1}'.
-    New_SamplerGitHubReleaseTag_TagCreatedNotPushed = Tag '{0}' was created. To push the tag to upstream, run 'git push {1} --tags'.
+    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption = 'Push tag to remote repository'
+    New_SamplerGitHubReleaseTag_TagCreatedAndPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created and pushed to the remote repository '{1}'.[0m
+    New_SamplerGitHubReleaseTag_TagCreatedNotPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created, but not pushed. To push the tag to the remote repository, run '[30mgit push {1} --tags[32m'.[0m
 
     ## Install-ModulePatch
     Install_ModulePatch_ShouldProcessDescription = Apply module patch file at location '{0}'.

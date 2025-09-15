@@ -308,16 +308,15 @@ function New-SamplerGitHubReleaseTag
     {
         git tag $ReleaseTag
 
-        if ($PushTag -and ($Force -or $PSCmdlet.ShouldContinue(('Do you want to push the tags to the upstream ''{0}''?' -f $UpstreamRemoteName), 'Confirm')))
+        if ($PushTag -and ($Force -or $PSCmdlet.ShouldContinue(($script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage -f $UpstreamRemoteName), $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption)))
         {
             git push origin --tags
 
-            Write-Information -MessageData ("`e[32mTag `e[1;37;44m{0}`e[0m`e[32m was created and pushed to upstream '{1}'`e[0m" -f $ReleaseTag, $UpstreamRemoteName) -InformationAction Continue
+            Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedAndPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
         }
         else
         {
-            # cSpell: disable-next-line
-            Write-Information -MessageData ("`e[32mTag `e[1;37;44m{0}`e[0m`e[32m was created. To push the tag to upstream, run `e[1;37;44mgit push {1} --tags`e[0m`e[32m.`e[0m" -f $ReleaseTag, $UpstreamRemoteName) -InformationAction Continue
+            Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedNotPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
         }
     }
 
