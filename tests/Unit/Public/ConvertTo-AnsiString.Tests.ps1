@@ -171,7 +171,18 @@ Describe 'ConvertTo-AnsiString' {
             $result | Should -BeExactly $expected
         }
 
-        It 'Should handle mix of backtick and proper escape characters' {
+        <#
+            TODO: Remove Skip when bug in Windows PowerShell is fixed (leaves an extra 'e' at start and end of string).
+
+            Bug:
+            ##[error]     Expected strings to be the same, but they were different.
+            ##[error]     Expected length: 43
+            ##[error]     Actual length:   45
+            ##[error]     Strings differ at index 0.
+            ##[error]     Expected: 'Backtick escapedProper escaped'
+            ##[error]     But was:  'eBacktick escapedProper escapede'
+        #>
+        It 'Should handle mix of backtick and proper escape characters' -Skip:($PSVersionTable.PSEdition -eq 'Desktop') {
             $inputString = "`e[32mBacktick escaped$($esc)[1mProper escaped`e[0m"
             $expected = "$($esc)[32mBacktick escaped$($esc)[1mProper escaped$($esc)[0m"
             $result = ConvertTo-AnsiString -InputString $inputString
