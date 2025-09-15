@@ -81,6 +81,13 @@ function Resolve-DnsName
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
+    # Fast path: input is already an IPv4 literal
+    if (Test-IPv4Address -IPAddress $HostName)
+    {
+        Write-Verbose -Message ($script:localizedData.Resolve_DnsName_ResolutionSuccessful -f $HostName, $HostName)
+        return $HostName
+    }
+
     Write-Verbose -Message ($script:localizedData.Resolve_DnsName_AttemptingResolution -f $HostName)
 
     try
@@ -88,7 +95,7 @@ function Resolve-DnsName
         $hostAddresses = [System.Net.Dns]::GetHostAddresses($HostName)
 
         $ipv4Address = $hostAddresses |
-            Where-Object -FilterScript { $_.AddressFamily -eq 'InterNetwork' } |
+            Where-Object -FilterScript { $_.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork } |
             Select-Object -First 1
 
         if ($null -ne $ipv4Address)
