@@ -54,32 +54,32 @@ Describe 'Assert-IPv4Address' {
             $invalidIPAddresses = @(
                 @{
                     IPAddress = '256.168.1.1'
-                    ExpectedErrorId = 'AIV0004'
+                    ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
                     Description = 'octet out of range'
                 },
                 @{
                     IPAddress = '192.168.01.1'
-                    ExpectedErrorId = 'AIV0003'
+                    ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
                     Description = 'leading zero'
                 },
                 @{
                     IPAddress = '192.168.1'
-                    ExpectedErrorId = 'AIV0003'
+                    ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
                     Description = 'invalid format'
                 },
                 @{
                     IPAddress = '192.168.1.1.1'
-                    ExpectedErrorId = 'AIV0003'
+                    ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
                     Description = 'too many octets'
                 },
                 @{
                     IPAddress = '192.168.1.a'
-                    ExpectedErrorId = 'AIV0003'
+                    ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
                     Description = 'non-numeric octet'
                 },
                 @{
                     IPAddress = '999.999.999.999'
-                    ExpectedErrorId = 'AIV0004'
+                    ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
                     Description = 'all octets out of range'
                 }
             )
@@ -88,7 +88,7 @@ Describe 'Assert-IPv4Address' {
         It 'Should throw exception for invalid IPv4 address with <Description>: <IPAddress>' -ForEach $invalidIPAddresses {
             {
                 Assert-IPv4Address -IPAddress $_.IPAddress
-            } | Should -Throw -ErrorId "$($_.ExpectedErrorId)*"
+            } | Should -Throw -ErrorId "$($_.ExpectedErrorId)"
         }
     }
 
