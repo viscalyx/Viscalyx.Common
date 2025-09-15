@@ -57,10 +57,29 @@ function Resolve-DnsName
     param
     (
         [Parameter(Mandatory = $true, Position = 0)]
-        [ValidateNotNullOrEmpty()]
         [System.String]
         $HostName
     )
+
+    # Additional validation for whitespace-only strings
+    if ([System.String]::IsNullOrWhiteSpace($HostName))
+    {
+        $writeErrorParameters = @{
+            Message      = $script:localizedData.Resolve_DnsName_InvalidHostName
+            Category     = 'InvalidArgument'
+            ErrorId      = 'RDN0007'
+            TargetObject = $HostName
+        }
+
+        $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+            [System.ArgumentException]::new($writeErrorParameters.Message),
+            $writeErrorParameters.ErrorId,
+            $writeErrorParameters.Category,
+            $writeErrorParameters.TargetObject
+        )
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    }
 
     Write-Verbose -Message ($script:localizedData.Resolve_DnsName_AttemptingResolution -f $HostName)
 

@@ -124,6 +124,7 @@ ConvertFrom-StringData @'
     Resolve_DnsName_ResolutionSuccessful = Successfully resolved '{0}' to '{1}'. (RDN0002)
     Resolve_DnsName_ResolutionFailed = DNS resolution failed for '{0}'. (RDN0003)
     Resolve_DnsName_NoIPv4AddressFound = No IPv4 addresses found for '{0}'. (RDN0004)
+    Resolve_DnsName_InvalidHostName = The host name cannot be null, empty, or contain only whitespace characters. (RDN0007)
 
     ## Send-WakeOnLan
     Send_WakeOnLan_SendingPacket = Sending Wake-on-LAN packet to MAC address '{0}' via broadcast '{1}' on port {2}. (SWOL0001)

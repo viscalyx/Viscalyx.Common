@@ -45,25 +45,26 @@ AfterAll {
 Describe 'Resolve-DnsName' {
     Context 'When checking command structure' {
         It 'Should have the correct parameters in parameter set __AllParameterSets' {
-            $result = (Get-Command -Name 'Resolve-DnsName').ParameterSets[0].ToString()
+            $result = (Get-Command -Name 'Resolve-DnsName' -Module 'Viscalyx.Common').ParameterSets[0].ToString()
             $result | Should -Be '[-HostName] <string> [<CommonParameters>]'
         }
 
         It 'Should have HostName as a mandatory parameter' {
-            $result = (Get-Command -Name 'Resolve-DnsName').Parameters['HostName'].Attributes.Mandatory
+            $result = (Get-Command -Name 'Resolve-DnsName' -Module 'Viscalyx.Common').Parameters['HostName'].Attributes.Mandatory
             $result | Should -Contain $true
         }
     }
 
     Context 'When testing parameter validation' {
         It 'Should not accept null or empty hostname' {
-            { Resolve-DnsName -HostName $null } | Should -Throw
-            { Resolve-DnsName -HostName '' } | Should -Throw
+            { Viscalyx.Common\Resolve-DnsName -HostName $null } | Should -Throw
+            { Viscalyx.Common\Resolve-DnsName -HostName '' } | Should -Throw
+            { Viscalyx.Common\Resolve-DnsName -HostName '   ' } | Should -Throw
         }
 
         It 'Should accept hostname by position' {
             # This test uses a real IP address that should resolve to itself
-            $result = Resolve-DnsName '127.0.0.1'
+            $result = Viscalyx.Common\Resolve-DnsName '127.0.0.1'
             $result | Should -Be '127.0.0.1'
         }
     }
@@ -79,20 +80,20 @@ Describe 'Resolve-DnsName' {
         }
 
         It 'Should return the same IPv4 address without modification for <Description>' -ForEach $testCases {
-            $result = Resolve-DnsName -HostName $IPAddress
+            $result = Viscalyx.Common\Resolve-DnsName -HostName $IPAddress
             $result | Should -Be $IPAddress
         }
     }
 
     Context 'When resolving known host names' {
         It 'Should resolve localhost to 127.0.0.1' {
-            $result = Resolve-DnsName -HostName 'localhost'
+            $result = Viscalyx.Common\Resolve-DnsName -HostName 'localhost'
             $result | Should -Be '127.0.0.1'
         }
 
         It 'Should resolve a well-known public host name' {
             # Use a reliable public DNS name that should always resolve
-            $result = Resolve-DnsName -HostName 'dns.google'
+            $result = Viscalyx.Common\Resolve-DnsName -HostName 'dns.google'
             $result | Should -Match '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
         }
     }
@@ -101,7 +102,7 @@ Describe 'Resolve-DnsName' {
         It 'Should throw an error for non-existent domain' {
             $errorRecord = $null
             try {
-                Resolve-DnsName -HostName 'this-domain-does-not-exist-12345.invalid' -ErrorAction Stop
+                Viscalyx.Common\Resolve-DnsName -HostName 'this-domain-does-not-exist-12345.invalid' -ErrorAction Stop
             }
             catch {
                 $errorRecord = $_
@@ -115,7 +116,7 @@ Describe 'Resolve-DnsName' {
         It 'Should throw an error for invalid hostname format' {
             $errorRecord = $null
             try {
-                Resolve-DnsName -HostName 'invalid..hostname' -ErrorAction Stop
+                Viscalyx.Common\Resolve-DnsName -HostName 'invalid..hostname' -ErrorAction Stop
             }
             catch {
                 $errorRecord = $_
@@ -129,7 +130,7 @@ Describe 'Resolve-DnsName' {
 
     Context 'When using verbose output' {
         It 'Should successfully resolve localhost and return valid IP address' {
-            $result = Resolve-DnsName -HostName 'localhost'
+            $result = Viscalyx.Common\Resolve-DnsName -HostName 'localhost'
 
             $result | Should -Not -BeNullOrEmpty
             $result | Should -BeOfType [System.String]
@@ -137,23 +138,23 @@ Describe 'Resolve-DnsName' {
         }
 
         It 'Should throw error for nonexistent domain during failed resolution' {
-            { Resolve-DnsName -HostName 'nonexistent-domain.invalid' -ErrorAction Stop } | Should -Throw
+            { Viscalyx.Common\Resolve-DnsName -HostName 'nonexistent-domain.invalid' -ErrorAction Stop } | Should -Throw
         }
     }
 
     Context 'When testing output format' {
         It 'Should return a string value' {
-            $result = Resolve-DnsName -HostName '127.0.0.1'
+            $result = Viscalyx.Common\Resolve-DnsName -HostName '127.0.0.1'
             $result | Should -BeOfType [System.String]
         }
 
         It 'Should return a valid IPv4 address format' {
-            $result = Resolve-DnsName -HostName 'localhost'
+            $result = Viscalyx.Common\Resolve-DnsName -HostName 'localhost'
             $result | Should -Match '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
         }
 
         It 'Should return only one IP address even if multiple exist' {
-            $result = Resolve-DnsName -HostName 'dns.google'
+            $result = Viscalyx.Common\Resolve-DnsName -HostName 'dns.google'
             $result | Should -BeOfType [System.String]
             # Should not be an array - test that it's a single string, not an array
             $result.GetType().IsArray | Should -BeFalse
@@ -169,7 +170,7 @@ Describe 'Resolve-DnsName' {
         }
 
         It 'Should successfully resolve using localized strings' {
-            $result = Resolve-DnsName -HostName 'localhost'
+            $result = Viscalyx.Common\Resolve-DnsName -HostName 'localhost'
 
             $result | Should -Not -BeNullOrEmpty
             $result | Should -BeOfType [System.String]
@@ -178,7 +179,7 @@ Describe 'Resolve-DnsName' {
 
         It 'Should use localized strings for error messages' {
             # TODO: Write-Error passing -Exception does not seem to include the localized exception message in the ErrorRecord.
-            { Resolve-DnsName -HostName 'nonexistent.domain.invalid' -ErrorAction Stop } | Should -Throw -ErrorId 'RDN0005,Resolve-DnsName'
+            { Viscalyx.Common\Resolve-DnsName -HostName 'nonexistent.domain.invalid' -ErrorAction Stop } | Should -Throw -ErrorId 'RDN0005,Resolve-DnsName'
         }
     }
 }
