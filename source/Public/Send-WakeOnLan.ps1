@@ -161,9 +161,9 @@ function Send-WakeOnLan
             {
                 $errorRecord = [System.Management.Automation.ErrorRecord]::new(
                     [System.Exception]::new($script:localizedData.Send_WakeOnLan_SendFailed, $_.Exception),
-                    'SendWakeOnLanFailed',
+                    'SWOL0003',
                     [System.Management.Automation.ErrorCategory]::ConnectionError,
-                    $null
+                    $LinkLayerAddress
                 )
 
                 $PSCmdlet.ThrowTerminatingError($errorRecord)
