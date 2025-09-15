@@ -44,9 +44,20 @@ AfterAll {
 
 Describe 'New-SamplerGitHubReleaseTag' {
     Context 'When checking command structure' {
-        It 'Should have the correct parameters in parameter set __AllParameterSets' {
-            $result = (Get-Command -Name 'New-SamplerGitHubReleaseTag').ParameterSets[0].ToString()
-            $result | Should -Be '[[-DefaultBranchName] <string>] [[-UpstreamRemoteName] <string>] [[-ReleaseTag] <string>] [-SwitchBackToPreviousBranch] [-Force] [-PushTag] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters       = '[[-DefaultBranchName] <string>] [[-UpstreamRemoteName] <string>] [[-ReleaseTag] <string>] [-SwitchBackToPreviousBranch] [-Force] [-PushTag] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'New-SamplerGitHubReleaseTag').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
 
         It 'Should have no mandatory parameters' {

@@ -155,7 +155,7 @@ Describe 'Assert-IPv4Address' {
         It 'Should throw exception for out of range octet in <_>' -ForEach $script:outOfRangeAddresses {
             {
                 Assert-IPv4Address -IPAddress $_
-            } | Should -Throw
+            } | Should -Throw -ErrorId 'AIV0004,Assert-IPv4Address'
         }
     }
 
@@ -172,7 +172,7 @@ Describe 'Assert-IPv4Address' {
         It 'Should throw exception for leading zero in <_>' -ForEach $script:leadingZeroAddresses {
             {
                 Assert-IPv4Address -IPAddress $_
-            } | Should -Throw
+            } | Should -Throw -ErrorId 'AIV0003,Assert-IPv4Address'
         }
     }
 
@@ -180,7 +180,7 @@ Describe 'Assert-IPv4Address' {
         It 'Should throw exception for conversion failure in <_>' -ForEach $script:conversionFailureAddresses {
             {
                 Assert-IPv4Address -IPAddress $_
-            } | Should -Throw
+            } | Should -Throw -ErrorId 'AIV0003,Assert-IPv4Address'
         }
     }
 

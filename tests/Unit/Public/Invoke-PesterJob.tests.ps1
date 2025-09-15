@@ -45,9 +45,20 @@ AfterAll {
 
 Describe 'Invoke-PesterJob' {
     Context 'When checking command structure' {
-        It 'Should have the correct parameters in parameter set __AllParameterSets' {
-            $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets[0].ToString()
-            $result | Should -Be '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters       = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
 
         It 'Should have no mandatory parameters' {
@@ -268,22 +279,6 @@ Describe 'Invoke-PesterJob' {
             Mock -CommandName Get-Module # Mocked with nothing, to mimic not finding Sampler module
             Mock -CommandName Get-ModuleVersion -MockWith { return '5.4.0' }
             Mock -CommandName Import-Module -MockWith { return @{ Version = [version] '5.4.0' } }
-        }
-
-        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
-            @{
-                ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
-            }
-        ) {
-            $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
-                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
-                Select-Object -Property @(
-                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
-                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
-                )
-            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
-            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
 
         It 'Should have EnableSourceLineMapping as a non-mandatory parameter' {

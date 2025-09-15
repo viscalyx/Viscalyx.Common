@@ -44,9 +44,20 @@ AfterAll {
 
 Describe 'Remove-PSReadLineHistory' {
     Context 'When checking command structure' {
-        It 'Should have the correct parameters in parameter set __AllParameterSets' {
-            $result = (Get-Command -Name 'Remove-PSReadLineHistory').ParameterSets[0].ToString()
-            $result | Should -Be '[-Pattern] <string> [-EscapeRegularExpression] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters       = '[-Pattern] <string> [-EscapeRegularExpression] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Remove-PSReadLineHistory').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
 
         It 'Should have Pattern as a mandatory parameter' {
