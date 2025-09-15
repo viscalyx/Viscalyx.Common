@@ -93,7 +93,11 @@ function ConvertTo-AnsiString
             $InputString,
             $ansiPattern,
             {
-                param($match)
+                param
+                (
+                    [Parameter()]
+                    $match
+                )
 
                 # If the match doesn't end with 'm', add it
                 if (-not $match.Value.EndsWith('m'))
@@ -139,7 +143,11 @@ function ConvertTo-AnsiString
             $normalizedInput,
             $ansiPattern,
             {
-                param($match)
+                param
+                (
+                    [Parameter()]
+                    $match
+                )
 
                 $codes = $match.Groups[1].Value
 
