@@ -43,24 +43,41 @@ AfterAll {
 }
 
 Describe 'Get-ModuleByVersion' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[-Name] <string> [-Version] <string> [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters = '[-Name] <string> [-Version] <string> [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Get-ModuleByVersion').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
-    ) {
-        $parameterSet = (Get-Command -Name 'Get-ModuleByVersion').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have Name as a mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Get-ModuleByVersion').Parameters['Name']
+            $parameterInfo.Attributes.Mandatory | Should -BeTrue
+        }
+
+        It 'Should have Version as a mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Get-ModuleByVersion').Parameters['Version']
+            $parameterInfo.Attributes.Mandatory | Should -BeTrue
+        }
     }
 
     Context 'When the module exists with the specified version' {
         BeforeAll {
             Mock -CommandName Get-Module -MockWith {
-                'ExistingModule'
+                [pscustomobject]@{
+                    Name = 'ExistingModule'
+                    Version = [version]'1.0.0'
+                }
             }
 
             Mock -CommandName Get-ModuleVersion -RemoveParameterType 'Module' -MockWith {

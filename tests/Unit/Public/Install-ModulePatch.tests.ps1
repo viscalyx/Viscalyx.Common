@@ -43,22 +43,38 @@ AfterAll {
 }
 
 Describe 'Install-ModulePatch' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = 'Path'
-            ExpectedParameterSetString = '-Path <string> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = 'Path'
+                ExpectedParameters = '-Path <string> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+            @{
+                ExpectedParameterSetName = 'URI'
+                ExpectedParameters = '-Uri <uri> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Install-ModulePatch').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
-        @{
-            Name = 'URI'
-            ExpectedParameterSetString = '-Uri <uri> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
-        }
-    ) {
-        $parameterSet = (Get-Command -Name 'Install-ModulePatch').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have Path as a mandatory parameter in Path parameter set' {
+            $parameterInfo = (Get-Command -Name 'Install-ModulePatch').Parameters['Path']
+            $mandatoryAttribute = $parameterInfo.Attributes | Where-Object { $_.TypeId.Name -eq 'ParameterAttribute' -and $_.ParameterSetName -eq 'Path' }
+            $mandatoryAttribute.Mandatory | Should -BeTrue
+        }
+
+        It 'Should have Uri as a mandatory parameter in URI parameter set' {
+            $parameterInfo = (Get-Command -Name 'Install-ModulePatch').Parameters['Uri']
+            $mandatoryAttribute = $parameterInfo.Attributes | Where-Object { $_.TypeId.Name -eq 'ParameterAttribute' -and $_.ParameterSetName -eq 'URI' }
+            $mandatoryAttribute.Mandatory | Should -BeTrue
+        }
     }
 
     Context 'When patch file is valid' {
@@ -221,7 +237,7 @@ Describe 'Install-ModulePatch' {
 
         It 'Should throw the correct error' {
             { Install-ModulePatch -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage "Module 'TestModule' version '1.1.1' not found."
+                Should -Throw -ExpectedMessage "Module 'TestModule' version '1.1.1' not found. (IMP0012)"
         }
     }
 }

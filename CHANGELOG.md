@@ -5,6 +5,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `ConvertTo-AnsiString` that converts strings containing ANSI
+  sequences to properly escaped and terminated ANSI sequences. It adds the
+  necessary escape character and ensures all sequences end with 'm'. Handles
+  both escaped and unescaped sequences, as well as sequences that may be
+  missing the 'm' terminator.
+- `Assert-IPv4Address` that validates if a string is a valid IPv4 address,
+  including format checking and value range validation (0-255 for each octet).
+  Also validates that octets do not have leading zeros.
+- `Test-IPv4Address` that tests if a string is a valid IPv4 address and returns
+  a boolean result. Performs the same validation as `Assert-IPv4Address` but
+  returns `$true` for valid addresses and `$false` for invalid ones instead
+  of throwing exceptions. Now supports pipeline input for processing multiple
+  IP addresses.
+
+### Changed
+
+- `New-SamplerGitHubReleaseTag` - The git push operation is now properly wrapped
+  in a ShouldProcess check, allowing WhatIf to report what would be pushed
+  without actually executing the push command.
+  of throwing exceptions.
+- `Get-LinkLayerAddress` (alias `Get-MacAddress`) that retrieves the MAC
+  address for an IP address on the local subnet/VLAN. Works cross-platform
+  across Windows, Linux, and macOS.
+- `Resolve-DnsName` that resolves a DNS host name to a single IPv4 address
+  using the cross-platform .NET System.Net.Dns class, providing compatibility
+  when the built-in Resolve-DnsName cmdlet is not available.
+- `Send-WakeOnLan` (alias `Send-WOL`) that sends a Wake-on-LAN magic packet
+  to wake up a remote computer. Supports various MAC address formats and
+  custom broadcast addresses and ports.
+
+### Changed
+
+- Aligned ShouldProcess localized string key naming with DSC community convention
+  by renaming `*_ShouldProcessVerboseDescription` and `*_ShouldProcessVerboseWarning`
+  keys to `*_ShouldProcessDescription` and `*_ShouldProcessConfirmation` respectively.
+  This affects string keys in `New-SamplerGitHubReleaseTag`, `Install-ModulePatch`,
+  and `Send-WakeOnLan` commands.
+- `Remove-PSHistory` and `Remove-PSReadLineHistory` now use localized strings
+  instead of hardcoded strings for ShouldProcess prompts and status messages.
+- Added proper string IDs to all localized strings following the pattern
+  `(XXXNNNNN)` where XXX is a 3-4 letter abbreviation and NNNNN is a 4-digit
+  number. This provides consistent identification and tracking of all
+  localized messages across the module.
+
 ## [0.5.0] - 2025-09-14
 
 ### Added

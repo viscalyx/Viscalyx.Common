@@ -101,16 +101,16 @@ function New-SamplerGitHubReleaseTag
                 ($script:localizedData.New_SamplerGitHubReleaseTag_RemoteMissing -f $UpstreamRemoteName),
                 'NSGRT0001', # cspell: disable-line
                 [System.Management.Automation.ErrorCategory]::ObjectNotFound,
-                $DatabaseName
+                $UpstreamRemoteName
             )
         )
     }
 
-    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseDescription -f $DefaultBranchName, $UpstreamRemoteName
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessVerboseWarning -f $DefaultBranchName, $UpstreamRemoteName
+    $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessDescription -f $DefaultBranchName, $UpstreamRemoteName
+    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessConfirmation -f $DefaultBranchName, $UpstreamRemoteName
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
         # Fetch $DefaultBranchName from upstream and throw an error if it doesn't exist.
         git fetch $UpstreamRemoteName $DefaultBranchName
@@ -122,7 +122,7 @@ function New-SamplerGitHubReleaseTag
                     ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote -f $DefaultBranchName, $UpstreamRemoteName),
                     'NSGRT0002', # cspell: disable-line
                     [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $DatabaseName
+                    $UpstreamRemoteName
                 )
             )
         }
@@ -139,7 +139,7 @@ function New-SamplerGitHubReleaseTag
                     $script:localizedData.New_SamplerGitHubReleaseTag_FailedGetLocalBranchName,
                     'NSGRT0003', # cspell: disable-line
                     [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $DatabaseName
+                    $null
                 )
             )
         }
@@ -147,12 +147,13 @@ function New-SamplerGitHubReleaseTag
 
     $continueProcessing = $true
     $errorMessage = $null
+    $switchedToDefaultBranch = $false
 
-    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseDescription -f $DefaultBranchName, $UpstreamRemoteName
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessVerboseWarning -f $DefaultBranchName
+    $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessDescription -f $DefaultBranchName, $UpstreamRemoteName
+    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessConfirmation -f $DefaultBranchName
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
         git checkout $DefaultBranchName
 
@@ -163,7 +164,11 @@ function New-SamplerGitHubReleaseTag
             $errorCode = 'NSGRT0004' # cspell: disable-line
         }
 
-        $switchedToDefaultBranch = $true
+        # Set only after successful checkout
+        if ($continueProcessing)
+        {
+            $switchedToDefaultBranch = $true
+        }
 
         if ($continueProcessing)
         {
@@ -202,17 +207,17 @@ function New-SamplerGitHubReleaseTag
                     $errorMessage,
                     $errorCode, # cspell: disable-line
                     [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $DatabaseName
+                    $DefaultBranchName
                 )
             )
         }
     }
 
-    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessVerboseDescription -f $UpstreamRemoteName
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessVerboseWarning -f $UpstreamRemoteName
+    $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessDescription -f $UpstreamRemoteName
+    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessConfirmation -f $UpstreamRemoteName
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
         git fetch $UpstreamRemoteName --tags
 
@@ -228,7 +233,7 @@ function New-SamplerGitHubReleaseTag
                     ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchTagsFromUpstreamRemote -f $UpstreamRemoteName),
                     'NSGRT0007', # cspell: disable-line
                     [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $DatabaseName
+                    $UpstreamRemoteName
                 )
             )
         }
@@ -285,7 +290,7 @@ function New-SamplerGitHubReleaseTag
                     $errorMessage,
                     $errorCode, # cspell: disable-line
                     [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $DatabaseName
+                    $null
                 )
             )
         }
@@ -293,41 +298,59 @@ function New-SamplerGitHubReleaseTag
 
     if ($WhatIfPreference)
     {
-        $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessVerboseDescription
+        $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessDescription
     }
     else
     {
-        $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessVerboseDescription
+        $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessDescription
     }
 
-    $verboseDescriptionMessage = $messageShouldProcess -f $ReleaseTag, $DefaultBranchName, $headCommitId
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessVerboseWarning -f $ReleaseTag
+    $descriptionMessage = $messageShouldProcess -f $ReleaseTag, $DefaultBranchName, $headCommitId
+    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation -f $ReleaseTag
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
         git tag $ReleaseTag
 
-        if ($PushTag -and ($Force -or $PSCmdlet.ShouldContinue(('Do you want to push the tags to the upstream ''{0}''?' -f $UpstreamRemoteName), 'Confirm')))
+        if ($LASTEXITCODE -ne 0)
         {
-            git push origin --tags
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    ($script:localizedData.New_SamplerGitHubReleaseTag_FailedCreateTag -f $ReleaseTag),
+                    'NSGRT0035',
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    $ReleaseTag
+                )
+            )
+        }
 
-            Write-Information -MessageData ("`e[32mTag `e[1;37;44m{0}`e[0m`e[32m was created and pushed to upstream '{1}'`e[0m" -f $ReleaseTag, $UpstreamRemoteName) -InformationAction Continue
+        if ($PushTag -and ($Force -or $PSCmdlet.ShouldContinue(($script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage -f $UpstreamRemoteName), $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption)))
+        {
+            $pushDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription -f $ReleaseTag, $UpstreamRemoteName
+            $pushConfirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessConfirmation -f $ReleaseTag, $UpstreamRemoteName
+            $pushCaptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessCaption
+
+            if ($PSCmdlet.ShouldProcess($pushDescriptionMessage, $pushConfirmationMessage, $pushCaptionMessage))
+            {
+                git push $UpstreamRemoteName --tags
+
+                Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedAndPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
+            }
         }
         else
         {
-            # cSpell: disable-next-line
-            Write-Information -MessageData ("`e[32mTag `e[1;37;44m{0}`e[0m`e[32m was created. To push the tag to upstream, run `e[1;37;44mgit push {1} --tags`e[0m`e[32m.`e[0m" -f $ReleaseTag, $UpstreamRemoteName) -InformationAction Continue
+            Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedNotPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
         }
     }
 
     if ($SwitchBackToPreviousBranch.IsPresent)
     {
-        $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessVerboseDescription -f $currentLocalBranchName
-        $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessVerboseWarning -f $currentLocalBranchName
+        $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessDescription -f $currentLocalBranchName
+        $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessConfirmation -f $currentLocalBranchName
         $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption
 
-        if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+        if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
         {
             git checkout $currentLocalBranchName
 
@@ -338,7 +361,7 @@ function New-SamplerGitHubReleaseTag
                         ($script:localizedData.New_SamplerGitHubReleaseTag_FailedCheckoutPreviousBranch -f $currentLocalBranchName),
                         'NSGRT0011', # cspell: disable-line
                         [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                        $DatabaseName
+                        $currentLocalBranchName
                     )
                 )
             }

@@ -43,18 +43,27 @@ AfterAll {
 }
 
 Describe 'New-SamplerGitHubReleaseTag' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[[-DefaultBranchName] <string>] [[-UpstreamRemoteName] <string>] [[-ReleaseTag] <string>] [-SwitchBackToPreviousBranch] [-Force] [-PushTag] [-WhatIf] [-Confirm] [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters       = '[[-DefaultBranchName] <string>] [[-UpstreamRemoteName] <string>] [[-ReleaseTag] <string>] [-SwitchBackToPreviousBranch] [-Force] [-PushTag] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'New-SamplerGitHubReleaseTag').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
-    ) {
-        $parameterSet = (Get-Command -Name 'New-SamplerGitHubReleaseTag').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have no mandatory parameters' {
+            $mandatoryParams = (Get-Command -Name 'New-SamplerGitHubReleaseTag').Parameters.Values | Where-Object { $_.Attributes.Mandatory -eq $true }
+            $mandatoryParams | Should -BeNullOrEmpty
+        }
     }
 
     BeforeAll {

@@ -43,27 +43,55 @@ AfterAll {
 }
 
 Describe 'Split-StringAtIndex' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = 'PipelineInput'
-            ExpectedParameterSetString = '-IndexObject <psobject> -InputString <string> [<CommonParameters>]'
-        }
-        @{
-            Name = 'StartEndInput'
-            # Windows PowerShell shows uint32, PowerShell 7+ shows uint
-            ExpectedParameterSetString = if ($PSVersionTable.PSVersion.Major -le 5) {
-                '-InputString <string> -StartIndex <uint32> -EndIndex <uint32> [<CommonParameters>]'
-            } else {
-                '-InputString <string> -StartIndex <uint> -EndIndex <uint> [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = 'PipelineInput'
+                ExpectedParameters = '-IndexObject <psobject> -InputString <string> [<CommonParameters>]'
             }
+            @{
+                ExpectedParameterSetName = 'StartEndInput'
+                # Windows PowerShell shows uint32, PowerShell 7+ shows uint
+                ExpectedParameters = if ($PSVersionTable.PSVersion.Major -le 5) {
+                    '-InputString <string> -StartIndex <uint32> -EndIndex <uint32> [<CommonParameters>]'
+                } else {
+                    '-InputString <string> -StartIndex <uint> -EndIndex <uint> [<CommonParameters>]'
+                }
+            }
+        ) {
+            $result = (Get-Command -Name 'Split-StringAtIndex').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
-    ) {
-        $parameterSet = (Get-Command -Name 'Split-StringAtIndex').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have IndexObject as a mandatory parameter in PipelineInput parameter set' {
+            $parameterInfo = (Get-Command -Name 'Split-StringAtIndex').Parameters['IndexObject']
+            $mandatoryAttribute = $parameterInfo.Attributes | Where-Object { $_.TypeId.Name -eq 'ParameterAttribute' -and $_.ParameterSetName -eq 'PipelineInput' }
+            $mandatoryAttribute.Mandatory | Should -BeTrue
+        }
+
+        It 'Should have InputString as a mandatory parameter in all parameter sets' {
+            $parameterInfo = (Get-Command -Name 'Split-StringAtIndex').Parameters['InputString']
+            $mandatoryAttributes = $parameterInfo.Attributes | Where-Object { $_.TypeId.Name -eq 'ParameterAttribute' }
+            $mandatoryAttributes | ForEach-Object { $_.Mandatory | Should -BeTrue }
+        }
+
+        It 'Should have StartIndex as a mandatory parameter in StartEndInput parameter set' {
+            $parameterInfo = (Get-Command -Name 'Split-StringAtIndex').Parameters['StartIndex']
+            $mandatoryAttribute = $parameterInfo.Attributes | Where-Object { $_.TypeId.Name -eq 'ParameterAttribute' -and $_.ParameterSetName -eq 'StartEndInput' }
+            $mandatoryAttribute.Mandatory | Should -BeTrue
+        }
+
+        It 'Should have EndIndex as a mandatory parameter in StartEndInput parameter set' {
+            $parameterInfo = (Get-Command -Name 'Split-StringAtIndex').Parameters['EndIndex']
+            $mandatoryAttribute = $parameterInfo.Attributes | Where-Object { $_.TypeId.Name -eq 'ParameterAttribute' -and $_.ParameterSetName -eq 'StartEndInput' }
+            $mandatoryAttribute.Mandatory | Should -BeTrue
+        }
     }
 
     Context 'Using StartIndex and EndIndex parameters' {
@@ -106,7 +134,7 @@ Describe 'Split-StringAtIndex' {
     }
 
     Context 'Edge cases' {
-        It 'Should return the whole string if no indices are provided' {
+        It 'Should return the whole string when indices cover the entire range' {
             $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 12
 
             $result | Should-BeEquivalent @('Hello, World!')

@@ -39,6 +39,7 @@
 function Install-ModulePatch
 {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+    [OutputType()]
     param
     (
         [Parameter(Mandatory = $true, ParameterSetName = 'Path')]
@@ -72,11 +73,11 @@ function Install-ModulePatch
         $Uri
     }
 
-    $verboseDescriptionMessage = $script:localizedData.Install_ModulePatch_ShouldProcessVerboseDescription -f $patchLocation
-    $verboseWarningMessage = $script:localizedData.Install_ModulePatch_ShouldProcessVerboseWarning -f $patchLocation
+    $descriptionMessage = $script:localizedData.Install_ModulePatch_ShouldProcessDescription -f $patchLocation
+    $confirmationMessage = $script:localizedData.Install_ModulePatch_ShouldProcessConfirmation -f $patchLocation
     $captionMessage = $script:localizedData.Install_ModulePatch_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
         $patchFileContent = if ($PSCmdlet.ParameterSetName -eq 'Path')
         {
@@ -108,7 +109,7 @@ function Install-ModulePatch
 
             Write-Error @writeErrorParameters
 
-            return
+            return $null
         }
 
         foreach ($moduleFile in $patchFileContent.ModuleFiles)

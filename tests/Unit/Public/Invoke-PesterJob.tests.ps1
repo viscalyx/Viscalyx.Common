@@ -44,18 +44,27 @@ AfterAll {
 }
 
 Describe 'Invoke-PesterJob' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters       = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
-    ) {
-        $parameterSet = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have no mandatory parameters' {
+            $mandatoryParams = (Get-Command -Name 'Invoke-PesterJob').Parameters.Values | Where-Object { $_.Attributes.Mandatory -eq $true }
+            $mandatoryParams | Should -BeNullOrEmpty
+        }
     }
 
     # Mock external dependencies
@@ -272,22 +281,6 @@ Describe 'Invoke-PesterJob' {
             Mock -CommandName Import-Module -MockWith { return @{ Version = [version] '5.4.0' } }
         }
 
-        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
-            @{
-                ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
-            }
-        ) {
-            $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
-                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
-                Select-Object -Property @(
-                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
-                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
-                )
-            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
-            $result.ParameterListAsString | Should -Be $ExpectedParameters
-        }
-
         It 'Should have EnableSourceLineMapping as a non-mandatory parameter' {
             $parameterInfo = (Get-Command -Name 'Invoke-PesterJob').Parameters['EnableSourceLineMapping']
             $parameterInfo.Attributes.Mandatory | Should -BeFalse
@@ -488,7 +481,7 @@ Describe 'Invoke-PesterJob' {
                         EnableSourceLineMapping = $true
                     }
 
-                    { Invoke-PesterJob @params } | Should -Not -Throw
+                    $null = Invoke-PesterJob @params
                 }
             }
 
@@ -516,7 +509,7 @@ Describe 'Invoke-PesterJob' {
                         EnableSourceLineMapping = $true
                     }
 
-                    { Invoke-PesterJob @params } | Should -Not -Throw
+                    $null = Invoke-PesterJob @params
                 }
             }
 
@@ -561,18 +554,16 @@ Describe 'Invoke-PesterJob' {
                 $filterArray = @('Get-*', 'Set-*', 'Test-*')
 
                 # This should not throw an error when validating parameter type
-                {
-                    $params = @{
-                        FilterCodeCoverageResult = $filterArray
-                        Path = '.'
-                        SkipRun = $true
-                        SkipCodeCoverage = $true
-                    }
+                $params = @{
+                    FilterCodeCoverageResult = $filterArray
+                    Path = '.'
+                    SkipRun = $true
+                    SkipCodeCoverage = $true
+                }
 
-                    # We're not actually running this, just validating parameter binding
-                    $command = Get-Command -Name 'Invoke-PesterJob'
-                    $null = $command.ResolveParameter('FilterCodeCoverageResult').ParameterType
-                } | Should -Not -Throw
+                # We're not actually running this, just validating parameter binding
+                $command = Get-Command -Name 'Invoke-PesterJob'
+                $null = $command.ResolveParameter('FilterCodeCoverageResult').ParameterType
             }
         }
 

@@ -33,7 +33,8 @@
         "PSDSC",
         "Viscalyx",
         "analyzersettings",
-        "CODEOWNERS"
+        "CODEOWNERS",
+        "UEFI"
     ],
     "cSpell.ignorePaths": [
         ".git",
@@ -41,7 +42,9 @@
     ],
     "cSpell.ignoreRegExpList": [
         "/HKCU:/g",
-        "/analyzersettings\\.psd1/g"
+        "/analyzersettings\\.psd1/g",
+        "/\\b[A-Z]+\\d{4}\\b/g",
+        "/\\[\\d*(;\\d+)*m[^\\[]*(?=\\[|$)/g"
     ],
     "[markdown]": {
         "files.trimTrailingWhitespace": true,

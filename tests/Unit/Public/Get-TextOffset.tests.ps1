@@ -43,6 +43,34 @@ AfterAll {
 }
 
 Describe 'Get-TextOffset' {
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters = '[-FilePath] <string> [-TextToFind] <string> [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Get-TextOffset').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
+        }
+
+        It 'Should have FilePath as a mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Get-TextOffset').Parameters['FilePath']
+            $parameterInfo.Attributes.Mandatory | Should -BeTrue
+        }
+
+        It 'Should have TextToFind as a mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Get-TextOffset').Parameters['TextToFind']
+            $parameterInfo.Attributes.Mandatory | Should -BeTrue
+        }
+    }
+
     BeforeEach {
         $testFilePath = Join-Path -Path $TestDrive -ChildPath 'TestFile.txt'
 
@@ -57,20 +85,6 @@ The text includes multiple lines.
     AfterEach {
         # Remove the test file
         Remove-Item -Path $testFilePath -Force
-    }
-
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[-FilePath] <string> [-TextToFind] <string> [<CommonParameters>]'
-        }
-    ) {
-        $parameterSet = (Get-Command -Name 'Get-TextOffset').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
-
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
     }
 
     Context 'When the text is found in the file' {

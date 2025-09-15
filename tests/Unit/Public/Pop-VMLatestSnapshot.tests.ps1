@@ -43,18 +43,27 @@ AfterAll {
 }
 
 Describe 'Pop-VMLatestSnapshot' {
-    It 'Should have the expected parameter set <Name>' -ForEach @(
-        @{
-            Name = '__AllParameterSets'
-            ExpectedParameterSetString = '[-ServerName] <string> [<CommonParameters>]'
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters       = '[-ServerName] <string> [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Pop-VMLatestSnapshot').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
-    ) {
-        $parameterSet = (Get-Command -Name 'Pop-VMLatestSnapshot').ParameterSets |
-            Where-Object -FilterScript { $_.Name -eq $Name }
 
-        $parameterSet | Should -Not -BeNullOrEmpty
-        $parameterSet.Name | Should -Be $Name
-        $parameterSet.ToString() | Should -Be $ExpectedParameterSetString
+        It 'Should have ServerName as a mandatory parameter' {
+            $result = (Get-Command -Name 'Pop-VMLatestSnapshot').Parameters['ServerName'].Attributes.Mandatory
+            $result | Should -Contain $true
+        }
     }
 
     BeforeAll {

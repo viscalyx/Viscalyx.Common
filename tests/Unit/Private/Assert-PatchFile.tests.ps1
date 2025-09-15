@@ -95,7 +95,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleName'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleName'. (APF0001)"
             }
         }
 
@@ -122,7 +122,7 @@ Describe 'Assert-PatchFile' {
 '@
 
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleVersion'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleVersion'. (APF0002)"
             }
         }
 
@@ -136,7 +136,7 @@ Describe 'Assert-PatchFile' {
 '@
 
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleFiles'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ModuleFiles'. (APF0003)"
             }
         }
 
@@ -163,7 +163,7 @@ Describe 'Assert-PatchFile' {
 '@
 
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'ScriptFileName'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ScriptFileName'. (APF0004)"
             }
         }
 
@@ -190,7 +190,7 @@ Describe 'Assert-PatchFile' {
 '@
 
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'OriginalHashSHA'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'OriginalHashSHA'. (APF0005)"
             }
         }
 
@@ -217,7 +217,7 @@ Describe 'Assert-PatchFile' {
 '@
 
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'ValidationHashSHA'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'ValidationHashSHA'. (APF0006)"
             }
         }
 
@@ -238,7 +238,7 @@ Describe 'Assert-PatchFile' {
 '@
 
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'FilePatches'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'FilePatches'. (APF0007)"
             }
         }
 
@@ -264,7 +264,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'. (APF0008)"
             }
         }
 
@@ -290,7 +290,7 @@ Describe 'Assert-PatchFile' {
 }
 '@
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'StartOffset' or 'EndOffset'. (APF0008)"
             }
         }
 
@@ -317,7 +317,7 @@ Describe 'Assert-PatchFile' {
 '@
 
                 { Assert-PatchFile -PatchFileObject ($patchFileContent | ConvertFrom-Json) -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage "Patch entry is missing 'PatchContent'."
+                    Should -Throw -ExpectedMessage "Patch entry is missing 'PatchContent'. (APF0009)"
             }
         }
     }

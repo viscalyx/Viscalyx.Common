@@ -91,7 +91,7 @@ Describe 'Merge-Patch' {
                     EndOffset = 30
                     PatchContent = 'PatchedContent1'
                 }
-                ExpectedMessage = "Start or end offset (-1-30) in patch entry does not exist in the script file '*/TestScript.ps1'."
+                ExpectedMessage = "Start or end offset (-1-30) in patch entry does not exist in the script file '*/TestScript.ps1'. (MP0001)"
             },
             @{
                 PatchEntry = @{
@@ -99,7 +99,7 @@ Describe 'Merge-Patch' {
                     EndOffset = 1000
                     PatchContent = 'PatchedContent1'
                 }
-                ExpectedMessage = "Start or end offset (20-1000) in patch entry does not exist in the script file '*/TestScript.ps1'."
+                ExpectedMessage = "Start or end offset (20-1000) in patch entry does not exist in the script file '*/TestScript.ps1'. (MP0001)"
             },
             @{
                 PatchEntry = @{
@@ -107,7 +107,7 @@ Describe 'Merge-Patch' {
                     EndOffset = 20
                     PatchContent = 'PatchedContent1'
                 }
-                ExpectedMessage = "Start or end offset (30-20) in patch entry does not exist in the script file '*/TestScript.ps1'."
+                ExpectedMessage = "Start or end offset (30-20) in patch entry does not exist in the script file '*/TestScript.ps1'. (MP0001)"
             }
         ) {
             InModuleScope -Parameters $_ -ScriptBlock {
