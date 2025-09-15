@@ -134,7 +134,7 @@ Describe 'Split-StringAtIndex' {
     }
 
     Context 'Edge cases' {
-        It 'Should return the whole string if no indices are provided' {
+        It 'Should return the whole string when indices cover the entire range' {
             $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 12
 
             $result | Should-BeEquivalent @('Hello, World!')
