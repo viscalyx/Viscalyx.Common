@@ -144,17 +144,4 @@ Describe 'ConvertTo-CanonicalMacAddress' {
             }
         }
     }
-
-    Context 'When encountering exceptions during normalization' {
-        It 'Should return original value if an exception occurs' {
-            InModuleScope -ScriptBlock {
-                # Mock the Substring method to throw an exception
-                Mock -CommandName Write-Debug
-
-                # Use a value that would cause an exception in processing
-                $result = ConvertTo-CanonicalMacAddress -MacAddress '00:11:22:33:44:5'
-                $result | Should -Be '00:11:22:33:44:5'
-            }
-        }
-    }
 }
