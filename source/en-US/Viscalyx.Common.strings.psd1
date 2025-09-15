@@ -45,6 +45,12 @@ ConvertFrom-StringData @'
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption = Switch to previous branch
 
+    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage = Do you want to push the tags to the upstream '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldContinue messages.
+    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption = Confirm
+    New_SamplerGitHubReleaseTag_TagCreatedAndPushed = Tag '{0}' was created and pushed to upstream '{1}'.
+    New_SamplerGitHubReleaseTag_TagCreatedNotPushed = Tag '{0}' was created. To push the tag to upstream, run 'git push {1} --tags'.
+
     ## Install-ModulePatch
     Install_ModulePatch_ShouldProcessDescription = Apply module patch file at location '{0}'.
     Install_ModulePatch_ShouldProcessConfirmation = Are you sure you want to apply the module patch at the location '{0}'?
@@ -160,4 +166,11 @@ ConvertFrom-StringData @'
     Remove_PSReadLineHistory_ShouldProcessCaption = Remove content matching the pattern from PSReadLine history
     Remove_PSReadLineHistory_Removed = Removed PSReadLine history content matching the pattern. (RPSH0003)
     Remove_PSReadLineHistory_NoMatches = No PSReadLine history content matching the pattern. (RPSH0004)
+
+    ## ConvertTo-AnsiString
+    ConvertTo_AnsiString_ProcessingBegin = Begin processing ANSI sequence conversion. (CTAS0001)
+    ConvertTo_AnsiString_EmptyInput = Input string is null or empty, returning as-is. (CTAS0002)
+    ConvertTo_AnsiString_ProcessingString = Processing string with {0} characters for ANSI sequence conversion. (CTAS0003)
+    ConvertTo_AnsiString_ProcessingSequence = Processing ANSI sequence with codes '{0}'. (CTAS0004)
+    ConvertTo_AnsiString_ProcessingComplete = ANSI sequence conversion completed. (CTAS0005)
 '@
