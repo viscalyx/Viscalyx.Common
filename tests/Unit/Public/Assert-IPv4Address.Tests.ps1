@@ -45,36 +45,33 @@ BeforeDiscovery {
         '192.168.1.1.0/24'     # CIDR notation
     )
 
-    $script:outOfRangeAddresses = @(
-        '256.168.1.1',        # First octet too high (passes regex, fails range)
-        '192.256.1.1',        # Second octet too high
-        '192.168.256.1',      # Third octet too high
-        '192.168.1.256'       # Fourth octet too high
-    )
-
-    # Specific test cases for 256 in each octet position
-    $script:octet256TestCases = @(
-        @{ IPAddress = '256.168.1.1'; Position = 'first'; ExpectedError = 'AIV0004' }
-        @{ IPAddress = '192.256.1.1'; Position = 'second'; ExpectedError = 'AIV0004' }
-        @{ IPAddress = '192.168.256.1'; Position = 'third'; ExpectedError = 'AIV0004' }
-        @{ IPAddress = '192.168.1.256'; Position = 'fourth'; ExpectedError = 'AIV0004' }
-    )
-
-    $script:leadingZeroAddresses = @(
-        '192.168.01.1',       # Leading zero in third octet
-        '192.168.1.01',       # Leading zero in fourth octet
-        '01.168.1.1',         # Leading zero in first octet
-        '192.01.1.1',         # Leading zero in second octet
-        '01.01.01.01',        # Leading zeros in all octets
-        '192.168.001.1',      # Multiple leading zeros
-        '192.168.010.1'       # Leading zero with non-zero digit
-    )
-
-    $script:conversionFailureAddresses = @(
-        '192.168.1.1e10',     # Scientific notation
-        '192.168.1.0x10',     # Hexadecimal
-        '192.168.1.+1',       # Plus sign
-        '192.168.1.1.0'       # Decimal point in octet
+    # Specific test cases for invalid IPv4 addresses (all should throw AIV0003)
+    $script:invalidIPAddressTestCases = @(
+        @{ IPAddress = '256.168.1.1'; Description = 'first octet 256' }
+        @{ IPAddress = '192.256.1.1'; Description = 'second octet 256' }
+        @{ IPAddress = '192.168.256.1'; Description = 'third octet 256' }
+        @{ IPAddress = '192.168.1.256'; Description = 'fourth octet 256' }
+        @{ IPAddress = '192.168.01.1'; Description = 'leading zero in third octet' }
+        @{ IPAddress = '192.168.1.01'; Description = 'leading zero in fourth octet' }
+        @{ IPAddress = '01.168.1.1'; Description = 'leading zero in first octet' }
+        @{ IPAddress = '192.01.1.1'; Description = 'leading zero in second octet' }
+        @{ IPAddress = '01.01.01.01'; Description = 'leading zeros in all octets' }
+        @{ IPAddress = '192.168.001.1'; Description = 'multiple leading zeros' }
+        @{ IPAddress = '192.168.010.1'; Description = 'leading zero with non-zero digit' }
+        @{ IPAddress = '192.168.1.1e10'; Description = 'scientific notation' }
+        @{ IPAddress = '192.168.1.0x10'; Description = 'hexadecimal' }
+        @{ IPAddress = '192.168.1.+1'; Description = 'plus sign' }
+        @{ IPAddress = '192.168.1.1.0'; Description = 'decimal point in octet' }
+        @{ IPAddress = '192.168.1'; Description = 'missing octet' }
+        @{ IPAddress = '192.168.1.1.1'; Description = 'too many octets' }
+        @{ IPAddress = '192.168.1.a'; Description = 'letter in octet' }
+        @{ IPAddress = '192.168..1'; Description = 'empty octet' }
+        @{ IPAddress = '192.168.1.'; Description = 'trailing period' }
+        @{ IPAddress = '.192.168.1.1'; Description = 'leading period' }
+        @{ IPAddress = '192 168 1 1'; Description = 'spaces instead of periods' }
+        @{ IPAddress = '192-168-1-1'; Description = 'dashes instead of periods' }
+        @{ IPAddress = 'not.an.ip.address'; Description = 'non-numeric octets' }
+        @{ IPAddress = '192.168.1.1.0/24'; Description = 'CIDR notation' }
     )
 
     $script:boundaryAddresses = @(
@@ -143,43 +140,10 @@ Describe 'Assert-IPv4Address' {
         }
     }
 
-    Context 'When validating an IPv4 address with invalid format' {
-        It 'Should throw InvalidResult exception for invalid format <_>' -ForEach $script:invalidFormatAddresses {
-            {
-                Assert-IPv4Address -IPAddress $_
-            } | Should -Throw -ErrorId 'AIV0003,Assert-IPv4Address'
-        }
-    }
-
-    Context 'When validating an IPv4 address with octets out of range' {
-        It 'Should throw exception for out of range octet in <_>' -ForEach $script:outOfRangeAddresses {
-            {
-                Assert-IPv4Address -IPAddress $_
-            } | Should -Throw -ErrorId 'AIV0004,Assert-IPv4Address'
-        }
-    }
-
-    Context 'When validating IPv4 addresses with 256 in specific octet positions' {
-        It 'Should throw AIV0004 exception when <Position> octet is 256 in <IPAddress>' -ForEach $script:octet256TestCases {
+    Context 'When validating an invalid IPv4 address' {
+        It 'Should throw InvalidResult exception for <Description>: <IPAddress>' -ForEach $script:invalidIPAddressTestCases {
             {
                 Assert-IPv4Address -IPAddress $_.IPAddress
-            } | Should -Throw -ErrorId "$($_.ExpectedError),Assert-IPv4Address"
-        }
-    }
-
-    Context 'When validating an IPv4 address with invalid leading zeros' {
-        # Note: Leading zeros are now caught early by regex validation (AIV0003) rather than loop validation
-        It 'Should throw exception for leading zero in <_>' -ForEach $script:leadingZeroAddresses {
-            {
-                Assert-IPv4Address -IPAddress $_
-            } | Should -Throw -ErrorId 'AIV0003,Assert-IPv4Address'
-        }
-    }
-
-    Context 'When validating an IPv4 address with octet conversion failure' {
-        It 'Should throw exception for conversion failure in <_>' -ForEach $script:conversionFailureAddresses {
-            {
-                Assert-IPv4Address -IPAddress $_
             } | Should -Throw -ErrorId 'AIV0003,Assert-IPv4Address'
         }
     }

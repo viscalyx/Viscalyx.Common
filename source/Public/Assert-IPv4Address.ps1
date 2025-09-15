@@ -54,8 +54,9 @@ function Assert-IPv4Address
         $IPAddress
     )
 
-    # Check if IPAddress is whitespace only before trimming
-    if ([string]::IsNullOrWhiteSpace($IPAddress))
+    Write-Verbose -Message ($script:localizedData.Assert_IPv4Address_ValidatingAddress -f $IPAddress)
+
+    if (-not (Test-IPv4Address -IPAddress $IPAddress))
     {
         $PSCmdlet.ThrowTerminatingError(
             [System.Management.Automation.ErrorRecord]::new(
@@ -65,69 +66,6 @@ function Assert-IPv4Address
                 $IPAddress
             )
         )
-    }
-
-    $IPAddress = $IPAddress.Trim()
-
-    Write-Verbose -Message ($script:localizedData.Assert_IPv4Address_ValidatingAddress -f $IPAddress)
-
-    if (-not (Test-IPv4Address -IPAddress $IPAddress))
-    {
-        # Need to determine the specific error to throw the appropriate exception
-        # Re-run the validation to get specific error details
-
-        # Basic format check - must be four groups of digits (0 or 1-3 digits without leading zeros) separated by periods
-        if ($IPAddress -notmatch '^(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})$')
-        {
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_InvalidFormatException -f $IPAddress)),
-                    'AIV0003',
-                    [System.Management.Automation.ErrorCategory]::InvalidData,
-                    $IPAddress
-                )
-            )
-        }
-
-        # Split and validate each octet to find the specific error
-        $octets = $IPAddress -split '\.'
-
-        foreach ($octet in $octets)
-        {
-            try
-            {
-                $octetValue = [System.Int32] $octet
-
-                # Check if octet value is within valid range (0-255)
-                if ($octetValue -lt 0 -or $octetValue -gt 255)
-                {
-                    $PSCmdlet.ThrowTerminatingError(
-                        [System.Management.Automation.ErrorRecord]::new(
-                            [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetOutOfRangeException -f $octet, $IPAddress)),
-                            'AIV0004',
-                            [System.Management.Automation.ErrorCategory]::InvalidData,
-                            $IPAddress
-                        )
-                    )
-                }
-            }
-            catch [System.Management.Automation.RuntimeException]
-            {
-                # Re-throw our custom exceptions
-                throw
-            }
-            catch
-            {
-                $PSCmdlet.ThrowTerminatingError(
-                    [System.Management.Automation.ErrorRecord]::new(
-                        [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetConversionFailedException -f $octet, $IPAddress)),
-                        'AIV0005',
-                        [System.Management.Automation.ErrorCategory]::InvalidData,
-                        $IPAddress
-                    )
-                )
-            }
-        }
     }
 
     Write-Verbose -Message ($script:localizedData.Assert_IPv4Address_ValidationSuccessful -f $IPAddress)

@@ -111,8 +111,6 @@ ConvertFrom-StringData @'
     Assert_IPv4Address_ValidatingAddress = Validating IPv4 address format for '{0}'. (AIV0001)
     Assert_IPv4Address_ValidationSuccessful = IPv4 address '{0}' is valid. (AIV0002)
     Assert_IPv4Address_InvalidFormatException = The input '{0}' is not a valid IPv4 address format. (AIV0003)
-    Assert_IPv4Address_OctetOutOfRangeException = Octet '{0}' in address '{1}' is out of valid range (0-255). (AIV0004)
-    Assert_IPv4Address_OctetConversionFailedException = Failed to convert octet '{0}' to integer in address '{1}'. (AIV0005)
 
     ## Test-IPv4Address
     Test_IPv4Address_ValidatingAddress = Testing IPv4 address format for '{0}'. (TIV0001)
