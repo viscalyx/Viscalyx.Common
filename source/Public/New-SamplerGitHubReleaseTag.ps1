@@ -148,11 +148,11 @@ function New-SamplerGitHubReleaseTag
     $continueProcessing = $true
     $errorMessage = $null
 
-    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessDescription -f $DefaultBranchName, $UpstreamRemoteName
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessConfirmation -f $DefaultBranchName
+    $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessDescription -f $DefaultBranchName, $UpstreamRemoteName
+    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessConfirmation -f $DefaultBranchName
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
         git checkout $DefaultBranchName
 
@@ -212,11 +212,11 @@ function New-SamplerGitHubReleaseTag
         }
     }
 
-    $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessDescription -f $UpstreamRemoteName
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessConfirmation -f $UpstreamRemoteName
+    $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessDescription -f $UpstreamRemoteName
+    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessConfirmation -f $UpstreamRemoteName
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
         git fetch $UpstreamRemoteName --tags
 
@@ -304,11 +304,11 @@ function New-SamplerGitHubReleaseTag
         $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessDescription
     }
 
-    $verboseDescriptionMessage = $messageShouldProcess -f $ReleaseTag, $DefaultBranchName, $headCommitId
-    $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation -f $ReleaseTag
+    $descriptionMessage = $messageShouldProcess -f $ReleaseTag, $DefaultBranchName, $headCommitId
+    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation -f $ReleaseTag
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
         git tag $ReleaseTag
 
@@ -326,11 +326,11 @@ function New-SamplerGitHubReleaseTag
 
         if ($PushTag -and ($Force -or $PSCmdlet.ShouldContinue(($script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage -f $UpstreamRemoteName), $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption)))
         {
-            $pushVerboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription -f $ReleaseTag, $UpstreamRemoteName
-            $pushVerboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessConfirmation -f $ReleaseTag, $UpstreamRemoteName
+            $pushDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription -f $ReleaseTag, $UpstreamRemoteName
+            $pushConfirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessConfirmation -f $ReleaseTag, $UpstreamRemoteName
             $pushCaptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessCaption
 
-            if ($PSCmdlet.ShouldProcess($pushVerboseDescriptionMessage, $pushVerboseWarningMessage, $pushCaptionMessage))
+            if ($PSCmdlet.ShouldProcess($pushDescriptionMessage, $pushConfirmationMessage, $pushCaptionMessage))
             {
                 git push $UpstreamRemoteName --tags
 
@@ -345,11 +345,11 @@ function New-SamplerGitHubReleaseTag
 
     if ($SwitchBackToPreviousBranch.IsPresent)
     {
-        $verboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessDescription -f $currentLocalBranchName
-        $verboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessConfirmation -f $currentLocalBranchName
+        $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessDescription -f $currentLocalBranchName
+        $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessConfirmation -f $currentLocalBranchName
         $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption
 
-        if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+        if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
         {
             git checkout $currentLocalBranchName
 
