@@ -481,7 +481,7 @@ Describe 'Invoke-PesterJob' {
                         EnableSourceLineMapping = $true
                     }
 
-                    { Invoke-PesterJob @params } | Should -Not -Throw
+                    $null = Invoke-PesterJob @params
                 }
             }
 
@@ -509,7 +509,7 @@ Describe 'Invoke-PesterJob' {
                         EnableSourceLineMapping = $true
                     }
 
-                    { Invoke-PesterJob @params } | Should -Not -Throw
+                    $null = Invoke-PesterJob @params
                 }
             }
 
@@ -554,18 +554,16 @@ Describe 'Invoke-PesterJob' {
                 $filterArray = @('Get-*', 'Set-*', 'Test-*')
 
                 # This should not throw an error when validating parameter type
-                {
-                    $params = @{
-                        FilterCodeCoverageResult = $filterArray
-                        Path = '.'
-                        SkipRun = $true
-                        SkipCodeCoverage = $true
-                    }
+                $params = @{
+                    FilterCodeCoverageResult = $filterArray
+                    Path = '.'
+                    SkipRun = $true
+                    SkipCodeCoverage = $true
+                }
 
-                    # We're not actually running this, just validating parameter binding
-                    $command = Get-Command -Name 'Invoke-PesterJob'
-                    $null = $command.ResolveParameter('FilterCodeCoverageResult').ParameterType
-                } | Should -Not -Throw
+                # We're not actually running this, just validating parameter binding
+                $command = Get-Command -Name 'Invoke-PesterJob'
+                $null = $command.ResolveParameter('FilterCodeCoverageResult').ParameterType
             }
         }
 
