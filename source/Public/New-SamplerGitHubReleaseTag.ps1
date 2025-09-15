@@ -310,9 +310,16 @@ function New-SamplerGitHubReleaseTag
 
         if ($PushTag -and ($Force -or $PSCmdlet.ShouldContinue(($script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage -f $UpstreamRemoteName), $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption)))
         {
-            git push origin --tags
+            $pushVerboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription -f $ReleaseTag, $UpstreamRemoteName
+            $pushVerboseWarningMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessConfirmation -f $ReleaseTag, $UpstreamRemoteName
+            $pushCaptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessCaption
 
-            Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedAndPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
+            if ($PSCmdlet.ShouldProcess($pushVerboseDescriptionMessage, $pushVerboseWarningMessage, $pushCaptionMessage))
+            {
+                git push $UpstreamRemoteName --tags
+
+                Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedAndPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
+            }
         }
         else
         {
