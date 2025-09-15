@@ -163,7 +163,11 @@ function New-SamplerGitHubReleaseTag
             $errorCode = 'NSGRT0004' # cspell: disable-line
         }
 
-        $switchedToDefaultBranch = $true
+        # Set only after successful checkout
+        if ($continueProcessing)
+        {
+            $switchedToDefaultBranch = $true
+        }
 
         if ($continueProcessing)
         {
