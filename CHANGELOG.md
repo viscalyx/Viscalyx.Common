@@ -38,6 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `Send-WakeOnLan` commands.
 - `Remove-PSHistory` and `Remove-PSReadLineHistory` now use localized strings
   instead of hardcoded strings for ShouldProcess prompts and status messages.
+- Added proper string IDs to all localized strings following the pattern
+  `(XXXNNNNN)` where XXX is a 3-4 letter abbreviation and NNNNN is a 4-digit
+  number. This provides consistent identification and tracking of all
+  localized messages across the module.
 
 ## [0.5.0] - 2025-09-14
 
