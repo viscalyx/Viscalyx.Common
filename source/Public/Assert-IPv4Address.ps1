@@ -30,18 +30,13 @@
         PS> Assert-IPv4Address -IPAddress '999.999.999.999'
 
         This example demonstrates validation failure for an invalid IPv4 address
-        with octets exceeding 255. A terminating error is thrown (ErrorId AIV0004).
+        with octets exceeding 255.
 
     .EXAMPLE
         PS> Assert-IPv4Address -IPAddress '192.168.01.1'
 
         This example demonstrates validation failure for an IPv4 address with
-        leading zeros in an octet. A terminating error is thrown (ErrorId AIV0003).
-
-    .NOTES
-        This command performs strict validation including checking for leading
-        zeros which are not allowed in standard IPv4 address notation. Throws
-        a terminating error if validation fails.
+        leading zeros in an octet.
 #>
 function Assert-IPv4Address
 {
