@@ -109,7 +109,7 @@ function Install-ModulePatch
 
             Write-Error @writeErrorParameters
 
-            return
+            return $null
         }
 
         foreach ($moduleFile in $patchFileContent.ModuleFiles)
