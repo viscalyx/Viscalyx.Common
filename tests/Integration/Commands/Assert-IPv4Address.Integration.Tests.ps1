@@ -113,7 +113,7 @@ Describe 'Assert-IPv4Address' {
     }
 
     Context 'When testing edge cases in real environment' {
-        BeforeAll {
+        BeforeDiscovery {
             $edgeCaseTests = @(
                 @{
                     IPAddress = '0.0.0.1'
