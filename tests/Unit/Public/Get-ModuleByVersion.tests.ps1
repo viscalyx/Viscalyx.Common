@@ -74,7 +74,10 @@ Describe 'Get-ModuleByVersion' {
     Context 'When the module exists with the specified version' {
         BeforeAll {
             Mock -CommandName Get-Module -MockWith {
-                'ExistingModule'
+                [pscustomobject]@{
+                    Name = 'ExistingModule'
+                    Version = [version]'1.0.0'
+                }
             }
 
             Mock -CommandName Get-ModuleVersion -RemoveParameterType 'Module' -MockWith {
