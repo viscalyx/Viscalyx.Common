@@ -14,30 +14,33 @@
         be in the format of four decimal numbers separated by periods.
 
     .INPUTS
-        None
+        System.String
 
-        Does not accept pipeline input.
+        Accepts strings from the pipeline for testing as IPv4 addresses.
 
     .OUTPUTS
         [System.Boolean]
+
         Returns true if the string is a valid IPv4 address, false otherwise.
 
     .EXAMPLE
-        PS> Test-IPv4Address -IPAddress '192.168.1.1'
-        True
+        Test-IPv4Address -IPAddress '192.168.1.1'
 
         This example tests a standard IPv4 address and returns True.
 
     .EXAMPLE
-        PS> Test-IPv4Address -IPAddress '999.999.999.999'
-        False
+        '192.168.1.1', '10.0.0.1' | Test-IPv4Address
+
+        This example demonstrates pipeline input with multiple IP addresses.
+
+    .EXAMPLE
+        Test-IPv4Address -IPAddress '999.999.999.999'
 
         This example tests an invalid IPv4 address with octets exceeding 255
         and returns False.
 
     .EXAMPLE
-        PS> Test-IPv4Address -IPAddress '192.168.01.1'
-        False
+        Test-IPv4Address -IPAddress '192.168.01.1'
 
         This example tests an IPv4 address with leading zeros in an octet
         and returns False.
@@ -52,21 +55,24 @@ function Test-IPv4Address
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $IPAddress
     )
 
-    Write-Verbose -Message ($script:localizedData.Test_IPv4Address_ValidatingAddress -f $IPAddress)
-
-    # Validate IPv4 address format and range (0-255) with no leading zeros
-    if ($IPAddress -notmatch '^(?:0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])(?:\.(?:0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])){3}$')
+    process
     {
-        Write-Verbose -Message ($script:localizedData.Test_IPv4Address_InvalidFormat -f $IPAddress)
-        return $false
-    }
+        Write-Verbose -Message ($script:localizedData.Test_IPv4Address_ValidatingAddress -f $IPAddress)
 
-    Write-Verbose -Message ($script:localizedData.Test_IPv4Address_ValidationSuccessful -f $IPAddress)
-    return $true
+        # Validate IPv4 address format and range (0-255) with no leading zeros
+        if ($IPAddress -notmatch '^(?:0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])(?:\.(?:0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])){3}$')
+        {
+            Write-Verbose -Message ($script:localizedData.Test_IPv4Address_InvalidFormat -f $IPAddress)
+            return $false
+        }
+
+        Write-Verbose -Message ($script:localizedData.Test_IPv4Address_ValidationSuccessful -f $IPAddress)
+        return $true
+    }
 }

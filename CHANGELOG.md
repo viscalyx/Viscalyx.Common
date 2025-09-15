@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Test-IPv4Address` that tests if a string is a valid IPv4 address and returns
   a boolean result. Performs the same validation as `Assert-IPv4Address` but
   returns `$true` for valid addresses and `$false` for invalid ones instead
+  of throwing exceptions. Now supports pipeline input for processing multiple
+  IP addresses.
 
 ### Changed
 
