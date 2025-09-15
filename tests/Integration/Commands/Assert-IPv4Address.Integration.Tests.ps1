@@ -31,7 +31,7 @@ BeforeAll {
 
 Describe 'Assert-IPv4Address' {
     Context 'When validating valid IPv4 addresses in real environment' {
-        BeforeAll {
+        BeforeDiscovery {
             $validIPAddresses = @(
                 '192.168.1.1',
                 '10.0.0.1',
