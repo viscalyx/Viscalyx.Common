@@ -58,7 +58,7 @@ function Get-LinkLayerAddress
     (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [ValidateScript({
-            if ($_ -match '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+            if (Test-IPv4Address -IPAddress $_)
             {
                 $true
             }
@@ -86,10 +86,10 @@ function Get-LinkLayerAddress
             Write-Debug -Message $script:localizedData.Get_LinkLayerAddress_UsingGetNetNeighbor
 
             # Native cmdlet available
-            $neighbor = Get-NetNeighbor -IPAddress $IPAddress -ErrorAction 'SilentlyContinue'
+            $neighbor = Get-NetNeighbor -IPAddress $IPAddress -ErrorAction 'SilentlyContinue' | Select-Object -First 1
             $mac = $neighbor.LinkLayerAddress
 
-            if ($null -ne $mac -and $mac -ne '')
+            if (-not [System.String]::IsNullOrEmpty($mac))
             {
                 $normalizedMac = ConvertTo-CanonicalMacAddress -MacAddress $mac
                 Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $normalizedMac)
@@ -110,7 +110,7 @@ function Get-LinkLayerAddress
                 {
                     $mac = ($line -split '\s+')[1]
 
-                    if ($null -ne $mac -and $mac -ne '')
+                    if (-not [System.String]::IsNullOrEmpty($mac))
                     {
                         $normalizedMac = ConvertTo-CanonicalMacAddress -MacAddress $mac
                         Write-Verbose -Message ($script:localizedData.Get_LinkLayerAddress_FoundMacAddress -f $IPAddress, $normalizedMac)
