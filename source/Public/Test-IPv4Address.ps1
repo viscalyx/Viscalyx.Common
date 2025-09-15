@@ -13,6 +13,11 @@
         Specifies the string to test as an IPv4 address. The string should
         be in the format of four decimal numbers separated by periods.
 
+    .INPUTS
+        None
+
+        Does not accept pipeline input.
+
     .OUTPUTS
         [System.Boolean]
         Returns true if the string is a valid IPv4 address, false otherwise.
@@ -55,34 +60,11 @@ function Test-IPv4Address
 
     Write-Verbose -Message ($script:localizedData.Test_IPv4Address_ValidatingAddress -f $IPAddress)
 
-    # Basic format check - must be four groups of digits (0 or 1-3 digits without leading zeros) separated by periods
-    if ($IPAddress -notmatch '^(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})$')
+    # Validate IPv4 address format and range (0-255) with no leading zeros
+    if ($IPAddress -notmatch '^(?:0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])(?:\.(?:0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])){3}$')
     {
         Write-Verbose -Message ($script:localizedData.Test_IPv4Address_InvalidFormat -f $IPAddress)
         return $false
-    }
-
-    # Split and validate each octet
-    $octets = $IPAddress -split '\.'
-
-    foreach ($octet in $octets)
-    {
-        try
-        {
-            $octetValue = [System.Int32] $octet
-
-            # Check if octet value is within valid range (0-255)
-            if ($octetValue -lt 0 -or $octetValue -gt 255)
-            {
-                Write-Verbose -Message ($script:localizedData.Test_IPv4Address_OctetOutOfRange -f $octet, $IPAddress)
-                return $false
-            }
-        }
-        catch
-        {
-            Write-Verbose -Message ($script:localizedData.Test_IPv4Address_OctetConversionFailed -f $octet, $IPAddress)
-            return $false
-        }
     }
 
     Write-Verbose -Message ($script:localizedData.Test_IPv4Address_ValidationSuccessful -f $IPAddress)
