@@ -147,6 +147,7 @@ function New-SamplerGitHubReleaseTag
 
     $continueProcessing = $true
     $errorMessage = $null
+    $switchedToDefaultBranch = $false
 
     $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessDescription -f $DefaultBranchName, $UpstreamRemoteName
     $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessConfirmation -f $DefaultBranchName
