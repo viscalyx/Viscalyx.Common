@@ -48,7 +48,7 @@ ConvertFrom-StringData @'
 
     New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage = Do you want to push the tags to the remote repository '{0}'? (NSGRT0028)
     # This string shall not end with full stop (.) since it is used as a title of ShouldContinue messages.
-    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption = 'Push tag to remote repository' (NSGRT0029)
+    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption = Push tag to remote repository (NSGRT0029)
 
     New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription = Pushing tag '{0}' to the remote repository '{1}'. (NSGRT0032)
     New_SamplerGitHubReleaseTag_PushTag_ShouldProcessConfirmation = Are you sure you want to push tag '{0}' to the remote repository '{1}'? (NSGRT0033)
