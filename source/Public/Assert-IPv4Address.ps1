@@ -13,6 +13,9 @@
         Specifies the string to validate as an IPv4 address. The string should
         be in the format of four decimal numbers separated by periods.
 
+    .INPUTS
+        None
+
     .OUTPUTS
         None. This command does not return a value but throws an exception if
         validation fails.
@@ -47,10 +50,11 @@ function Assert-IPv4Address
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
         [System.String]
         $IPAddress
     )
+
+    $IPAddress = $IPAddress.Trim()
 
     Write-Verbose -Message ($script:localizedData.Assert_IPv4Address_ValidatingAddress -f $IPAddress)
 
