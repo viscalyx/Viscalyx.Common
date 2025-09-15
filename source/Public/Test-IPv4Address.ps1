@@ -51,6 +51,7 @@
 #>
 function Test-IPv4Address
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseSyntacticallyCorrectExamples', '', Justification = 'Because the examples are syntactically correct. The rule does not seem to understand that there is pipeline input.')]
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
