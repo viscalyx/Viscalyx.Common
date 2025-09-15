@@ -104,7 +104,7 @@ function Assert-IPv4Address
                 $PSCmdlet.ThrowTerminatingError(
                     [System.Management.Automation.ErrorRecord]::new(
                         [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_OctetConversionFailedException -f $octet, $IPAddress)),
-                        'AIV0006',
+                        'AIV0005',
                         [System.Management.Automation.ErrorCategory]::InvalidData,
                         $IPAddress
                     )

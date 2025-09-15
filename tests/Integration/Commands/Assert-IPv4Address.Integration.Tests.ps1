@@ -50,11 +50,11 @@ Describe 'Assert-IPv4Address' {
     }
 
     Context 'When validating invalid IPv4 addresses in real environment' {
-        BeforeAll {
+        BeforeDiscovery {
             $invalidIPAddresses = @(
                 @{
                     IPAddress = '256.168.1.1'
-                    ExpectedErrorId = 'AIV0002'
+                    ExpectedErrorId = 'AIV0004'
                     Description = 'octet out of range'
                 },
                 @{
@@ -64,22 +64,22 @@ Describe 'Assert-IPv4Address' {
                 },
                 @{
                     IPAddress = '192.168.1'
-                    ExpectedErrorId = 'AIV0001'
+                    ExpectedErrorId = 'AIV0003'
                     Description = 'invalid format'
                 },
                 @{
                     IPAddress = '192.168.1.1.1'
-                    ExpectedErrorId = 'AIV0001'
+                    ExpectedErrorId = 'AIV0003'
                     Description = 'too many octets'
                 },
                 @{
                     IPAddress = '192.168.1.a'
-                    ExpectedErrorId = 'AIV0001'
+                    ExpectedErrorId = 'AIV0003'
                     Description = 'non-numeric octet'
                 },
                 @{
                     IPAddress = '999.999.999.999'
-                    ExpectedErrorId = 'AIV0002'
+                    ExpectedErrorId = 'AIV0004'
                     Description = 'all octets out of range'
                 }
             )
@@ -88,7 +88,7 @@ Describe 'Assert-IPv4Address' {
         It 'Should throw exception for invalid IPv4 address with <Description>: <IPAddress>' -ForEach $invalidIPAddresses {
             {
                 Assert-IPv4Address -IPAddress $_.IPAddress
-            } | Should -Throw -ErrorId $_.ExpectedErrorId
+            } | Should -Throw -ErrorId "$($_.ExpectedErrorId)*"
         }
     }
 
@@ -162,10 +162,10 @@ Describe 'Assert-IPv4Address' {
             } | Should -Throw -ErrorId 'ParameterArgumentValidationError*'
         }
 
-        It 'Should throw ParameterArgumentValidationError for whitespace string' {
+        It 'Should throw InvalidFormat error for whitespace string' {
             {
                 Assert-IPv4Address -IPAddress '   '
-            } | Should -Throw -ErrorId 'ParameterArgumentValidationError*'
+            } | Should -Throw -ErrorId 'AIV0003*'
         }
     }
 }
