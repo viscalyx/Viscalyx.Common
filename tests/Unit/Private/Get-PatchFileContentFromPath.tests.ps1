@@ -84,7 +84,7 @@ Describe 'Get-PatchFileContentFromPath' {
 
             InModuleScope -ScriptBlock {
                 { Get-PatchFileContentFromPath -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop' } |
-                    Should -Throw -ExpectedMessage ("The module patch file at location '$TestDrive{0}patches{0}TestModule_1.0.0_patch.json' does not exist." -f [System.IO.Path]::DirectorySeparatorChar)
+                    Should -Throw -ExpectedMessage ("The module patch file at location '$TestDrive{0}patches{0}TestModule_1.0.0_patch.json' does not exist. (IMP0004)" -f [System.IO.Path]::DirectorySeparatorChar)
             }
         }
 

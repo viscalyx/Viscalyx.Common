@@ -237,7 +237,7 @@ Describe 'Install-ModulePatch' {
 
         It 'Should throw the correct error' {
             { Install-ModulePatch -Force -Path "$TestDrive/patches/TestModule_1.0.0_patch.json" -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage "Module 'TestModule' version '1.1.1' not found."
+                Should -Throw -ExpectedMessage "Module 'TestModule' version '1.1.1' not found. (IMP0012)"
         }
     }
 }

@@ -126,7 +126,7 @@ Describe 'Get-ModuleFileSha' {
 
         It 'Should throw the correct error' {
             { Get-ModuleFileSha -Name 'NonExistentModule' -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage 'Module not found: NonExistentModule'
+                Should -Throw -ExpectedMessage 'Module not found: NonExistentModule (GMFS0001)'
         }
     }
 
@@ -145,7 +145,7 @@ Describe 'Get-ModuleFileSha' {
 
         It 'Should throw version mismatch error' {
             { Get-ModuleFileSha -Name 'TestModule' -Version '1.0.0' -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage 'Module with specified version not found: TestModule 1.0.0'
+                Should -Throw -ExpectedMessage 'Module with specified version not found: TestModule 1.0.0 (GMFS0002)'
         }
     }
 
@@ -168,7 +168,7 @@ Describe 'Get-ModuleFileSha' {
 
         It 'Should throw when path does not exist' {
             { Get-ModuleFileSha -Path 'NonExistentPath' -ErrorAction 'Stop' } |
-                Should -Throw -ExpectedMessage "Cannot validate argument on parameter 'Path'. The specified path must be a directory, the root of a module including its version folder, e.g. './Viscalyx.Common/1.0.0'."
+                Should -Throw -ExpectedMessage "Cannot validate argument on parameter 'Path'. The specified path must be a directory, the root of a module including its version folder, e.g. './Viscalyx.Common/1.0.0'. (GMFS0003)"
         }
     }
 
