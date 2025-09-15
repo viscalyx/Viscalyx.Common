@@ -39,6 +39,7 @@
 function Install-ModulePatch
 {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+    [OutputType()]
     param
     (
         [Parameter(Mandatory = $true, ParameterSetName = 'Path')]
