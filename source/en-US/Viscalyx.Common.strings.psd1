@@ -56,7 +56,7 @@ ConvertFrom-StringData @'
     New_SamplerGitHubReleaseTag_PushTag_ShouldProcessCaption = Push tag to remote repository (NSGRT0034)
 
     New_SamplerGitHubReleaseTag_TagCreatedAndPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created and pushed to the remote repository '{1}'.[0m (NSGRT0030)
-    New_SamplerGitHubReleaseTag_TagCreatedNotPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created, but not pushed. To push the tag to the remote repository, run '[30mgit push {1} --tags[32m'.[0m (NSGRT0031)
+    New_SamplerGitHubReleaseTag_TagCreatedNotPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created, but not pushed. To push the tag to the remote repository, run '[39mgit push {1} --tags[32m'.[0m (NSGRT0031)
 
     ## Install-ModulePatch
     Install_ModulePatch_ShouldProcessDescription = Apply module patch file at location '{0}'. (IMP0001)
