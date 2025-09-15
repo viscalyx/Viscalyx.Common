@@ -48,6 +48,12 @@ ConvertFrom-StringData @'
     New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage = Do you want to push the tags to the remote repository '{0}'? (NSGRT0028)
     # This string shall not end with full stop (.) since it is used as a title of ShouldContinue messages.
     New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption = 'Push tag to remote repository' (NSGRT0029)
+
+    New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription = Pushing tag '{0}' to the remote repository '{1}'. (NSGRT0032)
+    New_SamplerGitHubReleaseTag_PushTag_ShouldProcessConfirmation = Are you sure you want to push tag '{0}' to the remote repository '{1}'? (NSGRT0033)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    New_SamplerGitHubReleaseTag_PushTag_ShouldProcessCaption = Push tag to remote repository (NSGRT0034)
+
     New_SamplerGitHubReleaseTag_TagCreatedAndPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created and pushed to the remote repository '{1}'.[0m (NSGRT0030)
     New_SamplerGitHubReleaseTag_TagCreatedNotPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created, but not pushed. To push the tag to the remote repository, run '[30mgit push {1} --tags[32m'.[0m (NSGRT0031)
 

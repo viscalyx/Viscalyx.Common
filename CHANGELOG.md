@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Test-IPv4Address` that tests if a string is a valid IPv4 address and returns
   a boolean result. Performs the same validation as `Assert-IPv4Address` but
   returns `$true` for valid addresses and `$false` for invalid ones instead
+
+### Changed
+
+- `New-SamplerGitHubReleaseTag` - The git push operation is now properly wrapped
+  in a ShouldProcess check, allowing WhatIf to report what would be pushed
+  without actually executing the push command.
   of throwing exceptions.
 - `Get-LinkLayerAddress` (alias `Get-MacAddress`) that retrieves the MAC
   address for an IP address on the local subnet/VLAN. Works cross-platform
