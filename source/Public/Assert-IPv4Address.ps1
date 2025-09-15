@@ -54,6 +54,19 @@ function Assert-IPv4Address
         $IPAddress
     )
 
+    # Check if IPAddress is whitespace only before trimming
+    if ([string]::IsNullOrWhiteSpace($IPAddress))
+    {
+        $PSCmdlet.ThrowTerminatingError(
+            [System.Management.Automation.ErrorRecord]::new(
+                [System.InvalidOperationException]::new(($script:localizedData.Assert_IPv4Address_InvalidFormatException -f $IPAddress)),
+                'AIV0003',
+                [System.Management.Automation.ErrorCategory]::InvalidData,
+                $IPAddress
+            )
+        )
+    }
+
     $IPAddress = $IPAddress.Trim()
 
     Write-Verbose -Message ($script:localizedData.Assert_IPv4Address_ValidatingAddress -f $IPAddress)
