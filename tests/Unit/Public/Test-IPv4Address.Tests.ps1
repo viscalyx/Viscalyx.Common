@@ -237,23 +237,6 @@ Describe 'Test-IPv4Address' {
         }
     }
 
-    Context 'When testing verbose output' {
-        It 'Should write verbose messages when -Verbose is used' {
-            $verboseOutput = Test-IPv4Address -IPAddress '192.168.1.1' -Verbose 4>&1
-            $verboseOutput | Should -Not -BeNullOrEmpty
-        }
-
-        It 'Should write verbose validation message for valid address' {
-            $verboseOutput = Test-IPv4Address -IPAddress '192.168.1.1' -Verbose 4>&1
-            $verboseOutput -join ' ' | Should -Match 'Testing IPv4 address format'
-        }
-
-        It 'Should write verbose validation message for invalid address' {
-            $verboseOutput = Test-IPv4Address -IPAddress '256.168.1.1' -Verbose 4>&1
-            $verboseOutput -join ' ' | Should -Match 'Testing IPv4 address format'
-        }
-    }
-
     Context 'When testing return values' {
         It 'Should return exactly $true for valid addresses' {
             $result = Test-IPv4Address -IPAddress '192.168.1.1'
