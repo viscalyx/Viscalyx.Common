@@ -136,7 +136,7 @@ function Get-GitBranchCommit
 
     if ($exitCode -ne 0)
     {
-        if($PSBoundParameters.ContainsKey('BranchName'))
+        if ($PSBoundParameters.ContainsKey('BranchName'))
         {
             $errorMessage = $script:localizedData.Get_GitBranchCommit_FailedFromBranch -f $BranchName
         }
