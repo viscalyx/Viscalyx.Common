@@ -18,6 +18,7 @@ ConvertFrom-StringData @'
     New_SamplerGitHubReleaseTag_FailedDescribeTags = Failed to describe the tags. Make sure the tags exist in the local repository. (NSGRT0009)
     New_SamplerGitHubReleaseTag_LatestTagIsNotPreview = The latest tag '{0}' is not a preview tag or not a correctly formatted preview tag. Make sure the latest tag is a preview tag, or specify a release tag. (NSGRT0010)
     New_SamplerGitHubReleaseTag_FailedCheckoutPreviousBranch = Failed to checkout the previous branch '{0}'. (NSGRT0011)
+    New_SamplerGitHubReleaseTag_FailedCreateTag = Failed to create git tag '{0}'. (NSGRT0035)
 
     New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessDescription = Fetching branch '{0}' from the upstream remote '{1}'. (NSGRT0012)
     New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessConfirmation = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'? (NSGRT0013)

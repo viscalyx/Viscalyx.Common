@@ -308,6 +308,18 @@ function New-SamplerGitHubReleaseTag
     {
         git tag $ReleaseTag
 
+        if ($LASTEXITCODE -ne 0)
+        {
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    ($script:localizedData.New_SamplerGitHubReleaseTag_FailedCreateTag -f $ReleaseTag),
+                    'NSGRT0035',
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    $ReleaseTag
+                )
+            )
+        }
+
         if ($PushTag -and ($Force -or $PSCmdlet.ShouldContinue(($script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage -f $UpstreamRemoteName), $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption)))
         {
             $pushVerboseDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription -f $ReleaseTag, $UpstreamRemoteName
