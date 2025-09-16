@@ -184,3 +184,4 @@ ConvertFrom-StringData @'
     Get_ClassAst_ReturningAllClasses = Returning all class definitions found in the script file. (GCA0003)
     Get_ClassAst_FoundClassCount = Found {0} class definition(s) in the script file. (GCA0004)
 '@
+
