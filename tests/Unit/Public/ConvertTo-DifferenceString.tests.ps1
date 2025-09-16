@@ -81,6 +81,30 @@ Describe 'ConvertTo-DifferenceString' {
         $result | Should -Match 'Diff:'
     }
 
+    It 'Should align labels correctly with different label lengths' {
+        # Test with very short labels
+        $shortResult = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test' -ReferenceLabel 'A' -DifferenceLabel 'B'
+        $shortLabelLine = $shortResult[0]
+        
+        # Test with default labels
+        $defaultResult = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test'
+        $defaultLabelLine = $defaultResult[0]
+        
+        # Test with long labels
+        $longResult = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test' -ReferenceLabel 'VeryLongLabel:' -DifferenceLabel 'AlsoVeryLongLabel:'
+        $longLabelLine = $longResult[0]
+        
+        # Check that all second labels start at the same relative position (after accounting for label length differences)
+        $shortBIndex = $shortLabelLine.IndexOf('B')
+        $defaultButWasIndex = $defaultLabelLine.IndexOf('But was:')
+        $longAlsoIndex = $longLabelLine.IndexOf('AlsoVeryLongLabel:')
+        
+        # All should align to position 72 (64 + 8 for left column + spacing)
+        # Note: Due to ANSI escape codes, the actual position may be slightly different, but they should be consistent
+        $shortBIndex | Should -Be $defaultButWasIndex
+        $shortBIndex | Should -Be $longAlsoIndex
+    }
+
     It 'Should handle different encoding types' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -EncodingType 'ASCII')
         $result | Should -Match '31m65'

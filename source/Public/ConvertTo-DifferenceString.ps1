@@ -192,7 +192,13 @@ function ConvertTo-DifferenceString
     # Output the labels if NoLabels is not specified
     if (-not $NoLabels)
     {
-        "$($ReferenceLabelAnsi)$($ReferenceLabel)$($HighlightEnd)                                                               $($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
+        # Calculate spacing to align labels with columns (left column = 64 chars, spacing = 8 chars)
+        $leftColumnWidth = 64
+        $spacingWidth = 8
+        $rightColumnStart = $leftColumnWidth + $spacingWidth
+        $labelSpacing = $rightColumnStart - $ReferenceLabel.Length
+        
+        "$($ReferenceLabelAnsi)$($ReferenceLabel)$($HighlightEnd)$(' ' * $labelSpacing)$($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
         ('-' * 64) + (' ' * 8) + ('-' * 64) # Output a line of dashes under the labels
     }
 
