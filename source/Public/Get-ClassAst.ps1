@@ -28,10 +28,11 @@
         None. You cannot pipe input to this function.
 
     .OUTPUTS
-        [System.Management.Automation.Language.TypeDefinitionAst]
+        System.Collections.Generic.IEnumerable`1[[System.Management.Automation.Language.TypeDefinitionAst]]
 
-        Returns one or more TypeDefinitionAst objects representing the class
-        definitions found in the script file.
+        Returns a collection of TypeDefinitionAst objects representing the class
+        definitions found in the script file. Returns an empty collection if no
+        classes are found or when filtering for a non-existent class name.
 #>
 function Get-ClassAst
 {
