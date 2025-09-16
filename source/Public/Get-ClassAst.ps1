@@ -32,7 +32,6 @@
 
         Returns one or more TypeDefinitionAst objects representing the class
         definitions found in the script file.
-
 #>
 function Get-ClassAst
 {
