@@ -334,7 +334,7 @@ function Invoke-PesterJob
 
         [Parameter()]
         [ValidateScript({
-                if (-not (Test-Path $_ -PathType 'Leaf'))
+                if (-not (Test-Path -Path $_ -PathType 'Leaf'))
                 {
                     throw "The file path '$_' does not exist or is a container."
                 }
