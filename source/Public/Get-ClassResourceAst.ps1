@@ -90,7 +90,7 @@ function Get-ClassResourceAst
         }
 
         # Filter the results to only include DSC resources (classes with [DscResource()] attribute)
-        $dscClassResourceAst = $classAstResults | Where-Object {
+        $dscClassResourceAst = $classAstResults | Where-Object -FilterScript {
             $_.Attributes.TypeName.Name -contains 'DscResource'
         }
 
