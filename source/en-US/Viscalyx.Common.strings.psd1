@@ -185,4 +185,7 @@ ConvertFrom-StringData @'
     Get_ClassAst_FoundClassCount = Found {0} class definition(s) in the script file. (GCA0004)
     Get_ClassAst_ScriptFileNotFound = The script file '{0}' does not exist. (GCA0005)
     Get_ClassAst_ParseFailed = Parsing of script file '{0}' failed: {1} (GCA0006)
+
+    ## Get-ClassResourceAst
+    Get_ClassResourceAst_FoundClassCount = Found {0} DSC class resource definition(s) in the script file. (GCRA0004)
 '@
