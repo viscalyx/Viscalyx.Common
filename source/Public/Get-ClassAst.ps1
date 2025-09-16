@@ -12,7 +12,7 @@
         from strings (file paths).
 
     .PARAMETER ScriptFile
-        FileInfo object(s) representing the PowerShell script file(s) to parse. 
+        FileInfo object(s) representing the PowerShell script file(s) to parse.
         Accepts pipeline input from Get-ChildItem and other commands that return FileInfo objects.
 
     .PARAMETER ClassName
@@ -58,6 +58,7 @@
 #>
 function Get-ClassAst
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseSyntacticallyCorrectExamples', '', Justification = 'Because the examples are syntactically correct. The rule does not seem to understand that there is pipeline input.')]
     [CmdletBinding(DefaultParameterSetName = 'String')]
     [OutputType([System.Collections.Generic.IEnumerable`1[[System.Management.Automation.Language.Ast]]])]
     param
