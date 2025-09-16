@@ -197,7 +197,7 @@ function ConvertTo-DifferenceString
         $spacingWidth = 8
         $rightColumnStart = $leftColumnWidth + $spacingWidth
         $labelSpacing = $rightColumnStart - $ReferenceLabel.Length
-        
+
         "$($ReferenceLabelAnsi)$($ReferenceLabel)$($HighlightEnd)$(' ' * $labelSpacing)$($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
         ('-' * 64) + (' ' * 8) + ('-' * 64) # Output a line of dashes under the labels
     }
