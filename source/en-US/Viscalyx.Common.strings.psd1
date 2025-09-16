@@ -187,10 +187,5 @@ ConvertFrom-StringData @'
     Get_ClassAst_ParseFailed = Parsing of script file '{0}' failed: {1} (GCA0006)
 
     ## Get-ClassResourceAst
-    Get_ClassResourceAst_ParsingScriptFile = Parsing script file '{0}' for DSC class resource definitions. (GCRA0001)
-    Get_ClassResourceAst_FilteringForClass = Filtering for specific DSC class resource '{0}'. (GCRA0002)
-    Get_ClassResourceAst_ReturningAllClasses = Returning all DSC class resource definitions found in the script file. (GCRA0003)
     Get_ClassResourceAst_FoundClassCount = Found {0} DSC class resource definition(s) in the script file. (GCRA0004)
-    Get_ClassResourceAst_ScriptFileNotFound = The script file '{0}' does not exist. (GCRA0005)
-    Get_ClassResourceAst_ParseFailed = Parsing of script file '{0}' failed: {1} (GCRA0006)
 '@
