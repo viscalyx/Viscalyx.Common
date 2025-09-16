@@ -146,10 +146,8 @@ Describe 'Get-ClassAst' {
         BeforeAll {
             # Create a more complex test script that mimics a DSC resource
             $script:dscResourceContent = @'
-using module DscResource.Base
-
 [DscResource()]
-class TestDscResource : ResourceBase
+class TestDscResource
 {
     [DscProperty(Key)]
     [string] $Name
