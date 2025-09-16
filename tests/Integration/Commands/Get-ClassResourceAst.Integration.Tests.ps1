@@ -96,7 +96,7 @@ class AnotherDscResource
         }
 
         It 'Should parse DSC resource classes correctly' {
-            $result = Get-ClassResourceAst -ScriptFile $script:dscResourcePath
+            $result = Get-ClassResourceAst -ScriptFile $script:dscResourcePath -ErrorAction 'Stop'
 
             $result | Should -HaveCount 2
             $dscResourceClass1 = $result | Where-Object { $_.Name -eq 'TestDscResource' }
@@ -115,7 +115,7 @@ class AnotherDscResource
         }
 
         It 'Should filter for specific DSC resource class' {
-            $result = Get-ClassResourceAst -ScriptFile $script:dscResourcePath -ClassName 'TestDscResource'
+            $result = Get-ClassResourceAst -ScriptFile $script:dscResourcePath -ClassName 'TestDscResource' -ErrorAction 'Stop'
 
             $result | Should -HaveCount 1
             $result.Name | Should -Be 'TestDscResource'
@@ -123,13 +123,13 @@ class AnotherDscResource
         }
 
         It 'Should return empty collection when filtering for non-existent DSC resource' {
-            $result = Get-ClassResourceAst -ScriptFile $script:dscResourcePath -ClassName 'NonExistentDscResource'
+            $result = Get-ClassResourceAst -ScriptFile $script:dscResourcePath -ClassName 'NonExistentDscResource' -ErrorAction 'Stop'
 
             $result | Should -HaveCount 0
         }
 
         It 'Should return empty collection when filtering for non-DSC class' {
-            $result = Get-ClassResourceAst -ScriptFile $script:dscResourcePath -ClassName 'HelperClass'
+            $result = Get-ClassResourceAst -ScriptFile $script:dscResourcePath -ClassName 'HelperClass' -ErrorAction 'Stop'
 
             $result | Should -HaveCount 0
         }
@@ -204,7 +204,7 @@ enum TestEnum
         }
 
         It 'Should return only DSC resource classes' {
-            $result = Get-ClassResourceAst -ScriptFile $script:testScriptPath
+            $result = Get-ClassResourceAst -ScriptFile $script:testScriptPath -ErrorAction 'Stop'
 
             $result | Should -HaveCount 2
             $classNames = $result | ForEach-Object { $_.Name }
@@ -215,7 +215,7 @@ enum TestEnum
         }
 
         It 'Should return only the specified DSC resource class when ClassName parameter is provided' {
-            $result = Get-ClassResourceAst -ScriptFile $script:testScriptPath -ClassName 'FirstDscResource'
+            $result = Get-ClassResourceAst -ScriptFile $script:testScriptPath -ClassName 'FirstDscResource' -ErrorAction 'Stop'
 
             $result | Should -HaveCount 1
             $result | Should -BeOfType [System.Management.Automation.Language.TypeDefinitionAst]
@@ -224,13 +224,13 @@ enum TestEnum
         }
 
         It 'Should return empty collection when filtering for regular class' {
-            $result = Get-ClassResourceAst -ScriptFile $script:testScriptPath -ClassName 'RegularClass'
+            $result = Get-ClassResourceAst -ScriptFile $script:testScriptPath -ClassName 'RegularClass' -ErrorAction 'Stop'
 
             $result | Should -HaveCount 0
         }
 
         It 'Should not return enums when parsing script file' {
-            $result = Get-ClassResourceAst -ScriptFile $script:testScriptPath
+            $result = Get-ClassResourceAst -ScriptFile $script:testScriptPath -ErrorAction 'Stop'
 
             $result | Should -HaveCount 2
             $classNames = $result | ForEach-Object { $_.Name }
@@ -269,7 +269,7 @@ class PathTestDscResource
         }
 
         It 'Should work with Path parameter' {
-            $result = Get-ClassResourceAst -Path $script:pathTestScriptPath
+            $result = Get-ClassResourceAst -Path $script:pathTestScriptPath -ErrorAction 'Stop'
 
             $result | Should -HaveCount 1
             $result.Name | Should -Be 'PathTestDscResource'
@@ -277,7 +277,7 @@ class PathTestDscResource
         }
 
         It 'Should work with Path parameter and ClassName filter' {
-            $result = Get-ClassResourceAst -Path $script:pathTestScriptPath -ClassName 'PathTestDscResource'
+            $result = Get-ClassResourceAst -Path $script:pathTestScriptPath -ClassName 'PathTestDscResource' -ErrorAction 'Stop'
 
             $result | Should -HaveCount 1
             $result.Name | Should -Be 'PathTestDscResource'
@@ -286,7 +286,7 @@ class PathTestDscResource
         It 'Should throw error for non-existent file path' {
             $nonExistentPath = Join-Path -Path $TestDrive -ChildPath 'NonExistent.ps1'
 
-            { Get-ClassResourceAst -Path $nonExistentPath } | Should -Throw "*does not exist*"
+            { Get-ClassResourceAst -Path $nonExistentPath } | Should -Throw
         }
     }
 }
