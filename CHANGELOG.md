@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Get-ClassResourceAst` that parses PowerShell script files and extracts DSC
+  class resource definitions using Abstract Syntax Tree (AST) parsing. Filters
+  for classes that have the [DscResource()] attribute. Can return all DSC class
+  resources in a file or filter for a specific class by name.
 - `Get-ClassAst` that parses PowerShell script files and extracts class
   definitions using Abstract Syntax Tree (AST) parsing. Can return all classes
   in a file or filter for a specific class by name.
