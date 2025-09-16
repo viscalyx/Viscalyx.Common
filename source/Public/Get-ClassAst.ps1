@@ -51,6 +51,19 @@ function Get-ClassAst
 
     Write-Debug -Message ($script:localizedData.Get_ClassAst_ParsingScriptFile -f $ScriptFile)
 
+    # Check if the script file exists
+    if (-not (Test-Path -Path $ScriptFile -PathType Leaf))
+    {
+        $PSCmdlet.ThrowTerminatingError(
+            [System.Management.Automation.ErrorRecord]::new(
+                ($script:localizedData.Get_ClassAst_ScriptFileNotFound -f $ScriptFile),
+                'GCA0005', # cspell: disable-line
+                [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                $ScriptFile
+            )
+        )
+    }
+
     $tokens = $null
     $parseErrors = $null
 
@@ -60,8 +73,8 @@ function Get-ClassAst
     {
         $PSCmdlet.ThrowTerminatingError(
             [System.Management.Automation.ErrorRecord]::new(
-                ($parseErrors -join '; '),
-                'ParseError',
+                ($script:localizedData.Get_ClassAst_ParseFailed -f $ScriptFile, ($parseErrors -join '; ')),
+                'GCA0006', # cspell: disable-line
                 [System.Management.Automation.ErrorCategory]::ParserError,
                 $ScriptFile
             )

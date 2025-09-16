@@ -183,5 +183,7 @@ ConvertFrom-StringData @'
     Get_ClassAst_FilteringForClass = Filtering for specific class '{0}'. (GCA0002)
     Get_ClassAst_ReturningAllClasses = Returning all class definitions found in the script file. (GCA0003)
     Get_ClassAst_FoundClassCount = Found {0} class definition(s) in the script file. (GCA0004)
+    Get_ClassAst_ScriptFileNotFound = The script file '{0}' does not exist. (GCA0005)
+    Get_ClassAst_ParseFailed = Parsing of script file '{0}' failed: {1} (GCA0006)
 '@
 
