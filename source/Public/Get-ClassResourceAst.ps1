@@ -77,109 +77,26 @@ function Get-ClassResourceAst
         $ClassName
     )
 
-    begin
-    {
-        # Initialize the AST filter once in the begin block
-        if ($PSBoundParameters.ContainsKey('ClassName') -and $ClassName)
-        {
-            Write-Debug -Message ($script:localizedData.Get_ClassResourceAst_FilteringForClass -f $ClassName)
-
-            # Get only the specific DSC class resource.
-            $astFilter = {
-                param
-                (
-                    [Parameter()]
-                    $Node
-                )
-
-                $Node -is [System.Management.Automation.Language.TypeDefinitionAst] `
-                    -and $Node.IsClass `
-                    -and $Node.Name -eq $ClassName `
-                    -and $Node.Attributes.Extent.Text -imatch '\[DscResource\(.*\)\]'
-            }
-        }
-        else
-        {
-            Write-Debug -Message $script:localizedData.Get_ClassResourceAst_ReturningAllClasses
-
-            # Get all DSC class resources.
-            $astFilter = {
-                param
-                (
-                    [Parameter()]
-                    $Node
-                )
-
-                $Node -is [System.Management.Automation.Language.TypeDefinitionAst] `
-                    -and $Node.IsClass `
-                    -and $Node.Attributes.Extent.Text -imatch '\[DscResource\(.*\)\]'
-            }
-        }
-    }
-
     process
     {
-        # Determine which parameter set is being used and get the appropriate file collection
-        if ($PSCmdlet.ParameterSetName -eq 'String')
+        # Use Get-ClassAst to get all classes, then filter for DSC resources
+        $classAstResults = if ($PSCmdlet.ParameterSetName -eq 'String')
         {
-            $filesToProcess = $Path
+            Get-ClassAst -Path $Path -ClassName $ClassName
         }
         else
         {
-            $filesToProcess = $ScriptFile
+            Get-ClassAst -ScriptFile $ScriptFile -ClassName $ClassName
         }
 
-        foreach ($file in $filesToProcess)
-        {
-            # Convert FileInfo objects to string paths, or use string directly
-            if ($file -is [System.IO.FileInfo])
-            {
-                $filePath = $file.FullName
-            }
-            else
-            {
-                # String is expected for the String parameter set
-                $filePath = $file
-            }
-
-            Write-Debug -Message ($script:localizedData.Get_ClassResourceAst_ParsingScriptFile -f $filePath)
-
-            # Check if the script file exists
-            if (-not (Test-Path -Path $filePath -PathType Leaf))
-            {
-                $PSCmdlet.ThrowTerminatingError(
-                    [System.Management.Automation.ErrorRecord]::new(
-                        ($script:localizedData.Get_ClassResourceAst_ScriptFileNotFound -f $filePath),
-                        'GCRA0005', # cspell: disable-line
-                        [System.Management.Automation.ErrorCategory]::ObjectNotFound,
-                        $filePath
-                    )
-                )
-            }
-
-            $tokens = $null
-            $parseErrors = $null
-
-            $ast = [System.Management.Automation.Language.Parser]::ParseFile($filePath, [ref] $tokens, [ref] $parseErrors)
-
-            if ($parseErrors)
-            {
-                $PSCmdlet.ThrowTerminatingError(
-                    [System.Management.Automation.ErrorRecord]::new(
-                        ($script:localizedData.Get_ClassResourceAst_ParseFailed -f $filePath, ($parseErrors -join '; ')),
-                        'GCRA0006', # cspell: disable-line
-                        [System.Management.Automation.ErrorCategory]::ParserError,
-                        $filePath
-                    )
-                )
-            }
-
-            $dscClassResourceAst = $ast.FindAll($astFilter, $true)
-
-            Write-Debug -Message ($script:localizedData.Get_ClassResourceAst_FoundClassCount -f $dscClassResourceAst.Count)
-
-            # Output the results for this file
-            $dscClassResourceAst
+        # Filter the results to only include DSC resources (classes with [DscResource()] attribute)
+        $dscClassResourceAst = $classAstResults | Where-Object {
+            $_.Attributes.Extent.Text -imatch '\[DscResource\(.*\)\]'
         }
+
+        Write-Debug -Message ($script:localizedData.Get_ClassResourceAst_FoundClassCount -f $dscClassResourceAst.Count)
+
+        # Output the results
+        $dscClassResourceAst
     }
 }
