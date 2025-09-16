@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Get-ClassAst` that parses PowerShell script files and extracts class
+  definitions using Abstract Syntax Tree (AST) parsing. Can return all classes
+  in a file or filter for a specific class by name.
 - `ConvertTo-AnsiString` that converts strings containing ANSI
   sequences to properly escaped and terminated ANSI sequences. It adds the
   necessary escape character and ensures all sequences end with 'm'. Handles
