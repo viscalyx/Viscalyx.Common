@@ -191,24 +191,45 @@ Describe 'Clear-AnsiSequence' {
     }
 
     Context 'When handling unterminated ANSI sequences' {
-        It 'Should remove unterminated ANSI sequence' {
+        It 'Should preserve unterminated ANSI sequence by default' {
+            $inputString = '[32mGreen text[0'
+            $expected = 'Green text[0'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should remove unterminated ANSI sequence with -RemovePartial' {
             $inputString = '[32mGreen text[0'
             $expected = 'Green text'
+            $result = Clear-AnsiSequence -InputString $inputString -RemovePartial
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should preserve sequence missing m terminator by default' {
+            $inputString = '[32mGreen text[31Red text[0m'
+            $expected = 'Green text[31Red text'
             $result = Clear-AnsiSequence -InputString $inputString
             $result | Should -BeExactly $expected
         }
 
-        It 'Should remove sequence missing m terminator' {
+        It 'Should remove sequence missing m terminator with -RemovePartial' {
             $inputString = '[32mGreen text[31Red text[0m'
             $expected = 'Green textRed text'
+            $result = Clear-AnsiSequence -InputString $inputString -RemovePartial
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should preserve multiple unterminated sequences by default' {
+            $inputString = '[32mText[1;33More text[0'
+            $expected = 'Text[1;33More text[0'
             $result = Clear-AnsiSequence -InputString $inputString
             $result | Should -BeExactly $expected
         }
 
-        It 'Should handle multiple unterminated sequences' {
-            $inputString = '[32mText[1;33mMore text[0'
+        It 'Should remove multiple unterminated sequences with -RemovePartial' {
+            $inputString = '[32mText[1;33More text[0'
             $expected = 'TextMore text'
-            $result = Clear-AnsiSequence -InputString $inputString
+            $result = Clear-AnsiSequence -InputString $inputString -RemovePartial
             $result | Should -BeExactly $expected
         }
     }
@@ -223,8 +244,15 @@ Describe 'Clear-AnsiSequence' {
 
         It 'Should handle mix of terminated and unterminated sequences' {
             $inputString = '[32mTerminated[0m and [31unterminated'
-            $expected = 'Terminated and unterminated'
+            $expected = 'Terminated and [31unterminated'
             $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should handle mix of terminated and unterminated sequences with -RemovePartial' {
+            $inputString = '[32mTerminated[0m and [31unterminated'
+            $expected = 'Terminated and unterminated'
+            $result = Clear-AnsiSequence -InputString $inputString -RemovePartial
             $result | Should -BeExactly $expected
         }
     }
@@ -280,6 +308,95 @@ Describe 'Clear-AnsiSequence' {
             $plainText = Clear-AnsiSequence -InputString $formattedString
             $plainText | Should -BeExactly "This is a very long string with multiple formatted sections and reset sequences"
             $plainText.Length | Should -BeExactly 79
+        }
+    }
+
+    Context 'When handling plain bracketed numbers' {
+        It 'Should preserve plain bracketed numbers' {
+            $inputString = 'Value is [32] units'
+            $expected = 'Value is [32] units'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should preserve bracketed numbers without digits after' {
+            $inputString = 'Array[5] and Object[10]'
+            $expected = 'Array[5] and Object[10]'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should preserve bracketed text' {
+            $inputString = 'Text with [IMPORTANT] note'
+            $expected = 'Text with [IMPORTANT] note'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should distinguish between SGR and plain brackets' {
+            $inputString = '[32mColored[0m text and [32] value'
+            $expected = 'Colored text and [32] value'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+    }
+
+    Context 'When handling CSI sequences' {
+        It 'Should remove escaped cursor movement sequences' {
+            $inputString = "$($esc)[2KClearline$($esc)[H"
+            $expected = 'Clearline'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should preserve unescaped non-SGR patterns' {
+            $inputString = 'Text with [2K and [H patterns'
+            $expected = 'Text with [2K and [H patterns'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should remove complex escaped CSI sequences' {
+            $inputString = "$($esc)[2J$($esc)[1;1HCleared screen$($esc)[32mGreen$($esc)[0m"
+            $expected = 'Cleared screenGreen'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should handle mixed escaped and unescaped patterns' {
+            $inputString = "$($esc)[2KText[32mGreen[0m and [H cursor"
+            $expected = 'TextGreen and [H cursor'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+    }
+
+    Context 'When testing RemovePartial parameter' {
+        It 'Should have RemovePartial parameter' {
+            $parameterInfo = (Get-Command -Name 'Clear-AnsiSequence').Parameters['RemovePartial']
+            $parameterInfo | Should -Not -BeNullOrEmpty
+            $parameterInfo.ParameterType.Name | Should -BeExactly 'SwitchParameter'
+        }
+
+        It 'Should preserve incomplete sequences by default' {
+            $inputString = '[31Hello [32world [0'
+            $expected = '[31Hello [32world [0'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should remove incomplete sequences with -RemovePartial' {
+            $inputString = '[31Hello [32world [0'
+            $expected = 'Hello world '
+            $result = Clear-AnsiSequence -InputString $inputString -RemovePartial
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should handle complex mixed patterns with -RemovePartial' {
+            $inputString = '[32mComplete[0m [31incomplete and [42] number'
+            $expected = 'Complete incomplete and [42] number'
+            $result = Clear-AnsiSequence -InputString $inputString -RemovePartial
+            $result | Should -BeExactly $expected
         }
     }
 }
