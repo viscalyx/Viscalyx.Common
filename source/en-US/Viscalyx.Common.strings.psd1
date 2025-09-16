@@ -177,4 +177,12 @@ ConvertFrom-StringData @'
     ConvertTo_AnsiString_ProcessingString = Processing string with {0} characters for ANSI sequence conversion. (CTAS0003)
     ConvertTo_AnsiString_ProcessingSequence = Processing ANSI sequence with codes '{0}'. (CTAS0004)
     ConvertTo_AnsiString_ProcessingComplete = ANSI sequence conversion completed. (CTAS0005)
+
+    ## Get-ClassAst
+    Get_ClassAst_ParsingScriptFile = Parsing script file '{0}' for class definitions. (GCA0001)
+    Get_ClassAst_FilteringForClass = Filtering for specific class '{0}'. (GCA0002)
+    Get_ClassAst_ReturningAllClasses = Returning all class definitions found in the script file. (GCA0003)
+    Get_ClassAst_FoundClassCount = Found {0} class definition(s) in the script file. (GCA0004)
+    Get_ClassAst_ScriptFileNotFound = The script file '{0}' does not exist. (GCA0005)
+    Get_ClassAst_ParseFailed = Parsing of script file '{0}' failed: {1} (GCA0006)
 '@
