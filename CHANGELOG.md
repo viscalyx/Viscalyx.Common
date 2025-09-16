@@ -29,7 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `New-SamplerGitHubReleaseTag` - The git push operation is now properly wrapped
   in a ShouldProcess check, allowing WhatIf to report what would be pushed
   without actually executing the push command.
-  of throwing exceptions.
 - `Get-LinkLayerAddress` (alias `Get-MacAddress`) that retrieves the MAC
   address for an IP address on the local subnet/VLAN. Works cross-platform
   across Windows, Linux, and macOS.
@@ -39,9 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Send-WakeOnLan` (alias `Send-WOL`) that sends a Wake-on-LAN magic packet
   to wake up a remote computer. Supports various MAC address formats and
   custom broadcast addresses and ports.
-
-### Changed
-
 - Aligned ShouldProcess localized string key naming with DSC community convention
   by renaming `*_ShouldProcessVerboseDescription` and `*_ShouldProcessVerboseWarning`
   keys to `*_ShouldProcessDescription` and `*_ShouldProcessConfirmation` respectively.
@@ -161,4 +157,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Remove-PSHistory`
   - `Remove-PSReadLineHistory`
   - `Split-StringAtIndices`
-
