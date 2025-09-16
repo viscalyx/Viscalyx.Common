@@ -6,14 +6,14 @@ BeforeDiscovery {
     {
         if (-not (Get-Module -Name 'DscResource.Test'))
         {
-            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            # Assumes dependencies have been resolved, so if this module is not available, run 'noop' task.
             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
             {
                 # Redirect all streams to $null, except the error stream (stream 2)
                 & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
             }
 
-            # If the dependencies has not been resolved, this will throw an error.
+            # If the dependencies have not been resolved, this will throw an error.
             Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
         }
     }
@@ -67,7 +67,7 @@ function Test-Function
 class InvalidClass
 {
     [string] $Property1
-    
+
     [string] GetProperty(
     {
         return $this.Property1
@@ -92,7 +92,7 @@ Describe 'Get-ClassAst' {
             $result | Should -HaveCount 2
             $result[0] | Should -BeOfType [System.Management.Automation.Language.TypeDefinitionAst]
             $result[1] | Should -BeOfType [System.Management.Automation.Language.TypeDefinitionAst]
-            
+
             $classNames = $result | ForEach-Object { $_.Name }
             $classNames | Should -Contain 'TestClassOne'
             $classNames | Should -Contain 'TestClassTwo'
