@@ -91,7 +91,7 @@ function Get-ClassResourceAst
 
         # Filter the results to only include DSC resources (classes with [DscResource()] attribute)
         $dscClassResourceAst = $classAstResults | Where-Object {
-            $_.Attributes.Extent.Text -imatch '\[DscResource\(.*\)\]'
+            $_.Attributes.TypeName.Name -contains 'DscResource'
         }
 
         Write-Debug -Message ($script:localizedData.Get_ClassResourceAst_FoundClassCount -f $dscClassResourceAst.Count)
