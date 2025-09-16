@@ -377,6 +377,107 @@ Describe 'Clear-AnsiSequence' {
             $result = Clear-AnsiSequence -InputString $inputString
             $result | Should -BeExactly $expected
         }
+
+        It 'Should remove escaped cursor control sequences' {
+            $inputString = "$($esc)[2ACursor up$($esc)[3BCursor down$($esc)[5CCursor right"
+            $expected = 'Cursor upCursor downCursor right'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should remove escaped erase sequences' {
+            $inputString = "$($esc)[1KErase line start$($esc)[2KErase line$($esc)[0KErase to end"
+            $expected = 'Erase line startErase lineErase to end'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should remove escaped scroll sequences' {
+            $inputString = "$($esc)[2SScroll up$($esc)[3TScroll down"
+            $expected = 'Scroll upScroll down'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should remove escaped device control sequences' {
+            $inputString = "$($esc)[cDevice status$($esc)[6nCursor position$($esc)[5nDevice status"
+            $expected = 'Device statusCursor positionDevice status'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+    }
+
+    Context 'When handling tilde-terminated CSI sequences' {
+        It 'Should preserve escaped function key sequences (current limitation)' {
+            # Note: Current regex [A-Za-z] doesn't include tilde, so these are preserved
+            $inputString = "$($esc)[1~Home key$($esc)[4~End key"
+            $expected = "$($esc)[1~Home key$($esc)[4~End key"
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should preserve escaped special key sequences (current limitation)' {
+            # Note: Current regex [A-Za-z] doesn't include tilde, so these are preserved
+            $inputString = "$($esc)[2~Insert$($esc)[3~Delete$($esc)[5~Page Up$($esc)[6~Page Down"
+            $expected = "$($esc)[2~Insert$($esc)[3~Delete$($esc)[5~Page Up$($esc)[6~Page Down"
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should preserve escaped modified key sequences (current limitation)' {
+            # Note: Current regex [A-Za-z] doesn't include tilde, so these are preserved
+            $inputString = "$($esc)[1;2~Shift+Home$($esc)[1;5~Ctrl+Home"
+            $expected = "$($esc)[1;2~Shift+Home$($esc)[1;5~Ctrl+Home"
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should preserve unescaped tilde patterns' {
+            $inputString = 'File[1~] and directory[2~]'
+            $expected = 'File[1~] and directory[2~]'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should handle mixed tilde and letter-terminated sequences' {
+            # Letter-terminated sequences should be removed, tilde-terminated preserved
+            $inputString = "$($esc)[1~Function$($esc)[2JClear$($esc)[3~Delete"
+            $expected = "$($esc)[1~FunctionClear$($esc)[3~Delete"
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+    }
+
+    Context 'When testing regex pattern coverage' {
+        It 'Should remove sequences with various letter terminators' {
+            $inputString = "$($esc)[2AUp$($esc)[3ZDown$($esc)[1aBold$($esc)[2zItalic"
+            $expected = 'UpDownBoldItalic'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should handle sequences with complex parameters' {
+            $inputString = "$($esc)[12;34;56HPosition$($esc)[0;1;2;3;4;5mMulti-param"
+            $expected = 'PositionMulti-param'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should remove sequences with single letter finals' {
+            $inputString = "$($esc)[PDevice$($esc)[QQuery$($esc)[RResponse$($esc)[SStatus"
+            $expected = 'DeviceQueryResponseStatus'
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
+
+        It 'Should preserve sequences with unsupported final characters' {
+            # Testing characters not in [A-Za-z] range like numbers, symbols
+            $inputString = "$($esc)[2!Unsupported$($esc)[3#Also$($esc)[4@Symbol"
+            # These should NOT be removed by current regex since final chars are not [A-Za-z]
+            $expected = "$($esc)[2!Unsupported$($esc)[3#Also$($esc)[4@Symbol"
+            $result = Clear-AnsiSequence -InputString $inputString
+            $result | Should -BeExactly $expected
+        }
     }
 
     Context 'When testing RemovePartial parameter' {

@@ -114,7 +114,7 @@ function Clear-AnsiSequence
         Write-Debug -Message ($script:localizedData.Clear_AnsiSequence_ProcessingString -f $InputString.Length)
 
         <#
-            Two-pass ANSI sequence removal approach:
+            Three-pass ANSI sequence removal approach:
 
             Pass 1: Remove complete CSI sequences that start with an escape character
             This handles all CSI sequences (SGR and non-SGR) that are properly escaped.
@@ -124,7 +124,7 @@ function Clear-AnsiSequence
             This only matches unescaped patterns that end with 'm' to avoid removing
             plain bracketed numbers like "[32]"
 
-            With -RemovePartial: Also remove patterns that look like incomplete ANSI sequences
+            Pass 3: With -RemovePartial: Also remove patterns that look like incomplete ANSI sequences
             but distinguish from plain bracketed numbers by requiring the pattern to be
             followed by text that suggests it was meant to be an ANSI sequence.
         #>
@@ -142,9 +142,10 @@ function Clear-AnsiSequence
         # Pass 3: Optionally remove incomplete sequences that appear to be intended ANSI sequences
         if ($RemovePartial.IsPresent)
         {
-            # Remove incomplete ANSI-like sequences: [digits/semicolons] but only if NOT closed with ]
-            # Use word boundary or end of string to identify incomplete sequences
-            $incompletePattern = '\[([0-9;]+)(?![0-9;\]])'
+            # Remove incomplete ANSI-like sequences: [digits/semicolons] that are NOT followed by 'm' or ']'
+            # and are followed by a letter (indicating likely ANSI intent) or end of string/newline
+            # This removes fragments like "[31Red", "[1;33More" but preserves plain brackets like "[42]"
+            $incompletePattern = '\[([0-9;]+)(?=[A-Za-z]|$|\r?\n)'
             $result = [System.Text.RegularExpressions.Regex]::Replace($result, $incompletePattern, '')
         }
 
