@@ -177,7 +177,7 @@ function ConvertTo-DifferenceString
     # Precompute lengths to avoid repeated property lookups
     $refLength = $referenceBytes.Length
     $diffLength = $differenceBytes.Length
-    $maxLength = [Math]::Max($refLength, $diffLength)
+    $maxLength = [System.Math]::Max($refLength, $diffLength)
 
     # Use a larger group size when hex output is disabled
     $groupSize = if ($NoHexOutput)
@@ -204,9 +204,6 @@ function ConvertTo-DifferenceString
         $actualReferenceLabel = $ReferenceLabel
         if ($visibleReferenceLabel.Length -gt $leftColumnWidth)
         {
-            # Truncate the visible label to the maximum width
-            $truncatedVisibleLabel = $visibleReferenceLabel.Substring(0, $leftColumnWidth)
-
             # Reconstruct the label with ANSI sequences preserved up to the truncation point
             # We'll build the truncated label by iterating through the original and keeping track of visible characters
             $actualReferenceLabel = ''
@@ -216,7 +213,7 @@ function ConvertTo-DifferenceString
             while ($i -lt $ReferenceLabel.Length -and $visibleCharCount -lt $leftColumnWidth)
             {
                 # Check if we're at the start of an ANSI sequence
-                if ($ReferenceLabel[$i] -eq "`e" -and $i + 1 -lt $ReferenceLabel.Length -and $ReferenceLabel[$i + 1] -eq '[')
+                if ($ReferenceLabel[$i] -eq [System.Char] 0x1b -and $i + 1 -lt $ReferenceLabel.Length -and $ReferenceLabel[$i + 1] -eq '[')
                 {
                     # Find the end of the ANSI sequence
                     $ansiStart = $i
@@ -249,6 +246,9 @@ function ConvertTo-DifferenceString
             # Update the visible label to the truncated version
             $visibleReferenceLabel = Clear-AnsiSequence -InputString $actualReferenceLabel
 
+            # Ensure any ANSI sequences are properly terminated by appending reset sequence
+            $actualReferenceLabel += "$([System.Char] 0x1b)[0m"
+
             # Emit warning about truncation
             Write-Warning -Message ($script:localizedData.ConvertTo_DifferenceString_ReferenceLabelTruncated -f $ReferenceLabel, $leftColumnWidth, $actualReferenceLabel)
         }
@@ -256,7 +256,7 @@ function ConvertTo-DifferenceString
         $labelSpacing = $rightColumnStart - $visibleReferenceLabel.Length
 
         # Clamp labelSpacing to minimum of 0 to avoid negative repetition errors
-        $labelSpacing = [Math]::Max($labelSpacing, 0)
+        $labelSpacing = [System.Math]::Max($labelSpacing, 0)
 
         "$($ReferenceLabelAnsi)$($actualReferenceLabel)$($HighlightEnd)$(' ' * $labelSpacing)$($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
         ('-' * $leftColumnWidth) + (' ' * $spacingWidth) + ('-' * $leftColumnWidth) # Underline
