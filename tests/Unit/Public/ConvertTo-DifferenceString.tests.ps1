@@ -85,24 +85,32 @@ Describe 'ConvertTo-DifferenceString' {
         # Test with very short labels
         $shortResult = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test' -ReferenceLabel 'A' -DifferenceLabel 'B'
         $shortLabelLine = $shortResult[0]
-        
+
         # Test with default labels
         $defaultResult = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test'
         $defaultLabelLine = $defaultResult[0]
-        
+
         # Test with long labels
         $longResult = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test' -ReferenceLabel 'VeryLongLabel:' -DifferenceLabel 'AlsoVeryLongLabel:'
         $longLabelLine = $longResult[0]
-        
+
         # Check that all second labels start at the same relative position (after accounting for label length differences)
         $shortBIndex = $shortLabelLine.IndexOf('B')
         $defaultButWasIndex = $defaultLabelLine.IndexOf('But was:')
         $longAlsoIndex = $longLabelLine.IndexOf('AlsoVeryLongLabel:')
-        
+
         # All should align to position 72 (64 + 8 for left column + spacing)
         # Note: Due to ANSI escape codes, the actual position may be slightly different, but they should be consistent
         $shortBIndex | Should -Be $defaultButWasIndex
         $shortBIndex | Should -Be $longAlsoIndex
+    }
+
+    It 'Should handle left labels longer than the right-column start' {
+        $veryLongLeft = ('L' * 100)
+        $result = ConvertTo-DifferenceString -ReferenceString 'X' -DifferenceString 'X' -ReferenceLabel $veryLongLeft -DifferenceLabel 'R'
+        $firstLine = $result[0]
+        $firstLine | Should -Match $veryLongLeft
+        $firstLine | Should -Match ' R'  # at least one space before right label
     }
 
     It 'Should handle different encoding types' {

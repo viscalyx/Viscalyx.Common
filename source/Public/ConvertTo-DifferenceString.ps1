@@ -189,14 +189,14 @@ function ConvertTo-DifferenceString
         16
     }
 
+    # Calculate spacing to align labels with columns (left column = 64 chars, spacing = 8 chars)
+    $leftColumnWidth = 64
+    $spacingWidth = 8
+    $rightColumnStart = $leftColumnWidth + $spacingWidth
+
     # Output the labels if NoLabels is not specified
     if (-not $NoLabels)
     {
-        # Calculate spacing to align labels with columns (left column = 64 chars, spacing = 8 chars)
-        $leftColumnWidth = 64
-        $spacingWidth = 8
-        $rightColumnStart = $leftColumnWidth + $spacingWidth
-
         # Strip ANSI escape sequences from reference label to get visible length
         $visibleReferenceLabel = Clear-AnsiSequence -InputString $ReferenceLabel
         $labelSpacing = $rightColumnStart - $visibleReferenceLabel.Length
@@ -205,7 +205,7 @@ function ConvertTo-DifferenceString
         $labelSpacing = [Math]::Max($labelSpacing, 1)
 
         "$($ReferenceLabelAnsi)$($ReferenceLabel)$($HighlightEnd)$(' ' * $labelSpacing)$($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
-        ('-' * 64) + (' ' * 8) + ('-' * 64) # Output a line of dashes under the labels
+        ('-' * $leftColumnWidth) + (' ' * $spacingWidth) + ('-' * $leftColumnWidth) # Underline
     }
 
     # Output the column header once with dashes underline if NoColumnHeader is not specified
@@ -214,8 +214,8 @@ function ConvertTo-DifferenceString
         if ($NoHexOutput)
         {
             # New header when hex column is disabled
-            "$($ColumnHeaderAnsi)Ascii$(' ' * 67)Ascii$($ColumnHeaderResetAnsi)"
-            "$($ColumnHeaderAnsi)" + ('-' * 64) + (' ' * 8) + ('-' * 64) + "$($ColumnHeaderResetAnsi)"
+            "$($ColumnHeaderAnsi)Ascii$(' ' * ($rightColumnStart - 5))Ascii$($ColumnHeaderResetAnsi)"
+            "$($ColumnHeaderAnsi)" + ('-' * $leftColumnWidth) + (' ' * $spacingWidth) + ('-' * $leftColumnWidth) + "$($ColumnHeaderResetAnsi)"
         }
         else
         {
