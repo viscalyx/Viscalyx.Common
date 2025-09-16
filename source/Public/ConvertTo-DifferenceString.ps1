@@ -196,11 +196,11 @@ function ConvertTo-DifferenceString
         $leftColumnWidth = 64
         $spacingWidth = 8
         $rightColumnStart = $leftColumnWidth + $spacingWidth
-        
+
         # Strip ANSI escape sequences from reference label to get visible length
         $visibleReferenceLabel = Clear-AnsiSequence -InputString $ReferenceLabel
         $labelSpacing = $rightColumnStart - $visibleReferenceLabel.Length
-        
+
         # Clamp labelSpacing to minimum of 1 to avoid negative repetition errors
         $labelSpacing = [Math]::Max($labelSpacing, 1)
 
