@@ -36,7 +36,7 @@ Describe 'Get-ClassResourceAst Integration Tests' {
 class HelperClass
 {
     [System.String] $Name
-    
+
     [System.String] GetValue()
     {
         return $this.Name
