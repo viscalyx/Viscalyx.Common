@@ -87,9 +87,9 @@ function Get-ClassAst
 
         # Get only the specific class resource.
         $astFilter = {
-            $args[0] -is [System.Management.Automation.Language.TypeDefinitionAst] `
-                -and $args[0].IsClass `
-                -and $args[0].Name -eq $ClassName
+            param($Node)
+
+            $Node -is [System.Management.Automation.Language.TypeDefinitionAst] -and $Node.IsClass -and $Node.Name -eq $ClassName
         }
     }
     else
@@ -98,8 +98,9 @@ function Get-ClassAst
 
         # Get all class resources.
         $astFilter = {
-            $args[0] -is [System.Management.Automation.Language.TypeDefinitionAst] `
-                -and $args[0].IsClass
+            param($Node)
+
+            $Node -is [System.Management.Automation.Language.TypeDefinitionAst] -and $Node.IsClass
         }
     }
 
