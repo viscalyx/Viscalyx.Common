@@ -50,11 +50,11 @@
         You can pipe FileInfo objects to this function.
 
     .OUTPUTS
-        System.Collections.Generic.IEnumerable`1[[System.Management.Automation.Language.TypeDefinitionAst]]
+        System.Collections.Generic.IEnumerable`1[[System.Management.Automation.Language.Ast]]
 
-        Returns a collection of TypeDefinitionAst objects representing the class
-        definitions found in the script file. Returns an empty collection if no
-        classes are found or when filtering for a non-existent class name.
+        Returns a collection of AST nodes (items are TypeDefinitionAst) representing
+        the class definitions found in the script file. Returns an empty collection
+        if no classes are found or when filtering for a non-existent class name.
 #>
 function Get-ClassAst
 {
