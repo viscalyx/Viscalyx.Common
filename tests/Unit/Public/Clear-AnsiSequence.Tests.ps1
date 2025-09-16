@@ -76,6 +76,14 @@ Describe 'Clear-AnsiSequence' {
             $parameterInfo = (Get-Command -Name 'Clear-AnsiSequence').Parameters['InputString']
             $parameterInfo.Attributes.ValueFromPipeline | Should -BeTrue
         }
+
+        It 'Should have the correct parameters in parameter set __AllParameterSets' {
+            $r = (Get-Command -Name 'Clear-AnsiSequence').ParameterSets |
+                Where-Object { $_.Name -eq '__AllParameterSets' } |
+                Select-Object @{N='Name';E={$_.Name}}, @{N='Sig';E={$_.ToString()}}
+            $r.Name | Should -Be '__AllParameterSets'
+            $r.Sig  | Should -Be '[-InputString] <String> [-RemovePartial] [<CommonParameters>]'
+        }
     }
 
     Context 'When handling null or empty input' {
