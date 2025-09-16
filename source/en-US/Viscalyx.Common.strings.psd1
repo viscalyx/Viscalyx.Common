@@ -186,4 +186,3 @@ ConvertFrom-StringData @'
     Get_ClassAst_ScriptFileNotFound = The script file '{0}' does not exist. (GCA0005)
     Get_ClassAst_ParseFailed = Parsing of script file '{0}' failed: {1} (GCA0006)
 '@
-
