@@ -1,20 +1,25 @@
 <#
     .SYNOPSIS
-        Clears ANSI escape sequences from a string.
+        Clears ANSI CSI sequences from a string.
 
     .DESCRIPTION
-        The Clear-AnsiSequence command clears all ANSI escape sequences from a string,
-        returning only the visible text content. This is useful for calculating the actual
-        visible length of strings that contain ANSI formatting codes, or for extracting
-        plain text from formatted console output.
+        The Clear-AnsiSequence command clears ANSI CSI (Control Sequence Introducer) sequences
+        from a string, returning only the visible text content. This includes SGR (Select Graphic
+        Rendition) sequences for colors and formatting, as well as cursor control sequences.
+
+        This is useful for calculating the actual visible length of strings that contain ANSI
+        formatting codes, or for extracting plain text from formatted console output.
+
+        Note: This function specifically handles CSI sequences (ESC[ or just [). Other ANSI
+        escape sequence types like OSC, DCS, PM, or APC are not processed.
 
     .PARAMETER InputString
-        The string from which ANSI escape sequences should be cleared.
-        The string can contain any combination of ANSI escape sequences with or without
+        The string from which ANSI CSI sequences should be cleared.
+        The string can contain any combination of ANSI CSI sequences with or without
         proper escape characters.
 
     .PARAMETER RemovePartial
-        When specified, also removes unterminated ANSI sequences that don't end with 'm'.
+        When specified, also removes unterminated ANSI CSI sequences that don't end with 'm'.
         By default, unterminated sequences like "[31" are preserved to avoid accidentally
         removing plain bracketed numbers.
 
@@ -27,13 +32,13 @@
     .EXAMPLE
         Clear-AnsiSequence -InputString "`e[32mGreen text`e[0m"
 
-        This example clears ANSI escape sequences from a string with properly escaped sequences,
+        This example clears ANSI CSI sequences from a string with properly escaped sequences,
         returning "Green text".
 
     .EXAMPLE
         Clear-AnsiSequence -InputString "[31mRed text[0m"
 
-        This example clears ANSI escape sequences from a string with unescaped sequences,
+        This example clears ANSI CSI sequences from a string with unescaped sequences,
         returning "Red text".
 
     .EXAMPLE
@@ -51,25 +56,30 @@
     .EXAMPLE
         Clear-AnsiSequence -InputString "`e[1;37;44mBold white on blue`e[0m and plain text"
 
-        This example clears complex ANSI escape sequences, returning "Bold white on blue and plain text".
+        This example clears complex ANSI CSI sequences, returning "Bold white on blue and plain text".
 
     .EXAMPLE
         $visibleLength = (Clear-AnsiSequence -InputString $formattedString).Length
 
-        This example shows how to get the visible length of a string that contains ANSI sequences.
+        This example shows how to get the visible length of a string that contains ANSI CSI sequences.
 
     .NOTES
-        This function handles various ANSI escape sequence formats including:
-        - Properly escaped sequences: `e[32m or [char]0x1b[32m
+        This function handles various ANSI CSI (Control Sequence Introducer) sequence formats including:
+        - Properly escaped SGR sequences: `e[32m or [char]0x1b[32m (colors and formatting)
         - Unescaped SGR sequences: [32m (only when they end with 'm')
-        - Non-SGR CSI sequences: ESC[2K, ESC[H (only when properly escaped)
+        - Non-SGR CSI sequences: ESC[2K, ESC[H (cursor control, only when properly escaped)
         - Complex sequences with multiple codes: [1;37;44m
 
-        The function uses a two-pass approach:
+        The function uses a three-pass approach:
         1. Remove complete CSI sequences that start with an escape character
         2. Remove SGR-like patterns that aren't escaped but end with 'm'
+        3. Optionally remove incomplete sequences with -RemovePartial
 
         Plain bracketed numbers like "[32]" are preserved unless -RemovePartial is used.
+
+        Limitation: This function does not handle other ANSI escape sequence types such as
+        OSC (Operating System Command), DCS (Device Control String), PM (Privacy Message),
+        or APC (Application Program Command) sequences.
 #>
 function Clear-AnsiSequence
 {
