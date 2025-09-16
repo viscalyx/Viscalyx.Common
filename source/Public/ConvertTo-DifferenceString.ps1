@@ -199,12 +199,66 @@ function ConvertTo-DifferenceString
     {
         # Strip ANSI escape sequences from reference label to get visible length
         $visibleReferenceLabel = Clear-AnsiSequence -InputString $ReferenceLabel
+        
+        # Truncate the reference label if it's longer than the left column width
+        $actualReferenceLabel = $ReferenceLabel
+        if ($visibleReferenceLabel.Length -gt $leftColumnWidth)
+        {
+            # Truncate the visible label to the maximum width
+            $truncatedVisibleLabel = $visibleReferenceLabel.Substring(0, $leftColumnWidth)
+            
+            # Reconstruct the label with ANSI sequences preserved up to the truncation point
+            # We'll build the truncated label by iterating through the original and keeping track of visible characters
+            $actualReferenceLabel = ''
+            $visibleCharCount = 0
+            $i = 0
+            
+            while ($i -lt $ReferenceLabel.Length -and $visibleCharCount -lt $leftColumnWidth)
+            {
+                # Check if we're at the start of an ANSI sequence
+                if ($ReferenceLabel[$i] -eq "`e" -and $i + 1 -lt $ReferenceLabel.Length -and $ReferenceLabel[$i + 1] -eq '[')
+                {
+                    # Find the end of the ANSI sequence
+                    $ansiStart = $i
+                    $i += 2  # Skip the escape and [
+                    
+                    # Look for the end of the ANSI sequence (usually 'm' or other command letters)
+                    while ($i -lt $ReferenceLabel.Length -and $ReferenceLabel[$i] -match '[0-9;]')
+                    {
+                        $i++
+                    }
+                    
+                    # Include the final command character if present
+                    if ($i -lt $ReferenceLabel.Length)
+                    {
+                        $i++
+                    }
+                    
+                    # Add the entire ANSI sequence to the result
+                    $actualReferenceLabel += $ReferenceLabel.Substring($ansiStart, $i - $ansiStart)
+                }
+                else
+                {
+                    # Regular character - add it and increment visible count
+                    $actualReferenceLabel += $ReferenceLabel[$i]
+                    $visibleCharCount++
+                    $i++
+                }
+            }
+            
+            # Update the visible label to the truncated version
+            $visibleReferenceLabel = Clear-AnsiSequence -InputString $actualReferenceLabel
+            
+            # Emit warning about truncation
+            Write-Warning -Message ($script:localizedData.ConvertTo_DifferenceString_ReferenceLabelTruncated -f $ReferenceLabel, $leftColumnWidth, $actualReferenceLabel)
+        }
+        
         $labelSpacing = $rightColumnStart - $visibleReferenceLabel.Length
 
-        # Clamp labelSpacing to minimum of 1 to avoid negative repetition errors
-        $labelSpacing = [Math]::Max($labelSpacing, 1)
+        # Clamp labelSpacing to minimum of 0 to avoid negative repetition errors
+        $labelSpacing = [Math]::Max($labelSpacing, 0)
 
-        "$($ReferenceLabelAnsi)$($ReferenceLabel)$($HighlightEnd)$(' ' * $labelSpacing)$($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
+        "$($ReferenceLabelAnsi)$($actualReferenceLabel)$($HighlightEnd)$(' ' * $labelSpacing)$($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
         ('-' * $leftColumnWidth) + (' ' * $spacingWidth) + ('-' * $leftColumnWidth) # Underline
     }
 
