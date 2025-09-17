@@ -177,7 +177,7 @@ function ConvertTo-DifferenceString
     # Precompute lengths to avoid repeated property lookups
     $refLength = $referenceBytes.Length
     $diffLength = $differenceBytes.Length
-    $maxLength = [Math]::Max($refLength, $diffLength)
+    $maxLength = [System.Math]::Max($refLength, $diffLength)
 
     # Use a larger group size when hex output is disabled
     $groupSize = if ($NoHexOutput)
@@ -189,11 +189,77 @@ function ConvertTo-DifferenceString
         16
     }
 
+    # Calculate spacing to align labels with columns (left column = 64 chars, spacing = 8 chars)
+    $leftColumnWidth = 64
+    $spacingWidth = 8
+    $rightColumnStart = $leftColumnWidth + $spacingWidth
+
     # Output the labels if NoLabels is not specified
     if (-not $NoLabels)
     {
-        "$($ReferenceLabelAnsi)$($ReferenceLabel)$($HighlightEnd)                                                               $($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
-        ('-' * 64) + (' ' * 8) + ('-' * 64) # Output a line of dashes under the labels
+        # Strip ANSI escape sequences from reference label to get visible length
+        $visibleReferenceLabel = Clear-AnsiSequence -InputString $ReferenceLabel
+
+        # Truncate the reference label if it's longer than the left column width
+        $actualReferenceLabel = $ReferenceLabel
+        if ($visibleReferenceLabel.Length -gt $leftColumnWidth)
+        {
+            # Reconstruct the label with ANSI sequences preserved up to the truncation point
+            # We'll build the truncated label by iterating through the original and keeping track of visible characters
+            $actualReferenceLabel = ''
+            $visibleCharCount = 0
+            $i = 0
+
+            while ($i -lt $ReferenceLabel.Length -and $visibleCharCount -lt $leftColumnWidth)
+            {
+                # Check if we're at the start of an ANSI sequence
+                if ($ReferenceLabel[$i] -eq [System.Char] 0x1b -and $i + 1 -lt $ReferenceLabel.Length -and $ReferenceLabel[$i + 1] -eq '[')
+                {
+                    # Find the end of the ANSI sequence
+                    $ansiStart = $i
+                    $i += 2  # Skip the escape and [
+
+                    # Look for the end of the ANSI sequence (usually 'm' or other command letters)
+                    while ($i -lt $ReferenceLabel.Length -and $ReferenceLabel[$i] -match '[0-9;]')
+                    {
+                        $i++
+                    }
+
+                    # Include the final command character if present
+                    if ($i -lt $ReferenceLabel.Length)
+                    {
+                        $i++
+                    }
+
+                    # Add the entire ANSI sequence to the result
+                    $actualReferenceLabel += $ReferenceLabel.Substring($ansiStart, $i - $ansiStart)
+                }
+                else
+                {
+                    # Regular character - add it and increment visible count
+                    $actualReferenceLabel += $ReferenceLabel[$i]
+                    $visibleCharCount++
+                    $i++
+                }
+            }
+
+            # Update the visible label to the truncated version
+            $visibleReferenceLabel = Clear-AnsiSequence -InputString $actualReferenceLabel
+
+            # Ensure any ANSI sequences are properly terminated by appending reset sequence
+            $actualReferenceLabel += "$([System.Char] 0x1b)[0m"
+
+            # Emit warning about truncation
+            Write-Warning -Message ($script:localizedData.ConvertTo_DifferenceString_ReferenceLabelTruncated -f $ReferenceLabel, $leftColumnWidth, $actualReferenceLabel)
+        }
+
+        $labelSpacing = $rightColumnStart - $visibleReferenceLabel.Length
+
+        # Clamp labelSpacing to minimum of 0 to avoid negative repetition errors
+        $labelSpacing = [System.Math]::Max($labelSpacing, 0)
+
+        "$($ReferenceLabelAnsi)$($actualReferenceLabel)$($HighlightEnd)$(' ' * $labelSpacing)$($DifferenceLabelAnsi)$($DifferenceLabel)$($HighlightEnd)"
+        ('-' * $leftColumnWidth) + (' ' * $spacingWidth) + ('-' * $leftColumnWidth) # Underline
     }
 
     # Output the column header once with dashes underline if NoColumnHeader is not specified
@@ -202,8 +268,8 @@ function ConvertTo-DifferenceString
         if ($NoHexOutput)
         {
             # New header when hex column is disabled
-            "$($ColumnHeaderAnsi)Ascii$(' ' * 67)Ascii$($ColumnHeaderResetAnsi)"
-            "$($ColumnHeaderAnsi)" + ('-' * 64) + (' ' * 8) + ('-' * 64) + "$($ColumnHeaderResetAnsi)"
+            "$($ColumnHeaderAnsi)Ascii$(' ' * ($rightColumnStart - 5))Ascii$($ColumnHeaderResetAnsi)"
+            "$($ColumnHeaderAnsi)" + ('-' * $leftColumnWidth) + (' ' * $spacingWidth) + ('-' * $leftColumnWidth) + "$($ColumnHeaderResetAnsi)"
         }
         else
         {

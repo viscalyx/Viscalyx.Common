@@ -7,21 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `Get-ClassResourceAst` that parses PowerShell script files and extracts DSC
-  class resource definitions using Abstract Syntax Tree (AST) parsing. Filters
-  for classes that have the [DscResource()] attribute. Can return all DSC class
-  resources in a file or filter for a specific class by name.
-- `Get-ClassAst` that parses PowerShell script files and extracts class
-  definitions using Abstract Syntax Tree (AST) parsing. Can return all classes
-  in a file or filter for a specific class by name.
+- `Assert-IPv4Address` that validates if a string is a valid IPv4 address,
+  including format checking and value range validation (0-255 for each octet).
+  Also validates that octets do not have leading zeros.
+- `Clear-AnsiSequence` that clears all ANSI escape sequences from a string,
+  returning only the visible text content. Useful for calculating the actual
+  visible length of strings that contain ANSI formatting codes or extracting
+  plain text from formatted console output.
 - `ConvertTo-AnsiString` that converts strings containing ANSI
   sequences to properly escaped and terminated ANSI sequences. It adds the
   necessary escape character and ensures all sequences end with 'm'. Handles
   both escaped and unescaped sequences, as well as sequences that may be
   missing the 'm' terminator.
-- `Assert-IPv4Address` that validates if a string is a valid IPv4 address,
-  including format checking and value range validation (0-255 for each octet).
-  Also validates that octets do not have leading zeros.
+- `Get-ClassAst` that parses PowerShell script files and extracts class
+  definitions using Abstract Syntax Tree (AST) parsing. Can return all classes
+  in a file or filter for a specific class by name.
+- `Get-ClassResourceAst` that parses PowerShell script files and extracts DSC
+  class resource definitions using Abstract Syntax Tree (AST) parsing. Filters
+  for classes that have the [DscResource()] attribute. Can return all DSC class
+  resources in a file or filter for a specific class by name.
+
+### Fixed
+
+- `Out-Difference` now correctly aligns labels with column
+  structure when using custom labels ([issue #7](https://github.com/viscalyx/Viscalyx.Common/issues/7))
 - `Test-IPv4Address` that tests if a string is a valid IPv4 address and returns
   a boolean result. Performs the same validation as `Assert-IPv4Address` but
   returns `$true` for valid addresses and `$false` for invalid ones instead

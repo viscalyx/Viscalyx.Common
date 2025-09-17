@@ -81,6 +81,83 @@ Describe 'ConvertTo-DifferenceString' {
         $result | Should -Match 'Diff:'
     }
 
+    It 'Should align labels correctly with different label lengths' {
+        # Test with very short labels
+        $shortResult = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test' -ReferenceLabel 'A' -DifferenceLabel 'B'
+        $shortLabelLine = $shortResult[0]
+
+        # Test with default labels
+        $defaultResult = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test'
+        $defaultLabelLine = $defaultResult[0]
+
+        # Test with long labels
+        $longResult = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test' -ReferenceLabel 'VeryLongLabel:' -DifferenceLabel 'AlsoVeryLongLabel:'
+        $longLabelLine = $longResult[0]
+
+        # Check that all second labels start at the same relative position (after accounting for label length differences)
+        $shortBIndex = $shortLabelLine.IndexOf('B')
+        $defaultButWasIndex = $defaultLabelLine.IndexOf('But was:')
+        $longAlsoIndex = $longLabelLine.IndexOf('AlsoVeryLongLabel:')
+
+        # All should align to position 72 (64 + 8 for left column + spacing)
+        # Note: Due to ANSI escape codes, the actual position may be slightly different, but they should be consistent
+        $shortBIndex | Should -Be $defaultButWasIndex
+        $shortBIndex | Should -Be $longAlsoIndex
+    }
+
+    It 'Should handle left labels longer than the right-column start' {
+        $veryLongLeft = ('L' * 100)
+
+        # Capture warnings
+        $warnings = @()
+        $result = ConvertTo-DifferenceString -ReferenceString 'X' -DifferenceString 'X' -ReferenceLabel $veryLongLeft -DifferenceLabel 'R' -WarningVariable warnings
+
+        $firstLine = $result[0]
+
+        # Should contain the truncated label (64 characters)
+        $expectedTruncatedLabel = 'L' * 64
+        $firstLine | Should -Match $expectedTruncatedLabel
+        $firstLine | Should -Match 'R'  # right label should still appear
+
+        # Should emit a warning about truncation
+        $warnings | Should -HaveCount 1
+        $warnings[0] | Should -Match "Reference label.*is longer than the maximum width of 64 characters and has been truncated"
+    }
+
+    It 'Should align right column precisely at column 72 when visible label length is exactly 72' {
+        # Create a label that is exactly 72 characters visible (no ANSI sequences)
+        $exactLabel = 'A' * 72
+        $result = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test' -ReferenceLabel $exactLabel -DifferenceLabel 'Right'
+        $firstLine = $result[0]
+
+        # Strip ANSI sequences to get the actual visible content
+        $visibleLine = $firstLine -replace '\x1b\[[0-9;]*m', ''
+
+        # Find the position of 'Right' in the visible line
+        $rightLabelIndex = $visibleLine.IndexOf('Right')
+
+        # The right label should start exactly at position 72 (0-based indexing)
+        $rightLabelIndex | Should -Be 72
+    }
+
+    It 'Should truncate reference label when longer than left column width' {
+        # Create a label that is longer than the left column width (64 characters)
+        $longLabel = 'A' * 80
+        $result = ConvertTo-DifferenceString -ReferenceString 'Test' -DifferenceString 'Test' -ReferenceLabel $longLabel -DifferenceLabel 'Right' -WarningAction SilentlyContinue
+        $firstLine = $result[0]
+
+        # Strip ANSI sequences to get the actual visible content
+        $visibleLine = $firstLine -replace '\x1b\[[0-9;]*m', ''
+
+        # The reference label should be truncated to exactly 64 characters
+        $truncatedLabel = $visibleLine.Substring(0, 64)
+        $truncatedLabel | Should -Be ('A' * 64)
+
+        # The right label should start exactly at position 72 (64 + 8 spacing)
+        $rightLabelIndex = $visibleLine.IndexOf('Right')
+        $rightLabelIndex | Should -Be 72
+    }
+
     It 'Should handle different encoding types' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello' -DifferenceString 'Hallo' -EncodingType 'ASCII')
         $result | Should -Match '31m65'

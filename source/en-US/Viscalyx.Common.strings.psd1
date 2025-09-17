@@ -188,4 +188,13 @@ ConvertFrom-StringData @'
 
     ## Get-ClassResourceAst
     Get_ClassResourceAst_FoundClassCount = Found {0} DSC class resource definition(s) in the script file. (GCRA0004)
+
+    ## Clear-AnsiSequence
+    Clear_AnsiSequence_ProcessingBegin = Begin processing ANSI sequence clearing. (CAS0001)
+    Clear_AnsiSequence_EmptyInput = Input string is null or empty, returning as-is. (CAS0002)
+    Clear_AnsiSequence_ProcessingString = Processing string with {0} characters for ANSI sequence clearing. (CAS0003)
+    Clear_AnsiSequence_ProcessingComplete = ANSI sequence clearing completed. (CAS0004)
+
+    ## ConvertTo-DifferenceString
+    ConvertTo_DifferenceString_ReferenceLabelTruncated = Reference label '{0}' is longer than the maximum width of {1} characters and has been truncated to '{2}'. (CTDS0001)
 '@
