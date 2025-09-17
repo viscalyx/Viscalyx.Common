@@ -122,7 +122,7 @@ function New-SamplerGitHubReleaseTag
             Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
         }
 
-        Write-Error -ErrorRecord $_ -ErrorAction 'Stop'
+        $PSCmdlet.ThrowTerminatingError($_)
     }
 
     try
@@ -137,7 +137,7 @@ function New-SamplerGitHubReleaseTag
             Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
         }
 
-        Write-Error -ErrorRecord $_ -ErrorAction 'Stop'
+        $PSCmdlet.ThrowTerminatingError($_)
     }
 
     <#
@@ -152,14 +152,14 @@ function New-SamplerGitHubReleaseTag
 
             if (-not $latestTag)
             {
-                $errorMessageParameters = @{
-                    Message      = $script:localizedData.New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository
-                    Category     = 'InvalidOperation'
-                    ErrorId      = 'NSGRT0008' # cspell: disable-line
-                    TargetObject = 'tag'
-                }
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                    [System.InvalidOperationException]::new($script:localizedData.New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository),
+                    'NSGRT0008', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    'tag'
+                )
 
-                Write-Error @errorMessageParameters -ErrorAction 'Stop'
+                $PSCmdlet.ThrowTerminatingError($errorRecord)
             }
 
             $isCorrectlyFormattedPreviewTag = $latestTag -match '^(v\d+\.\d+\.\d+)-.*'
@@ -170,14 +170,14 @@ function New-SamplerGitHubReleaseTag
             }
             else
             {
-                $errorMessageParameters = @{
-                    Message      = $script:localizedData.New_SamplerGitHubReleaseTag_LatestTagIsNotPreview -f $latestPreviewTag
-                    Category     = 'InvalidOperation'
-                    ErrorId      = 'NSGRT0010' # cspell: disable-line
-                    TargetObject = $latestTag
-                }
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                    [System.InvalidOperationException]::new(($script:localizedData.New_SamplerGitHubReleaseTag_LatestTagIsNotPreview -f $latestTag)),
+                    'NSGRT0010', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    $latestTag
+                )
 
-                Write-Error @errorMessageParameters -ErrorAction 'Stop'
+                $PSCmdlet.ThrowTerminatingError($errorRecord)
             }
         }
         catch
@@ -187,7 +187,7 @@ function New-SamplerGitHubReleaseTag
                 Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
             }
 
-            Write-Error -ErrorRecord $_ -ErrorAction 'Stop'
+            $PSCmdlet.ThrowTerminatingError($_)
         }
     }
 
@@ -240,7 +240,7 @@ function New-SamplerGitHubReleaseTag
                 Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
             }
 
-            Write-Error -ErrorRecord $_ -ErrorAction 'Stop'
+            $PSCmdlet.ThrowTerminatingError($_)
         }
     }
 
