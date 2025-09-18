@@ -4,6 +4,7 @@
 - Always follow the instructions in this repository.
 
 ## Build & Test Workflow Requirements
+- Never use VS Code task, always use PowerShell scripts via terminal, from repository root
 - Run PowerShell script files from repository root
 - Setup build and test environment (once per `pwsh` session): `./build.ps1 -Tasks noop`
 - Build project before running tests: `./build.ps1 -Tasks build`
