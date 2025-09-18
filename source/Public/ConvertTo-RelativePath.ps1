@@ -23,10 +23,17 @@
         relative path of the given absolute path based on the current location.
 
     .INPUTS
-        [System.String]
+        System.String
+
+        Absolute path to convert to a relative path.
 
     .OUTPUTS
-        [System.String]
+        System.String
+
+        The relative path based on the current location.
+
+    .NOTES
+        This function uses .NET Path methods for cross-platform compatibility.
 #>
 function ConvertTo-RelativePath
 {
@@ -45,7 +52,7 @@ function ConvertTo-RelativePath
 
     begin
     {
-        if (-not $PSBoundParameters.ContainsKey('CurrentLocation'))
+        if (-not $PSBoundParameters.ContainsKey('CurrentLocation') -or [System.String]::IsNullOrWhiteSpace($CurrentLocation))
         {
             $CurrentLocation = (Get-Location).Path
         }
@@ -58,9 +65,10 @@ function ConvertTo-RelativePath
         if ($relativePath.StartsWith($CurrentLocation))
         {
             # Convert the directory separator characters to the current system's directory separator character.
-            $relativePath = [System.IO.Path]::GetFullPath($AbsolutePath)
+            $normalizedAbsolutePath = [System.IO.Path]::GetFullPath($AbsolutePath)
+            $normalizedCurrentLocation = [System.IO.Path]::GetFullPath($CurrentLocation)
 
-            $relativePath = [System.IO.Path]::GetRelativePath($CurrentLocation, $AbsolutePath).Insert(0, '.{0}' -f [System.IO.Path]::DirectorySeparatorChar)
+            $relativePath = [System.IO.Path]::GetRelativePath($normalizedCurrentLocation, $normalizedAbsolutePath).Insert(0, '.{0}' -f [System.IO.Path]::DirectorySeparatorChar)
         }
 
         return $relativePath

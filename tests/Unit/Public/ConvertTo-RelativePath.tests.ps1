@@ -52,7 +52,7 @@ Describe 'ConvertTo-RelativePath' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-AbsolutePath] <string> [[-CurrentLocation] <string>] [<CommonParameters>]'
+                ExpectedParameters       = '[-AbsolutePath] <string> [[-CurrentLocation] <string>] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'ConvertTo-RelativePath').ParameterSets |
@@ -81,17 +81,43 @@ Describe 'ConvertTo-RelativePath' {
         $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
-    Context 'When passing a path on Linux or MacOS that does not start with CurrentLocation' -Skip:($PSEdition -eq 'Desktop' -or $IsWindows) {
-        It 'Should return the absolute path as it was passed' {
-            $result = ConvertTo-RelativePath -AbsolutePath '/other/path/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
-            $result | Should -Be ('{0}other{0}path{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
-        }
+    It 'Should return the absolute path unchanged when it does not start with CurrentLocation' {
+        $result = ConvertTo-RelativePath -AbsolutePath '/other/path/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
+        $result | Should -Be '/other/path/ConvertTo-RelativePath.ps1'
     }
 
-    Context 'When passing a path on Windows that does not start with CurrentLocation' -Skip:($IsLinux -or $IsMacOS) {
-        It 'Should return the absolute path as it was passed' {
-            $result = ConvertTo-RelativePath -AbsolutePath '/other/path/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
-            $result | Should -Be '/other/path/ConvertTo-RelativePath.ps1'
+    It 'Should work with pipeline input' {
+        $result = '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' | ConvertTo-RelativePath -CurrentLocation '/source/Viscalyx.Common'
+        $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
+    }
+
+    It 'Should handle mixed directory separators correctly' {
+        $mixedPath = '/source/Viscalyx.Common\source\Public/ConvertTo-RelativePath.ps1'
+        $result = ConvertTo-RelativePath -AbsolutePath $mixedPath -CurrentLocation '/source/Viscalyx.Common'
+        $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
+    }
+
+    It 'Should handle empty CurrentLocation parameter correctly' {
+        Mock -CommandName Get-Location -MockWith { @{ Path = '/source/Viscalyx.Common' } }
+        $result = ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' -CurrentLocation ''
+        $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
+    }
+
+    Context 'When testing cross-platform behavior' {
+        It 'Should handle Windows-style paths on all platforms' -Skip:($PSEdition -eq 'Desktop') {
+            $windowsPath = 'C:\source\Viscalyx.Common\source\Public\ConvertTo-RelativePath.ps1'
+            $currentLocation = 'C:\source\Viscalyx.Common'
+            $result = ConvertTo-RelativePath -AbsolutePath $windowsPath -CurrentLocation $currentLocation
+
+            if ($IsWindows)
+            {
+                $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
+            }
+            else
+            {
+                # On non-Windows, should return the original path since it doesn't start with current location
+                $result | Should -Be $windowsPath
+            }
         }
     }
 }
