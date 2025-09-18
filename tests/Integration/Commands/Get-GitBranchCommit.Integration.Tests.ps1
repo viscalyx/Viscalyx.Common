@@ -168,14 +168,14 @@ Describe 'Get-GitBranchCommit Integration Tests' {
             $result = Get-GitBranchCommit -BranchName 'feature/test' -Latest -ErrorAction Stop
 
             $result | Should -Not -BeNullOrEmpty
-            
+
             # If result is an array, take the first element for comparison
             if ($result -is [Array]) {
                 $actualCommit = $result[0]
             } else {
                 $actualCommit = $result
             }
-            
+
             $actualCommit | Should -Match '^[a-f0-9]{40}$'
 
             # Verify it's the latest commit from the feature branch
@@ -269,7 +269,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
 
     Context 'When git operations fail' {
         It 'Should throw error for non-existent branch' {
-            { Get-GitBranchCommit -BranchName 'nonexistent-branch' -ErrorAction Stop } | 
+            { Get-GitBranchCommit -BranchName 'nonexistent-branch' -ErrorAction Stop 2>$null } |
                 Should -Throw -ErrorId 'GGBC0001,Get-GitBranchCommit'
         }
 
@@ -285,7 +285,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
                 git config user.name "Test User" *> $null
 
                 # Should throw error from Get-GitLocalBranchName for empty repository
-                { Get-GitBranchCommit -ErrorAction Stop } | 
+                { Get-GitBranchCommit -ErrorAction Stop 2>$null } |
                     Should -Throw -ErrorId 'GGLBN0001,Get-GitLocalBranchName'
             }
             finally {
@@ -303,7 +303,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
             Push-Location -Path $nonGitPath
             try {
                 # Should throw error from Get-GitLocalBranchName for non-git directory
-                { Get-GitBranchCommit -ErrorAction Stop } | 
+                { Get-GitBranchCommit -ErrorAction Stop 2>$null } |
                     Should -Throw -ErrorId 'GGLBN0001,Get-GitLocalBranchName'
             }
             finally {
@@ -328,6 +328,103 @@ Describe 'Get-GitBranchCommit Integration Tests' {
             $result2 = Get-GitBranchCommit -ErrorAction Stop
 
             $result1 | Should -Be $result2
+        }
+    }
+
+    Context 'When using Range parameter set' {
+        It 'Should return commits between HEAD~3 and HEAD' {
+            $result = Get-GitBranchCommit -From 'HEAD~3' -To 'HEAD' -ErrorAction Stop
+
+            $result | Should -Not -BeNullOrEmpty
+            $result.Count | Should -BeGreaterThan 0
+            $result.Count | Should -BeLessOrEqual 3
+
+            # Verify all results are valid commit IDs
+            $result | ForEach-Object {
+                $_ | Should -Match '^[a-f0-9]{40}$'
+            }
+        }
+
+        It 'Should return commits between two specific commits' {
+            # Get some commits to work with
+            $allCommits = Get-GitBranchCommit -ErrorAction Stop
+
+            if ($allCommits.Count -ge 3) {
+                $fromCommit = $allCommits[2]  # Third commit (older)
+                $toCommit = $allCommits[0]    # First commit (newer)
+
+                $result = Get-GitBranchCommit -From $fromCommit -To $toCommit -ErrorAction Stop
+
+                $result | Should -Not -BeNullOrEmpty
+                $result.Count | Should -BeGreaterOrEqual 1
+
+                # Verify all results are valid commit IDs
+                $result | ForEach-Object {
+                    $_ | Should -Match '^[a-f0-9]{40}$'
+                }
+            }
+        }
+
+        It 'Should return commits between branches' {
+            # Create a feature branch to test with
+            git checkout -b 'test-range-branch' *> $null
+
+            try {
+                # Make a commit on the feature branch
+                "Test range content" | Out-File -FilePath 'test-range-file.txt' -Encoding UTF8
+                git add . *> $null
+                git commit -m "Test range commit" *> $null
+
+                # Switch back to main and get range
+                git checkout 'main' *> $null
+
+                $result = Get-GitBranchCommit -From 'main' -To 'test-range-branch' -ErrorAction Stop
+
+                $result | Should -Not -BeNullOrEmpty
+                $result.Count | Should -BeGreaterOrEqual 1
+
+                # Verify all results are valid commit IDs
+                $result | ForEach-Object {
+                    $_ | Should -Match '^[a-f0-9]{40}$'
+                }
+            }
+            finally {
+                # Clean up
+                git checkout 'main' *> $null
+                git branch -D 'test-range-branch' *> $null
+                Remove-Item -Path 'test-range-file.txt' -ErrorAction SilentlyContinue
+            }
+        }
+
+        It 'Should handle empty ranges gracefully' {
+            # Test range where From and To are the same commit
+            $latestCommit = Get-GitBranchCommit -Latest -ErrorAction Stop
+
+            $result = Get-GitBranchCommit -From $latestCommit -To $latestCommit -ErrorAction Stop
+
+            # Git range syntax commit..commit should return empty when they're the same
+            $result | Should -BeNullOrEmpty
+        }
+
+        It 'Should throw error for invalid range references' {
+            { Get-GitBranchCommit -From 'invalid-commit-123' -To 'HEAD' -ErrorAction Stop 2>$null } |
+                Should -Throw -ErrorId 'GGBC0001,Get-GitBranchCommit'
+        }
+
+        It 'Should handle reversed range order' {
+            # Get some commits to work with
+            $allCommits = Get-GitBranchCommit -ErrorAction Stop
+
+            if ($allCommits.Count -ge 2) {
+                $olderCommit = $allCommits[1]   # Second commit (older)
+                $newerCommit = $allCommits[0]   # First commit (newer)
+
+                # Range from newer to older should return empty (git behavior)
+                $result = Get-GitBranchCommit -From $newerCommit -To $olderCommit -ErrorAction Stop
+
+                # This should return empty since we're going backwards in time
+                $result | Should -BeNullOrEmpty
+            }
         }
     }
 }

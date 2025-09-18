@@ -40,6 +40,10 @@ BeforeDiscovery {
             ExpectedParameterSetName = 'First'
             ExpectedParameters = '[-BranchName <string>] [-First <uint>] [<CommonParameters>]'
         }
+        @{
+            ExpectedParameterSetName = 'Range'
+            ExpectedParameters = '-From <string> -To <string> [<CommonParameters>]'
+        }
     )
 }
 
@@ -103,6 +107,16 @@ Describe 'Get-GitBranchCommit' {
             $parameterInfo.Attributes.Mandatory | Should -BeFalse
         }
 
+        It 'Should have From as a mandatory parameter in Range parameter set' {
+            $parameterInfo = (Get-Command -Name 'Get-GitBranchCommit').Parameters['From']
+            $parameterInfo.Attributes.Where({$_.ParameterSetName -eq 'Range'}).Mandatory | Should -BeTrue
+        }
+
+        It 'Should have To as a mandatory parameter in Range parameter set' {
+            $parameterInfo = (Get-Command -Name 'Get-GitBranchCommit').Parameters['To']
+            $parameterInfo.Attributes.Where({$_.ParameterSetName -eq 'Range'}).Mandatory | Should -BeTrue
+        }
+
         It 'Should have correct parameter types' {
             $command = Get-Command -Name 'Get-GitBranchCommit'
             
@@ -110,6 +124,8 @@ Describe 'Get-GitBranchCommit' {
             $command.Parameters['Latest'].ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
             $command.Parameters['Last'].ParameterType | Should -Be ([System.UInt32])
             $command.Parameters['First'].ParameterType | Should -Be ([System.UInt32])
+            $command.Parameters['From'].ParameterType | Should -Be ([System.String])
+            $command.Parameters['To'].ParameterType | Should -Be ([System.String])
         }
     }
 

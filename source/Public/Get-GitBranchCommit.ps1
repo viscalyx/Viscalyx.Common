@@ -22,6 +22,14 @@
         Retrieves the first X number of commit IDs. The order will be from the
         oldest to the newest commit.
 
+    .PARAMETER From
+        Specifies the starting reference (commit, branch, tag, or HEAD) for the range.
+        Used with the To parameter to get commits between two references.
+
+    .PARAMETER To
+        Specifies the ending reference (commit, branch, tag, or HEAD) for the range.
+        Used with the From parameter to get commits between two references.
+
     .INPUTS
         None
 
@@ -51,6 +59,21 @@
         Get-GitBranchCommit -First 3
 
         Retrieves the first 3 commit IDs for the current Git branch.
+
+    .EXAMPLE
+        Get-GitBranchCommit -From 'main' -To 'HEAD'
+
+        Retrieves all commit IDs between the main branch and HEAD.
+
+    .EXAMPLE
+        Get-GitBranchCommit -From 'v1.0.0' -To 'v2.0.0'
+
+        Retrieves all commit IDs between version tags v1.0.0 and v2.0.0.
+
+    .EXAMPLE
+        Get-GitBranchCommit -From 'abc123' -To 'def456'
+
+        Retrieves all commit IDs between two specific commit hashes.
 #>
 function Get-GitBranchCommit
 {
@@ -75,7 +98,15 @@ function Get-GitBranchCommit
 
         [Parameter(ParameterSetName = 'First')]
         [System.UInt32]
-        $First
+        $First,
+
+        [Parameter(ParameterSetName = 'Range', Mandatory = $true)]
+        [System.String]
+        $From,
+
+        [Parameter(ParameterSetName = 'Range', Mandatory = $true)]
+        [System.String]
+        $To
     )
 
     $commitId = $null
@@ -128,6 +159,13 @@ function Get-GitBranchCommit
 
             $exitCode = $LASTEXITCODE
         }
+    }
+    elseif ($PSBoundParameters.ContainsKey('From') -and $PSBoundParameters.ContainsKey('To'))
+    {
+        # Return commits between From and To references using git range syntax
+        $commitId = git log --pretty=format:"%H" "$From..$To"
+
+        $exitCode = $LASTEXITCODE
     }
     else
     {
