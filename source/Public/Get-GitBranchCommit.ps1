@@ -123,56 +123,63 @@ function Get-GitBranchCommit
         $BranchName
     )
 
-    if ($Latest.IsPresent)
+    switch ($PSCmdlet.ParameterSetName)
     {
-        # Return only the latest commit ID.
-        $commitId = git rev-parse $BranchName
-
-        $exitCode = $LASTEXITCODE # cSpell: ignore LASTEXITCODE
-    }
-    elseif ($Last)
-    {
-        # Return the latest X number of commits.
-        $commitId = git log -n $Last --pretty=format:"%H" @argument
-
-        $exitCode = $LASTEXITCODE
-    }
-    elseif ($First)
-    {
-        if (-not $PSBoundParameters.ContainsKey('BranchName'))
+        'Latest'
         {
-            $BranchName = Get-GitLocalBranchName -Current
+            # Return only the latest commit ID.
+            $commitId = git rev-parse $BranchName
+
+            $exitCode = $LASTEXITCODE # cSpell: ignore LASTEXITCODE
         }
 
-        # Count the total number of commits in the branch.
-        $totalCommits = git rev-list --count $BranchName
-
-        $exitCode = $LASTEXITCODE
-
-        if ($exitCode -eq 0)
+        'Last'
         {
-            # Calculate the number of commits to skip.
-            $skipCommits = $totalCommits - $First
-
-            # Return the first X number of commits.
-            $commitId = git log --skip $skipCommits --reverse -n $First --pretty=format:"%H" $BranchName
+            # Return the latest X number of commits.
+            $commitId = git log -n $Last --pretty=format:"%H" @argument
 
             $exitCode = $LASTEXITCODE
         }
-    }
-    elseif ($PSBoundParameters.ContainsKey('From') -and $PSBoundParameters.ContainsKey('To'))
-    {
-        # Return commits between From and To references using git range syntax
-        $commitId = git log --pretty=format:"%H" "$From..$To"
 
-        $exitCode = $LASTEXITCODE
-    }
-    else
-    {
-        # Return all commit IDs.
-        $commitId = git log --pretty=format:"%H" @argument
+        'First'
+        {
+            if (-not $PSBoundParameters.ContainsKey('BranchName'))
+            {
+                $BranchName = Get-GitLocalBranchName -Current
+            }
 
-        $exitCode = $LASTEXITCODE
+            # Count the total number of commits in the branch.
+            $totalCommits = git rev-list --count $BranchName
+
+            $exitCode = $LASTEXITCODE
+
+            if ($exitCode -eq 0)
+            {
+                # Calculate the number of commits to skip.
+                $skipCommits = $totalCommits - $First
+
+                # Return the first X number of commits.
+                $commitId = git log --skip $skipCommits --reverse -n $First --pretty=format:"%H" $BranchName
+
+                $exitCode = $LASTEXITCODE
+            }
+        }
+
+        'Range'
+        {
+            # Return commits between From and To references using git range syntax
+            $commitId = git log --pretty=format:"%H" "$From..$To"
+
+            $exitCode = $LASTEXITCODE
+        }
+
+        'NoParameter'
+        {
+            # Return all commit IDs.
+            $commitId = git log --pretty=format:"%H" @argument
+
+            $exitCode = $LASTEXITCODE
+        }
     }
 
     if ($exitCode -ne 0)
