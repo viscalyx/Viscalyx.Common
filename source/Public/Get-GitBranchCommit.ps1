@@ -22,6 +22,11 @@
         Retrieves the first X number of commit IDs. The order will be from the
         oldest to the newest commit.
 
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
     .OUTPUTS
         System.String
 
@@ -77,22 +82,20 @@ function Get-GitBranchCommit
     $exitCode = 0
     $argument = @()
 
-    if ($PSBoundParameters.ContainsKey('BranchName'))
-    {
-        if ($BranchName -eq '.')
-        {
-            $BranchName = Get-GitLocalBranchName -Current
-        }
 
-        $argument += @(
-            $BranchName
-        )
+    if (-not $PSBoundParameters.ContainsKey('BranchName') -or $BranchName -eq '.')
+    {
+        $BranchName = Get-GitLocalBranchName -Current
     }
+
+    $argument += @(
+        $BranchName
+    )
 
     if ($Latest.IsPresent)
     {
         # Return only the latest commit ID.
-        $commitId = git rev-parse HEAD @argument
+        $commitId = git rev-parse $BranchName
 
         $exitCode = $LASTEXITCODE # cSpell: ignore LASTEXITCODE
     }
