@@ -50,7 +50,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Get-GitTag`
   - `New-GitTag`
   - `Push-GitTag`
+  - `Receive-GitBranch`
+  - `Remove-GitTag`
   - `Rename-GitLocalBranch`
+  - `Rename-GitRemote`
   - `Request-GitTag`
   - `Switch-GitLocalBranch`
   - `Test-GitLocalChanges`
