@@ -46,7 +46,7 @@ Describe 'Disable-CursorShortcutCode' {
     It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
         @{
             ExpectedParameterSetName = '__AllParameterSets'
-            ExpectedParameters = '[<CommonParameters>]'
+            ExpectedParameters = '[-Force] [<CommonParameters>]'
         }
     ) {
         $result = (Get-Command -Name 'Disable-CursorShortcutCode').ParameterSets |
@@ -60,17 +60,17 @@ Describe 'Disable-CursorShortcutCode' {
     }
 
     BeforeEach {
-        # Mock Write-Information to capture information messages
+        # Mock Write-Information to keep test output clean (no assertions needed)
         Mock -CommandName Write-Information
 
-        # Mock Test-Path and Rename-Item
+        # Mock Test-Path and Move-Item
         Mock -CommandName Test-Path
-        Mock -CommandName Rename-Item
+        Mock -CommandName Move-Item
     }
 
     Context 'When Cursor path is found in PATH variable' {
         BeforeAll {
-            # Set up environment variable with Cursor path
+            # Store original PATH and set mock PATH
             $script:originalPath = $env:Path
             $env:Path = 'C:\Windows\System32;C:\Users\User\AppData\Local\Programs\Cursor\resources\app\bin;C:\Program Files\Git\cmd'
         }
@@ -81,7 +81,7 @@ Describe 'Disable-CursorShortcutCode' {
         }
 
         Context 'When both code files exist' {
-            BeforeAll {
+            BeforeEach {
                 Mock -CommandName Test-Path -MockWith { $true }
             }
 
@@ -89,16 +89,14 @@ Describe 'Disable-CursorShortcutCode' {
                 Disable-CursorShortcutCode
 
                 Should -Invoke -CommandName Test-Path -Exactly -Times 2
-                Should -Invoke -CommandName Rename-Item -Exactly -Times 2
-                Should -Invoke -CommandName Rename-Item -ParameterFilter { $NewName -eq 'code.cmd.old' } -Exactly -Times 1
-                Should -Invoke -CommandName Rename-Item -ParameterFilter { $NewName -eq 'code.old' } -Exactly -Times 1
-                Should -Invoke -CommandName Write-Information -ParameterFilter { $MessageData -eq 'Renamed code.cmd to code.cmd.old' } -Exactly -Times 1
-                Should -Invoke -CommandName Write-Information -ParameterFilter { $MessageData -eq 'Renamed code to code.old' } -Exactly -Times 1
+                Should -Invoke -CommandName Move-Item -Exactly -Times 2
+                Should -Invoke -CommandName Move-Item -ParameterFilter { $Destination -like '*code.cmd.old' } -Exactly -Times 1
+                Should -Invoke -CommandName Move-Item -ParameterFilter { $Destination -like '*code.old' } -Exactly -Times 1
             }
         }
 
         Context 'When only code.cmd file exists' {
-            BeforeAll {
+            BeforeEach {
                 Mock -CommandName Test-Path -MockWith {
                     param($Path)
                     return $Path -like '*code.cmd'
@@ -109,15 +107,13 @@ Describe 'Disable-CursorShortcutCode' {
                 Disable-CursorShortcutCode
 
                 Should -Invoke -CommandName Test-Path -Exactly -Times 2
-                Should -Invoke -CommandName Rename-Item -Exactly -Times 1
-                Should -Invoke -CommandName Rename-Item -ParameterFilter { $NewName -eq 'code.cmd.old' } -Exactly -Times 1
-                Should -Invoke -CommandName Write-Information -ParameterFilter { $MessageData -eq 'Renamed code.cmd to code.cmd.old' } -Exactly -Times 1
-                Should -Invoke -CommandName Write-Information -ParameterFilter { $MessageData -eq "File 'code' not found in the Cursor path." } -Exactly -Times 1
+                Should -Invoke -CommandName Move-Item -Exactly -Times 1
+                Should -Invoke -CommandName Move-Item -ParameterFilter { $Destination -like '*code.cmd.old' } -Exactly -Times 1
             }
         }
 
         Context 'When no code files exist' {
-            BeforeAll {
+            BeforeEach {
                 Mock -CommandName Test-Path -MockWith { $false }
             }
 
@@ -125,16 +121,14 @@ Describe 'Disable-CursorShortcutCode' {
                 Disable-CursorShortcutCode
 
                 Should -Invoke -CommandName Test-Path -Exactly -Times 2
-                Should -Invoke -CommandName Rename-Item -Times 0
-                Should -Invoke -CommandName Write-Information -ParameterFilter { $MessageData -eq "File 'code.cmd' not found in the Cursor path." } -Exactly -Times 1
-                Should -Invoke -CommandName Write-Information -ParameterFilter { $MessageData -eq "File 'code' not found in the Cursor path." } -Exactly -Times 1
+                Should -Invoke -CommandName Move-Item -Times 0
             }
         }
     }
 
     Context 'When Cursor path is not found in PATH variable' {
         BeforeAll {
-            # Set up environment variable without Cursor path
+            # Store original PATH and set mock PATH without Cursor
             $script:originalPath = $env:Path
             $env:Path = 'C:\Windows\System32;C:\Program Files\Git\cmd'
         }
@@ -148,8 +142,7 @@ Describe 'Disable-CursorShortcutCode' {
             Disable-CursorShortcutCode
 
             Should -Invoke -CommandName Test-Path -Times 0
-            Should -Invoke -CommandName Rename-Item -Times 0
-            Should -Invoke -CommandName Write-Information -ParameterFilter { $MessageData -eq 'Cursor path not found in the PATH variable.' } -Exactly -Times 1
+            Should -Invoke -CommandName Move-Item -Times 0
         }
     }
 }

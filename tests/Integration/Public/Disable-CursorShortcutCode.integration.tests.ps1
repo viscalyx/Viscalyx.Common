@@ -19,7 +19,7 @@ BeforeDiscovery {
     }
     catch [System.IO.FileNotFoundException]
     {
-        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks noop" first.'
     }
 }
 
@@ -44,8 +44,7 @@ AfterAll {
 
 Describe 'Disable-CursorShortcutCode' {
     BeforeAll {
-        Mock -CommandName Write-Information
-        Mock -CommandName Rename-Item
+        Mock -CommandName Move-Item
 
         if ($env:Path -notmatch 'Cursor')
         {
@@ -68,7 +67,7 @@ Describe 'Disable-CursorShortcutCode' {
 
         Viscalyx.Common\Disable-CursorShortcutCode
 
-        Should -Invoke -CommandName Rename-Item -Exactly -Times 2 -Scope It
+        Should -Invoke -CommandName Move-Item -Exactly -Times 2 -Scope It
     }
 
     It 'Should not disable Cursor shortcuts when Cursor path is not found' {
@@ -77,7 +76,7 @@ Describe 'Disable-CursorShortcutCode' {
         }
 
         Viscalyx.Common\Disable-CursorShortcutCode
-        Should -Invoke -CommandName Rename-Item -Times 0 -Scope It
+        Should -Invoke -CommandName Move-Item -Times 0 -Scope It
     }
 
     It 'Should handle cases where code.cmd does not exist' {
@@ -89,7 +88,7 @@ Describe 'Disable-CursorShortcutCode' {
 
         Viscalyx.Common\Disable-CursorShortcutCode
 
-        Should -Invoke -CommandName Rename-Item -Times 0 -Scope It
+        Should -Invoke -CommandName Move-Item -Times 0 -Scope It
     }
 
     It 'Should handle cases where code.cmd or code file does not exist' {
@@ -101,6 +100,6 @@ Describe 'Disable-CursorShortcutCode' {
 
         Viscalyx.Common\Disable-CursorShortcutCode
 
-        Should -Invoke -CommandName Rename-Item -Times 0 -Scope It
+        Should -Invoke -CommandName Move-Item -Times 0 -Scope It
     }
 }

@@ -10,12 +10,35 @@
         Specifies that the operation will be forced and override any previous backed
         up shortcuts.
 
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
+    .OUTPUTS
+        None
+
+        This function does not return any output.
+
     .EXAMPLE
-        Disable-CursorShortcuts
+        Disable-CursorShortcutCode
+
+        Disables Cursor shortcuts by renaming 'code' and 'code.cmd' files to '.old' extensions.
+
+    .EXAMPLE
+        Disable-CursorShortcutCode -Force
+
+        Disables Cursor shortcuts and forces overwrite of any existing '.old' backup files.
+
+    .NOTES
+        This function searches for Cursor installation paths in the system PATH variable.
+        If multiple Cursor paths are found, the function will throw an error.
+        Files are renamed with '.old' extension to preserve them for later restoration.
 #>
 function Disable-CursorShortcutCode
 {
     [CmdletBinding()]
+    [OutputType()]
     param
     (
         [Parameter()]
@@ -31,7 +54,7 @@ function Disable-CursorShortcutCode
 
     if (-not $cursorPath)
     {
-        Write-Information 'Cursor path not found in the PATH environment variable. Exiting.' -InformationAction 'Continue'
+        Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_CursorPathNotFound -InformationAction 'Continue'
 
         return
     }
@@ -39,9 +62,9 @@ function Disable-CursorShortcutCode
     if ($cursorPath.Count -gt 1)
     {
         $errorMessageParameters = @{
-            Message = 'More than one Cursor path was found in the PATH environment variable.'
+            Message = $script:localizedData.Disable_CursorShortcutCode_MultipleCursorPaths
             Category = 'InvalidResult'
-            ErrorId = 'DCSC0001' # cspell: disable-line
+            ErrorId = 'DCSC0002' # cspell: disable-line
             TargetObject = 'Path'
         }
 
@@ -61,21 +84,21 @@ function Disable-CursorShortcutCode
     {
         Move-Item -Path $codeCmdPath -Destination $codeCmdPathDestination -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
 
-        Write-Information 'Renamed code.cmd to code.cmd.old' -InformationAction 'Continue'
+        Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_RenamedCodeCmd -InformationAction 'Continue'
     }
     else
     {
-        Write-Information "File 'code.cmd' not found in the Cursor path. Skipping." -InformationAction 'Continue'
+        Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_CodeCmdNotFound -InformationAction 'Continue'
     }
 
     if (Test-Path $codePath)
     {
         Move-Item -Path $codePath -Destination $codePathDestination -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
 
-        Write-Information 'Renamed code to code.old' -InformationAction 'Continue'
+        Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_RenamedCode -InformationAction 'Continue'
     }
     else
     {
-        Write-Information "File 'code' not found in the Cursor path. Skipping." -InformationAction 'Continue'
+        Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_CodeNotFound -InformationAction 'Continue'
     }
 }
