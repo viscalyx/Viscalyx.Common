@@ -6,23 +6,28 @@
         The `Assert-GitRemote` command checks if the remote specified in the `$Name`
         parameter exists locally. If the remote doesn't exist, it throws an error.
 
-    .PARAMETER RemoteName
+    .PARAMETER Name
         Specifies the name of the Git remote to check.
 
-    .EXAMPLE
-        PS> Assert-GitRemote -Name "origin"
-
-        This example checks if the Git remote named "origin" exists locally.
-
     .INPUTS
-        None.
+        None
+
+        This function does not accept pipeline input.
 
     .OUTPUTS
-        None.
+        None
+
+        This function does not return any output.
+
+    .EXAMPLE
+        Assert-GitRemote -Name "origin"
+
+        This example checks if the Git remote named "origin" exists locally.
 #>
 function Assert-GitRemote
 {
     [CmdletBinding()]
+    [OutputType()]
     param
     (
         [Parameter(Mandatory = $true, Position = 0)]
@@ -30,25 +35,21 @@ function Assert-GitRemote
         $Name
     )
 
-    # Change the error action preference to always stop the script if an error occurs.
-    $ErrorActionPreference = 'Stop'
-
     <#
-        Check if the remote specified in $UpstreamRemoteName exists locally and
+        Check if the remote specified in $Name exists locally and
         throw an error if it doesn't.
     #>
     $remoteExists = Test-GitRemote -Name $Name
 
     if (-not $remoteExists)
     {
-
-        $errorMessageParameters = @{
-            Message = $script:localizedData.New_SamplerGitHubReleaseTag_RemoteMissing -f $Name
-            Category = 'ObjectNotFound'
-            ErrorId = 'AGR0001' # cspell: disable-line
-            TargetObject = $Name
-        }
-
-        Write-Error @errorMessageParameters
+        $PSCmdlet.ThrowTerminatingError(
+            [System.Management.Automation.ErrorRecord]::new(
+                ($script:localizedData.Assert_GitRemote_RemoteMissing -f $Name),
+                'AGR0001', # cspell: disable-line
+                [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+                $Name
+            )
+        )
     }
 }
