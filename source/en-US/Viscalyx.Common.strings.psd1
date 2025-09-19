@@ -7,8 +7,19 @@
 
 # cSpell: ignore unstaged
 ConvertFrom-StringData @'
+    ## Disable-CursorShortcutCode
+    Disable_CursorShortcutCode_CursorPathNotFound = Cursor path not found in the PATH environment variable. Exiting. (DCSC0001)
+    Disable_CursorShortcutCode_MultipleCursorPaths = More than one Cursor path was found in the PATH environment variable. (DCSC0002)
+    Disable_CursorShortcutCode_RenamedCodeCmd = Renamed code.cmd to code.cmd.old (DCSC0003)
+    Disable_CursorShortcutCode_CodeCmdNotFound = File 'code.cmd' not found in the Cursor path. Skipping. (DCSC0004)
+    Disable_CursorShortcutCode_RenamedCode = Renamed code to code.old (DCSC0005)
+    Disable_CursorShortcutCode_CodeNotFound = File 'code' not found in the Cursor path. Skipping. (DCSC0006)
+
     ## Assert-GitLocalChange
     Assert_GitLocalChanges_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
+
+    ## Assert-GitRemote
+    Assert_GitRemote_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (AGR0001)
 
     ## Get-GitLocalBranchName
     Get_GitLocalBranchName_Failed = Failed to get the name of the local branch. Make sure git repository is accessible.
@@ -40,6 +51,10 @@ ConvertFrom-StringData @'
     Rename_GitLocalBranch_FailedSetUpstreamTracking = Failed to set upstream tracking for branch '{0}' against remote '{1}'. Make sure the local repository is accessible.
     Rename_GitLocalBranch_FailedSetDefaultBranchForRemote = Failed to set '{0}' as the default branch for remote '{1}'. Make sure the local repository is accessible.
     Rename_GitLocalBranch_RenamedBranch = Successfully renamed branch '{0}' to '{1}'.
+
+    ## Rename-GitRemote
+    Rename_GitRemote_FailedToRename = Failed to rename remote '{0}' to '{1}'. Make sure the remote exists and the local repository is accessible.
+    Rename_GitRemote_RenamedRemote = Successfully renamed remote '{0}' to '{1}'.
 
     ## New-GitTag
     New_GitTag_ShouldProcessVerboseDescription = Creating tag '{0}'.
@@ -74,18 +89,10 @@ ConvertFrom-StringData @'
 
     New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessDescription = Fetching the tags from (upstream) remote '{0}'. (NSGRT0018)
     New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessConfirmation = Are you sure you want to fetch tags from remote '{0}'? (NSGRT0019)
-
-    # START-REMOVED?
-    New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository = Tags are missing. Make sure that at least one preview tag exist in the local repository, or specify a release tag.
-    New_SamplerGitHubReleaseTag_NewTag_ShouldProcessVerboseDescription = Creating tag '{0}' for (latest) commit '{2}' in the local branch '{1}'.
-    New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessVerboseDescription = Creating tag for latest commit in the local branch '{1}'. Note: Actual tag name and commit id cannot be determine during -WhatIf.
-    New_SamplerGitHubReleaseTag_NewTag_ShouldProcessVerboseWarning = Are you sure you want to create tag '{0}'?
-    # STOP-REMOVED?
-
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessCaption = Fetch tags from remote (NSGRT0020)
 
-    # START-REMOVED?
+    New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository = Tags are missing. Make sure that at least one preview tag exist in the local repository, or specify a release tag. (NSGRT0008)
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessDescription = Creating tag '{0}' for commit '{2}' in the local branch '{1}'. (NSGRT0021)
     New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessDescription = Creating tag for commit in the local branch '{1}'. Note: Actual tag name and commit id cannot be determined during -WhatIf. (NSGRT0022)
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation = Are you sure you want to create tag '{0}'? (NSGRT0023)
@@ -108,7 +115,6 @@ ConvertFrom-StringData @'
 
     New_SamplerGitHubReleaseTag_TagCreatedAndPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created and pushed to the remote repository '{1}'.[0m (NSGRT0030)
     New_SamplerGitHubReleaseTag_TagCreatedNotPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created, but not pushed. To push the tag to the remote repository, run '[39mgit push {1} --tags[32m'.[0m (NSGRT0031)
-    # STOP-REMOVED?
 
     ## Push-GitTag
     Push_GitTag_PushTag_ShouldProcessVerboseDescription = Pushing tag '{0}' to remote '{1}'.
@@ -121,6 +127,45 @@ ConvertFrom-StringData @'
     Push_GitTag_PushAllTags_ShouldProcessCaption = Push all tags
     Push_GitTag_FailedPushTag = Failed to push tag '{0}' to remote '{1}'.
     Push_GitTag_FailedPushAllTags = Failed to push all tags to remote '{0}'.
+
+    ## Receive-GitBranch
+    Receive_GitBranch_CheckoutBranch = Checking out branch '{0}'. (RGB0005)
+    Receive_GitBranch_FailedCheckout = Failed to checkout branch '{0}'. Make sure the branch exists and is accessible. (RGB0006)
+    Receive_GitBranch_FetchUpstream = Fetching upstream branch '{0}' from remote '{1}'. (RGB0007)
+    Receive_GitBranch_FailedFetch = Failed to fetch upstream branch '{1}' from remote '{0}'. Make sure the branch exists and is accessible. (RGB0008)
+    Receive_GitBranch_RebaseWithUpstream = Rebasing with upstream branch '{1}' from remote '{0}'. (RGB0009)
+    Receive_GitBranch_FailedRebase = Failed to rebase with upstream branch '{1}' from remote '{0}'. Make sure the branches exist and are accessible. (RGB0010)
+    Receive_GitBranch_PullChanges = Pulling changes into current branch. (RGB0011)
+    Receive_GitBranch_FailedPull = Failed to pull changes into current branch. Make sure the branch exists and is accessible. (RGB0012)
+    Receive_GitBranch_Success = Successfully updated branch. (RGB0013)
+    Receive_GitBranch_CheckoutRebase_ShouldProcessVerboseDescription = Checking out branch '{0}' and rebasing with upstream branch '{2}' from remote '{1}'.
+    Receive_GitBranch_CheckoutRebase_ShouldProcessVerboseWarning = Are you sure you want to checkout and rebase branch '{0}' with upstream branch '{2}' from remote '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_CheckoutRebase_ShouldProcessCaption = Checkout and rebase branch
+    Receive_GitBranch_CheckoutPull_ShouldProcessVerboseDescription = Checking out branch '{0}' and pulling latest changes.
+    Receive_GitBranch_CheckoutPull_ShouldProcessVerboseWarning = Are you sure you want to checkout and pull into branch '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_CheckoutPull_ShouldProcessCaption = Checkout and pull branch
+    Receive_GitBranch_Rebase_ShouldProcessVerboseDescription = Rebasing current branch with upstream branch '{1}' from remote '{0}'.
+    Receive_GitBranch_Rebase_ShouldProcessVerboseWarning = Are you sure you want to rebase current branch with upstream branch '{1}' from remote '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_Rebase_ShouldProcessCaption = Rebase current branch
+    Receive_GitBranch_Pull_ShouldProcessVerboseDescription = Pulling latest changes into current branch.
+    Receive_GitBranch_Pull_ShouldProcessVerboseWarning = Are you sure you want to pull into current branch?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_Pull_ShouldProcessCaption = Pull into current branch
+
+    ## Remove-GitTag
+    Remove_GitTag_Local_ShouldProcessVerboseDescription = Removing tag '{0}' from local repository.
+    Remove_GitTag_Local_ShouldProcessVerboseWarning = Are you sure you want to remove tag '{0}' from the local repository?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Remove_GitTag_Local_ShouldProcessCaption = Remove local tag
+    Remove_GitTag_Remote_ShouldProcessVerboseDescription = Removing tag '{0}' from remote '{1}'.
+    Remove_GitTag_Remote_ShouldProcessVerboseWarning = Are you sure you want to remove tag '{0}' from remote '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Remove_GitTag_Remote_ShouldProcessCaption = Remove remote tag
+    Remove_GitTag_FailedToRemoveLocalTag = Failed to remove tag '{0}' from local repository.
+    Remove_GitTag_FailedToRemoveRemoteTag = Failed to remove tag '{0}' from remote '{1}'.
 
     ## Request-GitTag
     Request_GitTag_FetchTag_ShouldProcessVerboseDescription = Fetching tag '{0}' from remote '{1}'.
