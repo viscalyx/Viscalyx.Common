@@ -14,6 +14,11 @@
     .PARAMETER Current
         Indicates whether to retrieve the name of the current branch. If this switch parameter is present, the function will return the name of the current branch.
 
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
     .OUTPUTS
         System.String
 
