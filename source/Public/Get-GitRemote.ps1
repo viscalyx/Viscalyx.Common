@@ -86,7 +86,7 @@ function Get-GitRemote
     if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
     {
         $errorMessageParameters = @{
-            Message      = $script:localizedData.Get_GitRemote_Failed
+            Message      = $script:localizedData.Get_GitRemote_Failed -f $Name
             Category     = 'ObjectNotFound'
             ErrorId      = 'GGR0001' # cspell: disable-line
             TargetObject = $Name
@@ -97,8 +97,11 @@ function Get-GitRemote
 
     if ($PSCmdlet.ParameterSetName -eq 'Default')
     {
-        # Filter out the remote if it exist.
-        $result = @($result) -eq $Name
+        # Filter out the remote if Name is provided and it exists.
+        if ($PSBoundParameters.ContainsKey('Name'))
+        {
+            $result = @($result) -eq $Name
+        }
     }
 
     return $result
