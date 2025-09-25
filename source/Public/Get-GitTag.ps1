@@ -27,9 +27,15 @@
         Specifies whether to sort the tags in descending order. This parameter is
         used in the 'First' parameter set. Default is ascending order.
 
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
     .OUTPUTS
         System.String
-            The retrieved Git tag(s).
+
+        The retrieved Git tag(s).
 
     .EXAMPLE
         Get-GitTag -Name 'v1.0'
@@ -58,7 +64,8 @@
 #>
 function Get-GitTag
 {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'First')]
+    [OutputType([System.String])]
     param (
         [Parameter(Position = 0, ParameterSetName = 'First')]
         [System.String]
@@ -140,7 +147,7 @@ function Get-GitTag
     if ($exitCode -ne 0)
     {
         $errorMessageParameters = @{
-            Message      = $script:localizedData.Get_GitTag_FailedToGetTag
+            Message      = $script:localizedData.Get_GitTag_FailedToGetTag -f $Name
             Category     = 'InvalidOperation'
             ErrorId      = 'GGT0001' # cspell: disable-line
             TargetObject = $Name
