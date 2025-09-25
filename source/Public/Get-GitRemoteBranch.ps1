@@ -1,3 +1,49 @@
+<#
+    .SYNOPSIS
+        Retrieves the names of remote Git branches.
+
+    .DESCRIPTION
+        The Get-GitRemoteBranch command retrieves the names of remote Git branches
+        from the specified remote repository. It supports filtering by branch name
+        patterns and can optionally remove the 'refs/heads/' prefix from branch names.
+
+    .PARAMETER RemoteName
+        Specifies the name of the remote repository to query for branches.
+
+    .PARAMETER Name
+        Specifies the name or pattern of the branch to retrieve. Supports wildcard patterns.
+
+    .PARAMETER RemoveRefsHeads
+        When specified, removes the 'refs/heads/' prefix from the returned branch names.
+
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
+    .OUTPUTS
+        System.String
+
+        Returns the names of remote branches matching the specified criteria.
+
+    .EXAMPLE
+        Get-GitRemoteBranch -RemoteName 'origin'
+
+        Retrieves all remote branches from the 'origin' remote repository.
+
+    .EXAMPLE
+        Get-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*'
+
+        Retrieves all remote branches from 'origin' that match the pattern 'feature/*'.
+
+    .EXAMPLE
+        Get-GitRemoteBranch -RemoteName 'origin' -Name 'main' -RemoveRefsHeads
+
+        Retrieves the 'main' branch from 'origin' with the 'refs/heads/' prefix removed.
+
+    .NOTES
+        This function requires Git to be installed and accessible from the command line.
+#>
 function Get-GitRemoteBranch
 {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
