@@ -23,6 +23,16 @@
     .PARAMETER TrackUpstream
         If specified, sets up the newly renamed branch to track the upstream branch.
 
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
+    .OUTPUTS
+        None
+
+        This function does not return any output.
+
     .EXAMPLE
         Rename-GitLocalBranch -Name "feature/old-name" -NewName "feature/new-name"
 
@@ -48,6 +58,7 @@
 function Rename-GitLocalBranch
 {
     [CmdletBinding()]
+    [OutputType()]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -80,17 +91,14 @@ function Rename-GitLocalBranch
     }
     else
     {
-        $errorMessageParameters = @{
-            Message      = $script:localizedData.Rename_GitLocalBranch_FailedToRename -f $Name, $NewName
-            Category     = 'InvalidOperation'
-            ErrorId      = 'RGLB0001' # cspell: disable-line
-            TargetObject = $Name
-        }
-
-        Write-Error @errorMessageParameters
-
-        # Exit early if the branch rename failed, and user did not ask for terminating error.
-        return
+        $PSCmdlet.ThrowTerminatingError(
+            [System.Management.Automation.ErrorRecord]::new(
+                ($script:localizedData.Rename_GitLocalBranch_FailedToRename -f $Name, $NewName),
+                'RGLB0001', # cspell: disable-line
+                [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                $Name
+            )
+        )
     }
 
 
@@ -102,17 +110,14 @@ function Rename-GitLocalBranch
 
         if ($LASTEXITCODE -ne 0)
         {
-            $errorMessageParameters = @{
-                Message      = $script:localizedData.Rename_GitLocalBranch_FailedFetch -f $RemoteName
-                Category     = 'InvalidOperation'
-                ErrorId      = 'RGLB0002' # cspell: disable-line
-                TargetObject = $RemoteName
-            }
-
-            Write-Error @errorMessageParameters
-
-            # Exit early if the branch rename failed, and user did not ask for terminating error.
-            return
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    ($script:localizedData.Rename_GitLocalBranch_FailedFetch -f $RemoteName),
+                    'RGLB0002', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    $RemoteName
+                )
+            )
         }
     }
 
@@ -123,17 +128,14 @@ function Rename-GitLocalBranch
 
         if ($LASTEXITCODE -ne 0)
         {
-            $errorMessageParameters = @{
-                Message      = $script:localizedData.Rename_GitLocalBranch_FailedSetUpstreamTracking -f $NewName, $RemoteName
-                Category     = 'InvalidOperation'
-                ErrorId      = 'RGLB0003' # cspell: disable-line
-                TargetObject = $Name
-            }
-
-            Write-Error @errorMessageParameters
-
-            # Exit early if the branch rename failed, and user did not ask for terminating error.
-            return
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    ($script:localizedData.Rename_GitLocalBranch_FailedSetUpstreamTracking -f $NewName, $RemoteName),
+                    'RGLB0003', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    $Name
+                )
+            )
         }
     }
 
@@ -144,17 +146,14 @@ function Rename-GitLocalBranch
 
         if ($LASTEXITCODE -ne 0)
         {
-            $errorMessageParameters = @{
-                Message      = $script:localizedData.Rename_GitLocalBranch_FailedSetDefaultBranchForRemote -f $NewName, $RemoteName
-                Category     = 'InvalidOperation'
-                ErrorId      = 'RGLB0003' # cspell: disable-line
-                TargetObject = $RemoteName
-            }
-
-            Write-Error @errorMessageParameters
-
-            # Exit early if the branch rename failed, and user did not ask for terminating error.
-            return
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    ($script:localizedData.Rename_GitLocalBranch_FailedSetDefaultBranchForRemote -f $NewName, $RemoteName),
+                    'RGLB0004', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    $RemoteName
+                )
+            )
         }
     }
 }

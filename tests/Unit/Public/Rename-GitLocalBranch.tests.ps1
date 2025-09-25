@@ -19,7 +19,7 @@ BeforeDiscovery {
     }
     catch [System.IO.FileNotFoundException]
     {
-        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks noop" first.'
     }
 }
 
@@ -44,15 +44,6 @@ AfterAll {
 
 # cSpell: ignore LASTEXITCODE
 Describe 'Rename-GitLocalBranch' {
-    BeforeAll {
-        InModuleScope -ScriptBlock {
-            # Stub for git command
-            function script:git
-            {
-            }
-        }
-    }
-
     Context 'When renaming a local branch' {
         BeforeAll {
             Mock -CommandName git -MockWith {
@@ -107,14 +98,10 @@ Describe 'Rename-GitLocalBranch' {
                 $global:LASTEXITCODE = 0
             }
 
-            It 'Should handle non-terminating error correctly' {
-                Mock -CommandName Write-Error
-
-                Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch'
-
-                Should -Invoke -CommandName Write-Error -ParameterFilter {
-                    $Message -eq $mockErrorMessage
-                }
+            It 'Should throw terminating error regardless of ErrorAction' {
+                {
+                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -ErrorAction 'SilentlyContinue'
+                } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
 
             It 'Should handle terminating error correctly' {
@@ -183,14 +170,10 @@ Describe 'Rename-GitLocalBranch' {
                     $mockErrorMessage | Should-BeTruthy -Because 'The error message should have been localized, and shall not be empty'
                 }
 
-                It 'Should handle non-terminating error correctly' {
-                    Mock -CommandName Write-Error
-
-                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream
-
-                    Should -Invoke -CommandName Write-Error -ParameterFilter {
-                        $Message -eq $mockErrorMessage
-                    }
+                It 'Should throw terminating error regardless of ErrorAction' {
+                    {
+                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'SilentlyContinue'
+                    } | Should -Throw -ExpectedMessage $mockErrorMessage
                 }
 
                 It 'Should handle terminating error correctly' {
@@ -236,14 +219,10 @@ Describe 'Rename-GitLocalBranch' {
                     $mockErrorMessage | Should-BeTruthy -Because 'The error message should have been localized, and shall not be empty'
                 }
 
-                It 'Should handle non-terminating error correctly when setting upstream tracking fails' {
-                    Mock -CommandName Write-Error
-
-                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream
-
-                    Should -Invoke -CommandName Write-Error -ParameterFilter {
-                        $Message -eq $mockErrorMessage
-                    }
+                It 'Should throw terminating error regardless of ErrorAction when setting upstream tracking fails' {
+                    {
+                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'SilentlyContinue'
+                    } | Should -Throw -ExpectedMessage $mockErrorMessage
                 }
 
                 It 'Should handle terminating error correctly when setting upstream tracking fails' {
@@ -316,14 +295,10 @@ Describe 'Rename-GitLocalBranch' {
                 $mockErrorMessage | Should-BeTruthy -Because 'The error message should have been localized, and shall not be empty'
             }
 
-            It 'Should handle non-terminating error correctly when setting default branch fails' {
-                Mock -CommandName Write-Error
-
-                Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault
-
-                Should -Invoke -CommandName Write-Error -ParameterFilter {
-                    $Message -eq $mockErrorMessage
-                }
+            It 'Should throw terminating error regardless of ErrorAction when setting default branch fails' {
+                {
+                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault -ErrorAction 'SilentlyContinue'
+                } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
 
             It 'Should handle terminating error correctly when setting default branch fails' {
