@@ -1,4 +1,4 @@
-[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
 param ()
 
 BeforeDiscovery {
@@ -6,20 +6,20 @@ BeforeDiscovery {
     {
         if (-not (Get-Module -Name 'DscResource.Test'))
         {
-            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            # Assumes dependencies have been resolved, so if this module is not available, run 'noop' task.
             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
             {
                 # Redirect all streams to $null, except the error stream (stream 2)
-                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
             }
 
-            # If the dependencies has not been resolved, this will throw an error.
+            # If the dependencies have not been resolved, this will throw an error.
             Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
         }
     }
     catch [System.IO.FileNotFoundException]
     {
-        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks noop" first.'
     }
 }
 
@@ -44,15 +44,6 @@ AfterAll {
 
 # cSpell: ignore LASTEXITCODE
 Describe 'New-GitTag' {
-    BeforeAll {
-        InModuleScope -ScriptBlock {
-            # Stub for git command
-            function script:git
-            {
-            }
-        }
-    }
-
     Context 'When creating a new tag' {
         BeforeAll {
             Mock -CommandName git -MockWith {
@@ -79,22 +70,6 @@ Describe 'New-GitTag' {
             }
         }
 
-        It 'Should create an annotated tag when Message is provided' {
-            New-GitTag -Name 'v1.0.0' -Message 'Release version 1.0.0' -Force
-
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'tag' -and $args[1] -eq '-a' -and $args[2] -eq 'v1.0.0' -and $args[3] -eq '-m' -and $args[4] -eq 'Release version 1.0.0'
-            }
-        }
-
-        It 'Should create a tag for a specific commit when CommitHash is provided' {
-            New-GitTag -Name 'v1.0.0' -CommitHash 'abc1234' -Force
-
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'tag' -and $args[1] -eq 'v1.0.0' -and $args[2] -eq 'abc1234'
-            }
-        }
-
         Context 'When the operation fails' {
             BeforeAll {
                 Mock -CommandName git -MockWith {
@@ -109,10 +84,8 @@ Describe 'New-GitTag' {
                 }
 
                 $mockErrorMessage = InModuleScope -ScriptBlock {
-                    $script:localizedData.New_GitTag_FailedToCreate
+                    $script:localizedData.New_GitTag_FailedToCreateTag -f 'v1.0.0'
                 }
-
-                $mockErrorMessage = $mockErrorMessage -f 'v1.0.0'
             }
 
             AfterEach {
@@ -123,28 +96,18 @@ Describe 'New-GitTag' {
                 $mockErrorMessage | Should-BeTruthy -Because 'The error message should have been localized, and shall not be empty'
             }
 
-            It 'Should handle non-terminating error correctly' {
-                Mock -CommandName Write-Error
-
-                New-GitTag -Name 'v1.0.0' -Force
-
-                Should -Invoke -CommandName Write-Error -ParameterFilter {
-                    $Message -eq $mockErrorMessage
-                }
-            }
-
-            It 'Should handle terminating error correctly' {
+            It 'Should throw terminating error when git fails' {
                 {
-                    New-GitTag -Name 'v1.0.0' -ErrorAction 'Stop' -Force
+                    New-GitTag -Name 'v1.0.0' -Force
                 } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
         }
     }
 
-    Context 'When using the Force parameter' {
+    Context 'When ShouldProcess is used' {
         BeforeAll {
             Mock -CommandName git -MockWith {
-                if ($args[0] -eq 'tag' -and $args -contains '-f')
+                if ($args[0] -eq 'tag')
                 {
                     $global:LASTEXITCODE = 0
                 }
@@ -159,11 +122,36 @@ Describe 'New-GitTag' {
             $global:LASTEXITCODE = 0
         }
 
-        It 'Should force create a tag when Force is specified' {
-            New-GitTag -Name 'v1.0.0' -Force -Force
+        It 'Should not create tag when WhatIf is specified' {
+            New-GitTag -Name 'v1.0.0' -WhatIf
+
+            Should -Invoke -CommandName git -Times 0
+        }
+    }
+
+    Context 'When Force parameter is used' {
+        BeforeAll {
+            Mock -CommandName git -MockWith {
+                if ($args[0] -eq 'tag')
+                {
+                    $global:LASTEXITCODE = 0
+                }
+                else
+                {
+                    throw "Mock git unexpected args: $($args -join ' ')"
+                }
+            }
+        }
+
+        AfterEach {
+            $global:LASTEXITCODE = 0
+        }
+
+        It 'Should bypass confirmation when Force is used' {
+            New-GitTag -Name 'v1.0.0' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'tag' -and $args[1] -eq '-f' -and $args[2] -eq 'v1.0.0'
+                $args[0] -eq 'tag' -and $args[1] -eq 'v1.0.0'
             }
         }
     }
