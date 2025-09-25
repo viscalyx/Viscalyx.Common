@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   class resource definitions using Abstract Syntax Tree (AST) parsing. Filters
   for classes that have the [DscResource()] attribute. Can return all DSC class
   resources in a file or filter for a specific class by name.
+- `Invoke-PesterJob` now supports filtering tests by name using the new
+  `TestNameFilter` parameter (with aliases `TestName` and `Test`). This feature
+  enables AI agents and automation scenarios to focus on specific tests by
+  providing test name patterns with wildcard support.
 
 ### Fixed
 

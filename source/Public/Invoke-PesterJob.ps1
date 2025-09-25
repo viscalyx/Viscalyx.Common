@@ -28,6 +28,12 @@
     .PARAMETER Tag
         Specifies the tags to filter the Pester tests.
 
+    .PARAMETER TestNameFilter
+        Specifies the test names to filter. Tests with names that match any of the
+        provided patterns will be executed. Supports wildcards and can be used to
+        run specific tests. This parameter is useful for AI agents and automation
+        scenarios that need to focus on specific tests.
+
     .PARAMETER ModuleName
         Specifies the name of the module to test. If not specified, it will be
         inferred based on the project type.
@@ -147,6 +153,19 @@
         commands that were missed with a reference to the SourceLineNumber in
         SourceFile for all functions and classes.
 
+    .EXAMPLE
+        Invoke-PesterJob -Path './tests/Unit' -TestNameFilter 'Should do something*'
+
+        Runs only tests with names matching 'Should do something*' from the
+        'tests/Unit' folder. This is useful for running specific tests during
+        development or debugging.
+
+    .EXAMPLE
+        Invoke-PesterJob -Path './tests/Unit' -TestName @('Should validate input', 'Should handle errors*')
+
+        Runs tests with names matching either 'Should validate input' or 'Should handle errors*'
+        from the 'tests/Unit' folder using the TestName alias.
+
     .NOTES
         This function requires the Pester module to be imported. If the module is
         not available, it will attempt to run the build script to ensure the
@@ -231,6 +250,12 @@ function Invoke-PesterJob
         [ValidateNotNullOrEmpty()]
         [System.String[]]
         $Tag,
+
+        [Parameter()]
+        [Alias('TestName', 'Test')]
+        [ValidateNotNullOrEmpty()]
+        [System.String[]]
+        $TestNameFilter,
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
@@ -542,6 +567,18 @@ function Invoke-PesterJob
         else
         {
             $pesterConfig.Filter.Tag = $Tag
+        }
+    }
+
+    if ($PSBoundParameters.ContainsKey('TestNameFilter'))
+    {
+        if ($importedPesterModule.Version.Major -eq 4)
+        {
+            $pesterConfig.TestName = $TestNameFilter
+        }
+        else
+        {
+            $pesterConfig.Filter.FullName = $TestNameFilter
         }
     }
 

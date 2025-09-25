@@ -48,7 +48,7 @@ Describe 'Invoke-PesterJob' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters       = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
+                ExpectedParameters       = '[[-Path] <string[]>] [[-CodeCoveragePath] <string[]>] [-RootPath <string>] [-Tag <string[]>] [-TestNameFilter <string[]>] [-ModuleName <string>] [-Output <string>] [-SkipCodeCoverage] [-PassThru] [-EnableSourceLineMapping] [-FilterCodeCoverageResult <string[]>] [-ShowError] [-SkipRun] [-BuildScriptPath <string>] [-BuildScriptParameter <hashtable>] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Invoke-PesterJob').ParameterSets |
@@ -179,6 +179,44 @@ Describe 'Invoke-PesterJob' {
                 $null = Invoke-PesterJob @params
             }
         }
+        Context 'When passing TestNameFilter parameter' {
+            It 'Should accept TestNameFilter parameter without error' {
+                $params = @{
+                    Path           = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    TestNameFilter = 'Should do something*'
+                }
+
+                $null = Invoke-PesterJob @params
+            }
+
+            It 'Should accept multiple test name patterns' {
+                $params = @{
+                    Path           = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    TestNameFilter = @('Should validate*', 'Should handle*')
+                }
+
+                $null = Invoke-PesterJob @params
+            }
+
+            It 'Should work with TestName alias' {
+                $params = @{
+                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    TestName = 'Should work*'
+                }
+
+                $null = Invoke-PesterJob @params
+            }
+
+            It 'Should work with Test alias' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    Test = 'Should pass*'
+                }
+
+                $null = Invoke-PesterJob @params
+            }
+        }
+
 
         Context 'When changing output verbosity levels' {
             It 'Should set Output verbosity to Detailed by default' {
@@ -286,6 +324,14 @@ Describe 'Invoke-PesterJob' {
             $parameterInfo.Attributes.Mandatory | Should -BeFalse
             $parameterInfo.ParameterType.FullName | Should -Be 'System.Management.Automation.SwitchParameter'
         }
+
+        It 'Should have TestNameFilter as a non-mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Invoke-PesterJob').Parameters['TestNameFilter']
+            $parameterInfo.Attributes.Mandatory | Should -BeFalse
+            $parameterInfo.ParameterType.FullName | Should -Be 'System.String[]'
+            $parameterInfo.Aliases | Should -Contain 'TestName'
+            $parameterInfo.Aliases | Should -Contain 'Test'
+        }
     }
 
     Context 'When using Pester v5' {
@@ -320,6 +366,43 @@ Describe 'Invoke-PesterJob' {
                 $params = @{
                     Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     Tag  = 'Unit'
+                }
+
+                $null = Invoke-PesterJob @params
+            }
+        }
+        Context 'When passing TestNameFilter parameter' {
+            It 'Should use passed TestNameFilter' {
+                $params = @{
+                    Path           = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    TestNameFilter = 'Should do something*'
+                }
+
+                $null = Invoke-PesterJob @params
+            }
+
+            It 'Should accept multiple test name patterns' {
+                $params = @{
+                    Path           = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    TestNameFilter = @('Should validate*', 'Should handle*')
+                }
+
+                $null = Invoke-PesterJob @params
+            }
+
+            It 'Should work with TestName alias' {
+                $params = @{
+                    Path     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    TestName = 'Should work*'
+                }
+
+                $null = Invoke-PesterJob @params
+            }
+
+            It 'Should work with Test alias' {
+                $params = @{
+                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                    Test = 'Should pass*'
                 }
 
                 $null = Invoke-PesterJob @params
