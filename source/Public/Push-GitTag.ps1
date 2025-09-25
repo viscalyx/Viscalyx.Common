@@ -13,6 +13,20 @@
         Specifies the name of the tag to push. This parameter is optional if, if
         left out all tags are pushed.
 
+    .PARAMETER Force
+        Forces the operation to proceed without confirmation prompts when used with
+        -Confirm:$false.
+
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
+    .OUTPUTS
+        None
+
+        This function does not return any output.
+
     .EXAMPLE
         Push-GitTag
 
@@ -33,12 +47,6 @@
 
         Pushes all tags to the 'upstream' remote repository.
 
-    .INPUTS
-        None.
-
-    .OUTPUTS
-        None.
-
     .NOTES
         This function requires Git to be installed and accessible from the command
         line.
@@ -46,6 +54,7 @@
 function Push-GitTag
 {
     [CmdletBinding(SupportsShouldProcess = $true)]
+    [OutputType()]
     param
     (
         [Parameter(Position = 0)]
@@ -82,18 +91,18 @@ function Push-GitTag
 
     if ($PSBoundParameters.ContainsKey('Name'))
     {
-        $verboseDescriptionMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessVerboseDescription -f $Name, $RemoteName
-        $verboseWarningMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessVerboseWarning -f $Name, $RemoteName
+        $descriptionMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessVerboseDescription -f $Name, $RemoteName
+        $confirmationMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessVerboseWarning -f $Name, $RemoteName
         $captionMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessCaption
     }
     else
     {
-        $verboseDescriptionMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessVerboseDescription -f $RemoteName
-        $verboseWarningMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessVerboseWarning -f $RemoteName
+        $descriptionMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessVerboseDescription -f $RemoteName
+        $confirmationMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessVerboseWarning -f $RemoteName
         $captionMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessCaption
     }
 
-    if ($PSCmdlet.ShouldProcess($verboseDescriptionMessage, $verboseWarningMessage, $captionMessage))
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
         git push @arguments
 
@@ -108,14 +117,14 @@ function Push-GitTag
                 $errorMessage = $script:localizedData.Push_GitTag_FailedPushAllTags -f $RemoteName
             }
 
-            $errorMessageParameters = @{
-                Message      = $errorMessage
-                Category     = 'InvalidOperation'
-                ErrorId      = 'PGT0001' # cspell: disable-line
-                TargetObject = $Name # Null if Name is not provided.
-            }
-
-            Write-Error @errorMessageParameters
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    $errorMessage,
+                    'PGT0001', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    $Name # Null if Name is not provided.
+                )
+            )
         }
     }
 }
