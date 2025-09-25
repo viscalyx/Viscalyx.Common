@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-09-25
+
 ### Added
 
 - `Assert-IPv4Address` that validates if a string is a valid IPv4 address,
