@@ -47,7 +47,7 @@ Describe 'New-SamplerGitHubReleaseTag' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters       = '[[-DefaultBranchName] <string>] [[-UpstreamRemoteName] <string>] [[-ReleaseTag] <string>] [-SwitchBackToPreviousBranch] [-Force] [-PushTag] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters       = '[[-DefaultBranchName] <string>] [[-UpstreamRemoteName] <string>] [[-ReleaseTag] <string>] [-ReturnToCurrentBranch] [-PushTag] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'New-SamplerGitHubReleaseTag').ParameterSets |
@@ -70,6 +70,16 @@ Describe 'New-SamplerGitHubReleaseTag' {
         $script:MockLastExitCode = 0
 
         Mock -CommandName Write-Information
+        Mock -CommandName Assert-GitRemote
+        Mock -CommandName Get-GitLocalBranchName -MockWith { return 'feature-branch' }
+        Mock -CommandName Switch-GitLocalBranch
+        Mock -CommandName Update-GitLocalBranch
+        Mock -CommandName Get-GitBranchCommit -MockWith { return '3c3092976409645d74f58707331f66ffe1967127' }
+        Mock -CommandName Request-GitTag
+        Mock -CommandName Get-GitTag -MockWith { return 'v1.1.0-preview' }
+        Mock -CommandName New-GitTag
+        Mock -CommandName Push-GitTag
+        Mock -CommandName ConvertTo-AnsiString -MockWith { return $InputString }
     }
 
     BeforeEach {
@@ -138,28 +148,28 @@ Describe 'New-SamplerGitHubReleaseTag' {
         }
 
         It 'Should throw if branch does not exist' {
-            $mockErrorMessage = InModuleScope -ScriptBlock {
-                ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote -f 'UnknownBranchName', 'origin')
+            Mock -CommandName Update-GitLocalBranch -MockWith { 
+                throw [System.InvalidOperationException]::new("Failed to update branch")
             }
 
             {
                 New-SamplerGitHubReleaseTag -DefaultBranchName 'UnknownBranchName' -ReleaseTag 'v1.0.0' -Force
-            } | Should-Throw -ExceptionMessage $mockErrorMessage
+            } | Should-Throw
         }
 
         It 'Should throw if remote does not exist' {
-            $mockErrorMessage = InModuleScope -ScriptBlock {
-                ($script:localizedData.New_SamplerGitHubReleaseTag_RemoteMissing -f 'UnknownRemoteName')
+            Mock -CommandName Assert-GitRemote -MockWith { 
+                throw [System.InvalidOperationException]::new("Remote does not exist")
             }
 
             {
                 New-SamplerGitHubReleaseTag -UpstreamRemoteName 'UnknownRemoteName' -ReleaseTag 'v1.0.0' -Force
-            } | Should-Throw -ExceptionMessage $mockErrorMessage
+            } | Should-Throw
         }
     }
 
     It 'Should switch back to previous branch if specified' {
-        $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -SwitchBackToPreviousBranch -Force
+        $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -ReturnToCurrentBranch -Force
     }
 
     It 'Should push tag to upstream if specified' {

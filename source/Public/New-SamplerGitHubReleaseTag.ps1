@@ -51,13 +51,20 @@
 
         Creates a new release tag and switches back to the previous branch.
 
-    .NOTES
-        This function requires Git to be installed and accessible from the command
-        line.
+    .INPUTS
+        None
+
+        This function does not accept values over the pipeline.
+
+    .OUTPUTS
+        None
+
+        This function does not return any objects.
 #>
 function New-SamplerGitHubReleaseTag
 {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType()]
     param
     (
         [Parameter()]

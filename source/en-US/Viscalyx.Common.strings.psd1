@@ -303,4 +303,11 @@ ConvertFrom-StringData @'
     Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessVerboseWarning = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessCaption = Fetch upstream branch
+
+    ## ConvertTo-AnsiString
+    ConvertTo_AnsiString_ProcessingBegin = Processing ANSI string conversion. (CTAS0001)
+    ConvertTo_AnsiString_EmptyInput = Input string is null or empty, returning as-is. (CTAS0002)
+    ConvertTo_AnsiString_ProcessingString = Processing input string with {0} characters. (CTAS0003)
+    ConvertTo_AnsiString_ProcessingSequence = Processing ANSI sequence: {0}. (CTAS0004)
+    ConvertTo_AnsiString_ProcessingComplete = ANSI string conversion completed. (CTAS0005)
 '@

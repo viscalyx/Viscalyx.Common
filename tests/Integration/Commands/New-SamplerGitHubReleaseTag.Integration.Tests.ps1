@@ -1,0 +1,287 @@
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
+param ()
+
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies have been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
+
+            # If the dependencies have not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks noop" first.'
+    }
+}
+
+BeforeAll {
+    $script:moduleName = 'Viscalyx.Common'
+
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
+}
+
+AfterAll {
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+}
+
+Describe 'New-SamplerGitHubReleaseTag Integration Tests' -Tag 'Integration' {
+    BeforeAll {
+        # Store original location
+        $script:originalLocation = Get-Location
+
+        # Create a temporary directory for our test repository
+        $script:testRepoPath = Join-Path -Path $TestDrive -ChildPath 'TestSamplerRepo'
+        $null = New-Item -Path $script:testRepoPath -ItemType Directory -Force
+
+        # Initialize a git repository with proper setup
+        Push-Location -Path $script:testRepoPath
+        try {
+            & git init --quiet --initial-branch=main 2>$null
+            if ($LASTEXITCODE -ne 0) {
+                # Fallback for older git versions
+                & git init --quiet
+                & git checkout -b main --quiet 2>$null
+            }
+            & git config user.name "Test User"
+            & git config user.email "test@example.com"
+
+            # Create an initial commit
+            $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -ItemType File -Force
+            Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Test Sampler Repository'
+            & git add README.md
+            & git commit -m "Initial commit" --quiet
+
+            # Create a preview tag to simulate a Sampler project state
+            & git tag 'v1.0.0-preview0001'
+        }
+        catch {
+            throw "Failed to setup test git repository: $($_.Exception.Message)"
+        }
+        finally {
+            Pop-Location
+        }
+    }
+
+    BeforeEach {
+        # Change to the test repository directory for each test
+        Push-Location -Path $script:testRepoPath
+
+        # Clean up any release tags before each test (but keep preview tags)
+        try {
+            $tags = & git tag 2>$null | Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
+            if ($tags) {
+                foreach ($tag in $tags) {
+                    & git tag -d $tag 2>$null | Out-Null
+                }
+            }
+        }
+        catch {
+            # Ignore cleanup errors
+        }
+    }
+
+    AfterEach {
+        # Clean up any release tags created during testing
+        try {
+            $tags = & git tag 2>$null | Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
+            if ($tags) {
+                foreach ($tag in $tags) {
+                    & git tag -d $tag 2>$null | Out-Null
+                }
+            }
+        }
+        catch {
+            # Ignore cleanup errors
+        }
+
+        # Return to original location
+        try {
+            Pop-Location
+        }
+        catch {
+            # Ignore location errors
+        }
+    }
+
+    Context 'When creating a release tag with existing preview tag' {
+        BeforeEach {
+            # Add a remote origin for this specific test
+            & git remote add origin "file://$script:testRepoPath/.git" 2>$null
+        }
+
+        AfterEach {
+            # Remove remote after test
+            & git remote remove origin 2>$null
+        }
+
+        It 'Should create a release tag from preview tag automatically' {
+            # This should extract version from v1.0.0-preview0001 and create v1.0.0
+            { New-SamplerGitHubReleaseTag -Force -ErrorAction Stop } | Should -Not -Throw
+
+            # Verify the release tag was created
+            $tags = & git tag
+            $tags | Should -Contain 'v1.0.0'
+        }
+
+        It 'Should create a specified release tag' {
+            { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.1.0' -Force -ErrorAction Stop } | Should -Not -Throw
+
+            # Verify the specified tag was created
+            $tags = & git tag
+            $tags | Should -Contain 'v1.1.0'
+        }
+    }
+
+    Context 'When using ShouldProcess functionality' {
+        BeforeEach {
+            # Add a local remote for this specific test
+            & git remote add origin "file://$script:testRepoPath/.git" 2>$null
+        }
+
+        AfterEach {
+            # Remove remote after test
+            & git remote remove origin 2>$null
+        }
+
+        It 'Should not create tag when WhatIf is specified' {
+            { New-SamplerGitHubReleaseTag -ReleaseTag 'v2.0.0' -WhatIf } | Should -Not -Throw
+
+            # Verify the tag was NOT created
+            $tags = & git tag
+            $tags | Should -Not -Contain 'v2.0.0'
+        }
+    }
+
+    Context 'When repository setup is invalid' {
+        BeforeAll {
+            # Create a repository without proper setup
+            $script:invalidRepoPath = Join-Path -Path $TestDrive -ChildPath 'InvalidRepo'
+            $null = New-Item -Path $script:invalidRepoPath -ItemType Directory -Force
+
+            Push-Location -Path $script:invalidRepoPath
+            try {
+                & git init --quiet
+                & git config user.name "Test User"
+                & git config user.email "test@example.com"
+
+                # Create initial commit but no remote or tags
+                $null = New-Item -Path (Join-Path -Path $script:invalidRepoPath -ChildPath 'README.md') -ItemType File -Force
+                Set-Content -Path (Join-Path -Path $script:invalidRepoPath -ChildPath 'README.md') -Value '# Invalid Repository'
+                & git add README.md
+                & git commit -m "Initial commit" --quiet
+            }
+            finally {
+                Pop-Location
+            }
+        }
+
+        BeforeEach {
+            Push-Location -Path $script:invalidRepoPath
+        }
+
+        AfterEach {
+            Pop-Location
+        }
+
+        It 'Should throw an error when no remote exists' {
+            { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.0.0' -Force -ErrorAction Stop } | Should -Throw
+        }
+
+        It 'Should throw an error when no preview tags exist and no release tag specified' {
+            # Create a separate remote repository without any tags
+            $emptyRemotePath = Join-Path -Path $TestDrive -ChildPath 'EmptyRemote'
+            $null = New-Item -Path $emptyRemotePath -ItemType Directory -Force
+
+            Push-Location -Path $emptyRemotePath
+            try {
+                # Initialize empty remote repository
+                & git init --bare --quiet 2>$null
+            }
+            finally {
+                Pop-Location
+            }
+
+            # Remove local preview tag and add remote pointing to empty repository
+            & git tag -d 'v1.0.0-preview0001' 2>$null
+            & git remote add origin "file://$emptyRemotePath/.git" 2>$null
+
+            { New-SamplerGitHubReleaseTag -Force -ErrorAction Stop } | Should -Throw
+
+            # Restore the preview tag and remove the remote for other tests
+            & git tag 'v1.0.0-preview0001'
+            & git remote remove origin 2>$null
+        }
+    }
+
+    Context 'When working with different branch names' {
+        BeforeEach {
+            # Add a local remote for this specific test
+            & git remote add origin "file://$script:testRepoPath/.git" 2>$null
+        }
+
+        AfterEach {
+            # Remove remote after test
+            & git remote remove origin 2>$null
+        }
+
+        It 'Should work with non-default branch name' {
+            # Create a develop branch and switch to it
+            & git checkout -b develop --quiet 2>$null
+            & git checkout main --quiet 2>$null
+
+            { New-SamplerGitHubReleaseTag -DefaultBranchName 'main' -ReleaseTag 'v1.2.0' -Force -ErrorAction Stop } | Should -Not -Throw
+
+            # Verify the tag was created
+            $tags = & git tag
+            $tags | Should -Contain 'v1.2.0'
+        }
+    }
+
+    Context 'When using ReturnToCurrentBranch functionality' {
+        BeforeEach {
+            # Add a local remote for this specific test
+            & git remote add origin "file://$script:testRepoPath/.git" 2>$null
+        }
+
+        AfterEach {
+            # Remove remote after test
+            & git remote remove origin 2>$null
+        }
+
+        It 'Should return to the current branch after tagging' {
+            # Create and switch to a feature branch
+            & git checkout -b feature-branch --quiet 2>$null
+            $originalBranch = & git branch --show-current 2>$null
+
+            { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.3.0' -ReturnToCurrentBranch -Force -ErrorAction Stop } | Should -Not -Throw
+
+            # Verify we're back on the original branch
+            $currentBranch = & git branch --show-current 2>$null
+            $currentBranch | Should -Be $originalBranch
+
+            # Verify the tag was still created
+            $tags = & git tag
+            $tags | Should -Contain 'v1.3.0'
+        }
+    }
+
+    AfterAll {
+        # Restore original location
+        try {
+            Set-Location -Path $script:originalLocation
+        }
+        catch {
+            # Ignore location restore errors
+        }
+    }
+}
