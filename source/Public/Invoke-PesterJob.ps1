@@ -161,10 +161,10 @@
         development or debugging.
 
     .EXAMPLE
-        Invoke-PesterJob -Path './tests/Unit' -TestName @('Should validate input', 'Should handle errors*')
+        Invoke-PesterJob -Path './tests/Unit' -TestNameFilter @('Should validate input', 'Should handle errors*')
 
         Runs tests with names matching either 'Should validate input' or 'Should handle errors*'
-        from the 'tests/Unit' folder using the TestName alias.
+        from the 'tests/Unit' folder.
 
     .NOTES
         This function requires the Pester module to be imported. If the module is

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Documentation: Added instruction for using TestNameFilter parameter with Invoke-PesterJob to run specific tests by name.
+- `Invoke-PesterJob` - Updated documentation example to use `-TestNameFilter` parameter instead of the `-TestName` alias and removed reference to alias usage for consistency and clarity.
 
 ## [0.6.0] - 2025-09-25
 
