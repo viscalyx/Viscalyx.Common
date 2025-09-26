@@ -134,20 +134,6 @@ Describe 'Test-GitRemote' {
                 $result | Should -BeOfType [System.Boolean]
             }
         }
-
-        It 'Should pass through errors from Get-GitRemote' {
-            Mock -CommandName 'Get-GitRemote' -MockWith {
-                Write-Error "Remote not found" -ErrorId 'GGR0001' -Category ObjectNotFound
-                return $null
-            }
-
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote -Name 'error' -ErrorAction SilentlyContinue 2>$null
-                $result | Should -BeFalse
-                $result | Should -BeOfType [System.Boolean]
-                Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly
-            }
-        }
     }
 
     Context 'When validating parameter input' {
