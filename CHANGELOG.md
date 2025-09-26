@@ -39,11 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parameter instead of the `-TestName` alias and removed reference to alias
   usage for consistency and clarity.
 
-### Fixed
-
-- `ConvertTo-AnsiSequence`
-  - Make it render ANSI sequences in Windows PowerShell.
-
 ## [0.6.0] - 2025-09-25
 
 ### Added
@@ -184,6 +179,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added parameter `NoHexOutput`.
 - `Out-Difference`
   - Added parameter `NoHexOutput`.
+
+### Fixed
+
+- `ConvertTo-DifferenceString`
+  - Make it render ANSI sequences in Windows PowerShell
+  - Optimize using List\<T\> instead of using `+=` for adding to arrays.
 
 ## [0.3.0] - 2024-09-02
 
