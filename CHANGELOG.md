@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Documentation: Added instruction for using TestNameFilter parameter with Invoke-PesterJob to run specific tests by name.
+
 ## [0.6.0] - 2025-09-25
 
 ### Added
