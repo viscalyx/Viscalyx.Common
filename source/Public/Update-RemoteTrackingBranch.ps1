@@ -14,6 +14,16 @@
         Specifies the name of the branch to update. If not provided, all branches
         will be updated.
 
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
+    .OUTPUTS
+        None
+
+        This function does not return any output.
+
     .EXAMPLE
         Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main'
 
@@ -30,6 +40,7 @@
 function Update-RemoteTrackingBranch
 {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType()]
     param
     (
         [Parameter(Mandatory = $true, Position = 0)]
@@ -63,14 +74,14 @@ function Update-RemoteTrackingBranch
 
         if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
         {
-            $errorMessageParameters = @{
-                Message = $script:localizedData.Update_RemoteTrackingBranch_FailedFetchBranchFromRemote -f ($arguments -join ' ')
-                Category = 'InvalidOperation'
-                ErrorId = 'URTB0001' # cspell: disable-line
-                TargetObject = ($BranchName + ' ' + $RemoteName)
-            }
-
-            Write-Error @errorMessageParameters
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    ($script:localizedData.Update_RemoteTrackingBranch_FailedFetchBranchFromRemote -f ($arguments -join ' ')),
+                    'URTB0001', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    ($BranchName + ' ' + $RemoteName)
+                )
+            )
         }
     }
 }
