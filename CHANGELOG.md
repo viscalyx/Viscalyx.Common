@@ -32,12 +32,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Test-GitRemoteBranch`
   - `Update-GitLocalBranch`
   - `Update-RemoteTrackingBranch`
+- Documentation:
+  - `Testing-PowerShell-Modules.md` - Comprehensive beginner's guide for
+    testing PowerShell modules with `Invoke-PesterJob`, covering session
+    isolation, code coverage, source line mapping, and best practices for
+    different resource types including MOF-based and class-based DSC resources.
 
 ### Changed
 
 - `Invoke-PesterJob` - Updated documentation example to use `-TestNameFilter`
   parameter instead of the `-TestName` alias and removed reference to alias
   usage for consistency and clarity.
+- `New-SamplerGitHubReleaseTag` - Major architectural rewrite with the following
+  key improvements:
+  - Complete implementation refactor replacing ~200 lines of raw Git commands
+    with dedicated PowerShell helper functions for improved reliability.
+  - Enhanced error handling using proper try-catch blocks instead of manual
+    `$LASTEXITCODE` checking, with automatic cleanup on failures.
+  - Improved WhatIf support with intelligent handling that skips complex logic
+    during WhatIf operations.
+  - Renamed `SwitchBackToPreviousBranch` parameter to `ReturnToCurrentBranch`
+    for better clarity.
+  - Updated documentation sections.
 
 ## [0.6.0] - 2025-09-25
 
