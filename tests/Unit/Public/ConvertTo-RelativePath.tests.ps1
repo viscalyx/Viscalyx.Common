@@ -165,7 +165,7 @@ Describe 'ConvertTo-RelativePath' {
         It 'Should normalize paths with multiple consecutive separators' {
             $pathWithDoubleSeparators = '/home//user///projects//file.txt'
             $currentLocation = '/home/user'
-            $result = ConvertTo-RelativePath -AbsolutePath $pathWithDoubleSeparators -CurrentLocation $currentLocation
+            $result = ConvertTo-RelativePath -AbsolutePath $pathWithDoubleSeparators -CurrentLocation $currentLocation -DirectorySeparator '/'
             # Paths don't match after normalization so returns original absolute path
             $result | Should -Be '/home//user///projects//file.txt'
         }
