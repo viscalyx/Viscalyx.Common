@@ -37,6 +37,16 @@
     .PARAMETER Force
         If specified, the command will not prompt for confirmation.
 
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
+    .OUTPUTS
+        None
+
+        This function does not return any output.
+
     .EXAMPLE
         Update-GitLocalBranch
 
@@ -68,11 +78,16 @@
 
         Checks out the 'main' branch, pulls the latest changes, and switches back
         to the original branch.
+
+    .NOTES
+        This function requires Git to be installed and accessible from the command line.
+        The function will check for unstaged or staged changes before proceeding.
 #>
 function Update-GitLocalBranch
 {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '', Justification = 'ShouldProcess is implemented correctly.')]
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium', DefaultParameterSetName = 'Default')]
+    [OutputType()]
     param
     (
         [Parameter(ParameterSetName = 'Default')]
@@ -221,15 +236,14 @@ function Update-GitLocalBranch
                     return
                 }
 
-                $errorMessageParameters = @{
-                    Message      = $script:localizedData.Update_GitLocalBranch_FailedRebase -f $RemoteName, $UpstreamBranchName
-
-                    Category     = 'InvalidOperation'
-                    ErrorId      = 'UGLB0001' # cspell: disable-line
-                    TargetObject = $argument -join ' '
-                }
-
-                Write-Error @errorMessageParameters
+                $PSCmdlet.ThrowTerminatingError(
+                    [System.Management.Automation.ErrorRecord]::new(
+                        ($script:localizedData.Update_GitLocalBranch_FailedRebase -f $BranchName, $RemoteName),
+                        'UGLB0001', # cspell: disable-line
+                        [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                        $argument -join ' '
+                    )
+                )
             }
         }
     }
