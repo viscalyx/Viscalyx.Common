@@ -77,6 +77,12 @@ Describe 'Get-GitBranchCommit' {
                 )
 
             $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+
+            if ($PSVersionTable.PSVersion.Major -eq 5) {
+                # Windows PowerShell 5.1 shows <uint32> for System.UInt32 type
+                $ExpectedParameters = $ExpectedParameters -replace '<uint>', '<uint32>'
+            }
+
             $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
 
@@ -119,7 +125,7 @@ Describe 'Get-GitBranchCommit' {
 
         It 'Should have correct parameter types' {
             $command = Get-Command -Name 'Get-GitBranchCommit'
-            
+
             $command.Parameters['BranchName'].ParameterType | Should -Be ([System.String])
             $command.Parameters['Latest'].ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
             $command.Parameters['Last'].ParameterType | Should -Be ([System.UInt32])
@@ -155,19 +161,19 @@ Describe 'Get-GitBranchCommit' {
                 Mock -CommandName 'git' -MockWith {
                     return $null
                 }
-                
+
                 # Mock Get-GitLocalBranchName to prevent it from calling Write-Error
                 Mock -CommandName 'Get-GitLocalBranchName' -MockWith {
                     return 'main'
                 }
-                
-                Mock -CommandName 'Write-Error' -MockWith { 
+
+                Mock -CommandName 'Write-Error' -MockWith {
                     Write-Output "Mocked error"
                 }
-                
+
                 # Simulate LASTEXITCODE failure
                 $global:LASTEXITCODE = 128
-                
+
                 $result = Get-GitBranchCommit -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 
                 Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly

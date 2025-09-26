@@ -62,6 +62,12 @@ Describe 'Get-GitTag' {
                     @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
                 )
             $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+
+            if ($PSVersionTable.PSVersion.Major -eq 5) {
+                # Windows PowerShell 5.1 shows <uint32> for System.UInt32 type
+                $ExpectedParameters = $ExpectedParameters -replace '<uint>', '<uint32>'
+            }
+
             $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
     }
