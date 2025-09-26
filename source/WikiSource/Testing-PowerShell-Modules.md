@@ -178,8 +178,9 @@ $missedLines | Format-Table -Property SourceFile,SourceLineNumber,Command
 This automatically enables **PassThru** (overriding the default behavior) as
 it's required to generate the source line mapping data. Note that _Pester_
 will still output all missed commands during test execution, as there's no way
-to selectively disable this output - the only option is to suppress all output
-by using `-Output 'None'`.
+to selectively disable this output - you can suppress all output by using
+`-Output 'None'` or use `-Output 'Minimal'` to suppress detailed coverage
+output while still showing high-level test results.
 
 ### Filtering Coverage Results
 

@@ -663,61 +663,83 @@ function Invoke-PesterJob
         Receive-Job -AutoRemoveJob -Wait
 
     # Process source line mapping if enabled
-    if ($EnableSourceLineMapping.IsPresent -and -not $SkipCodeCoverage.IsPresent -and $pesterResult)
+    if ($EnableSourceLineMapping.IsPresent -and -not $SkipCodeCoverage.IsPresent)
     {
-        <#
-            The variable $pesterResult will contain the commands missed. Normally
-            it would have been assigned to $pesterResult.CodeCoverage.CommandsMissed
-            but due to the bug mentioned above (in the job script) the variable
-            $pesterResult has already been assigned to CodeCoverage.CommandsMissed.
-        #>
-        $commandsMissed = $pesterResult
-
-        # Apply filter if specified
-        if ($PSBoundParameters.ContainsKey('FilterCodeCoverageResult'))
+        if ($pesterResult)
         {
-            $commandsMissed = $commandsMissed | Where-Object -FilterScript {
-                $currentItem = $_
-                $matchFound = $false
+            <#
+                The variable $pesterResult will contain the commands missed. Normally
+                it would have been assigned to $pesterResult.CodeCoverage.CommandsMissed
+                but due to the bug mentioned above (in the job script) the variable
+                $pesterResult has already been assigned to CodeCoverage.CommandsMissed.
+            #>
+            $commandsMissed = $pesterResult
 
-                foreach ($pattern in $FilterCodeCoverageResult)
-                {
-                    if ($currentItem.Function -like $pattern -or $currentItem.Class -like $pattern)
+            # Apply filter if specified
+            if ($PSBoundParameters.ContainsKey('FilterCodeCoverageResult'))
+            {
+                $commandsMissed = $commandsMissed | Where-Object -FilterScript {
+                    $currentItem = $_
+                    $matchFound = $false
+
+                    foreach ($pattern in $FilterCodeCoverageResult)
                     {
-                        $matchFound = $true
-                        break
+                        if ($currentItem.Function -like $pattern -or $currentItem.Class -like $pattern)
+                        {
+                            $matchFound = $true
+                            break
+                        }
                     }
-                }
 
-                $matchFound
+                    $matchFound
+                }
+            }
+
+            if ($commandsMissed)
+            {
+                <#
+                    Example of a command missed object:
+                    ```
+                    PS> $result.CodeCoverage.CommandsMissed -is [System.Collections.Generic.List`1[[System.Object]]]
+                    True
+                    PS> $result.CodeCoverage.CommandsMissed[0].GetType().FullName
+                    System.Management.Automation.PSCustomObject
+                    PS> $result.CodeCoverage.CommandsMissed[0]
+
+                    File        : /Users/MyLogn/source/SqlServerDsc/output/builtModule/SqlServerDsc/0.0.1/DSCResources/DSC_SqlAG/DSC_SqlAG.psm1
+                    Line        : 1
+                    StartLine   : 1
+                    EndLine     : 1
+                    StartColumn : 40
+                    EndColumn   : 116
+                    Class       :
+                    Function    :
+                    Command     : $script:sqlServerDscHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\SqlServerDsc.Common'
+                    HitCount    : 0
+                    ```
+                #>
+                # Convert line numbers and return the processed result
+                $commandsMissed |
+                    ConvertTo-SourceLineNumber -PassThru |
+                    Select-Object -Property Class, Function, Command, SourceLineNumber, SourceFile
+            }
+            else
+            {
+                # Show different message based on whether filtering was applied
+                if ($PSBoundParameters.ContainsKey('FilterCodeCoverageResult'))
+                {
+                    Write-Information -MessageData $script:localizedData.Invoke_PesterJob_AllLinesCoveredFiltered -InformationAction 'Continue'
+                }
+                else
+                {
+                    Write-Information -MessageData $script:localizedData.Invoke_PesterJob_AllLinesCovered -InformationAction 'Continue'
+                }
             }
         }
-
-        <#
-            Example of a command missed object:
-            ```
-            PS> $result.CodeCoverage.CommandsMissed -is [System.Collections.Generic.List`1[[System.Object]]]
-            True
-            PS> $result.CodeCoverage.CommandsMissed[0].GetType().FullName
-            System.Management.Automation.PSCustomObject
-            PS> $result.CodeCoverage.CommandsMissed[0]
-
-            File        : /Users/MyLogn/source/SqlServerDsc/output/builtModule/SqlServerDsc/0.0.1/DSCResources/DSC_SqlAG/DSC_SqlAG.psm1
-            Line        : 1
-            StartLine   : 1
-            EndLine     : 1
-            StartColumn : 40
-            EndColumn   : 116
-            Class       :
-            Function    :
-            Command     : $script:sqlServerDscHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\SqlServerDsc.Common'
-            HitCount    : 0
-            ```
-        #>
-        # Convert line numbers and return the processed result
-        $commandsMissed |
-            ConvertTo-SourceLineNumber -PassThru |
-            Select-Object -Property Class, Function, Command, SourceLineNumber, SourceFile
+        else
+        {
+            Write-Warning -Message $script:localizedData.Invoke_PesterJob_NoPesterObjectReturned
+        }
     }
     else
     {

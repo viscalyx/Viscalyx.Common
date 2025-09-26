@@ -275,6 +275,9 @@ ConvertFrom-StringData @'
 
     ## Invoke-PesterJob
     Invoke_PesterJob_ModuleBuilderRequired = The ModuleBuilder module is required for source line mapping but is not available. Please install the ModuleBuilder module or run the command in a Sampler project environment. (IPJ0001)
+    Invoke_PesterJob_AllLinesCovered = All lines are covered by tests. (IPJ0002)
+    Invoke_PesterJob_AllLinesCoveredFiltered = All lines are covered by tests based on filtering criteria. (IPJ0003)
+    Invoke_PesterJob_NoPesterObjectReturned = Unable to determine code coverage result because no Pester object was returned from the test execution. (IPJ0004)
 
     ## Update-GitBranch
     Update_GitBranch_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
