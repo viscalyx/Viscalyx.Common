@@ -25,6 +25,11 @@
         path to a relative path. If not specified, the function uses the current
         location obtained from Get-Location.
 
+    .PARAMETER DirectorySeparator
+        Specifies the directory separator character to use when normalizing paths
+        and constructing the relative path. If not specified, the function uses
+        the current platform's directory separator character.
+
     .EXAMPLE
         ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' -CurrentLocation "/source/Viscalyx.Common"
 
@@ -37,6 +42,12 @@
         On Windows, returns ".\src\file.txt". On non-Windows platforms, returns the
         original path unchanged since Windows-style paths are not valid absolute paths
         on those platforms.
+
+    .EXAMPLE
+        ConvertTo-RelativePath -AbsolutePath 'C:\Projects\MyApp\src\file.txt' -CurrentLocation 'C:\Projects\MyApp' -DirectorySeparator '/'
+
+        Returns "./src/file.txt" using forward slash as the directory separator,
+        even on Windows platforms.
 
     .NOTES
         This function uses .NET Path methods for cross-platform compatibility with
@@ -74,7 +85,11 @@ function ConvertTo-RelativePath
 
         [Parameter(Position = 1)]
         [System.String]
-        $CurrentLocation
+        $CurrentLocation,
+
+        [Parameter()]
+        [System.Char]
+        $DirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
     )
 
     begin
@@ -87,66 +102,26 @@ function ConvertTo-RelativePath
 
     process
     {
-        $relativePath = $AbsolutePath
+        # 1. Normalize all directory separators to the specified separator
+        $normalizedAbsolutePath = $AbsolutePath -replace '[/\\]', $DirectorySeparator
+        $normalizedCurrentLocation = $CurrentLocation -replace '[/\\]', $DirectorySeparator
 
-        # Check if both paths are absolute and valid for the current platform
-        $isAbsolutePathValid = [System.IO.Path]::IsPathRooted($AbsolutePath)
-        $isCurrentLocationValid = [System.IO.Path]::IsPathRooted($CurrentLocation)
-
-        # Additional checks for cross-platform scenarios
-        $isWindowsStylePath = $AbsolutePath -match '^[A-Za-z]:\\' -or $AbsolutePath.StartsWith('\\')
-        $isUncPath = $AbsolutePath.StartsWith('\\') -or $AbsolutePath.StartsWith('//')
-
-        # On non-Windows platforms, don't process Windows-style paths or UNC paths with backslashes
-        if (-not $IsWindows -and (($isWindowsStylePath -and -not $isUncPath) -or ($isUncPath -and $AbsolutePath.StartsWith('\\'))))
+        # 2. Check if normalized AbsolutePath starts with CurrentLocation
+        if ($normalizedAbsolutePath.StartsWith($normalizedCurrentLocation, [System.StringComparison]::OrdinalIgnoreCase))
         {
-            return $relativePath
+            # Remove CurrentLocation from the start of AbsolutePath
+            $strippedPath = $normalizedAbsolutePath.Substring($normalizedCurrentLocation.Length)
+
+            # Remove leading separator if present
+            $strippedPath = $strippedPath.TrimStart($DirectorySeparator)
+
+            # 3. Return stripped path with ./ prefix
+            return '.{0}{1}' -f $DirectorySeparator, $strippedPath
         }
-
-        # On Windows platforms, don't process Unix-style paths unless they have string matching
-        # (this preserves the existing behavior where Unix-style paths can work on Windows if they match as strings)
-
-        # Determine if we should attempt path processing based on platform validation or basic string matching
-        $shouldProcessPaths = ($isAbsolutePathValid -and $isCurrentLocationValid) -or $relativePath.StartsWith($CurrentLocation)
-
-        if ($shouldProcessPaths)
+        else
         {
-            try
-            {
-                # For cross-platform compatibility, handle cases where paths use different separators
-                # but are logically equivalent (e.g., Unix-style paths on Windows)
-                if ($isAbsolutePathValid -and $isCurrentLocationValid)
-                {
-                    # Both paths are platform-valid, use standard normalization
-                    $normalizedAbsolutePath = [System.IO.Path]::GetFullPath($AbsolutePath)
-                    $normalizedCurrentLocation = [System.IO.Path]::GetFullPath($CurrentLocation)
-                }
-                elseif ($relativePath.StartsWith($CurrentLocation))
-                {
-                    # Handle mixed platform scenarios where paths match as strings but aren't platform-valid
-                    # Only do this if the string-based comparison already shows they match
-                    $normalizedAbsolutePath = $AbsolutePath.Replace('/', [System.IO.Path]::DirectorySeparatorChar).Replace('\', [System.IO.Path]::DirectorySeparatorChar)
-                    $normalizedCurrentLocation = $CurrentLocation.Replace('/', [System.IO.Path]::DirectorySeparatorChar).Replace('\', [System.IO.Path]::DirectorySeparatorChar)
-                }
-                else
-                {
-                    # If we shouldn't process, skip to avoid unwanted conversions
-                    return $relativePath
-                }
-
-                # Use normalized paths for comparison to handle mixed separators correctly
-                if ($normalizedAbsolutePath.StartsWith($normalizedCurrentLocation, [System.StringComparison]::OrdinalIgnoreCase))
-                {
-                    $relativePath = [System.IO.Path]::GetRelativePath($normalizedCurrentLocation, $normalizedAbsolutePath).Insert(0, '.{0}' -f [System.IO.Path]::DirectorySeparatorChar)
-                }
-            }
-            catch
-            {
-                # If path processing fails, return original path unchanged
-                Write-Debug -Message "Path processing failed: $($_.Exception.Message)"
-            }
+            # Return normalized absolute path unchanged
+            return $normalizedAbsolutePath
         }
-
-        return $relativePath
     }
 }

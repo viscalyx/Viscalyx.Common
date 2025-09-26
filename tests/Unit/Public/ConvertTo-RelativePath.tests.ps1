@@ -52,7 +52,7 @@ Describe 'ConvertTo-RelativePath' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters       = '[-AbsolutePath] <string> [[-CurrentLocation] <string>] [<CommonParameters>]'
+                ExpectedParameters       = '[-AbsolutePath] <string> [[-CurrentLocation] <string>] [-DirectorySeparator <char>] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'ConvertTo-RelativePath').ParameterSets |
@@ -81,9 +81,9 @@ Describe 'ConvertTo-RelativePath' {
         $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
-    It 'Should return the absolute path unchanged when it does not start with CurrentLocation' {
+    It 'Should return normalized absolute path when it does not start with CurrentLocation' {
         $result = ConvertTo-RelativePath -AbsolutePath '/other/path/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
-        $result | Should -Be '/other/path/ConvertTo-RelativePath.ps1'
+        $result | Should -Be ('{0}other{0}path{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
     It 'Should work with pipeline input' {
@@ -91,17 +91,22 @@ Describe 'ConvertTo-RelativePath' {
         $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
-    It 'Should handle mixed directory separators correctly on Windows' -Skip:(-not $IsWindows) {
-        $mixedPath = 'C:\source\Viscalyx.Common/source/Public\ConvertTo-RelativePath.ps1'
-        $result = ConvertTo-RelativePath -AbsolutePath $mixedPath -CurrentLocation 'C:\source\Viscalyx.Common'
+    It 'Should handle mixed directory separators correctly' {
+        $mixedPath = '/source\Viscalyx.Common/source/Public\ConvertTo-RelativePath.ps1'
+        $result = ConvertTo-RelativePath -AbsolutePath $mixedPath -CurrentLocation '/source/Viscalyx.Common'
         $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
-    It 'Should handle Windows mixed directory separators on non-Windows platforms' -Skip:($IsWindows) {
-        # On non-Windows platforms, Windows-style paths with mixed separators should be returned unchanged
-        $mixedPath = 'C:\source\Viscalyx.Common/source/Public\ConvertTo-RelativePath.ps1'
-        $result = ConvertTo-RelativePath -AbsolutePath $mixedPath -CurrentLocation 'C:\source\Viscalyx.Common'
-        $result | Should -Be $mixedPath
+    It 'Should handle mixed separators in CurrentLocation' {
+        $result = ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' -CurrentLocation '/source\Viscalyx.Common'
+        $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
+    }
+
+    It 'Should handle mixed separators in both paths' {
+        $mixedAbsolute = '/source\Viscalyx.Common\source/Public/ConvertTo-RelativePath.ps1'
+        $mixedCurrent = '\source/Viscalyx.Common'
+        $result = ConvertTo-RelativePath -AbsolutePath $mixedAbsolute -CurrentLocation $mixedCurrent
+        $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
     It 'Should handle empty CurrentLocation parameter correctly' {
@@ -110,74 +115,69 @@ Describe 'ConvertTo-RelativePath' {
         $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
-    Context 'When testing cross-platform behavior' {
-        It 'Should handle Windows-style paths on Windows' -Skip:(-not $IsWindows) {
+    Context 'When testing cross-platform path handling' {
+        It 'Should normalize Windows-style paths' {
             $windowsPath = 'C:\source\Viscalyx.Common\source\Public\ConvertTo-RelativePath.ps1'
             $currentLocation = 'C:\source\Viscalyx.Common'
             $result = ConvertTo-RelativePath -AbsolutePath $windowsPath -CurrentLocation $currentLocation
             $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
         }
 
-        It 'Should handle Windows-style paths on non-Windows platforms' -Skip:($IsWindows) {
-            $windowsPath = 'C:\source\Viscalyx.Common\source\Public\ConvertTo-RelativePath.ps1'
-            $currentLocation = 'C:\source\Viscalyx.Common'
-            $result = ConvertTo-RelativePath -AbsolutePath $windowsPath -CurrentLocation $currentLocation
-            # Improved implementation now correctly returns Windows paths unchanged on non-Windows platforms
-            # since they are not considered valid absolute paths for the platform
-            $result | Should -Be $windowsPath
-        }
-
-        It 'Should handle Unix-style paths on non-Windows platforms' -Skip:($IsWindows) {
+        It 'Should normalize Unix-style paths' {
             $unixPath = '/home/user/projects/source/Public/ConvertTo-RelativePath.ps1'
             $currentLocation = '/home/user/projects'
             $result = ConvertTo-RelativePath -AbsolutePath $unixPath -CurrentLocation $currentLocation
             $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
         }
 
-        It 'Should handle mixed directory separators on Unix platforms' -Skip:($IsWindows) {
-            # Test with mixed separators on Unix (backslashes in path names, not as separators)
+        It 'Should normalize mixed separators and handle literal backslashes in path names' {
+            # Test with mixed separators where backslashes might be part of filename/folder names
             $mixedPath = '/home/user/some\folder/with\backslashes/file.txt'
             $currentLocation = '/home/user'
             $result = ConvertTo-RelativePath -AbsolutePath $mixedPath -CurrentLocation $currentLocation
-            $result | Should -Be ('.{0}some\folder{0}with\backslashes{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
+            # All separators get normalized, including those that might be literal backslashes
+            $result | Should -Be ('.{0}some{0}folder{0}with{0}backslashes{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
         }
 
-        It 'Should return original path when paths do not share common root on Unix' -Skip:($IsWindows) {
+        It 'Should return normalized path when paths do not share common root' {
             $absolutePath = '/usr/local/bin/someapp'
             $currentLocation = '/home/user/projects'
             $result = ConvertTo-RelativePath -AbsolutePath $absolutePath -CurrentLocation $currentLocation
-            $result | Should -Be $absolutePath
+            $result | Should -Be ('{0}usr{0}local{0}bin{0}someapp' -f [System.IO.Path]::DirectorySeparatorChar)
         }
     }
 
-    Context 'When testing UNC path handling' {
-        It 'Should handle Windows-style UNC paths on Windows' -Skip:(-not $IsWindows) {
+    Context 'When testing path normalization edge cases' {
+        It 'Should normalize UNC paths' -Skip:(-not $IsWindows) {
             $uncPath = '\\server\share\folder\file.txt'
-            $uncCurrentLocation = '\\server\share'
-            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $uncCurrentLocation
+            $currentLocation = '\\server\share'
+            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $currentLocation
             $result | Should -Be ('.{0}folder{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
         }
 
-        It 'Should handle Unix-style UNC paths on non-Windows platforms' -Skip:($IsWindows) {
-            $uncPath = '//server/share/folder/file.txt'
-            $uncCurrentLocation = '//server/share'
-            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $uncCurrentLocation
-            $result | Should -Be ('.{0}folder{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
+        It 'Should handle UNC paths that do not match current location' -Skip:(-not $IsWindows) {
+            $uncPath = '\\server1\share1\folder\file.txt'
+            $currentLocation = '\\server2\share2'
+            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $currentLocation
+            $result | Should -Be ('{0}{0}server1{0}share1{0}folder{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
         }
 
-        It 'Should return Windows UNC paths unchanged on non-Windows platforms' -Skip:($IsWindows) {
-            $uncPath = '\\server\share\folder\file.txt'
-            $uncCurrentLocation = '\\server\share'
-            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $uncCurrentLocation
-            $result | Should -Be $uncPath
+        It 'Should normalize paths with multiple consecutive separators' {
+            $pathWithDoubleSeparators = '/home//user///projects//file.txt'
+            $currentLocation = '/home/user'
+            $result = ConvertTo-RelativePath -AbsolutePath $pathWithDoubleSeparators -CurrentLocation $currentLocation
+            # Paths don't match after normalization so returns original absolute path
+            $result | Should -Be '/home//user///projects//file.txt'
         }
 
-        It 'Should handle mixed UNC path styles appropriately on Windows' -Skip:(-not $IsWindows) {
-            # Test forward-slash UNC path on Windows (should work as it's considered rooted)
-            $uncPath = '//server/share/folder/file.txt'
-            $uncCurrentLocation = '//server/share'
-            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $uncCurrentLocation
-            $result | Should -Be ('.{0}folder{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
+        It 'Should handle empty string inputs gracefully' {
+            # Empty string should be handled by parameter validation
+            { ConvertTo-RelativePath -AbsolutePath '' -CurrentLocation '/home/user' } | Should -Throw
+        }
+
+        It 'Should handle paths with only separators' {
+            $result = ConvertTo-RelativePath -AbsolutePath '///' -CurrentLocation '/'
+            $result | Should -Be ('.{0}' -f [System.IO.Path]::DirectorySeparatorChar)
         }
     }
 }

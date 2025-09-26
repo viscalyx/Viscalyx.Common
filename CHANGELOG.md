@@ -54,6 +54,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Renamed `SwitchBackToPreviousBranch` parameter to `ReturnToCurrentBranch`
     for better clarity.
   - Updated documentation sections.
+- `ConvertTo-RelativePath` - Simplified function logic to consistently normalize
+  directory separators using `[System.IO.Path]::DirectorySeparatorChar` and
+  removed complex cross-platform path handling.
 
 ## [0.6.0] - 2025-09-25
 
