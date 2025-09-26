@@ -204,6 +204,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ConvertTo-DifferenceString`
   - `Get-NumericalSequence`
   - `Get-PSReadLineHistory`
+  - `Invoke-PesterJob`
   - `New-SamplerGitHubReleaseTag`
   - `Out-Difference`
   - `Pop-VMLatestSnapshot`
