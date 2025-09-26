@@ -90,13 +90,22 @@ BeforeAll {
 AfterAll {
     # Clean up - remove the test repositories
     if (Test-Path -Path $script:testRepoPath) {
+        $previousProgressPreference = $ProgressPreference
+        $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
+        $ProgressPreference = $previousProgressPreference
     }
     if (Test-Path -Path $script:bareRepoPath) {
+        $previousProgressPreference = $ProgressPreference
+        $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:bareRepoPath -Recurse -Force -ErrorAction SilentlyContinue
+        $ProgressPreference = $previousProgressPreference
     }
     if (Test-Path -Path $script:upstreamRepoPath) {
+        $previousProgressPreference = $ProgressPreference
+        $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:upstreamRepoPath -Recurse -Force -ErrorAction SilentlyContinue
+        $ProgressPreference = $previousProgressPreference
     }
 }
 

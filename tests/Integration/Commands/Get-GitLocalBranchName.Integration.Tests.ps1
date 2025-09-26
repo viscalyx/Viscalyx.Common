@@ -83,7 +83,10 @@ BeforeAll {
 AfterAll {
     # Clean up - remove the test repository
     if (Test-Path -Path $script:testRepoPath) {
+        $previousProgressPreference = $ProgressPreference
+        $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
+        $ProgressPreference = $previousProgressPreference
     }
 }
 

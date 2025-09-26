@@ -71,7 +71,10 @@ BeforeAll {
 AfterAll {
     # Clean up - remove the test repository
     if (Test-Path -Path $script:testRepoPath) {
+        $previousProgressPreference = $ProgressPreference
+        $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
+        $ProgressPreference = $previousProgressPreference
     }
 }
 
@@ -253,7 +256,10 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             
             # Remove bare repository
             if (Test-Path -Path $script:bareRepoPath) {
+                $previousProgressPreference = $ProgressPreference
+                $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:bareRepoPath -Recurse -Force -ErrorAction SilentlyContinue
+                $ProgressPreference = $previousProgressPreference
             }
         }
 
@@ -302,7 +308,10 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             # Clean up additional remote
             try { git remote remove upstream *> $null } catch { }
             if (Test-Path -Path $script:upstreamRepoPath) {
+                $previousProgressPreference = $ProgressPreference
+                $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:upstreamRepoPath -Recurse -Force -ErrorAction SilentlyContinue
+                $ProgressPreference = $previousProgressPreference
             }
         }
     }

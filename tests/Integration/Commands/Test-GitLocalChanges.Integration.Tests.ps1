@@ -60,7 +60,10 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
             # Clean up the test repository
             if (Test-Path -Path $script:testRepoPath)
             {
+                $previousProgressPreference = $ProgressPreference
+                $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force
+                $ProgressPreference = $previousProgressPreference
             }
         }
 
@@ -104,7 +107,10 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
             # Clean up the test repository
             if (Test-Path -Path $script:testRepoPath)
             {
+                $previousProgressPreference = $ProgressPreference
+                $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force
+                $ProgressPreference = $previousProgressPreference
             }
         }
 
@@ -149,7 +155,10 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
             # Clean up the test repository
             if (Test-Path -Path $script:testRepoPath)
             {
+                $previousProgressPreference = $ProgressPreference
+                $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force
+                $ProgressPreference = $previousProgressPreference
             }
         }
 
@@ -197,7 +206,10 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
             # Clean up the test repository
             if (Test-Path -Path $script:testRepoPath)
             {
+                $previousProgressPreference = $ProgressPreference
+                $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force
+                $ProgressPreference = $previousProgressPreference
             }
         }
 
@@ -228,7 +240,10 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
             # Clean up the test directory
             if (Test-Path -Path $script:testPath)
             {
+                $previousProgressPreference = $ProgressPreference
+                $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testPath -Recurse -Force
+                $ProgressPreference = $previousProgressPreference
             }
         }
 

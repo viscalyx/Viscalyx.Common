@@ -87,7 +87,10 @@ AfterAll {
                     $_.Attributes = $_.Attributes -bxor [System.IO.FileAttributes]::ReadOnly
                 }
             }
+            $previousProgressPreference = $ProgressPreference
+            $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
             Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
+            $ProgressPreference = $previousProgressPreference
         }
     }
     catch {
