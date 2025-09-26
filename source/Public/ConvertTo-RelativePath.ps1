@@ -95,11 +95,7 @@ function ConvertTo-RelativePath
 
         # Additional checks for cross-platform scenarios
         $isWindowsStylePath = $AbsolutePath -match '^[A-Za-z]:\\' -or $AbsolutePath.StartsWith('\\')
-        $isWindowsStyleCurrentLocation = $CurrentLocation -match '^[A-Za-z]:\\' -or $CurrentLocation.StartsWith('\\')
-        $isUnixStylePath = $AbsolutePath.StartsWith('/') -and -not $AbsolutePath.StartsWith('//')
-        $isUnixStyleCurrentLocation = $CurrentLocation.StartsWith('/') -and -not $CurrentLocation.StartsWith('//')
         $isUncPath = $AbsolutePath.StartsWith('\\') -or $AbsolutePath.StartsWith('//')
-        $isUncCurrentLocation = $CurrentLocation.StartsWith('\\') -or $CurrentLocation.StartsWith('//')
 
         # On non-Windows platforms, don't process Windows-style paths or UNC paths with backslashes
         if (-not $IsWindows -and (($isWindowsStylePath -and -not $isUncPath) -or ($isUncPath -and $AbsolutePath.StartsWith('\\'))))
