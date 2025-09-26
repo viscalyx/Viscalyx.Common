@@ -307,12 +307,28 @@ ConvertFrom-StringData @'
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessCaption = Fetch upstream branch
 
+    ## Remove-PSHistory
+    Remove_PSHistory_ShouldProcessDescription = Removing content matching the pattern '{0}'. (RH0001)
+    Remove_PSHistory_ShouldProcessConfirmation = Are you sure you want to remove the content matching the pattern '{0}' from PowerShell history? (RH0002)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Remove_PSHistory_ShouldProcessCaption = Remove content matching the pattern from PowerShell history (RH0005)
+    Remove_PSHistory_Removed = Removed PowerShell history content matching the pattern. (RH0003)
+    Remove_PSHistory_NoMatches = No PowerShell history content matching the pattern. (RH0004)
+
+    ## Remove-PSReadLineHistory
+    Remove_PSReadLineHistory_ShouldProcessDescription = Removing content matching the pattern '{0}'. (RPSH0001)
+    Remove_PSReadLineHistory_ShouldProcessConfirmation = Are you sure you want to remove the content matching the pattern '{0}' from PSReadLine history? (RPSH0002)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Remove_PSReadLineHistory_ShouldProcessCaption = Remove content matching the pattern from PSReadLine history (RPSH0005)
+    Remove_PSReadLineHistory_Removed = Removed PSReadLine history content matching the pattern. (RPSH0003)
+    Remove_PSReadLineHistory_NoMatches = No PSReadLine history content matching the pattern. (RPSH0004)
+
     ## ConvertTo-AnsiString
-    ConvertTo_AnsiString_ProcessingBegin = Processing ANSI string conversion. (CTAS0001)
+    ConvertTo_AnsiString_ProcessingBegin = Begin processing ANSI sequence conversion. (CTAS0001)
     ConvertTo_AnsiString_EmptyInput = Input string is null or empty, returning as-is. (CTAS0002)
-    ConvertTo_AnsiString_ProcessingString = Processing input string with {0} characters. (CTAS0003)
-    ConvertTo_AnsiString_ProcessingSequence = Processing ANSI sequence: {0}. (CTAS0004)
-    ConvertTo_AnsiString_ProcessingComplete = ANSI string conversion completed. (CTAS0005)
+    ConvertTo_AnsiString_ProcessingString = Processing string with {0} characters for ANSI sequence conversion. (CTAS0003)
+    ConvertTo_AnsiString_ProcessingSequence = Processing ANSI sequence with codes '{0}'. (CTAS0004)
+    ConvertTo_AnsiString_ProcessingComplete = ANSI sequence conversion completed. (CTAS0005)
 
     ## Get-ClassAst
     Get_ClassAst_ParsingScriptFile = Parsing script file '{0}' for class definitions. (GCA0001)
