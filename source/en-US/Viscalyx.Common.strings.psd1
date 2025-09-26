@@ -15,6 +15,12 @@ ConvertFrom-StringData @'
     Disable_CursorShortcutCode_RenamedCode = Renamed code to code.old (DCSC0005)
     Disable_CursorShortcutCode_CodeNotFound = File 'code' not found in the Cursor path. Skipping. (DCSC0006)
 
+    ## Clear-AnsiSequence
+    Clear_AnsiSequence_ProcessingBegin = Processing ANSI sequence removal. (CAS0001)
+    Clear_AnsiSequence_EmptyInput = Input string is null or empty, returning as-is. (CAS0002)
+    Clear_AnsiSequence_ProcessingString = Processing input string with {0} characters. (CAS0003)
+    Clear_AnsiSequence_ProcessingComplete = ANSI sequence removal completed. (CAS0004)
+
     ## Assert-GitLocalChange
     Assert_GitLocalChanges_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
 
