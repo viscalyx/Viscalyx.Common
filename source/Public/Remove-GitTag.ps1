@@ -3,17 +3,17 @@
         Removes Git tags from local repository and/or remote repositories.
 
     .DESCRIPTION
-        The Remove-GitTag command removes Git tags from the local repository 
-        and/or one or more remote repositories. It supports removing multiple 
+        The Remove-GitTag command removes Git tags from the local repository
+        and/or one or more remote repositories. It supports removing multiple
         tags and handling multiple remotes in a single operation.
 
     .PARAMETER Tag
-        Specifies the tag or tags to remove. This parameter is mandatory and 
+        Specifies the tag or tags to remove. This parameter is mandatory and
         accepts an array of strings to support removing multiple tags.
 
     .PARAMETER Remote
-        Specifies the remote repository or repositories from which to remove 
-        the tag(s). This parameter accepts an array of strings to support 
+        Specifies the remote repository or repositories from which to remove
+        the tag(s). This parameter accepts an array of strings to support
         removing from multiple remotes.
 
     .PARAMETER Local
@@ -62,8 +62,8 @@
     .NOTES
         This function requires Git to be installed and accessible from the command line.
         The function will fail if there are any Git errors during tag removal.
-        
-        When only the Tag parameter is specified, the tag will be removed from the 
+
+        When only the Tag parameter is specified, the tag will be removed from the
         local repository (equivalent to specifying -Local).
 #>
 function Remove-GitTag
