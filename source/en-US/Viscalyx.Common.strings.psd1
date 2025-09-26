@@ -15,12 +15,6 @@ ConvertFrom-StringData @'
     Disable_CursorShortcutCode_RenamedCode = Renamed code to code.old (DCSC0005)
     Disable_CursorShortcutCode_CodeNotFound = File 'code' not found in the Cursor path. Skipping. (DCSC0006)
 
-    ## Clear-AnsiSequence
-    Clear_AnsiSequence_ProcessingBegin = Processing ANSI sequence removal. (CAS0001)
-    Clear_AnsiSequence_EmptyInput = Input string is null or empty, returning as-is. (CAS0002)
-    Clear_AnsiSequence_ProcessingString = Processing input string with {0} characters. (CAS0003)
-    Clear_AnsiSequence_ProcessingComplete = ANSI sequence removal completed. (CAS0004)
-
     ## Assert-GitLocalChange
     Assert_GitLocalChanges_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
 
@@ -319,4 +313,13 @@ ConvertFrom-StringData @'
     ConvertTo_AnsiString_ProcessingString = Processing input string with {0} characters. (CTAS0003)
     ConvertTo_AnsiString_ProcessingSequence = Processing ANSI sequence: {0}. (CTAS0004)
     ConvertTo_AnsiString_ProcessingComplete = ANSI string conversion completed. (CTAS0005)
+
+    ## Clear-AnsiSequence
+    Clear_AnsiSequence_ProcessingBegin = Begin processing ANSI sequence clearing. (CAS0001)
+    Clear_AnsiSequence_EmptyInput = Input string is null or empty, returning as-is. (CAS0002)
+    Clear_AnsiSequence_ProcessingString = Processing string with {0} characters for ANSI sequence clearing. (CAS0003)
+    Clear_AnsiSequence_ProcessingComplete = ANSI sequence clearing completed. (CAS0004)
+
+    ## ConvertTo-DifferenceString
+    ConvertTo_DifferenceString_ReferenceLabelTruncated = Reference label '{0}' is longer than the maximum width of {1} characters and has been truncated to '{2}'. (CTDS0001)
 '@
