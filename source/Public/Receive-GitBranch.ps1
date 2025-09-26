@@ -145,7 +145,7 @@ function Receive-GitBranch
         if ($Checkout.IsPresent)
         {
             Write-Verbose -Message ($script:localizedData.Receive_GitBranch_CheckoutBranch -f $BranchName)
-            
+
             git checkout $BranchName
 
             if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
@@ -166,7 +166,7 @@ function Receive-GitBranch
         {
             # Fetch upstream changes
             Write-Verbose -Message ($script:localizedData.Receive_GitBranch_FetchUpstream -f $UpstreamBranchName, $RemoteName)
-            
+
             git fetch $RemoteName $UpstreamBranchName
 
             if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
@@ -184,7 +184,7 @@ function Receive-GitBranch
 
             # Rebase local branch with upstream
             Write-Verbose -Message ($script:localizedData.Receive_GitBranch_RebaseWithUpstream -f $RemoteName, $UpstreamBranchName)
-            
+
             git rebase "$RemoteName/$UpstreamBranchName"
 
             if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
@@ -204,7 +204,7 @@ function Receive-GitBranch
         {
             # Use git pull with default behavior
             Write-Verbose -Message ($script:localizedData.Receive_GitBranch_PullChanges)
-            
+
             git pull
 
             if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
