@@ -228,7 +228,7 @@ function New-SamplerGitHubReleaseTag
 
                 if (-not $WhatIfPreference)
                 {
-                    Write-Information -MessageData ("`e[32mTag `e[1;37;44m{0}`e[0m`e[32m was created and pushed to upstream '{1}'`e[0m" -f $ReleaseTag, $UpstreamRemoteName) -InformationAction Continue
+                    Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedAndPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
                 }
             }
             else

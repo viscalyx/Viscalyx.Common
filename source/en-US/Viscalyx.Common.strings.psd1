@@ -39,12 +39,6 @@ ConvertFrom-StringData @'
     ## Get-GitTag
     Get_GitTag_FailedToGetTag = Failed to get the tag '{0}'. Make sure the tags exist and is accessible.
 
-    ## Remove-History
-    Convert_PesterSyntax_ShouldProcessVerboseDescription = Converting the script file '{0}'.
-    Convert_PesterSyntax_ShouldProcessVerboseWarning = Are you sure you want to convert the script file '{0}'?
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    Convert_PesterSyntax_ShouldProcessCaption = Convert script file
-
     ## Rename-GitLocalBranch
     Rename_GitLocalBranch_FailedToRename = Failed to rename branch '{0}' to '{1}'. Make sure the local repository is accessible.
     Rename_GitLocalBranch_FailedFetch = Failed to fetch from remote '{0}'. Make sure the remote exists and is accessible.
@@ -64,55 +58,13 @@ ConvertFrom-StringData @'
     New_GitTag_FailedToCreateTag = Failed to create tag '{0}'. Make sure the local repository is accessible.
 
     ## New-SamplerGitHubReleaseTag
-    New_SamplerGitHubReleaseTag_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (NSGRT0001)
-    New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote = Failed to fetch branch '{0}' from the remote '{1}'. Make sure the branch exists in the remote git repository and the remote is accessible. (NSGRT0002)
-    New_SamplerGitHubReleaseTag_FailedGetLocalBranchName = Failed to get the name of the local branch. Make sure the local branch exists and is accessible. (NSGRT0003)
-    New_SamplerGitHubReleaseTag_FailedCheckoutLocalBranch = Failed to checkout the local branch '{0}'. Make sure the branch exists and is accessible. (NSGRT0004)
-    New_SamplerGitHubReleaseTag_FailedRebaseLocalDefaultBranch = Failed to rebase the local default branch '{0}' using '{1}/{0}'. Make sure the branch exists and is accessible. (NSGRT0005)
-    New_SamplerGitHubReleaseTag_FailedGetLastCommitId = Failed to get the last commit id of the local branch '{0}'. Make sure the branch exists and is accessible. (NSGRT0006)
-    New_SamplerGitHubReleaseTag_FailedFetchTagsFromUpstreamRemote = Failed to fetch tags from the upstream remote '{0}'. Make sure the remote exists and is accessible. (NSGRT0007)
-    New_SamplerGitHubReleaseTag_FailedGetTagsOrMissingTagsInLocalRepository = Failed to get tags from the local repository or the tags are missing. Make sure that at least one preview tag exist in the local repository, or specify a release tag. (NSGRT0008)
-    New_SamplerGitHubReleaseTag_FailedDescribeTags = Failed to describe the tags. Make sure the tags exist in the local repository. (NSGRT0009)
     New_SamplerGitHubReleaseTag_LatestTagIsNotPreview = The latest tag '{0}' is not a preview tag or not a correctly formatted preview tag. Make sure the latest tag is a preview tag, or specify a release tag. (NSGRT0010)
-    New_SamplerGitHubReleaseTag_FailedCheckoutPreviousBranch = Failed to checkout the previous branch '{0}'. (NSGRT0011)
-    New_SamplerGitHubReleaseTag_FailedCreateTag = Failed to create git tag '{0}'. (NSGRT0035)
-
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessDescription = Fetching branch '{0}' from the upstream remote '{1}'. (NSGRT0012)
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessConfirmation = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'? (NSGRT0013)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessCaption = Fetch upstream branch (NSGRT0014)
-
-    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessDescription = Switching to and rebasing the local default branch '{0}' using the upstream branch '{1}/{0}'. (NSGRT0015)
-    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessConfirmation = Are you sure you want to switch to and rebase the local branch '{0}'? (NSGRT0016)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessCaption = Rebase the local default branch (NSGRT0017)
-
-    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessDescription = Fetching the tags from (upstream) remote '{0}'. (NSGRT0018)
-    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessConfirmation = Are you sure you want to fetch tags from remote '{0}'? (NSGRT0019)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessCaption = Fetch tags from remote (NSGRT0020)
-
     New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository = Tags are missing. Make sure that at least one preview tag exist in the local repository, or specify a release tag. (NSGRT0008)
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessDescription = Creating tag '{0}' for commit '{2}' in the local branch '{1}'. (NSGRT0021)
     New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessDescription = Creating tag for commit in the local branch '{1}'. Note: Actual tag name and commit id cannot be determined during -WhatIf. (NSGRT0022)
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation = Are you sure you want to create tag '{0}'? (NSGRT0023)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessCaption = Create tag (NSGRT0024)
-
-    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessDescription = Switching back to previous local branch '{0}'. (NSGRT0025)
-    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessConfirmation = Are you sure you want to switch back to previous local branch '{0}'? (NSGRT0026)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption = Switch to previous branch (NSGRT0027)
-
-    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage = Do you want to push the tags to the remote repository '{0}'? (NSGRT0028)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldContinue messages.
-    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption = Push tag to remote repository (NSGRT0029)
-
-    New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription = Pushing tag '{0}' to the remote repository '{1}'. (NSGRT0032)
-    New_SamplerGitHubReleaseTag_PushTag_ShouldProcessConfirmation = Are you sure you want to push tag '{0}' to the remote repository '{1}'? (NSGRT0033)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_PushTag_ShouldProcessCaption = Push tag to remote repository (NSGRT0034)
-
     New_SamplerGitHubReleaseTag_TagCreatedAndPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created and pushed to the remote repository '{1}'.[0m (NSGRT0030)
     New_SamplerGitHubReleaseTag_TagCreatedNotPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created, but not pushed. To push the tag to the remote repository, run '[39mgit push {1} --tags[32m'.[0m (NSGRT0031)
 
@@ -278,9 +230,6 @@ ConvertFrom-StringData @'
     Invoke_PesterJob_AllLinesCovered = All lines are covered by tests. (IPJ0002)
     Invoke_PesterJob_AllLinesCoveredFiltered = All lines are covered by tests based on filtering criteria. (IPJ0003)
     Invoke_PesterJob_NoPesterObjectReturned = Unable to determine code coverage result because no Pester object was returned from the test execution. (IPJ0004)
-
-    ## Update-GitBranch
-    Update_GitBranch_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
 
     ## Switch-GitLocalBranch
     Switch_GitLocalBranch_FailedCheckoutLocalBranch = Failed to checkout the local branch '{0}'. Make sure the branch exists and is accessible.
