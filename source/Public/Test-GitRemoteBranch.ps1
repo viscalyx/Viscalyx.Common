@@ -6,26 +6,27 @@
         The Test-GitRemoteBranch command checks if a specified branch exists in a
         remote Git repository.
 
-    .PARAMETER Name
-        Specifies the name of the branch to check.
-
     .PARAMETER RemoteName
         Specifies the name of the remote repository.
 
-    .EXAMPLE
-        Test-GitRemoteBranch -BranchName "feature/branch" -Name "origin"
-
-        This example tests if the branch "feature/branch" exists in the remote repository
-        named "origin".
+    .PARAMETER Name
+        Specifies the name of the branch to check.
 
     .INPUTS
-        None. You cannot pipe input to this function.
+        None
+
+        This function does not accept pipeline input.
 
     .OUTPUTS
         System.Boolean
 
-        This function returns a Boolean value indicating whether the branch exists in
-        the remote repository.
+        Returns $true if the remote branch exists, otherwise $false.
+
+    .EXAMPLE
+        Test-GitRemoteBranch -RemoteName "origin" -Name "feature/branch"
+
+        This example tests if the branch "feature/branch" exists in the remote repository
+        named "origin".
 #>
 function Test-GitRemoteBranch
 {
