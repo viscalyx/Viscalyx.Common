@@ -9,6 +9,16 @@
     .PARAMETER Name
         Specifies the name of the Git remote to be tested.
 
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
+    .OUTPUTS
+        System.Boolean
+
+        Returns $true if the remote exists, otherwise $false.
+
     .EXAMPLE
         Test-GitRemote -Name "origin"
 
