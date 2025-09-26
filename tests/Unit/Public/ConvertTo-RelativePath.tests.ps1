@@ -149,4 +149,35 @@ Describe 'ConvertTo-RelativePath' {
             $result | Should -Be $absolutePath
         }
     }
+
+    Context 'When testing UNC path handling' {
+        It 'Should handle Windows-style UNC paths on Windows' -Skip:(-not $IsWindows) {
+            $uncPath = '\\server\share\folder\file.txt'
+            $uncCurrentLocation = '\\server\share'
+            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $uncCurrentLocation
+            $result | Should -Be ('.{0}folder{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
+        }
+
+        It 'Should handle Unix-style UNC paths on non-Windows platforms' -Skip:($IsWindows) {
+            $uncPath = '//server/share/folder/file.txt'
+            $uncCurrentLocation = '//server/share'
+            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $uncCurrentLocation
+            $result | Should -Be ('.{0}folder{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
+        }
+
+        It 'Should return Windows UNC paths unchanged on non-Windows platforms' -Skip:($IsWindows) {
+            $uncPath = '\\server\share\folder\file.txt'
+            $uncCurrentLocation = '\\server\share'
+            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $uncCurrentLocation
+            $result | Should -Be $uncPath
+        }
+
+        It 'Should handle mixed UNC path styles appropriately on Windows' -Skip:(-not $IsWindows) {
+            # Test forward-slash UNC path on Windows (should work as it's considered rooted)
+            $uncPath = '//server/share/folder/file.txt'
+            $uncCurrentLocation = '//server/share'
+            $result = ConvertTo-RelativePath -AbsolutePath $uncPath -CurrentLocation $uncCurrentLocation
+            $result | Should -Be ('.{0}folder{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
+        }
+    }
 }
