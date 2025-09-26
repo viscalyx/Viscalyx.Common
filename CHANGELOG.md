@@ -5,9 +5,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Viscalyx.Common
+  - Added unit tests to run in Windows PowerShell.
+- Public commands:
+  - `Assert-GitLocalChange`
+  - `Assert-GitRemote`
+  - `ConvertTo-RelativePath`
+  - `Disable-CursorShortcutCode`
+  - `Get-GitBranchCommit`
+  - `Get-GitLocalBranchName`
+  - `Get-GitRemote`
+  - `Get-GitRemoteBranch`
+  - `Get-GitTag`
+  - `New-GitTag`
+  - `Push-GitTag`
+  - `Receive-GitBranch`
+  - `Remove-GitTag`
+  - `Rename-GitLocalBranch`
+  - `Rename-GitRemote`
+  - `Request-GitTag`
+  - `Switch-GitLocalBranch`
+  - `Test-GitLocalChanges`
+  - `Test-GitRemote`
+  - `Test-GitRemoteBranch`
+  - `Update-GitLocalBranch`
+  - `Update-RemoteTrackingBranch`
+
 ### Changed
 
-- `Invoke-PesterJob` - Updated documentation example to use `-TestNameFilter` parameter instead of the `-TestName` alias and removed reference to alias usage for consistency and clarity.
+- `Invoke-PesterJob` - Updated documentation example to use `-TestNameFilter`
+  parameter instead of the `-TestName` alias and removed reference to alias
+  usage for consistency and clarity.
+
+### Fixed
+
+- `ConvertTo-AnsiSequence`
+  - Make it render ANSI sequences in Windows PowerShell.
 
 ## [0.6.0] - 2025-09-25
 
@@ -36,31 +71,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `TestNameFilter` parameter (with aliases `TestName` and `Test`). This feature
   enables AI agents and automation scenarios to focus on specific tests by
   providing test name patterns with wildcard support.
-- Viscalyx.Common
-  - Added unit tests to run in Windows PowerShell.
-- Public commands:
-  - `Assert-GitLocalChange`
-  - `Assert-GitRemote`
-  - `ConvertTo-RelativePath`
-  - `Disable-CursorShortcutCode`
-  - `Get-GitBranchCommit`
-  - `Get-GitLocalBranchName`
-  - `Get-GitRemote`
-  - `Get-GitRemoteBranch`
-  - `Get-GitTag`
-  - `New-GitTag`
-  - `Push-GitTag`
-  - `Receive-GitBranch`
-  - `Remove-GitTag`
-  - `Rename-GitLocalBranch`
-  - `Rename-GitRemote`
-  - `Request-GitTag`
-  - `Switch-GitLocalBranch`
-  - `Test-GitLocalChanges`
-  - `Test-GitRemote`
-  - `Test-GitRemoteBranch`
-  - `Update-GitLocalBranch`
-  - `Update-RemoteTrackingBranch`
 
 ### Fixed
 
@@ -172,8 +182,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     block to output printable versions.
   - Optimize code and improve performance.
   - Added parameter `NoHexOutput`.
-- `ConvertTo-AnsiSequence`
-  - Make it render ANSI sequences in Windows PowerShell.
 - `Out-Difference`
   - Added parameter `NoHexOutput`.
 
