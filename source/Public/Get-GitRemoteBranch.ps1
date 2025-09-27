@@ -66,6 +66,25 @@ function Get-GitRemoteBranch
         $RemoveRefsHeads
     )
 
+    # Verify that the remote exists if RemoteName is specified
+    if ($PSBoundParameters.ContainsKey('RemoteName'))
+    {
+        $existingRemote = Get-GitRemote -Name $RemoteName
+
+        if (-not $existingRemote)
+        {
+            $errorMessageParameters = @{
+                Message      = $script:localizedData.Get_GitRemoteBranch_RemoteNotFound -f $RemoteName
+                Category     = 'ObjectNotFound'
+                ErrorId      = 'GGRB0002' # cspell: disable-line
+                TargetObject = $RemoteName
+            }
+
+            Write-Error @errorMessageParameters
+            return
+        }
+    }
+
     $arguments = @()
 
     # Make sure the remote URL is not printed to stderr.
@@ -78,22 +97,30 @@ function Get-GitRemoteBranch
 
     if ($PSBoundParameters.ContainsKey('Name'))
     {
-        if ($Name -match 'refs/heads/')
+        # If Name is just '*', treat it as if no Name was specified
+        if ($Name -eq '*')
         {
-            $Name = $Name -replace 'refs/heads/'
+            # Skip adding the Name parameter - this will list all branches like when Name is not specified
         }
-
-        if ($Name -notmatch '\*\*$' -and $Name -match '^([^*].*\*)$')
+        else
         {
-            <#
-                if Name contains '*' but do not end with '**' or is already
-                prefixed with'*', then prefix with '*'.
-            #>
-            $Name = '*{0}' -f $matches[1]
-        }
+            if ($Name -match 'refs/heads/')
+            {
+                $Name = $Name -replace 'refs/heads/'
+            }
 
-        # Name can also have wildcard like 'feature/*'
-        $arguments += $Name
+            if ($Name -notmatch '\*\*$' -and $Name -match '^([^*].*\*)$')
+            {
+                <#
+                    if Name contains '*' but do not end with '**' or is already
+                    prefixed with'*', then prefix with '*'.
+                #>
+                $Name = '*{0}' -f $matches[1]
+            }
+
+            # Name can also have wildcard like 'feature/*'
+            $arguments += $Name
+        }
     }
 
     $result = git ls-remote --branches @arguments

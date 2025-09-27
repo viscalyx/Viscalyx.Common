@@ -36,6 +36,7 @@ ConvertFrom-StringData @'
     Get_GitRemoteBranch_Failed = Failed to get the remote branches'. Make sure the remote branch exists and is accessible.
     Get_GitRemoteBranch_FromRemote_Failed = Failed to get the remote branches from remote '{0}'. Make sure the remote branch exists and is accessible.
     Get_GitRemoteBranch_ByName_Failed = Failed to get the remote branch '{0}' using the remote '{1}'. Make sure the remote branch exists and is accessible.
+    Get_GitRemoteBranch_RemoteNotFound = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (GGRB0002)
 
     ## Get-GitTag
     Get_GitTag_FailedToGetTag = Failed to get the tag '{0}'. Make sure the tags exist and is accessible.

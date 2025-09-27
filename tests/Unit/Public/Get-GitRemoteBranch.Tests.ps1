@@ -149,6 +149,10 @@ Describe 'Get-GitRemoteBranch' {
 
     Context 'When getting remote branches from specific remote' {
         It 'Should call git ls-remote --branches with remote name' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return 'origin'
+            }
+            
             Mock -CommandName 'git' -MockWith {
                 return @(
                     "a1b2c3d4e5f6	refs/heads/main",
@@ -173,6 +177,10 @@ Describe 'Get-GitRemoteBranch' {
 
     Context 'When getting specific branch by name' {
         It 'Should call git ls-remote --branches with remote and branch name' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return 'origin'
+            }
+            
             Mock -CommandName 'git' -MockWith {
                 return @("a1b2c3d4e5f6	refs/heads/main")
             }
@@ -193,6 +201,10 @@ Describe 'Get-GitRemoteBranch' {
         }
 
         It 'Should handle wildcard patterns in branch names' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return 'origin'
+            }
+            
             Mock -CommandName 'git' -MockWith {
                 return @(
                     "a1b2c3d4e5f6	refs/heads/feature/test1",
@@ -216,6 +228,10 @@ Describe 'Get-GitRemoteBranch' {
         }
 
         It 'Should strip refs/heads/ from Name parameter if present' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return 'origin'
+            }
+            
             Mock -CommandName 'git' -MockWith {
                 return @("a1b2c3d4e5f6	refs/heads/main")
             }
@@ -234,10 +250,41 @@ Describe 'Get-GitRemoteBranch' {
                 }
             }
         }
+
+        It 'Should treat Name parameter with single asterisk same as no Name parameter' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return 'origin'
+            }
+            
+            Mock -CommandName 'git' -MockWith {
+                return @(
+                    "a1b2c3d4e5f6	refs/heads/main",
+                    "f6e5d4c3b2a1	refs/heads/develop"
+                )
+            }
+
+            InModuleScope -ScriptBlock {
+                $global:LASTEXITCODE = 0
+                $result = Get-GitRemoteBranch -RemoteName 'origin' -Name '*'
+                $result | Should -Be @('refs/heads/main', 'refs/heads/develop')
+                # Should not pass the asterisk to git - should behave same as no Name parameter
+                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
+                    $args[0] -eq 'ls-remote' -and
+                    $args[1] -eq '--branches' -and
+                    $args[2] -eq '--quiet' -and
+                    $args[3] -eq 'origin' -and
+                    $args.Count -eq 4  # No Name parameter should be passed
+                }
+            }
+        }
     }
 
     Context 'When using RemoveRefsHeads switch' {
         It 'Should remove refs/heads/ prefix from branch names' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return 'origin'
+            }
+            
             Mock -CommandName 'git' -MockWith {
                 return @(
                     "a1b2c3d4e5f6	refs/heads/main",
@@ -253,6 +300,10 @@ Describe 'Get-GitRemoteBranch' {
         }
 
         It 'Should work with Name parameter and RemoveRefsHeads' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return 'origin'
+            }
+            
             Mock -CommandName 'git' -MockWith {
                 return @("a1b2c3d4e5f6	refs/heads/main")
             }
@@ -281,6 +332,10 @@ Describe 'Get-GitRemoteBranch' {
         }
 
         It 'Should write error with correct parameters when remote name fails' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return 'nonexistent'  # Remote exists but git command fails
+            }
+            
             Mock -CommandName 'git' -MockWith {
                 $global:LASTEXITCODE = 1
                 return $null
@@ -299,6 +354,10 @@ Describe 'Get-GitRemoteBranch' {
         }
 
         It 'Should write error with correct parameters when branch name fails' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return 'origin'  # Remote exists but git command fails
+            }
+            
             Mock -CommandName 'git' -MockWith {
                 $global:LASTEXITCODE = 1
                 return $null
@@ -331,6 +390,44 @@ Describe 'Get-GitRemoteBranch' {
                     $ErrorId -eq 'GGRB0001' -and
                     $TargetObject -eq $null
                 }
+            }
+        }
+    }
+
+    Context 'When remote validation fails' {
+        It 'Should write error when remote does not exist' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return $null
+            }
+            Mock -CommandName 'Write-Error' -MockWith { }
+
+            InModuleScope -ScriptBlock {
+                $result = Get-GitRemoteBranch -RemoteName 'nonexistent' -ErrorAction SilentlyContinue
+                $result | Should -BeNullOrEmpty
+                Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly -ParameterFilter {
+                    $Name -eq 'nonexistent'
+                }
+                Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly -ParameterFilter {
+                    $Message -match 'The remote.*nonexistent.*does not exist in the local git repository' -and
+                    $Category -eq 'ObjectNotFound' -and
+                    $ErrorId -eq 'GGRB0002' -and
+                    $TargetObject -eq 'nonexistent'
+                }
+            }
+        }
+        
+        It 'Should not call git ls-remote when remote does not exist' {
+            Mock -CommandName 'Get-GitRemote' -MockWith {
+                return $null
+            }
+            Mock -CommandName 'git' -MockWith {
+                throw 'git should not be called when remote does not exist'
+            }
+            Mock -CommandName 'Write-Error' -MockWith { }
+
+            InModuleScope -ScriptBlock {
+                Get-GitRemoteBranch -RemoteName 'nonexistent' -ErrorAction SilentlyContinue
+                Should -Invoke -CommandName 'git' -Times 0 -Exactly
             }
         }
     }
