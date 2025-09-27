@@ -285,7 +285,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
                 git config user.name "Test User" *> $null
 
                 # Should throw error from Get-GitLocalBranchName for empty repository
-                { Get-GitBranchCommit -ErrorAction Stop 2>$null } |
+                { Get-GitBranchCommit -ErrorAction Stop } |
                     Should -Throw -ErrorId 'GGLBN0001,Get-GitLocalBranchName'
             }
             finally {
@@ -306,7 +306,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
             Push-Location -Path $nonGitPath
             try {
                 # Should throw error from Get-GitLocalBranchName for non-git directory
-                { Get-GitBranchCommit -ErrorAction Stop 2>$null } |
+                { Get-GitBranchCommit -ErrorAction Stop } |
                     Should -Throw -ErrorId 'GGLBN0001,Get-GitLocalBranchName'
             }
             finally {
@@ -413,7 +413,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
         }
 
         It 'Should throw error for invalid range references' {
-            { Get-GitBranchCommit -From 'invalid-commit-123' -To 'HEAD' -ErrorAction Stop 2>$null } |
+            { Get-GitBranchCommit -From 'invalid-commit-123' -To 'HEAD' -ErrorAction Stop } |
                 Should -Throw -ErrorId 'GGBC0001,Get-GitBranchCommit'
         }
 
