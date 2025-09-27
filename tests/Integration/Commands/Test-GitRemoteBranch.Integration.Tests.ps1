@@ -105,9 +105,8 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
             $result | Should -BeTrue
         }
 
-        It 'Should return false when testing non-existent remote' {
-            $result = Test-GitRemoteBranch -RemoteName 'nonexistent-remote' -Name $script:defaultBranch 2>$null
-            $result | Should -BeFalse
+        It 'Should throw an exception when testing non-existent remote' {
+            { Test-GitRemoteBranch -RemoteName 'nonexistent-remote' -Name $script:defaultBranch -ErrorAction 'Stop' } | Should -Throw
         }
 
         Context 'When multiple branches exist' {
