@@ -65,7 +65,7 @@ Describe 'Disable-CursorShortcutCode' {
             return $true
         }
 
-        Viscalyx.Common\Disable-CursorShortcutCode
+        Viscalyx.Common\Disable-CursorShortcutCode -Confirm:$false
 
         Should -Invoke -CommandName Move-Item -Exactly -Times 2 -Scope It
     }
@@ -75,7 +75,7 @@ Describe 'Disable-CursorShortcutCode' {
             return $false
         }
 
-        Viscalyx.Common\Disable-CursorShortcutCode
+        Viscalyx.Common\Disable-CursorShortcutCode -Confirm:$false
         Should -Invoke -CommandName Move-Item -Times 0 -Scope It
     }
 
@@ -86,7 +86,7 @@ Describe 'Disable-CursorShortcutCode' {
             $Path -match 'code\.cmd$'
         }
 
-        Viscalyx.Common\Disable-CursorShortcutCode
+        Viscalyx.Common\Disable-CursorShortcutCode -Confirm:$false
 
         Should -Invoke -CommandName Move-Item -Times 0 -Scope It
     }
@@ -98,8 +98,28 @@ Describe 'Disable-CursorShortcutCode' {
             $Path -match 'code$'
         }
 
-        Viscalyx.Common\Disable-CursorShortcutCode
+        Viscalyx.Common\Disable-CursorShortcutCode -Confirm:$false
 
         Should -Invoke -CommandName Move-Item -Times 0 -Scope It
+    }
+
+    It 'Should not perform operations when using WhatIf' {
+        Mock -CommandName Test-Path -MockWith {
+            return $true
+        }
+
+        Viscalyx.Common\Disable-CursorShortcutCode -WhatIf
+
+        Should -Invoke -CommandName Move-Item -Times 0 -Scope It
+    }
+
+    It 'Should perform operations without confirmation when using Force' {
+        Mock -CommandName Test-Path -MockWith {
+            return $true
+        }
+
+        Viscalyx.Common\Disable-CursorShortcutCode -Force
+
+        Should -Invoke -CommandName Move-Item -Exactly -Times 2 -Scope It
     }
 }

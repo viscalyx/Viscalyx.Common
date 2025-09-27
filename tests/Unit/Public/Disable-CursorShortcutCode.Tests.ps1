@@ -46,7 +46,7 @@ Describe 'Disable-CursorShortcutCode' {
     It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
         @{
             ExpectedParameterSetName = '__AllParameterSets'
-            ExpectedParameters = '[-Force] [<CommonParameters>]'
+            ExpectedParameters = '[-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
         }
     ) {
         $result = (Get-Command -Name 'Disable-CursorShortcutCode').ParameterSets |
@@ -57,6 +57,12 @@ Describe 'Disable-CursorShortcutCode' {
             )
         $result.ParameterSetName | Should -Be $ExpectedParameterSetName
         $result.ParameterListAsString | Should -Be $ExpectedParameters
+    }
+
+    It 'Should support ShouldProcess' {
+        $commandInfo = Get-Command -Name 'Disable-CursorShortcutCode'
+        $commandInfo.Parameters.ContainsKey('WhatIf') | Should -BeTrue
+        $commandInfo.Parameters.ContainsKey('Confirm') | Should -BeTrue
     }
 
     BeforeEach {
@@ -86,7 +92,7 @@ Describe 'Disable-CursorShortcutCode' {
             }
 
             It 'Should rename both code.cmd and code files' {
-                Disable-CursorShortcutCode
+                Disable-CursorShortcutCode -Confirm:$false
 
                 Should -Invoke -CommandName Test-Path -Exactly -Times 2
                 Should -Invoke -CommandName Move-Item -Exactly -Times 2
@@ -104,7 +110,7 @@ Describe 'Disable-CursorShortcutCode' {
             }
 
             It 'Should rename only code.cmd file' {
-                Disable-CursorShortcutCode
+                Disable-CursorShortcutCode -Confirm:$false
 
                 Should -Invoke -CommandName Test-Path -Exactly -Times 2
                 Should -Invoke -CommandName Move-Item -Exactly -Times 1
@@ -118,7 +124,7 @@ Describe 'Disable-CursorShortcutCode' {
             }
 
             It 'Should not rename any files and display appropriate messages' {
-                Disable-CursorShortcutCode
+                Disable-CursorShortcutCode -Confirm:$false
 
                 Should -Invoke -CommandName Test-Path -Exactly -Times 2
                 Should -Invoke -CommandName Move-Item -Times 0
@@ -139,10 +145,60 @@ Describe 'Disable-CursorShortcutCode' {
         }
 
         It 'Should display message that Cursor path was not found' {
-            Disable-CursorShortcutCode
+            Disable-CursorShortcutCode -Confirm:$false
 
             Should -Invoke -CommandName Test-Path -Times 0
             Should -Invoke -CommandName Move-Item -Times 0
+        }
+    }
+
+    Context 'When using WhatIf' {
+        BeforeAll {
+            # Store original PATH and set mock PATH
+            $script:originalPath = $env:Path
+            $env:Path = 'C:\Windows\System32;C:\Users\User\AppData\Local\Programs\Cursor\resources\app\bin;C:\Program Files\Git\cmd'
+        }
+
+        AfterAll {
+            # Restore original PATH
+            $env:Path = $script:originalPath
+        }
+
+        BeforeEach {
+            Mock -CommandName Test-Path -MockWith { $true }
+        }
+
+        It 'Should not perform any file operations when WhatIf is specified' {
+            Disable-CursorShortcutCode -WhatIf
+
+            Should -Invoke -CommandName Test-Path -Exactly -Times 2
+            Should -Invoke -CommandName Move-Item -Times 0
+        }
+    }
+
+    Context 'When using Force parameter' {
+        BeforeAll {
+            # Store original PATH and set mock PATH
+            $script:originalPath = $env:Path
+            $env:Path = 'C:\Windows\System32;C:\Users\User\AppData\Local\Programs\Cursor\resources\app\bin;C:\Program Files\Git\cmd'
+        }
+
+        AfterAll {
+            # Restore original PATH
+            $env:Path = $script:originalPath
+        }
+
+        BeforeEach {
+            Mock -CommandName Test-Path -MockWith { $true }
+        }
+
+        It 'Should perform operations without confirmation when Force is specified' {
+            Disable-CursorShortcutCode -Force
+
+            Should -Invoke -CommandName Test-Path -Exactly -Times 2
+            Should -Invoke -CommandName Move-Item -Exactly -Times 2
+            Should -Invoke -CommandName Move-Item -ParameterFilter { $Destination -like '*code.cmd.old' } -Exactly -Times 1
+            Should -Invoke -CommandName Move-Item -ParameterFilter { $Destination -like '*code.old' } -Exactly -Times 1
         }
     }
 }

@@ -10,8 +10,16 @@ ConvertFrom-StringData @'
     ## Disable-CursorShortcutCode
     Disable_CursorShortcutCode_CursorPathNotFound = Cursor path not found in the PATH environment variable. Exiting. (DCSC0001)
     Disable_CursorShortcutCode_MultipleCursorPaths = More than one Cursor path was found in the PATH environment variable. (DCSC0002)
+    Disable_CursorShortcutCode_RenameCodeCmd_ShouldProcessDescription = Renaming 'code.cmd' to 'code.cmd.old' in the Cursor path '{0}'.
+    Disable_CursorShortcutCode_RenameCodeCmd_ShouldProcessConfirmation = Are you sure you want to rename 'code.cmd' to 'code.cmd.old'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Disable_CursorShortcutCode_RenameCodeCmd_ShouldProcessCaption = Rename code.cmd
     Disable_CursorShortcutCode_RenamedCodeCmd = Renamed code.cmd to code.cmd.old (DCSC0003)
     Disable_CursorShortcutCode_CodeCmdNotFound = File 'code.cmd' not found in the Cursor path. Skipping. (DCSC0004)
+    Disable_CursorShortcutCode_RenameCode_ShouldProcessDescription = Renaming 'code' to 'code.old' in the Cursor path '{0}'.
+    Disable_CursorShortcutCode_RenameCode_ShouldProcessConfirmation = Are you sure you want to rename 'code' to 'code.old'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Disable_CursorShortcutCode_RenameCode_ShouldProcessCaption = Rename code
     Disable_CursorShortcutCode_RenamedCode = Renamed code to code.old (DCSC0005)
     Disable_CursorShortcutCode_CodeNotFound = File 'code' not found in the Cursor path. Skipping. (DCSC0006)
 

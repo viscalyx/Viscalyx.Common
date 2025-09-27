@@ -37,7 +37,7 @@
 #>
 function Disable-CursorShortcutCode
 {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType()]
     param
     (
@@ -45,6 +45,11 @@ function Disable-CursorShortcutCode
         [System.Management.Automation.SwitchParameter]
         $Force
     )
+
+    if ($Force.IsPresent -and -not $Confirm)
+    {
+        $ConfirmPreference = 'None'
+    }
 
     # Get the directories in the $env:Path
     $pathDirs = $env:Path.Split([System.IO.Path]::PathSeparator)
@@ -82,9 +87,16 @@ function Disable-CursorShortcutCode
 
     if (Test-Path $codeCmdPath)
     {
-        Move-Item -Path $codeCmdPath -Destination $codeCmdPathDestination -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
+        $shouldProcessDescription = $script:localizedData.Disable_CursorShortcutCode_RenameCodeCmd_ShouldProcessDescription -f $cursorPath
+        $shouldProcessConfirmation = $script:localizedData.Disable_CursorShortcutCode_RenameCodeCmd_ShouldProcessConfirmation
+        $shouldProcessCaption = $script:localizedData.Disable_CursorShortcutCode_RenameCodeCmd_ShouldProcessCaption
 
-        Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_RenamedCodeCmd -InformationAction 'Continue'
+        if ($PSCmdlet.ShouldProcess($shouldProcessDescription, $shouldProcessConfirmation, $shouldProcessCaption))
+        {
+            Move-Item -Path $codeCmdPath -Destination $codeCmdPathDestination -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
+
+            Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_RenamedCodeCmd -InformationAction 'Continue'
+        }
     }
     else
     {
@@ -93,9 +105,16 @@ function Disable-CursorShortcutCode
 
     if (Test-Path $codePath)
     {
-        Move-Item -Path $codePath -Destination $codePathDestination -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
+        $shouldProcessDescription = $script:localizedData.Disable_CursorShortcutCode_RenameCode_ShouldProcessDescription -f $cursorPath
+        $shouldProcessConfirmation = $script:localizedData.Disable_CursorShortcutCode_RenameCode_ShouldProcessConfirmation
+        $shouldProcessCaption = $script:localizedData.Disable_CursorShortcutCode_RenameCode_ShouldProcessCaption
 
-        Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_RenamedCode -InformationAction 'Continue'
+        if ($PSCmdlet.ShouldProcess($shouldProcessDescription, $shouldProcessConfirmation, $shouldProcessCaption))
+        {
+            Move-Item -Path $codePath -Destination $codePathDestination -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
+
+            Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_RenamedCode -InformationAction 'Continue'
+        }
     }
     else
     {
