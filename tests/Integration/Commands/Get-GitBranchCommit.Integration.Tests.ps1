@@ -384,7 +384,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
                 # Switch back to current branch and get range
                 $currentGitBranch = git rev-parse --abbrev-ref HEAD 2>$null
                 if ($currentGitBranch -ne $script:currentBranch) {
-                    git checkout $script:currentBranch 2>$null
+                    $null = git checkout $script:currentBranch 2>$null
                 }
 
                 $result = Get-GitBranchCommit -From $script:currentBranch -To 'test-range-branch' -ErrorAction Stop
