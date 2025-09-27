@@ -127,6 +127,12 @@ Describe 'Push-GitTag' {
                 {
                     $global:LASTEXITCODE = 0
                 }
+                elseif ($args[0] -eq 'tag')
+                {
+                    # Return some mock tags to simulate existing tags
+                    $global:LASTEXITCODE = 0
+                    return @('v1.0.0', 'v2.0.0')
+                }
                 else
                 {
                     throw "Mock git unexpected args: $($args -join ' ')"
@@ -160,6 +166,12 @@ Describe 'Push-GitTag' {
                     if ($args[0] -eq 'push')
                     {
                         $global:LASTEXITCODE = 1
+                    }
+                    elseif ($args[0] -eq 'tag')
+                    {
+                        # Return some mock tags to simulate existing tags
+                        $global:LASTEXITCODE = 0
+                        return @('v1.0.0', 'v2.0.0')
                     }
                     else
                     {
@@ -196,12 +208,58 @@ Describe 'Push-GitTag' {
         }
     }
 
+    Context 'When pushing all tags with no local tags (no-op)' {
+        BeforeAll {
+            Mock -CommandName git -MockWith {
+                if ($args[0] -eq 'tag')
+                {
+                    # Return empty string to simulate no existing tags
+                    $global:LASTEXITCODE = 0
+                    return ''
+                }
+                elseif ($args[0] -eq 'push')
+                {
+                    # This should not be called, but if it is, we'll allow it for now
+                    $global:LASTEXITCODE = 0
+                }
+                else
+                {
+                    throw "Mock git unexpected args: $($args -join ' ')"
+                }
+            }
+        }
+
+        AfterEach {
+            $global:LASTEXITCODE = 0
+        }
+
+        It 'Should succeed without calling git push when no local tags exist' {
+            { Push-GitTag -Force } | Should -Not -Throw
+
+            # Verify git tag was called to check for tags
+            Should -Invoke -CommandName git -ParameterFilter {
+                $args[0] -eq 'tag'
+            } -Times 1
+
+            # Verify git push was NOT called since no tags exist - if this fails, it means the logic needs adjustment
+            Should -Invoke -CommandName git -ParameterFilter {
+                $args[0] -eq 'push'
+            } -Times 0 -Because "no git push should occur when no local tags exist"
+        }
+    }
+
     Context 'When ShouldProcess is used' {
         BeforeAll {
             Mock -CommandName git -MockWith {
                 if ($args[0] -eq 'push')
                 {
                     $global:LASTEXITCODE = 0
+                }
+                elseif ($args[0] -eq 'tag')
+                {
+                    # Return some mock tags for WhatIf testing
+                    $global:LASTEXITCODE = 0
+                    return @('v1.0.0')
                 }
                 else
                 {
@@ -233,6 +291,12 @@ Describe 'Push-GitTag' {
                 if ($args[0] -eq 'push')
                 {
                     $global:LASTEXITCODE = 0
+                }
+                elseif ($args[0] -eq 'tag')
+                {
+                    # Return some mock tags for Force testing
+                    $global:LASTEXITCODE = 0
+                    return @('v1.0.0')
                 }
                 else
                 {

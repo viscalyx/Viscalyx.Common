@@ -108,7 +108,7 @@ function Push-GitTag
         if (-not $PSBoundParameters.ContainsKey('Name'))
         {
             $localTags = git tag
-            if ($LASTEXITCODE -ne 0 -or -not $localTags)
+            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrEmpty($localTags) -or ($localTags -is [array] -and $localTags.Count -eq 0))
             {
                 # No local tags exist or failed to get tags, this is a no-op case
                 return
