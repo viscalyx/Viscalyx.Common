@@ -45,33 +45,31 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
 
         # Initialize a git repository
         Push-Location -Path $script:testRepoPath
-        try {
-            & git init --quiet
-            & git config user.name "Test User"
-            & git config user.email "test@example.com"
+        try
+        {
+            & git init --quiet --initial-branch=main
+            & git config user.name 'Test User'
+            & git config user.email 'test@example.com'
 
             # Create an initial commit on main branch
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Test Repository'
             & git add README.md
-            & git commit -m "Initial commit" --quiet
-
-            # Ensure we're on main branch (some Git versions default to master)
-            & git branch -M main 2>$null || $true
+            & git commit -m 'Initial commit' --quiet
 
             # Create a feature branch for testing
             & git checkout -b 'feature/test-branch' --quiet
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'feature.txt') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'feature.txt') -Value 'Feature content'
             & git add feature.txt
-            & git commit -m "Add feature file" --quiet
+            & git commit -m 'Add feature file' --quiet
 
             # Create a development branch with additional commits
             & git checkout -b 'develop' --quiet
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'develop.txt') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'develop.txt') -Value 'Development content'
             & git add develop.txt
-            & git commit -m "Add development file" --quiet
+            & git commit -m 'Add development file' --quiet
 
             # Switch back to main branch
             & git checkout main --quiet
@@ -79,7 +77,7 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
             # Add more commits to main for testing updates
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value "# Test Repository`nUpdated content"
             & git add README.md
-            & git commit -m "Update README" --quiet
+            & git commit -m 'Update README' --quiet
 
             # Create a simple remote by creating another local repository
             $script:remoteRepoPath = Join-Path -Path $TestDrive -ChildPath 'RemoteRepo'
@@ -89,51 +87,90 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
             & git remote add origin $script:remoteRepoPath
 
             # Push branches to remote and set up tracking
-            & git push origin main --quiet 2>$null || $true
-            & git push origin develop --quiet 2>$null || $true
-            & git push origin feature/test-branch --quiet 2>$null || $true
+            try
+            {
+                & git push origin main --quiet 2>$null
+            }
+            catch
+            {
+            }
+            try
+            {
+                & git push origin develop --quiet 2>$null
+            }
+            catch
+            {
+            }
+            try
+            {
+                & git push origin feature/test-branch --quiet 2>$null
+            }
+            catch
+            {
+            }
 
             # Set up proper tracking branches
-            & git branch --set-upstream-to=origin/main main 2>$null || $true
-            & git branch --set-upstream-to=origin/develop develop 2>$null || $true
-            & git branch --set-upstream-to=origin/feature/test-branch feature/test-branch 2>$null || $true
-
-            # Create some additional commits in the "remote" to test fetching
+            try
+            {
+                & git branch --set-upstream-to=origin/main main 2>$null
+            }
+            catch
+            {
+            }
+            try
+            {
+                & git branch --set-upstream-to=origin/develop develop 2>$null
+            }
+            catch
+            {
+            }
+            try
+            {
+                & git branch --set-upstream-to=origin/feature/test-branch feature/test-branch 2>$null
+            }
+            catch
+            {
+            }            # Create some additional commits in the "remote" to test fetching
             Push-Location -Path $script:remoteRepoPath
-            try {
+            try
+            {
                 # Since it's a bare repo, we need to work around this by cloning it temporarily
                 $script:tempRemoteWorkPath = Join-Path -Path $TestDrive -ChildPath 'TempRemoteWork'
                 & git clone $script:remoteRepoPath $script:tempRemoteWorkPath --quiet
                 Push-Location -Path $script:tempRemoteWorkPath
-                try {
-                    & git config user.name "Remote User"
-                    & git config user.email "remote@example.com"
+                try
+                {
+                    & git config user.name 'Remote User'
+                    & git config user.email 'remote@example.com'
 
                     # Add commits to main branch
                     Set-Content -Path (Join-Path -Path $script:tempRemoteWorkPath -ChildPath 'CHANGELOG.md') -Value '# Changelog'
                     & git add CHANGELOG.md
-                    & git commit -m "Add CHANGELOG" --quiet
+                    & git commit -m 'Add CHANGELOG' --quiet
                     & git push origin main --quiet
 
                     # Add commits to develop branch
                     & git checkout develop --quiet
                     Set-Content -Path (Join-Path -Path $script:tempRemoteWorkPath -ChildPath 'develop.txt') -Value 'Updated development content'
                     & git add develop.txt
-                    & git commit -m "Update develop file" --quiet
+                    & git commit -m 'Update develop file' --quiet
                     & git push origin develop --quiet
 
                     # Go back to main
                     & git checkout main --quiet
                 }
-                finally {
+                finally
+                {
                     Pop-Location
                 }
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
         }
-        catch {
+        catch
+        {
             Pop-Location
             throw
         }
@@ -146,13 +183,16 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
         # Clean up temporary directories
         $previousProgressPreference = $ProgressPreference
         $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
-        if (Test-Path -Path $script:testRepoPath) {
+        if (Test-Path -Path $script:testRepoPath)
+        {
             Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         }
-        if (Test-Path -Path $script:remoteRepoPath) {
+        if (Test-Path -Path $script:remoteRepoPath)
+        {
             Remove-Item -Path $script:remoteRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         }
-        if (Test-Path -Path $script:tempRemoteWorkPath) {
+        if (Test-Path -Path $script:tempRemoteWorkPath)
+        {
             Remove-Item -Path $script:tempRemoteWorkPath -Recurse -Force -ErrorAction SilentlyContinue
         }
         $ProgressPreference = $previousProgressPreference
@@ -217,10 +257,12 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
                 being tested, but rather a known limitation of the integration test infrastructure. The retry
                 mechanism with 'git fetch origin' successfully recovers from these transient corruption issues.
             #>
-            try {
+            try
+            {
                 Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false -ErrorAction Stop
             }
-            catch {
+            catch
+            {
                 # If there's a repository corruption, try to recover by re-fetching all references
                 & git fetch origin --quiet 2>$null
                 Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false -ErrorAction Stop
@@ -298,9 +340,10 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
 
             # Test WhatIf by redirecting all streams and capturing output differently
             $whatIfOutput = $null
-            try {
+            try
+            {
                 # Use Start-Transcript temporarily to capture all output
-                $tempTranscriptPath = Join-Path $TestDrive "whatif-test.txt"
+                $tempTranscriptPath = Join-Path $TestDrive 'whatif-test.txt'
                 Start-Transcript -Path $tempTranscriptPath -Force
                 Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -WhatIf
                 Stop-Transcript
@@ -309,12 +352,15 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
                 $transcriptContent = Get-Content -Path $tempTranscriptPath -Raw
                 $whatIfOutput = $transcriptContent
             }
-            catch {
+            catch
+            {
                 Stop-Transcript -ErrorAction SilentlyContinue
                 throw
             }
-            finally {
-                if (Test-Path $tempTranscriptPath) {
+            finally
+            {
+                if (Test-Path $tempTranscriptPath)
+                {
                     $previousProgressPreference = $ProgressPreference
                     $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                     Remove-Item $tempTranscriptPath -ErrorAction SilentlyContinue
@@ -359,12 +405,19 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
             & git clone $script:remoteRepoPath $script:upstreamRepoPath --bare --quiet
 
             # Add upstream remote
-            & git remote add upstream $script:upstreamRepoPath 2>$null || $true
+            try
+            {
+                & git remote add upstream $script:upstreamRepoPath 2>$null
+            }
+            catch
+            {
+            }
         }
 
         AfterAll {
             Pop-Location
-            if (Test-Path -Path $script:upstreamRepoPath) {
+            if (Test-Path -Path $script:upstreamRepoPath)
+            {
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:upstreamRepoPath -Recurse -Force -ErrorAction SilentlyContinue

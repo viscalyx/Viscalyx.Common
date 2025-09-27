@@ -45,31 +45,34 @@ Describe 'Switch-GitLocalBranch Integration Tests' -Tag 'Integration' {
 
         # Initialize a git repository
         Push-Location -Path $script:testRepoPath
-        try {
-            & git init --quiet
-            & git config user.name "Test User"
-            & git config user.email "test@example.com"
+        try
+        {
+            & git init --quiet --initial-branch=main
+            & git config user.name 'Test User'
+            & git config user.email 'test@example.com'
 
             # Create an initial commit
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Test Repository'
             & git add README.md
-            & git commit -m "Initial commit" --quiet
+            & git commit -m 'Initial commit' --quiet
 
             # Create a feature branch for testing
             & git checkout -b 'feature/test-branch' --quiet
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'feature.txt') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'feature.txt') -Value 'Feature content'
             & git add feature.txt
-            & git commit -m "Add feature file" --quiet
+            & git commit -m 'Add feature file' --quiet
 
-            # Switch back to main/master branch
-            & git checkout main 2>$null || & git checkout master 2>$null
+            # Switch back to main branch
+            & git checkout main --quiet
         }
-        catch {
+        catch
+        {
             throw "Failed to setup test git repository: $($_.Exception.Message)"
         }
-        finally {
+        finally
+        {
             Pop-Location
         }
     }
@@ -78,43 +81,43 @@ Describe 'Switch-GitLocalBranch Integration Tests' -Tag 'Integration' {
         # Change to the test repository directory for each test
         Push-Location -Path $script:testRepoPath
 
-        # Ensure we're on the default branch (main or master) before each test
-        try {
-            & git checkout main 2>$null || & git checkout master 2>$null
-        }
-        catch {
-            # Ignore if branch doesn't exist
-        }
+        # Ensure we're on the main branch before each test
+        & git checkout main --quiet
     }
 
     AfterEach {
         # Return to original location after each test
-        try {
+        try
+        {
             Pop-Location
         }
-        catch {
+        catch
+        {
             # Ignore if we're already at the original location
         }
     }
 
     AfterAll {
         # Clean up and return to original location
-        try {
-            if (Get-Location | Where-Object { $_.Path -eq $script:testRepoPath }) {
+        try
+        {
+            if (Get-Location | Where-Object { $_.Path -eq $script:testRepoPath })
+            {
                 Pop-Location
             }
             Set-Location -Path $script:originalLocation
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors
         }
     }
 
     Context 'When switching to an existing branch' {
         It 'Should successfully switch to feature branch' {
-            # Verify we're on the default branch first
+            # Verify we're on the main branch first
             $currentBranch = & git branch --show-current
-            $currentBranch | Should -BeIn @('main', 'master')
+            $currentBranch | Should -Be 'main'
 
             # Switch to feature branch
             { Switch-GitLocalBranch -Name 'feature/test-branch' -Force } | Should -Not -Throw
@@ -130,22 +133,12 @@ Describe 'Switch-GitLocalBranch Integration Tests' -Tag 'Integration' {
             $currentBranch = & git branch --show-current
             $currentBranch | Should -Be 'feature/test-branch'
 
-            # Get the default branch name
-            $defaultBranch = & git symbolic-ref refs/remotes/origin/HEAD 2>$null
-            if ($defaultBranch) {
-                $defaultBranch = $defaultBranch -replace 'refs/remotes/origin/', ''
-            } else {
-                # Fallback to checking existing branches
-                $branches = & git branch --format='%(refname:short)'
-                $defaultBranch = if ($branches -contains 'main') { 'main' } else { 'master' }
-            }
-
-            # Switch back to default branch
-            { Switch-GitLocalBranch -Name $defaultBranch -Force } | Should -Not -Throw
+            # Switch back to main branch (we know it's main since we set it explicitly)
+            { Switch-GitLocalBranch -Name 'main' -Force } | Should -Not -Throw
 
             # Verify we switched branches
             $newBranch = & git branch --show-current
-            $newBranch | Should -Be $defaultBranch
+            $newBranch | Should -Be 'main'
         }
     }
 
@@ -167,7 +160,7 @@ Describe 'Switch-GitLocalBranch Integration Tests' -Tag 'Integration' {
 
             {
                 Switch-GitLocalBranch -Name 'feature/test-branch' -Force 2>$null
-            } | Should -Throw -ExpectedMessage "*There are unstaged or staged changes*"
+            } | Should -Throw -ExpectedMessage '*There are unstaged or staged changes*'
 
             # Clean up
             & git reset --hard HEAD --quiet 2>$null
@@ -180,7 +173,7 @@ Describe 'Switch-GitLocalBranch Integration Tests' -Tag 'Integration' {
 
             {
                 Switch-GitLocalBranch -Name 'feature/test-branch' -Force 2>$null
-            } | Should -Throw -ExpectedMessage "*There are unstaged or staged changes*"
+            } | Should -Throw -ExpectedMessage '*There are unstaged or staged changes*'
 
             # Clean up
             & git checkout -- README.md 2>$null

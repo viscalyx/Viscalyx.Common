@@ -45,33 +45,31 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
 
         # Initialize a git repository
         Push-Location -Path $script:testRepoPath
-        try {
-            & git init --quiet
-            & git config user.name "Test User"
-            & git config user.email "test@example.com"
+        try
+        {
+            & git init --quiet --initial-branch=main
+            & git config user.name 'Test User'
+            & git config user.email 'test@example.com'
 
             # Create an initial commit on main branch
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Test Repository'
             & git add README.md
-            & git commit -m "Initial commit" --quiet
-
-            # Ensure we're on main branch (some Git versions default to master)
-            & git branch -M main 2>$null || $true
+            & git commit -m 'Initial commit' --quiet
 
             # Create a feature branch for testing
             & git checkout -b 'feature/test-branch' --quiet
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'feature.txt') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'feature.txt') -Value 'Feature content'
             & git add feature.txt
-            & git commit -m "Add feature file" --quiet
+            & git commit -m 'Add feature file' --quiet
 
             # Create a development branch with additional commits
             & git checkout -b 'develop' --quiet
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'develop.txt') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'develop.txt') -Value 'Development content'
             & git add develop.txt
-            & git commit -m "Add development file" --quiet
+            & git commit -m 'Add development file' --quiet
 
             # Switch back to main branch
             & git checkout main --quiet
@@ -79,29 +77,67 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
             # Add more commits to main for testing updates
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value "# Test Repository`nUpdated content"
             & git add README.md
-            & git commit -m "Update README" --quiet
+            & git commit -m 'Update README' --quiet
 
             # Create a simple remote by creating another local repository
             $script:remoteRepoPath = Join-Path -Path $TestDrive -ChildPath 'RemoteRepo'
             & git clone $script:testRepoPath $script:remoteRepoPath --quiet
 
-            # Add remote to our test repository  
+            # Add remote to our test repository
             & git remote add origin $script:remoteRepoPath
 
             # Push branches to remote and set up tracking
-            & git push origin main --quiet 2>$null || $true
-            & git push origin develop --quiet 2>$null || $true  
-            & git push origin feature/test-branch --quiet 2>$null || $true
-            
+            try
+            {
+                & git push origin main --quiet 2>$null
+            }
+            catch
+            {
+            }
+            try
+            {
+                & git push origin develop --quiet 2>$null
+            }
+            catch
+            {
+            }
+            try
+            {
+                & git push origin feature/test-branch --quiet 2>$null
+            }
+            catch
+            {
+            }
+
             # Set up proper tracking branches
-            & git branch --set-upstream-to=origin/main main 2>$null || $true
-            & git branch --set-upstream-to=origin/develop develop 2>$null || $true
-            & git branch --set-upstream-to=origin/feature/test-branch feature/test-branch 2>$null || $true
+            try
+            {
+                & git branch --set-upstream-to=origin/main main 2>$null
+            }
+            catch
+            {
+            }
+            try
+            {
+                & git branch --set-upstream-to=origin/develop develop 2>$null
+            }
+            catch
+            {
+            }
+            try
+            {
+                & git branch --set-upstream-to=origin/feature/test-branch feature/test-branch 2>$null
+            }
+            catch
+            {
+            }
         }
-        catch {
+        catch
+        {
             throw "Failed to setup test git repository: $($_.Exception.Message)"
         }
-        finally {
+        finally
+        {
             Pop-Location
         }
     }
@@ -111,29 +147,32 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
         Push-Location -Path $script:testRepoPath
 
         # Force cleanup and reset to a known good state
-        try {
+        try
+        {
             # Clean any uncommitted changes
             & git reset --hard HEAD --quiet 2>$null
             & git clean -fd --quiet 2>$null
-            
+
             # Try to checkout main branch
             & git checkout main --quiet 2>$null
-            
+
             # If that fails, try master
-            if ($LASTEXITCODE -ne 0) {
+            if ($LASTEXITCODE -ne 0)
+            {
                 & git checkout master --quiet 2>$null
             }
-            
+
             # Reset again to make sure we're clean
             & git reset --hard HEAD --quiet 2>$null
-            
+
             # Ensure we have the latest from remote
             & git fetch origin --quiet 2>$null
-            
+
             # Reset exit code for tests
             $global:LASTEXITCODE = 0
         }
-        catch {
+        catch
+        {
             # If we can't get to a clean state, at least ensure we're in the repo directory
             Write-Warning "Could not reset repository state: $($_.Exception.Message)"
         }
@@ -141,23 +180,28 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
 
     AfterEach {
         # Return to original location after each test
-        try {
+        try
+        {
             Pop-Location
         }
-        catch {
+        catch
+        {
             # Ignore if we're already at the original location
         }
     }
 
     AfterAll {
         # Clean up and return to original location
-        try {
-            if (Get-Location | Where-Object { $_.Path -eq $script:testRepoPath }) {
+        try
+        {
+            if (Get-Location | Where-Object { $_.Path -eq $script:testRepoPath })
+            {
                 Pop-Location
             }
             Set-Location -Path $script:originalLocation
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors
         }
     }
@@ -166,12 +210,14 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
         It 'Should successfully update main branch using pull' {
             # Simulate a remote change by updating the remote repo
             Push-Location -Path $script:remoteRepoPath
-            try {
+            try
+            {
                 Set-Content -Path (Join-Path -Path $script:remoteRepoPath -ChildPath 'remote-change.txt') -Value 'Remote change'
                 & git add remote-change.txt
-                & git commit -m "Remote change" --quiet
+                & git commit -m 'Remote change' --quiet
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
 
@@ -185,7 +231,7 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
             $currentBranch = & git branch --show-current
             $currentBranch | Should -Be 'main'
 
-            # Note: In this simple setup, we don't expect the commit to change 
+            # Note: In this simple setup, we don't expect the commit to change
             # unless we properly set up fetch/pull, but the command should not fail
         }
 
@@ -229,13 +275,13 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
         It 'Should return to original branch after update' -Skip {
             # This test is skipped due to Git repository state management complexity
             # The core functionality is tested in unit tests
-            Set-ItResult -Skipped -Because "Git repository state management complexity"
+            Set-ItResult -Skipped -Because 'Git repository state management complexity'
         }
 
         It 'Should not switch if already on target branch' -Skip {
-            # This test is skipped due to Git repository state management complexity  
+            # This test is skipped due to Git repository state management complexity
             # The core functionality is tested in unit tests
-            Set-ItResult -Skipped -Because "Git repository state management complexity"
+            Set-ItResult -Skipped -Because 'Git repository state management complexity'
         }
     }
 
@@ -243,7 +289,7 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
         It 'Should not switch branches but still update remote tracking' -Skip {
             # This test is skipped due to remote tracking complexity in test environment
             # The core functionality is tested in unit tests
-            Set-ItResult -Skipped -Because "Remote tracking complexity in test environment"
+            Set-ItResult -Skipped -Because 'Remote tracking complexity in test environment'
         }
     }
 
@@ -251,7 +297,7 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
         It 'Should only update remote tracking branch without local changes' -Skip {
             # This test is skipped due to remote tracking complexity in test environment
             # The core functionality is tested in unit tests
-            Set-ItResult -Skipped -Because "Remote tracking complexity in test environment"
+            Set-ItResult -Skipped -Because 'Remote tracking complexity in test environment'
         }
     }
 
@@ -259,7 +305,7 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
         It 'Should use existing tracking branch without fetching' -Skip {
             # This test is skipped due to tracking branch setup complexity in test environment
             # The core functionality is tested in unit tests
-            Set-ItResult -Skipped -Because "Tracking branch setup complexity in test environment"
+            Set-ItResult -Skipped -Because 'Tracking branch setup complexity in test environment'
         }
     }
 
@@ -326,8 +372,8 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
     Context 'When testing different upstream branch names' {
         It 'Should successfully pull from different upstream branch' -Skip {
             # This test is skipped due to upstream branch setup complexity in test environment
-            # The core functionality is tested in unit tests  
-            Set-ItResult -Skipped -Because "Upstream branch setup complexity in test environment"
+            # The core functionality is tested in unit tests
+            Set-ItResult -Skipped -Because 'Upstream branch setup complexity in test environment'
         }
     }
 
@@ -338,12 +384,20 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
             & git clone $script:testRepoPath $script:upstreamRepoPath --quiet
 
             Push-Location -Path $script:testRepoPath
-            try {
+            try
+            {
                 & git remote add upstream $script:upstreamRepoPath
                 # Set up tracking for upstream remote as well
-                & git branch --set-upstream-to=upstream/main main 2>$null || $true
+                try
+                {
+                    & git branch --set-upstream-to=upstream/main main 2>$null
+                }
+                catch
+                {
+                }
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
         }
@@ -351,7 +405,7 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
         It 'Should successfully pull from different remote' -Skip {
             # This test is skipped due to multiple remotes setup complexity in test environment
             # The core functionality is tested in unit tests
-            Set-ItResult -Skipped -Because "Multiple remotes setup complexity in test environment"
+            Set-ItResult -Skipped -Because 'Multiple remotes setup complexity in test environment'
         }
     }
 }
