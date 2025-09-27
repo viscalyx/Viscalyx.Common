@@ -24,7 +24,15 @@ BeforeDiscovery {
 }
 
 BeforeAll {
+    # Save the original location before any operations
+    $script:originalLocation = Get-Location
+
     $script:moduleName = 'Viscalyx.Common'
+
+    # Initialize all script-level path variables to prevent null reference errors in AfterAll
+    $script:testRepoPath = $null
+    $script:bareRepoPath = $null
+    $script:secondRepoPath = $null
 
     Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 
@@ -125,11 +133,11 @@ AfterAll {
     # Clean up - return to original location if we're still in test directories
     $currentLocation = Get-Location
     if ($currentLocation.Path.StartsWith($TestDrive)) {
-        Set-Location -Path $PSScriptRoot
+        Set-Location -Path $script:originalLocation
     }
     
     # Force cleanup of git repositories to prevent TestDrive deletion issues
-    if (Test-Path -Path $script:testRepoPath) {
+    if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath)) {
         try {
             # Remove read-only attributes from .git directory recursively
             Get-ChildItem -Path $script:testRepoPath -Recurse -Force | ForEach-Object {
@@ -144,7 +152,7 @@ AfterAll {
         }
     }
     
-    if (Test-Path -Path $script:secondRepoPath) {
+    if ($script:secondRepoPath -and (Test-Path -Path $script:secondRepoPath)) {
         try {
             # Remove read-only attributes from .git directory recursively
             Get-ChildItem -Path $script:secondRepoPath -Recurse -Force | ForEach-Object {
@@ -159,7 +167,7 @@ AfterAll {
         }
     }
     
-    if (Test-Path -Path $script:bareRepoPath) {
+    if ($script:bareRepoPath -and (Test-Path -Path $script:bareRepoPath)) {
         try {
             # Remove read-only attributes from .git directory recursively
             Get-ChildItem -Path $script:bareRepoPath -Recurse -Force | ForEach-Object {
