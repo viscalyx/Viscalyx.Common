@@ -396,8 +396,8 @@ Describe 'Get-GitBranchCommit Integration Tests' {
             }
             finally {
                 # Clean up
-                git checkout $script:currentBranch 2> $null
-                git branch -D 'test-range-branch' 2> $null
+                git checkout $script:currentBranch 2>$null
+                git branch -D 'test-range-branch' 2>$null
                 Remove-Item -Path 'test-range-file.txt' -ErrorAction SilentlyContinue
             }
         }
