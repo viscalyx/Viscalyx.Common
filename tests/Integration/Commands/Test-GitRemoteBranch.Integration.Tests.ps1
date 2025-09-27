@@ -27,11 +27,17 @@ BeforeAll {
     $script:moduleName = 'Viscalyx.Common'
 
     Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
+
+    # Set a fallback default branch name for contexts that don't have git repositories
+    $script:fallbackBranch = 'main'
 }
 
 Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
     Context 'When repository has remotes configured' {
         BeforeEach {
+            # Set the branch name for consistent reference throughout the test
+            $script:defaultBranch = 'main'
+
             # Create a temporary directory for our test git repository
             $script:testRepoPath = Join-Path -Path $TestDrive -ChildPath "TestRepo_$([guid]::NewGuid().Guid)"
             New-Item -Path $script:testRepoPath -ItemType Directory -Force | Out-Null
@@ -42,8 +48,8 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
             # Change to the test repository directory
             Set-Location -Path $script:testRepoPath
 
-            # Initialize git repository
-            $null = git init --quiet 2>&1
+            # Initialize git repository with the specified default branch
+            $null = git init --initial-branch $script:defaultBranch --quiet 2>&1
             $null = git config user.email "test@example.com" 2>&1
             $null = git config user.name "Test User" 2>&1
 
@@ -52,9 +58,6 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
             $null = git add . 2>&1
             $null = git commit -m "Initial commit" --quiet 2>&1
 
-            # Ensure we're on the main branch (for consistency across Git versions)
-            $null = git branch -M main 2>&1
-
             # Create a bare repository to act as our "remote"
             $script:bareRepoPath = Join-Path -Path $TestDrive -ChildPath "BareRepo_$([guid]::NewGuid().Guid)"
             $null = git init --bare $script:bareRepoPath --quiet 2>&1
@@ -62,8 +65,11 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
             # Add the bare repository as a remote
             $null = git remote add origin $script:bareRepoPath 2>&1
 
-            # Push initial branch to create remote branch
-            $null = git push origin main --quiet 2>&1
+            # Push initial branch to create remote branch - capture output for debugging
+            $pushOutput = git push origin $script:defaultBranch --quiet 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                Write-Warning "Push failed with exit code $LASTEXITCODE. Output: $pushOutput"
+            }
         }
 
         AfterEach {
@@ -85,7 +91,7 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return true when testing existing remote branch' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'main'
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch
             $result | Should -BeTrue
         }
 
@@ -100,7 +106,7 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return false when testing non-existent remote' {
-            $result = Test-GitRemoteBranch -RemoteName 'nonexistent-remote' -Name 'main' 2>$null
+            $result = Test-GitRemoteBranch -RemoteName 'nonexistent-remote' -Name $script:defaultBranch 2>$null
             $result | Should -BeFalse
         }
 
@@ -119,12 +125,12 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
                 $null = git commit -m "Feature commit" --quiet 2>&1
                 $null = git push origin feature/test --quiet 2>&1
 
-                # Return to main branch
-                $null = git checkout main --quiet 2>&1
+                # Return to default branch
+                $null = git checkout $script:defaultBranch --quiet 2>&1
             }
 
             It 'Should return true when testing specific existing branches' {
-                Test-GitRemoteBranch -RemoteName 'origin' -Name 'main' | Should -BeTrue
+                Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch | Should -BeTrue
                 Test-GitRemoteBranch -RemoteName 'origin' -Name 'develop' | Should -BeTrue
                 Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test' | Should -BeTrue
             }
@@ -170,6 +176,9 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
 
     Context 'When no remotes are configured' {
         BeforeEach {
+            # Set the branch name for consistent reference throughout the test
+            $script:defaultBranch = 'main'
+
             # Create a temporary directory for our test git repository
             $script:testRepoPath = Join-Path -Path $TestDrive -ChildPath "NoRemoteRepo_$([guid]::NewGuid().Guid)"
             New-Item -Path $script:testRepoPath -ItemType Directory -Force | Out-Null
@@ -180,8 +189,8 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
             # Change to the test repository directory
             Set-Location -Path $script:testRepoPath
 
-            # Initialize git repository without any remotes
-            $null = git init --quiet 2>&1
+            # Initialize git repository with the specified default branch (no remotes)
+            $null = git init --initial-branch $script:defaultBranch --quiet 2>&1
             $null = git config user.email "test@example.com" 2>&1
             $null = git config user.name "Test User" 2>&1
 
@@ -207,7 +216,7 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return false when testing remote branch without configured remotes' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'main' 2>$null
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch 2>$null
             $result | Should -BeFalse
         }
 
@@ -251,7 +260,7 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return false when not in a git repository' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'main' 2>$null
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name $script:fallbackBranch 2>$null
             $result | Should -BeFalse
         }
 
@@ -268,6 +277,9 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
 
     Context 'When testing with unreachable remote' {
         BeforeEach {
+            # Set the branch name for consistent reference throughout the test
+            $script:defaultBranch = 'main'
+
             # Create a temporary directory for our test git repository
             $script:testRepoPath = Join-Path -Path $TestDrive -ChildPath "UnreachableRemoteRepo_$([guid]::NewGuid().Guid)"
             New-Item -Path $script:testRepoPath -ItemType Directory -Force | Out-Null
@@ -278,8 +290,8 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
             # Change to the test repository directory
             Set-Location -Path $script:testRepoPath
 
-            # Initialize git repository
-            $null = git init --quiet 2>&1
+            # Initialize git repository with the specified default branch
+            $null = git init --initial-branch $script:defaultBranch --quiet 2>&1
             $null = git config user.email "test@example.com" 2>&1
             $null = git config user.name "Test User" 2>&1
 
@@ -309,7 +321,7 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return false when remote is unreachable' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'main' 2>$null
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch 2>$null
             $result | Should -BeFalse
         }
 
