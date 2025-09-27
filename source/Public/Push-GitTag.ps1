@@ -104,6 +104,17 @@ function Push-GitTag
 
     if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
+        # When pushing all tags, check if there are any local tags to push
+        if (-not $PSBoundParameters.ContainsKey('Name'))
+        {
+            $localTags = git tag
+            if ($LASTEXITCODE -ne 0 -or -not $localTags)
+            {
+                # No local tags exist or failed to get tags, this is a no-op case
+                return
+            }
+        }
+
         git push @arguments
 
         if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE

@@ -58,6 +58,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   directory separators using `[System.IO.Path]::DirectorySeparatorChar` and
   removed complex cross-platform path handling.
 
+### Fixed
+
+- `Push-GitTag` now properly handles the no-op case when trying to push all
+  tags but no local tags exist, treating it as a successful operation instead
+  of throwing an error.
+
 ## [0.6.0] - 2025-09-25
 
 ### Added
