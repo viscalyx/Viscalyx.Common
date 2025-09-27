@@ -37,36 +37,36 @@ BeforeAll {
     try {
         # Initialize git repository
         git init --initial-branch=main --quiet 2>$null
-        git config user.email "test@example.com" *> $null
-        git config user.name "Test User" *> $null
+        git config user.email "test@example.com" 2>$null
+        git config user.name "Test User" 2>$null
 
         # Create initial commit
         "Initial content" | Out-File -FilePath 'test1.txt' -Encoding utf8
-        git add test1.txt *> $null
-        git commit -m "Initial commit" *> $null
+        git add test1.txt 2>$null
+        git commit -m "Initial commit" 2>$null
 
         # Create more commits for testing
         "Second content" | Out-File -FilePath 'test2.txt' -Encoding utf8
-        git add test2.txt *> $null
-        git commit -m "Second commit" *> $null
+        git add test2.txt 2>$null
+        git commit -m "Second commit" 2>$null
 
         "Third content" | Out-File -FilePath 'test3.txt' -Encoding utf8
-        git add test3.txt *> $null
-        git commit -m "Third commit" *> $null
+        git add test3.txt 2>$null
+        git commit -m "Third commit" 2>$null
 
         "Fourth content" | Out-File -FilePath 'test4.txt' -Encoding utf8
-        git add test4.txt *> $null
-        git commit -m "Fourth commit" *> $null
+        git add test4.txt 2>$null
+        git commit -m "Fourth commit" 2>$null
 
         "Fifth content" | Out-File -FilePath 'test5.txt' -Encoding utf8
-        git add test5.txt *> $null
-        git commit -m "Fifth commit" *> $null
+        git add test5.txt 2>$null
+        git commit -m "Fifth commit" 2>$null
 
         # Create a feature branch for testing
         git checkout -b feature/test --quiet 2>$null
         "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
-        git add feature.txt *> $null
-        git commit -m "Feature commit" *> $null
+        git add feature.txt 2>$null
+        git commit -m "Feature commit" 2>$null
 
         # Switch back to main branch
         git checkout main --quiet 2>$null
@@ -281,8 +281,8 @@ Describe 'Get-GitBranchCommit Integration Tests' {
             Push-Location -Path $emptyRepoPath
             try {
                 git init --initial-branch=main --quiet 2>$null
-                git config user.email "test@example.com" *> $null
-                git config user.name "Test User" *> $null
+                git config user.email "test@example.com" 2>$null
+                git config user.name "Test User" 2>$null
 
                 # Should throw error from Get-GitLocalBranchName for empty repository
                 { Get-GitBranchCommit -ErrorAction Stop } |
@@ -378,13 +378,13 @@ Describe 'Get-GitBranchCommit Integration Tests' {
             try {
                 # Make a commit on the feature branch
                 "Test range content" | Out-File -FilePath 'test-range-file.txt' -Encoding UTF8
-                git add . *> $null
-                git commit -m "Test range commit" *> $null
+                git add . 2>$null
+                git commit -m "Test range commit" 2>$null
 
                 # Switch back to current branch and get range
                 $currentGitBranch = git rev-parse --abbrev-ref HEAD 2>$null
                 if ($currentGitBranch -ne $script:currentBranch) {
-                    git checkout $script:currentBranch *> $null
+                    git checkout $script:currentBranch 2> $null
                 }
 
                 $result = Get-GitBranchCommit -From $script:currentBranch -To 'test-range-branch' -ErrorAction Stop
