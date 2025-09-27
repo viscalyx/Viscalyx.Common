@@ -136,7 +136,7 @@ function Get-GitBranchCommit
         'Last'
         {
             # Return the latest X number of commits.
-            $commitId = git log -n $Last --pretty=format:"%H" @argument
+            $commitId = git log -n $Last --pretty=format:"%H" @argument 2>$null
 
             $exitCode = $LASTEXITCODE
         }
@@ -159,7 +159,7 @@ function Get-GitBranchCommit
                 $skipCommits = $totalCommits - $First
 
                 # Return the first X number of commits.
-                $commitId = git log --skip $skipCommits --reverse -n $First --pretty=format:"%H" $BranchName
+                $commitId = git log --skip $skipCommits --reverse -n $First --pretty=format:"%H" $BranchName 2>$null
 
                 $exitCode = $LASTEXITCODE
             }
@@ -168,7 +168,7 @@ function Get-GitBranchCommit
         'Range'
         {
             # Return commits between From and To references using git range syntax
-            $commitId = git log --pretty=format:"%H" "$From..$To"
+            $commitId = git log --pretty=format:"%H" "$From..$To" 2>$null
 
             $exitCode = $LASTEXITCODE
         }
@@ -176,7 +176,7 @@ function Get-GitBranchCommit
         'NoParameter'
         {
             # Return all commit IDs.
-            $commitId = git log --pretty=format:"%H" @argument
+            $commitId = git log --pretty=format:"%H" @argument 2>$null
 
             $exitCode = $LASTEXITCODE
         }
