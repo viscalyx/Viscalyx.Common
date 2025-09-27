@@ -5,58 +5,141 @@
         classes (that are not a DSC resource).
 #>
 
+# cSpell: ignore unstaged
 ConvertFrom-StringData @'
+    ## Disable-CursorShortcutCode
+    Disable_CursorShortcutCode_CursorPathNotFound = Cursor path not found in the PATH environment variable. Exiting. (DCSC0001)
+    Disable_CursorShortcutCode_MultipleCursorPaths = More than one Cursor path was found in the PATH environment variable. (DCSC0002)
+    Disable_CursorShortcutCode_RenameCodeCmd_ShouldProcessDescription = Renaming 'code.cmd' to 'code.cmd.old' in the Cursor path '{0}'.
+    Disable_CursorShortcutCode_RenameCodeCmd_ShouldProcessConfirmation = Are you sure you want to rename 'code.cmd' to 'code.cmd.old'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Disable_CursorShortcutCode_RenameCodeCmd_ShouldProcessCaption = Rename code.cmd
+    Disable_CursorShortcutCode_RenamedCodeCmd = Renamed code.cmd to code.cmd.old (DCSC0003)
+    Disable_CursorShortcutCode_CodeCmdNotFound = File 'code.cmd' not found in the Cursor path. Skipping. (DCSC0004)
+    Disable_CursorShortcutCode_RenameCode_ShouldProcessDescription = Renaming 'code' to 'code.old' in the Cursor path '{0}'.
+    Disable_CursorShortcutCode_RenameCode_ShouldProcessConfirmation = Are you sure you want to rename 'code' to 'code.old'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Disable_CursorShortcutCode_RenameCode_ShouldProcessCaption = Rename code
+    Disable_CursorShortcutCode_RenamedCode = Renamed code to code.old (DCSC0005)
+    Disable_CursorShortcutCode_CodeNotFound = File 'code' not found in the Cursor path. Skipping. (DCSC0006)
+
+    ## Assert-GitLocalChange
+    Assert_GitLocalChanges_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
+
+    ## Assert-GitRemote
+    Assert_GitRemote_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (AGR0001)
+
+    ## Get-GitLocalBranchName
+    Get_GitLocalBranchName_Failed = Failed to get the name of the local branch. Make sure git repository is accessible.
+
+    ## Get-GitBranchCommit
+    Get_GitBranchCommit_FailedFromBranch = Failed to retrieve commits. Make sure the branch '{0}' exists and is accessible. (GGBC0001)
+    Get_GitBranchCommit_FailedFromCurrent = Failed to retrieve commits from current branch. (GGBC0002)
+    Get_GitBranchCommit_FailedFromRange = Failed to retrieve commits from range '{0}..{1}'. Make sure both references exist and are accessible. (GGBC0003)
+
+    ## Get-GitRemote
+    Get_GitRemote_Failed = Failed to get the remote '{0}'. Make sure the remote exists and is accessible.
+
+    ## Get-GitRemoteBranch
+    Get_GitRemoteBranch_Failed = Failed to get the remote branches'. Make sure the remote branch exists and is accessible.
+    Get_GitRemoteBranch_FromRemote_Failed = Failed to get the remote branches from remote '{0}'. Make sure the remote branch exists and is accessible.
+    Get_GitRemoteBranch_ByName_Failed = Failed to get the remote branch '{0}' using the remote '{1}'. Make sure the remote branch exists and is accessible.
+    Get_GitRemoteBranch_RemoteNotFound = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (GGRB0002)
+
+    ## Get-GitTag
+    Get_GitTag_FailedToGetTag = Failed to get the tag '{0}'. Make sure the tags exist and is accessible.
+
+    ## Rename-GitLocalBranch
+    Rename_GitLocalBranch_FailedToRename = Failed to rename branch '{0}' to '{1}'. Make sure the local repository is accessible.
+    Rename_GitLocalBranch_FailedFetch = Failed to fetch from remote '{0}'. Make sure the remote exists and is accessible.
+    Rename_GitLocalBranch_FailedSetUpstreamTracking = Failed to set upstream tracking for branch '{0}' against remote '{1}'. Make sure the local repository is accessible.
+    Rename_GitLocalBranch_FailedSetDefaultBranchForRemote = Failed to set '{0}' as the default branch for remote '{1}'. Make sure the local repository is accessible.
+    Rename_GitLocalBranch_RenamedBranch = Successfully renamed branch '{0}' to '{1}'.
+
+    ## Rename-GitRemote
+    Rename_GitRemote_FailedToRename = Failed to rename remote '{0}' to '{1}'. Make sure the remote exists and the local repository is accessible.
+    Rename_GitRemote_RenamedRemote = Successfully renamed remote '{0}' to '{1}'.
+
+    ## New-GitTag
+    New_GitTag_ShouldProcessVerboseDescription = Creating tag '{0}'.
+    New_GitTag_ShouldProcessVerboseWarning = Are you sure you want to create tag '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    New_GitTag_ShouldProcessCaption = Create tag
+    New_GitTag_FailedToCreateTag = Failed to create tag '{0}'. Make sure the local repository is accessible.
+
     ## New-SamplerGitHubReleaseTag
-    New_SamplerGitHubReleaseTag_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (NSGRT0001)
-    New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote = Failed to fetch branch '{0}' from the remote '{1}'. Make sure the branch exists in the remote git repository and the remote is accessible. (NSGRT0002)
-    New_SamplerGitHubReleaseTag_FailedGetLocalBranchName = Failed to get the name of the local branch. Make sure the local branch exists and is accessible. (NSGRT0003)
-    New_SamplerGitHubReleaseTag_FailedCheckoutLocalBranch = Failed to checkout the local branch '{0}'. Make sure the branch exists and is accessible. (NSGRT0004)
-    New_SamplerGitHubReleaseTag_FailedRebaseLocalDefaultBranch = Failed to rebase the local default branch '{0}' using '{1}/{0}'. Make sure the branch exists and is accessible. (NSGRT0005)
-    New_SamplerGitHubReleaseTag_FailedGetLastCommitId = Failed to get the last commit id of the local branch '{0}'. Make sure the branch exists and is accessible. (NSGRT0006)
-    New_SamplerGitHubReleaseTag_FailedFetchTagsFromUpstreamRemote = Failed to fetch tags from the upstream remote '{0}'. Make sure the remote exists and is accessible. (NSGRT0007)
-    New_SamplerGitHubReleaseTag_FailedGetTagsOrMissingTagsInLocalRepository = Failed to get tags from the local repository or the tags are missing. Make sure that at least one preview tag exist in the local repository, or specify a release tag. (NSGRT0008)
-    New_SamplerGitHubReleaseTag_FailedDescribeTags = Failed to describe the tags. Make sure the tags exist in the local repository. (NSGRT0009)
     New_SamplerGitHubReleaseTag_LatestTagIsNotPreview = The latest tag '{0}' is not a preview tag or not a correctly formatted preview tag. Make sure the latest tag is a preview tag, or specify a release tag. (NSGRT0010)
-    New_SamplerGitHubReleaseTag_FailedCheckoutPreviousBranch = Failed to checkout the previous branch '{0}'. (NSGRT0011)
-    New_SamplerGitHubReleaseTag_FailedCreateTag = Failed to create git tag '{0}'. (NSGRT0035)
-
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessDescription = Fetching branch '{0}' from the upstream remote '{1}'. (NSGRT0012)
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessConfirmation = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'? (NSGRT0013)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessCaption = Fetch upstream branch (NSGRT0014)
-
-    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessDescription = Switching to and rebasing the local default branch '{0}' using the upstream branch '{1}/{0}'. (NSGRT0015)
-    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessConfirmation = Are you sure you want to switch to and rebase the local branch '{0}'? (NSGRT0016)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_Rebase_ShouldProcessCaption = Rebase the local default branch (NSGRT0017)
-
-    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessDescription = Fetching the tags from (upstream) remote '{0}'. (NSGRT0018)
-    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessConfirmation = Are you sure you want to fetch tags from remote '{0}'? (NSGRT0019)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessCaption = Fetch tags from remote (NSGRT0020)
-
+    New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository = Tags are missing. Make sure that at least one preview tag exist in the local repository, or specify a release tag. (NSGRT0008)
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessDescription = Creating tag '{0}' for commit '{2}' in the local branch '{1}'. (NSGRT0021)
     New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessDescription = Creating tag for commit in the local branch '{1}'. Note: Actual tag name and commit id cannot be determined during -WhatIf. (NSGRT0022)
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation = Are you sure you want to create tag '{0}'? (NSGRT0023)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessCaption = Create tag (NSGRT0024)
-
-    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessDescription = Switching back to previous local branch '{0}'. (NSGRT0025)
-    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessConfirmation = Are you sure you want to switch back to previous local branch '{0}'? (NSGRT0026)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption = Switch to previous branch (NSGRT0027)
-
-    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage = Do you want to push the tags to the remote repository '{0}'? (NSGRT0028)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldContinue messages.
-    New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption = Push tag to remote repository (NSGRT0029)
-
-    New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription = Pushing tag '{0}' to the remote repository '{1}'. (NSGRT0032)
-    New_SamplerGitHubReleaseTag_PushTag_ShouldProcessConfirmation = Are you sure you want to push tag '{0}' to the remote repository '{1}'? (NSGRT0033)
-    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    New_SamplerGitHubReleaseTag_PushTag_ShouldProcessCaption = Push tag to remote repository (NSGRT0034)
-
     New_SamplerGitHubReleaseTag_TagCreatedAndPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created and pushed to the remote repository '{1}'.[0m (NSGRT0030)
     New_SamplerGitHubReleaseTag_TagCreatedNotPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created, but not pushed. To push the tag to the remote repository, run '[39mgit push {1} --tags[32m'.[0m (NSGRT0031)
+
+    ## Push-GitTag
+    Push_GitTag_PushTag_ShouldProcessVerboseDescription = Pushing tag '{0}' to remote '{1}'.
+    Push_GitTag_PushTag_ShouldProcessVerboseWarning = Are you sure you want to push tag '{0}' to remote '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Push_GitTag_PushTag_ShouldProcessCaption = Push tag
+    Push_GitTag_PushAllTags_ShouldProcessVerboseDescription = Pushing all tags to remote '{0}'.
+    Push_GitTag_PushAllTags_ShouldProcessVerboseWarning = Are you sure you want to push all tags to remote '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Push_GitTag_PushAllTags_ShouldProcessCaption = Push all tags
+    Push_GitTag_FailedPushTag = Failed to push tag '{0}' to remote '{1}'.
+    Push_GitTag_FailedPushAllTags = Failed to push all tags to remote '{0}'.
+
+    ## Receive-GitBranch
+    Receive_GitBranch_CheckoutBranch = Checking out branch '{0}'. (RGB0005)
+    Receive_GitBranch_FailedCheckout = Failed to checkout branch '{0}'. Make sure the branch exists and is accessible. (RGB0006)
+    Receive_GitBranch_FetchUpstream = Fetching upstream branch '{0}' from remote '{1}'. (RGB0007)
+    Receive_GitBranch_FailedFetch = Failed to fetch upstream branch '{1}' from remote '{0}'. Make sure the branch exists and is accessible. (RGB0008)
+    Receive_GitBranch_RebaseWithUpstream = Rebasing with upstream branch '{1}' from remote '{0}'. (RGB0009)
+    Receive_GitBranch_FailedRebase = Failed to rebase with upstream branch '{1}' from remote '{0}'. Make sure the branches exist and are accessible. (RGB0010)
+    Receive_GitBranch_PullChanges = Pulling changes into current branch. (RGB0011)
+    Receive_GitBranch_FailedPull = Failed to pull changes into current branch. Make sure the branch exists and is accessible. (RGB0012)
+    Receive_GitBranch_Success = Successfully updated branch. (RGB0013)
+    Receive_GitBranch_CheckoutRebase_ShouldProcessVerboseDescription = Checking out branch '{0}' and rebasing with upstream branch '{2}' from remote '{1}'.
+    Receive_GitBranch_CheckoutRebase_ShouldProcessVerboseWarning = Are you sure you want to checkout and rebase branch '{0}' with upstream branch '{2}' from remote '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_CheckoutRebase_ShouldProcessCaption = Checkout and rebase branch
+    Receive_GitBranch_CheckoutPull_ShouldProcessVerboseDescription = Checking out branch '{0}' and pulling latest changes.
+    Receive_GitBranch_CheckoutPull_ShouldProcessVerboseWarning = Are you sure you want to checkout and pull into branch '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_CheckoutPull_ShouldProcessCaption = Checkout and pull branch
+    Receive_GitBranch_Rebase_ShouldProcessVerboseDescription = Rebasing current branch with upstream branch '{1}' from remote '{0}'.
+    Receive_GitBranch_Rebase_ShouldProcessVerboseWarning = Are you sure you want to rebase current branch with upstream branch '{1}' from remote '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_Rebase_ShouldProcessCaption = Rebase current branch
+    Receive_GitBranch_Pull_ShouldProcessVerboseDescription = Pulling latest changes into current branch.
+    Receive_GitBranch_Pull_ShouldProcessVerboseWarning = Are you sure you want to pull into current branch?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_Pull_ShouldProcessCaption = Pull into current branch
+
+    ## Remove-GitTag
+    Remove_GitTag_Local_ShouldProcessVerboseDescription = Removing tag '{0}' from local repository.
+    Remove_GitTag_Local_ShouldProcessVerboseWarning = Are you sure you want to remove tag '{0}' from the local repository?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Remove_GitTag_Local_ShouldProcessCaption = Remove local tag
+    Remove_GitTag_Remote_ShouldProcessVerboseDescription = Removing tag '{0}' from remote '{1}'.
+    Remove_GitTag_Remote_ShouldProcessVerboseWarning = Are you sure you want to remove tag '{0}' from remote '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Remove_GitTag_Remote_ShouldProcessCaption = Remove remote tag
+    Remove_GitTag_FailedToRemoveLocalTag = Failed to remove tag '{0}' from local repository.
+    Remove_GitTag_FailedToRemoveRemoteTag = Failed to remove tag '{0}' from remote '{1}'.
+
+    ## Request-GitTag
+    Request_GitTag_FetchTag_ShouldProcessVerboseDescription = Fetching tag '{0}' from remote '{1}'.
+    Request_GitTag_FetchTag_ShouldProcessVerboseWarning = Are you sure you want to fetch tag '{0}' from remote '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Request_GitTag_FetchTag_ShouldProcessCaption = Fetch tag
+    Request_GitTag_FetchAllTags_ShouldProcessVerboseDescription = Fetching all tags from remote '{0}'.
+    Request_GitTag_FetchAllTags_ShouldProcessVerboseWarning = Are you sure you want to fetch all tags from remote '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Request_GitTag_FetchAllTags_ShouldProcessCaption = Fetch all tags
+    Request_GitTag_FailedFetchTag = Failed to fetch tag '{0}' from remote '{1}'. Make sure the tag exists and remote is accessible.
+    Request_GitTag_FailedFetchAllTags = Failed to fetch all tags from remote '{0}'.
 
     ## Install-ModulePatch
     Install_ModulePatch_ShouldProcessDescription = Apply module patch file at location '{0}'. (IMP0001)
@@ -154,6 +237,34 @@ ConvertFrom-StringData @'
 
     ## Invoke-PesterJob
     Invoke_PesterJob_ModuleBuilderRequired = The ModuleBuilder module is required for source line mapping but is not available. Please install the ModuleBuilder module or run the command in a Sampler project environment. (IPJ0001)
+    Invoke_PesterJob_AllLinesCovered = All lines are covered by tests. (IPJ0002)
+    Invoke_PesterJob_AllLinesCoveredFiltered = All lines are covered by tests based on filtering criteria. (IPJ0003)
+    Invoke_PesterJob_NoPesterObjectReturned = Unable to determine code coverage result because no Pester object was returned from the test execution. (IPJ0004)
+
+    ## Switch-GitLocalBranch
+    Switch_GitLocalBranch_FailedCheckoutLocalBranch = Failed to checkout the local branch '{0}'. Make sure the branch exists and is accessible.
+    Switch_GitLocalBranch_ShouldProcessVerboseDescription = Switching to the local branch '{0}'.
+    Switch_GitLocalBranch_ShouldProcessVerboseWarning = Are you sure you want to switch to the local branch '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Switch_GitLocalBranch_ShouldProcessCaption = Switch local branch
+
+    ## Update-GitLocalBranch
+    Update_GitLocalBranch_Rebase_ShouldProcessVerboseDescription = Rebasing the local branch '{0}' using tracking branch '{1}/{2}'.
+    Update_GitLocalBranch_Rebase_ShouldProcessVerboseWarning = Are you sure you want to rebase the local branch '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Update_GitLocalBranch_Rebase_ShouldProcessCaption = Rebase local branch
+    Update_GitLocalBranch_Pull_ShouldProcessVerboseDescription = Updating the local branch '{0}' by pulling from tracking branch '{1}/{2}'.
+    Update_GitLocalBranch_Pull_ShouldProcessVerboseWarning = Are you sure you want to pull into the local branch '{0}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Update_GitLocalBranch_Pull_ShouldProcessCaption = Pull into local branch
+    Update_GitLocalBranch_FailedRebase = Failed to rebase the local branch '{0}' from remote '{1}'. Make sure the branch exists and is accessible.
+
+    ## Update-RemoteTrackingBranch
+    Update_RemoteTrackingBranch_FailedFetchBranchFromRemote = Failed to fetch from '{0}'. Make sure the branch exists in the remote git repository and the remote is accessible.
+    Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessVerboseDescription = Fetching branch '{0}' from the upstream remote '{1}'.
+    Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessVerboseWarning = Are you sure you want to fetch branch '{0}' from the upstream remote '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessCaption = Fetch upstream branch
 
     ## Remove-PSHistory
     Remove_PSHistory_ShouldProcessDescription = Removing content matching the pattern '{0}'. (RH0001)

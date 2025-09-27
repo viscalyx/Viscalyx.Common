@@ -42,47 +42,95 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe 'ConvertTo-RelativePath' {
-    BeforeAll {
-        # Mock Get-Location to return a specific path
-        Mock -CommandName Get-Location -MockWith { @{ Path = '/source/Viscalyx.Common' } }
-    }
-
-    Context 'When checking command structure' {
+Describe 'Assert-GitLocalChange' {
+    Context 'When checking parameter sets' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-AbsolutePath] <string> [[-CurrentLocation] <string>] [<CommonParameters>]'
+                ExpectedParameters = '[<CommonParameters>]'
             }
         ) {
-            $result = (Get-Command -Name 'ConvertTo-RelativePath').ParameterSets |
+            $result = (Get-Command -Name 'Assert-GitLocalChange').ParameterSets |
                 Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
                 Select-Object -Property @(
                     @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
                     @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
                 )
+
             $result.ParameterSetName | Should -Be $ExpectedParameterSetName
             $result.ParameterListAsString | Should -Be $ExpectedParameters
         }
+    }
 
-        It 'Should have AbsolutePath as a mandatory parameter' {
-            $parameterInfo = (Get-Command -Name 'ConvertTo-RelativePath').Parameters['AbsolutePath']
-            $parameterInfo.Attributes.Mandatory | Should -BeTrue
+    Context 'When there are no local changes' {
+        BeforeAll {
+            Mock -CommandName 'Test-GitLocalChanges' -MockWith {
+                return $false
+            }
+        }
+
+        It 'Should not throw an exception' {
+            { Assert-GitLocalChange } | Should -Not -Throw
+        }
+
+        It 'Should call Test-GitLocalChanges once' {
+            Assert-GitLocalChange
+
+            Should -Invoke -CommandName 'Test-GitLocalChanges' -Exactly -Times 1
         }
     }
 
-    It 'Should convert absolute path to relative path when CurrentLocation is provided' {
-        $result = ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
-        $result | Should -Be './source/Public/ConvertTo-RelativePath.ps1'
+    Context 'When there are local changes' {
+        BeforeAll {
+            Mock -CommandName 'Test-GitLocalChanges' -MockWith {
+                return $true
+            }
+
+            $script:mockLocalizedData = InModuleScope -ScriptBlock {
+                $script:localizedData
+            }
+        }
+
+        It 'Should throw a terminating error with the correct message' {
+            { Assert-GitLocalChange } | Should -Throw -ExpectedMessage $script:mockLocalizedData.Assert_GitLocalChanges_FailedUnstagedChanges
+        }
+
+        It 'Should throw a terminating error with the correct error ID' {
+            try {
+                Assert-GitLocalChange
+            }
+            catch {
+                $_.FullyQualifiedErrorId | Should -Be 'AGLC0001,Assert-GitLocalChange'
+            }
+        }
+
+        It 'Should throw a terminating error with the correct error category' {
+            try {
+                Assert-GitLocalChange
+            }
+            catch {
+                $_.CategoryInfo.Category | Should -Be 'InvalidResult'
+            }
+        }
+
+        It 'Should call Test-GitLocalChanges once' {
+            try {
+                Assert-GitLocalChange
+            }
+            catch {
+                # Expected to throw, ignore the error
+            }
+
+            Should -Invoke -CommandName 'Test-GitLocalChanges' -Exactly -Times 1
+        }
     }
 
-    It 'Should convert absolute path to relative path using Get-Location when CurrentLocation is not provided' {
-        $result = ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1'
-        $result | Should -Be './source/Public/ConvertTo-RelativePath.ps1'
-    }
+    Context 'When validating output type' {
+        It 'Should have OutputType of [void]' {
+            $commandInfo = Get-Command -Name 'Assert-GitLocalChange'
+            $outputType = $commandInfo.OutputType.Name
 
-    It 'Should return the absolute path if it does not start with CurrentLocation' {
-        $result = ConvertTo-RelativePath -AbsolutePath '/other/path/ConvertTo-RelativePath.ps1' -CurrentLocation '/source/Viscalyx.Common'
-        $result | Should -Be '/other/path/ConvertTo-RelativePath.ps1'
+            $outputType | Should -BeNullOrEmpty
+        }
     }
 }

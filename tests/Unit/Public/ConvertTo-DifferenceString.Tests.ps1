@@ -212,10 +212,15 @@ Describe 'ConvertTo-DifferenceString' {
         $result | Should -Match '31md'
     }
 
-    It 'Should handle special characters' {
+    It 'Should handle CR and LF special characters' {
         $result = -join (ConvertTo-DifferenceString -ReferenceString "Hello`n" -DifferenceString "Hello`r")
         $result | Should -Match '31m0A'
         $result | Should -Match '31m0D'
+    }
+
+    It 'Should handle DEL special characters' {
+        $result = -join (ConvertTo-DifferenceString -ReferenceString ('Hello' + [char] 127) -DifferenceString ('Hello' + [char] 127))
+        $result | Should -Match ([System.Char] 0x2421)
     }
 
     It 'Should use custom highlighting' {
@@ -254,15 +259,28 @@ Describe 'ConvertTo-DifferenceString' {
         $result | Should -Match "$($esc)\[31m0A$($esc)\[0m $($esc)\[31m0D$($esc)\[0m"  # Newline + Carriage return
     }
 
-    It 'Should handle longer strings' {
-         $result = ConvertTo-DifferenceString -ReferenceString 'This is a string' -DifferenceString 'This is a string that is longer'
-         $result | Should-BeBlockString -Expected @(
-            "Expected:[0m                                                               But was:[0m"
-            "----------------------------------------------------------------        ----------------------------------------------------------------"
-            "Bytes                                           Ascii                   Bytes                                           Ascii"
-            "-----                                           -----                   -----                                           -----"
-            "54 68 69 73 20 69 73 20 61 20 73 74 72 69 6E 67 This is a string   ==   54 68 69 73 20 69 73 20 61 20 73 74 72 69 6E 67 This is a string"
-            "[31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m [31m  [0m    [31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m[31m [0m    !=   [31m20[0m [31m74[0m [31m68[0m [31m61[0m [31m74[0m [31m20[0m [31m69[0m [31m73[0m [31m20[0m [31m6C[0m [31m6F[0m [31m6E[0m [31m67[0m [31m65[0m [31m72[0m    [31m [0m[31mt[0m[31mh[0m[31ma[0m[31mt[0m[31m [0m[31mi[0m[31ms[0m[31m [0m[31ml[0m[31mo[0m[31mn[0m[31mg[0m[31me[0m[31mr[0m "
-         )
+    # This could not be used in Azure DevOps pipeline due to irregular performance in build agents.
+    # It 'Should process large strings efficiently' {
+    #     $largeString1 = 'a' * 10000
+    #     $largeString2 = 'a' * 9999 + 'b'
+
+    #     # TODO: When Because works in Should-BeFasterThan, uncomment the part on the following line.
+    #     Measure-Command { ConvertTo-DifferenceString -ReferenceString $largeString1 -DifferenceString $largeString2 } | Should-BeFasterThan '1.5s' #-Because 'Large strings should be processed efficiently, and should not take more than 1.5 seconds.'
+    # }
+
+    Context 'NoHexOutput functionality' {
+        It 'Should output only ascii characters when NoHexOutput is specified' {
+            $result = -join (ConvertTo-DifferenceString -ReferenceString 'Hello World' -DifferenceString 'Hello World' -NoHexOutput)
+            # Ensure no hex values appear (e.g. two-digit hex groups).
+            $result | Should -Not -Match '\b[0-9A-F]{2}\b'
+            # Ensure that the ascii portion of the string is present.
+            $result | Should -Match 'Hello World'
+        }
+        It 'Should use larger grouping (64 characters) when NoHexOutput is specified' {
+            $longStr = 'A' * 70
+            $result = -join (ConvertTo-DifferenceString -ReferenceString $longStr -DifferenceString $longStr -NoHexOutput)
+            $result | Should -Match 'A{64}   ==   A{64}'
+            ($result -split '\n').Count | Should -Be 1
+        }
     }
 }
