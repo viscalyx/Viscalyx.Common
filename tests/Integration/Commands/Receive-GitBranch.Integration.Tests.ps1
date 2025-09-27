@@ -63,14 +63,14 @@ BeforeAll {
 
         # Set up main branch and push to remote
         git branch -M main *> $null
-        git push -u origin main *> $null
+        git push -u origin main --quiet 2>$null
 
         # Create a feature branch
         git checkout -b feature/test --quiet 2>$null
         "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
         git commit -m "Feature commit" *> $null
-        git push -u origin feature/test *> $null
+        git push -u origin feature/test --quiet 2>$null
 
         # Switch back to main branch
         git checkout main *> $null

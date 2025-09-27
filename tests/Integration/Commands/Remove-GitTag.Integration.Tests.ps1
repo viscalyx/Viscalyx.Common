@@ -61,9 +61,9 @@ BeforeAll {
         git commit -m "Initial commit" *> $null
 
         # Push to remote
-        git push -u origin main *> $null 2> $null
+        git push -u origin main --quiet 2>$null
         if ($LASTEXITCODE -ne 0) {
-            git push -u origin master *> $null
+            git push -u origin master --quiet 2>$null
         }
 
         # Create test tags locally and push them

@@ -72,9 +72,9 @@ BeforeAll {
         git remote add upstream $script:upstreamRepoPath *> $null
 
         # Push to remotes to establish them
-        git push -u myremote main *> $null 2> $null
+        git push -u myremote main --quiet 2>$null
         if ($LASTEXITCODE -ne 0) {
-            git push -u myremote master *> $null
+            git push -u myremote master --quiet 2>$null
         }
 
         git push upstream main *> $null 2> $null
@@ -182,7 +182,7 @@ Describe 'Rename-GitRemote Integration Tests' {
 
             # Set up upstream tracking for the current branch and push
             $currentBranch = git branch --show-current
-            git push --set-upstream origin $currentBranch *> $null
+            git push --set-upstream origin $currentBranch --quiet 2>$null
 
             # Now a regular push should work without errors
             { git push origin } | Should -Not -Throw

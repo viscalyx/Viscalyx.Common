@@ -97,7 +97,7 @@ BeforeAll {
         }
 
         # Push to origin
-        git push --set-upstream origin $currentBranch *> $null
+        git push --set-upstream origin $currentBranch --quiet 2>$null
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Failed to push to origin'
@@ -427,8 +427,8 @@ Describe 'Request-GitTag Integration Tests' {
                     throw 'Failed to determine current branch name'
                 }
 
-                git push upstream $currentBranch *> $null
-                git push upstream --tags *> $null
+                git push upstream $currentBranch --quiet 2>$null
+                git push upstream --tags --quiet 2>$null
             }
             finally
             {
