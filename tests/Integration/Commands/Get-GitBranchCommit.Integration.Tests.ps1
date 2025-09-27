@@ -384,10 +384,10 @@ Describe 'Get-GitBranchCommit Integration Tests' {
                 git add . *> $null
                 git commit -m "Test range commit" *> $null
 
-                # Switch back to main and get range
-                git checkout 'main' *> $null
+                # Switch back to current branch and get range
+                git checkout $script:currentBranch *> $null
 
-                $result = Get-GitBranchCommit -From 'main' -To 'test-range-branch' -ErrorAction Stop
+                $result = Get-GitBranchCommit -From $script:currentBranch -To 'test-range-branch' -ErrorAction Stop
 
                 $result | Should -Not -BeNullOrEmpty
                 $result.Count | Should -BeGreaterOrEqual 1
@@ -399,7 +399,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
             }
             finally {
                 # Clean up
-                git checkout 'main' *> $null
+                git checkout $script:currentBranch *> $null
                 git branch -D 'test-range-branch' *> $null
                 Remove-Item -Path 'test-range-file.txt' -ErrorAction SilentlyContinue
             }
