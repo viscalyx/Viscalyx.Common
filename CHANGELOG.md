@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Public commands:
   - `Assert-GitLocalChange`
   - `Assert-GitRemote`
-  - `ConvertTo-RelativePath`
   - `Disable-CursorShortcutCode`
   - `Get-GitBranchCommit`
   - `Get-GitLocalBranchName`
