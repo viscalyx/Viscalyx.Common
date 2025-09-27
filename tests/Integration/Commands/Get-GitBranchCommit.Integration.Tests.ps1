@@ -70,7 +70,7 @@ BeforeAll {
 
         # Switch back to main branch
         git checkout main --quiet 2>$null
-        
+
         # Store the current branch name for tests
         $script:currentBranch = git rev-parse --abbrev-ref HEAD
     }
@@ -269,7 +269,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
 
     Context 'When git operations fail' {
         It 'Should throw error for non-existent branch' {
-            { Get-GitBranchCommit -BranchName 'nonexistent-branch' -ErrorAction Stop 2>$null } |
+            { Get-GitBranchCommit -BranchName 'nonexistent-branch' -ErrorAction Stop } |
                 Should -Throw -ErrorId 'GGBC0001,Get-GitBranchCommit'
         }
 
