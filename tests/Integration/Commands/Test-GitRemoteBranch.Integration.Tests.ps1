@@ -52,6 +52,9 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
             $null = git add . 2>&1
             $null = git commit -m "Initial commit" --quiet 2>&1
 
+            # Ensure we're on the main branch (for consistency across Git versions)
+            $null = git branch -M main 2>&1
+
             # Create a bare repository to act as our "remote"
             $script:bareRepoPath = Join-Path -Path $TestDrive -ChildPath "BareRepo_$([guid]::NewGuid().Guid)"
             $null = git init --bare $script:bareRepoPath --quiet 2>&1
