@@ -49,13 +49,13 @@ BeforeAll {
         $script:defaultBranch = git rev-parse --abbrev-ref HEAD
 
         # Create feature branches for testing
-        git checkout -b 'feature/original-branch' *> $null
+        git checkout -b 'feature/original-branch' --quiet 2>$null
         "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
         git commit -m "Feature commit" *> $null
 
         # Create another test branch for remote scenarios
-        git checkout -b 'develop' *> $null
+        git checkout -b 'develop' --quiet 2>$null
         "Develop content" | Out-File -FilePath 'develop.txt' -Encoding utf8
         git add develop.txt *> $null
         git commit -m "Develop commit" *> $null
@@ -139,11 +139,11 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
         It 'Should preserve commit history when renaming a branch' {
             # Make sure we have a fresh branch for this test
             git checkout $script:defaultBranch *> $null
-            git checkout -b 'feature/original-branch' *> $null
+            git checkout -b 'feature/original-branch' --quiet 2>$null
             "Feature content" | Out-File -FilePath 'feature2.txt' -Encoding utf8
             git add feature2.txt *> $null
             git commit -m "Feature commit" *> $null
-            
+
             # Get the commit hash before renaming
             $originalCommit = git rev-parse HEAD
 
@@ -159,7 +159,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             # Verify the commit message is preserved
             $commitMessage = git log -1 --pretty=format:"%s"
             $commitMessage | Should -Be 'Feature commit'
-            
+
             # Clean up the extra file
             git checkout $script:defaultBranch *> $null
             try { git branch -D 'feature/renamed-branch' *> $null } catch { }
@@ -168,7 +168,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
         It 'Should handle branch names with special characters' {
             # Create a branch with special characters
-            git checkout -b 'feature/test-123_special.branch' *> $null
+            git checkout -b 'feature/test-123_special.branch' --quiet 2>$null
             "Special content" | Out-File -FilePath 'special.txt' -Encoding utf8
             git add special.txt *> $null
             git commit -m "Special commit" *> $null
@@ -195,8 +195,8 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
         It 'Should throw error when trying to rename to existing branch name' {
             # Create two branches
-            git checkout -b 'branch-one' *> $null
-            git checkout -b 'branch-two' *> $null
+            git checkout -b 'branch-one' --quiet 2>$null
+            git checkout -b 'branch-two' --quiet 2>$null
 
             # Try to rename branch-two to branch-one (which already exists)
             {
@@ -210,7 +210,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
         }
 
         It 'Should throw error when trying to rename branch with invalid characters' {
-            git checkout -b 'valid-branch' *> $null
+            git checkout -b 'valid-branch' --quiet 2>$null
 
             # Try to rename to an invalid branch name (contains spaces and special chars)
             {
@@ -233,7 +233,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             git remote add origin $script:bareRepoPath 2>$null
 
             # Create and push a branch to remote
-            git checkout -b 'remote-test-branch' *> $null
+            git checkout -b 'remote-test-branch' --quiet 2>$null
             "Remote test content" | Out-File -FilePath 'remote-test.txt' -Encoding utf8
             git add remote-test.txt *> $null
             git commit -m "Remote test commit" *> $null
@@ -246,14 +246,14 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             if ($currentBranch -ne $script:defaultBranch) {
                 git checkout $script:defaultBranch *> $null
             }
-            
+
             # Remove test branches
             git branch -D 'remote-test-branch' 2>$null
             git branch -D 'renamed-remote-branch' 2>$null
-            
+
             # Remove remote
             git remote remove origin 2>$null
-            
+
             # Remove bare repository
             if (Test-Path -Path $script:bareRepoPath) {
                 $previousProgressPreference = $ProgressPreference
@@ -269,7 +269,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             # Rename with upstream tracking - this will fail because the upstream doesn't exist yet
             # but we test that the error is handled correctly
-            { 
+            {
                 Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -TrackUpstream 2>$null
             } | Should -Throw -Because "The upstream branch doesn't exist in our test setup"
 
@@ -284,7 +284,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             # This test verifies the command executes and properly handles the expected failure
             # In a real repository with proper remote setup, this would set the default branch
             # but in our test setup, it will fail because there's no remote HEAD to determine
-            { 
+            {
                 Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -SetDefault 2>$null
             } | Should -Throw -Because "Cannot determine remote HEAD in test setup"
 
@@ -301,7 +301,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             try { git remote add upstream $script:upstreamRepoPath *> $null } catch { }
 
             # Test with custom remote name - this will fail due to missing upstream branch
-            { 
+            {
                 Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -RemoteName 'upstream' -TrackUpstream 2>$null
             } | Should -Throw -Because "Upstream branch doesn't exist"
 
@@ -319,8 +319,8 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
     Context 'When testing edge cases' {
         It 'Should work when renaming current branch' {
             # Create and switch to a test branch
-            git checkout -b 'current-branch-test' *> $null
-            
+            git checkout -b 'current-branch-test' --quiet 2>$null
+
             # Rename the current branch
             { Rename-GitLocalBranch -Name 'current-branch-test' -NewName 'renamed-current-branch' } | Should -Not -Throw
 
@@ -335,9 +335,9 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
         It 'Should work when renaming branch that is not current' {
             # Create two test branches
-            git checkout -b 'branch-to-rename' *> $null
-            git checkout -b 'other-branch' *> $null
-            
+            git checkout -b 'branch-to-rename' --quiet 2>$null
+            git checkout -b 'other-branch' --quiet 2>$null
+
             # Rename a branch we're not currently on
             { Rename-GitLocalBranch -Name 'branch-to-rename' -NewName 'renamed-other-branch' } | Should -Not -Throw
 

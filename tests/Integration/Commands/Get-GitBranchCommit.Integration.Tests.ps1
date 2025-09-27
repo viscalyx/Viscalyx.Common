@@ -63,7 +63,7 @@ BeforeAll {
         git commit -m "Fifth commit" *> $null
 
         # Create a feature branch for testing
-        git checkout -b feature/test *> $null
+        git checkout -b feature/test --quiet 2>$null
         "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
         git commit -m "Feature commit" *> $null
@@ -376,7 +376,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
 
         It 'Should return commits between branches' {
             # Create a feature branch to test with
-            git checkout -b 'test-range-branch' *> $null
+            git checkout -b 'test-range-branch' --quiet 2>$null
 
             try {
                 # Make a commit on the feature branch

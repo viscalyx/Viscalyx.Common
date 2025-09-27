@@ -46,22 +46,22 @@ BeforeAll {
         git commit -m "Initial commit" *> $null
 
         # Create feature branches for testing
-        git checkout -b 'feature/branch1' *> $null
+        git checkout -b 'feature/branch1' --quiet 2>$null
         "Feature 1 content" | Out-File -FilePath 'feature1.txt' -Encoding utf8
         git add feature1.txt *> $null
         git commit -m "Feature 1 commit" *> $null
 
-        git checkout -b 'feature/branch2' *> $null
+        git checkout -b 'feature/branch2' --quiet 2>$null
         "Feature 2 content" | Out-File -FilePath 'feature2.txt' -Encoding utf8
         git add feature2.txt *> $null
         git commit -m "Feature 2 commit" *> $null
 
-        git checkout -b 'bugfix/issue123' *> $null
+        git checkout -b 'bugfix/issue123' --quiet 2>$null
         "Bug fix content" | Out-File -FilePath 'bugfix.txt' -Encoding utf8
         git add bugfix.txt *> $null
         git commit -m "Bug fix commit" *> $null
 
-        git checkout -b 'develop' *> $null
+        git checkout -b 'develop' --quiet 2>$null
         "Develop content" | Out-File -FilePath 'develop.txt' -Encoding utf8
         git add develop.txt *> $null
         git commit -m "Develop commit" *> $null
@@ -239,7 +239,7 @@ Describe 'Get-GitLocalBranchName Integration Tests' {
     Context 'When testing specific branch name formats' {
         It 'Should handle branch names with special characters' {
             # Create a branch with numbers and special characters
-            git checkout -b 'test-branch_123' *> $null
+            git checkout -b 'test-branch_123' --quiet 2>$null
 
             $result = Get-GitLocalBranchName -Name 'test-branch_123' -ErrorAction Stop
 

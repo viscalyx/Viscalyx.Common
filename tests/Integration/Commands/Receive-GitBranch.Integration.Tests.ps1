@@ -66,7 +66,7 @@ BeforeAll {
         git push -u origin main *> $null
 
         # Create a feature branch
-        git checkout -b feature/test *> $null
+        git checkout -b feature/test --quiet 2>$null
         "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
         git commit -m "Feature commit" *> $null
