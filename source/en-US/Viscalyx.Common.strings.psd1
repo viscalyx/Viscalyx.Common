@@ -25,8 +25,9 @@ ConvertFrom-StringData @'
     Get_GitLocalBranchName_Failed = Failed to get the name of the local branch. Make sure git repository is accessible.
 
     ## Get-GitBranchCommit
-    Get_GitBranchCommit_FailedFromBranch = Failed to retrieve commits. Make sure the branch '{0}' exists and is accessible.
-    Get_GitBranchCommit_FailedFromCurrent = Failed to retrieve commits from current branch.
+    Get_GitBranchCommit_FailedFromBranch = Failed to retrieve commits. Make sure the branch '{0}' exists and is accessible. (GGBC0001)
+    Get_GitBranchCommit_FailedFromCurrent = Failed to retrieve commits from current branch. (GGBC0002)
+    Get_GitBranchCommit_FailedFromRange = Failed to retrieve commits from range '{0}..{1}'. Make sure both references exist and are accessible. (GGBC0003)
 
     ## Get-GitRemote
     Get_GitRemote_Failed = Failed to get the remote '{0}'. Make sure the remote exists and is accessible.

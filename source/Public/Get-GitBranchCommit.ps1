@@ -184,7 +184,11 @@ function Get-GitBranchCommit
 
     if ($exitCode -ne 0)
     {
-        if ($PSBoundParameters.ContainsKey('BranchName'))
+        if ($PSCmdlet.ParameterSetName -eq 'Range')
+        {
+            $errorMessage = $script:localizedData.Get_GitBranchCommit_FailedFromRange -f $From, $To
+        }
+        elseif ($PSBoundParameters.ContainsKey('BranchName'))
         {
             $errorMessage = $script:localizedData.Get_GitBranchCommit_FailedFromBranch -f $BranchName
         }
@@ -194,10 +198,17 @@ function Get-GitBranchCommit
         }
 
         $errorMessageParameters = @{
-            Message = $errorMessage
-            Category = 'ObjectNotFound'
-            ErrorId = 'GGBC0001' # cspell: disable-line
-            TargetObject = $BranchName # This will be null if no branch name is provided.
+            Message      = $errorMessage
+            Category     = 'ObjectNotFound'
+            ErrorId      = 'GGBC0001' # cspell: disable-line
+            TargetObject = if ($PSCmdlet.ParameterSetName -eq 'Range')
+            {
+                "$From..$To"
+            }
+            else
+            {
+                $BranchName
+            }
         }
 
         Write-Error @errorMessageParameters

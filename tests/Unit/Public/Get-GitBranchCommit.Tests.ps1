@@ -140,6 +140,7 @@ Describe 'Get-GitBranchCommit' {
             InModuleScope -ScriptBlock {
                 $script:localizedData.Get_GitBranchCommit_FailedFromBranch | Should -Match 'Failed to retrieve commits.*Make sure the branch.*exists and is accessible'
                 $script:localizedData.Get_GitBranchCommit_FailedFromCurrent | Should -Match 'Failed to retrieve commits from current branch'
+                $script:localizedData.Get_GitBranchCommit_FailedFromRange | Should -Match 'Failed to retrieve commits from range.*Make sure both references exist and are accessible'
             }
         }
     }
