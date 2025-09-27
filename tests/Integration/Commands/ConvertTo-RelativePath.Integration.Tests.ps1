@@ -43,7 +43,7 @@ Describe 'ConvertTo-RelativePath' -Tag 'Integration' {
 
         It 'Should return original path when absolute path does not start with current location' {
             $currentDir = Get-Location
-            $testPath = if ($IsWindows)
+            $testPath = if ($IsWindows -or $PSVersionTable.PSEdition -eq 'Desktop')
             {
                 'C:\NonExistent\Path'
             }
