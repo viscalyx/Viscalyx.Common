@@ -49,7 +49,7 @@ BeforeAll {
     Push-Location -Path $script:testRepoPath
     try {
         # Initialize git repository
-        git init *> $null
+        git init --initial-branch=main --quiet 2>$null
         git config user.email "test@example.com" *> $null
         git config user.name "Test User" *> $null
 
@@ -73,7 +73,7 @@ BeforeAll {
         git push -u origin feature/test --quiet 2>$null
 
         # Switch back to main branch
-        git checkout main *> $null
+        git checkout main --quiet 2>$null
 
         # Store the initial branch for reference
         $script:initialBranch = git rev-parse --abbrev-ref HEAD
@@ -108,7 +108,7 @@ Describe 'Receive-GitBranch Integration Tests' {
     AfterEach {
         # Return to original location and clean up any test changes
         try {
-            git checkout main *> $null 2> $null
+            git checkout main --quiet 2>$null
             git reset --hard HEAD *> $null 2> $null
         }
         catch {
@@ -132,7 +132,7 @@ Describe 'Receive-GitBranch Integration Tests' {
 
         It 'Should successfully checkout and pull specified branch' {
             # Start from main branch
-            git checkout main *> $null
+            git checkout main --quiet 2>$null
 
             # Use Receive-GitBranch to switch to feature branch and pull
             { Receive-GitBranch -Checkout -BranchName 'feature/test' -Force } | Should -Not -Throw
@@ -158,7 +158,7 @@ Describe 'Receive-GitBranch Integration Tests' {
 
         It 'Should successfully checkout and rebase feature branch with main upstream' {
             # Start from main branch
-            git checkout main *> $null
+            git checkout main --quiet 2>$null
 
             # Use Receive-GitBranch with rebase on feature branch
             { Receive-GitBranch -Checkout -BranchName 'feature/test' -UpstreamBranchName 'main' -Rebase -Force } | Should -Not -Throw
@@ -193,7 +193,7 @@ Describe 'Receive-GitBranch Integration Tests' {
     Context 'When testing in a repository with local changes' {
         It 'Should successfully work when there are no local changes' {
             # Ensure clean working directory
-            git checkout main *> $null
+            git checkout main --quiet 2>$null
             git reset --hard HEAD *> $null
 
             # This should work without issues
@@ -229,7 +229,7 @@ Describe 'Receive-GitBranch Integration Tests' {
             # Add additional content to remote to test pulling
             Push-Location -Path $script:testRepoPath
             try {
-                git checkout main *> $null
+                git checkout main --quiet 2>$null
                 "Additional content" | Out-File -FilePath 'additional.txt' -Encoding utf8
                 git add additional.txt *> $null
                 git commit -m "Additional commit" *> $null
@@ -246,7 +246,7 @@ Describe 'Receive-GitBranch Integration Tests' {
         It 'Should successfully pull new commits from remote' {
             Push-Location -Path $script:testRepoPath
             try {
-                git checkout main *> $null
+                git checkout main --quiet 2>$null
 
                 # Count commits before pull
                 $commitsBefore = @(git log --oneline).Count

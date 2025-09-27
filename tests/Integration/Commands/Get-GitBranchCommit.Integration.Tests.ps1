@@ -36,7 +36,7 @@ BeforeAll {
     Push-Location -Path $script:testRepoPath
     try {
         # Initialize git repository
-        git init *> $null
+        git init --initial-branch=main --quiet 2>$null
         git config user.email "test@example.com" *> $null
         git config user.name "Test User" *> $null
 
@@ -68,12 +68,9 @@ BeforeAll {
         git add feature.txt *> $null
         git commit -m "Feature commit" *> $null
 
-        # Switch back to main/master branch
-        git checkout main *> $null 2> $null
-        if ($LASTEXITCODE -ne 0) {
-            git checkout master *> $null
-        }
-
+        # Switch back to main branch
+        git checkout main --quiet 2>$null
+        
         # Store the current branch name for tests
         $script:currentBranch = git rev-parse --abbrev-ref HEAD
     }
@@ -283,7 +280,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
 
             Push-Location -Path $emptyRepoPath
             try {
-                git init *> $null
+                git init --initial-branch=main --quiet 2>$null
                 git config user.email "test@example.com" *> $null
                 git config user.name "Test User" *> $null
 

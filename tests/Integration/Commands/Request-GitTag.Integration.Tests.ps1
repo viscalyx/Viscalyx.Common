@@ -63,7 +63,7 @@ BeforeAll {
     try
     {
         # Initialize git repository
-        git init *> $null
+        git init --initial-branch=main --quiet 2>$null
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Failed to initialize test repository'
