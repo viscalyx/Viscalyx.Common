@@ -45,23 +45,28 @@ BeforeAll {
 
     # Initialize the bare repository (simulates a remote)
     Push-Location -Path $script:bareRepoPath
-    try {
+    try
+    {
         git init --bare *> $null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to initialize bare repository"
+        if ($LASTEXITCODE -ne 0)
+        {
+            throw 'Failed to initialize bare repository'
         }
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 
     # Initialize the test repository and create test commits
     Push-Location -Path $script:testRepoPath
-    try {
+    try
+    {
         # Initialize git repository
         git init *> $null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to initialize test repository"
+        if ($LASTEXITCODE -ne 0)
+        {
+            throw 'Failed to initialize test repository'
         }
 
         # Configure git user for testing
@@ -72,20 +77,30 @@ BeforeAll {
         'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
         git add . *> $null
         git commit -m 'Initial commit' *> $null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to create initial commit"
+        if ($LASTEXITCODE -ne 0)
+        {
+            throw 'Failed to create initial commit'
         }
 
         # Add the bare repository as origin remote
         git remote add origin $script:bareRepoPath *> $null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to add origin remote"
+        if ($LASTEXITCODE -ne 0)
+        {
+            throw 'Failed to add origin remote'
+        }
+
+        # Get the current branch name (don't assume 'main' or 'master')
+        $currentBranch = git branch --show-current 2>$null
+        if (-not $currentBranch)
+        {
+            throw 'Failed to determine current branch name'
         }
 
         # Push to origin
-        git push --set-upstream origin main *> $null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to push to origin"
+        git push --set-upstream origin $currentBranch *> $null
+        if ($LASTEXITCODE -ne 0)
+        {
+            throw 'Failed to push to origin'
         }
 
         # Create and push tags
@@ -94,11 +109,13 @@ BeforeAll {
         git tag 'v2.0.0' *> $null
 
         git push origin --tags *> $null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to push tags to origin"
+        if ($LASTEXITCODE -ne 0)
+        {
+            throw 'Failed to push tags to origin'
         }
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 
@@ -107,11 +124,13 @@ BeforeAll {
     New-Item -Path $script:secondRepoPath -ItemType Directory -Force | Out-Null
 
     Push-Location -Path $script:secondRepoPath
-    try {
+    try
+    {
         # Clone the bare repository
         git clone $script:bareRepoPath . *> $null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Failed to clone repository"
+        if ($LASTEXITCODE -ne 0)
+        {
+            throw 'Failed to clone repository'
         }
 
         # Configure git user for testing
@@ -120,11 +139,13 @@ BeforeAll {
 
         # Remove all local tags to test fetching
         $tags = git tag
-        if ($tags) {
+        if ($tags)
+        {
             git tag -d $tags *> $null
         }
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 }
@@ -132,52 +153,65 @@ BeforeAll {
 AfterAll {
     # Clean up - return to original location if we're still in test directories
     $currentLocation = Get-Location
-    if ($currentLocation.Path.StartsWith($TestDrive)) {
+    if ($currentLocation.Path.StartsWith($TestDrive))
+    {
         Set-Location -Path $script:originalLocation
     }
-    
+
     # Force cleanup of git repositories to prevent TestDrive deletion issues
-    if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath)) {
-        try {
+    if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath))
+    {
+        try
+        {
             # Remove read-only attributes from .git directory recursively
             Get-ChildItem -Path $script:testRepoPath -Recurse -Force | ForEach-Object {
-                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly) {
+                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
+                {
                     $_.Attributes = $_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
                 }
             }
             Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors - TestDrive will handle remaining cleanup
         }
     }
-    
-    if ($script:secondRepoPath -and (Test-Path -Path $script:secondRepoPath)) {
-        try {
+
+    if ($script:secondRepoPath -and (Test-Path -Path $script:secondRepoPath))
+    {
+        try
+        {
             # Remove read-only attributes from .git directory recursively
             Get-ChildItem -Path $script:secondRepoPath -Recurse -Force | ForEach-Object {
-                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly) {
+                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
+                {
                     $_.Attributes = $_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
                 }
             }
             Remove-Item -Path $script:secondRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors - TestDrive will handle remaining cleanup
         }
     }
-    
-    if ($script:bareRepoPath -and (Test-Path -Path $script:bareRepoPath)) {
-        try {
+
+    if ($script:bareRepoPath -and (Test-Path -Path $script:bareRepoPath))
+    {
+        try
+        {
             # Remove read-only attributes from .git directory recursively
             Get-ChildItem -Path $script:bareRepoPath -Recurse -Force | ForEach-Object {
-                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly) {
+                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
+                {
                     $_.Attributes = $_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
                 }
             }
             Remove-Item -Path $script:bareRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors - TestDrive will handle remaining cleanup
         }
     }
@@ -212,7 +246,8 @@ Describe 'Request-GitTag Integration Tests' {
         It 'Should successfully fetch multiple specific tags' {
             # Remove any existing tags
             $existingTags = git tag 2>$null
-            if ($existingTags) {
+            if ($existingTags)
+            {
                 git tag -d $existingTags 2>$null
             }
 
@@ -244,7 +279,8 @@ Describe 'Request-GitTag Integration Tests' {
 
             # Remove all local tags to test fetching all
             $existingTags = git tag 2>$null
-            if ($existingTags) {
+            if ($existingTags)
+            {
                 git tag -d $existingTags 2>$null
             }
         }
@@ -313,7 +349,8 @@ Describe 'Request-GitTag Integration Tests' {
 
             # Remove test tag if it exists
             $existingTags = git tag 2>$null
-            if ($existingTags -contains 'v1.0.0') {
+            if ($existingTags -contains 'v1.0.0')
+            {
                 git tag -d 'v1.0.0' 2>$null
             }
         }
@@ -363,34 +400,49 @@ Describe 'Request-GitTag Integration Tests' {
             New-Item -Path $script:upstreamRepoPath -ItemType Directory -Force | Out-Null
 
             Push-Location -Path $script:upstreamRepoPath
-            try {
+            try
+            {
                 git init --bare *> $null
-                if ($LASTEXITCODE -ne 0) {
-                    throw "Failed to initialize upstream repository"
+                if ($LASTEXITCODE -ne 0)
+                {
+                    throw 'Failed to initialize upstream repository'
                 }
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
 
             # Add upstream remote to the second repo and create a different tag
             Push-Location -Path $script:testRepoPath
-            try {
+            try
+            {
                 git remote add upstream $script:upstreamRepoPath *> $null
                 git tag 'upstream-v1.0.0' *> $null
-                git push upstream main *> $null
+
+                # Get the current branch name (don't assume 'main' or 'master')
+                $currentBranch = git branch --show-current 2>$null
+                if (-not $currentBranch)
+                {
+                    throw 'Failed to determine current branch name'
+                }
+
+                git push upstream $currentBranch *> $null
                 git push upstream --tags *> $null
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
 
             # Add upstream remote to second repo for testing
             Push-Location -Path $script:secondRepoPath
-            try {
+            try
+            {
                 git remote add upstream $script:upstreamRepoPath *> $null
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
         }
@@ -406,7 +458,8 @@ Describe 'Request-GitTag Integration Tests' {
         It 'Should fetch tags from different remotes' {
             # Remove all local tags
             $existingTags = git tag
-            if ($existingTags) {
+            if ($existingTags)
+            {
                 git tag -d $existingTags *> $null
             }
 
@@ -416,7 +469,8 @@ Describe 'Request-GitTag Integration Tests' {
             $originTags | Should -Contain 'v1.0.0'
 
             # Remove all tags again
-            if ($originTags) {
+            if ($originTags)
+            {
                 git tag -d $originTags 2>$null
             }
 
@@ -429,7 +483,8 @@ Describe 'Request-GitTag Integration Tests' {
         It 'Should fetch specific tag from upstream remote' {
             # Remove the upstream tag if it exists locally
             $existingTags = git tag 2>$null
-            if ($existingTags -contains 'upstream-v1.0.0') {
+            if ($existingTags -contains 'upstream-v1.0.0')
+            {
                 git tag -d 'upstream-v1.0.0' 2>$null
             }
 
@@ -456,14 +511,16 @@ Describe 'Request-GitTag Integration Tests' {
             $originalUrl = git config --get remote.origin.url
             git remote set-url origin 'invalid-url' *> $null
 
-            try {
+            try
+            {
                 $errorRecord = { Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force 2>$null } |
                     Should -Throw -PassThru
 
                 $errorRecord.Exception.Message | Should -Match "Failed to fetch tag 'v1.0.0' from remote 'origin'"
                 $errorRecord.FullyQualifiedErrorId | Should -Be 'RGT0001,Request-GitTag'
             }
-            finally {
+            finally
+            {
                 # Restore the original URL
                 git remote set-url origin $originalUrl *> $null
             }
@@ -474,14 +531,16 @@ Describe 'Request-GitTag Integration Tests' {
             $originalUrl = git config --get remote.origin.url
             git remote set-url origin 'invalid-url' *> $null
 
-            try {
+            try
+            {
                 $errorRecord = { Request-GitTag -RemoteName 'origin' -Force 2>$null } |
                     Should -Throw -PassThru
 
                 $errorRecord.Exception.Message | Should -Match "Failed to fetch all tags from remote 'origin'"
                 $errorRecord.FullyQualifiedErrorId | Should -Be 'RGT0001,Request-GitTag'
             }
-            finally {
+            finally
+            {
                 # Restore the original URL
                 git remote set-url origin $originalUrl *> $null
             }
