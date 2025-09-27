@@ -215,18 +215,15 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return false when testing remote branch without configured remotes' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch 2>$null
-            $result | Should -BeFalse
+            { Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch 2>$null } | Should -Throw
         }
 
         It 'Should return false when testing any remote branches without configured remotes' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' 2>$null
-            $result | Should -BeFalse
+            { Test-GitRemoteBranch -RemoteName 'origin' 2>$null } | Should -Throw
         }
 
         It 'Should return false when testing without specifying remote' {
-            $result = Test-GitRemoteBranch 2>$null
-            $result | Should -BeFalse
+            { Test-GitRemoteBranch 2>$null } | Should -Throw
         }
     }
 
@@ -259,18 +256,15 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return false when not in a git repository' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name $script:fallbackBranch 2>$null
-            $result | Should -BeFalse
+            { Test-GitRemoteBranch -RemoteName 'origin' -Name $script:fallbackBranch 2>$null } | Should -Throw
         }
 
         It 'Should return false when testing any remote branches outside git repository' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' 2>$null
-            $result | Should -BeFalse
+            { Test-GitRemoteBranch -RemoteName 'origin' 2>$null } | Should -Throw
         }
 
         It 'Should return false when testing without specifying remote outside git repository' {
-            $result = Test-GitRemoteBranch 2>$null
-            $result | Should -BeFalse
+            { Test-GitRemoteBranch 2>$null } | Should -Throw
         }
     }
 
@@ -320,13 +314,11 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return false when remote is unreachable' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch 2>$null
-            $result | Should -BeFalse
+            { Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch 2>$null } | Should -Throw
         }
 
         It 'Should return false when testing any branches from unreachable remote' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' 2>$null
-            $result | Should -BeFalse
+            { Test-GitRemoteBranch -RemoteName 'origin' 2>$null } | Should -Throw
         }
     }
 }

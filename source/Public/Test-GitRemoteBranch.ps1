@@ -58,7 +58,7 @@ function Test-GitRemoteBranch
         $getGitRemoteBranchParameters['Name'] = $Name
     }
 
-    $branch = Get-GitRemoteBranch @getGitRemoteBranchParameters -RemoveRefsHeads
+    $branch = Get-GitRemoteBranch @getGitRemoteBranchParameters -RemoveRefsHeads -ErrorAction 'Stop'
 
     $result = $false
 
