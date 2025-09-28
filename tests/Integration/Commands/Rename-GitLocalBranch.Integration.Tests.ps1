@@ -34,57 +34,76 @@ BeforeAll {
 
     # Initialize the test repository and create test structure
     Push-Location -Path $script:testRepoPath
-    try {
+    try
+    {
         # Initialize git repository
-        git init --initial-branch=main --quiet 2>$null
-        git config user.email "test@example.com" *> $null
-        git config user.name "Test User" *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
+            & cmd.exe /c 'git init --initial-branch=main --quiet >nul 2>&1'
+        }
+        else
+        {
+            $gitOutput = git init --initial-branch=main --quiet 2>&1
+        }
+        git config user.email 'test@example.com' *> $null
+        git config user.name 'Test User' *> $null
 
         # Create initial commit
-        "Initial content" | Out-File -FilePath 'test.txt' -Encoding utf8
+        'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
         git add test.txt *> $null
-        git commit -m "Initial commit" *> $null
+        git commit -m 'Initial commit' *> $null
 
         # Get the default branch name (main or master)
         $script:defaultBranch = git rev-parse --abbrev-ref HEAD
 
         # Create feature branches for testing
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
-            & cmd.exe /c "git checkout -b feature/original-branch --quiet >nul 2>&1"
-        } else {
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
+            & cmd.exe /c 'git checkout -b feature/original-branch --quiet >nul 2>&1'
+        }
+        else
+        {
             $gitOutput = git checkout -b 'feature/original-branch' --quiet 2>&1
         }
-        "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
+        'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
-        git commit -m "Feature commit" *> $null
+        git commit -m 'Feature commit' *> $null
 
         # Create another test branch for remote scenarios
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
-            & cmd.exe /c "git checkout -b develop --quiet >nul 2>&1"
-        } else {
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
+            & cmd.exe /c 'git checkout -b develop --quiet >nul 2>&1'
+        }
+        else
+        {
             $gitOutput = git checkout -b 'develop' --quiet 2>&1
         }
-        "Develop content" | Out-File -FilePath 'develop.txt' -Encoding utf8
+        'Develop content' | Out-File -FilePath 'develop.txt' -Encoding utf8
         git add develop.txt *> $null
-        git commit -m "Develop commit" *> $null
+        git commit -m 'Develop commit' *> $null
 
         # Switch back to default branch
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
             # Windows PowerShell - use cmd.exe for reliable output suppression
             & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-        } else {
+        }
+        else
+        {
             # PowerShell 7+ - use direct redirection
             git checkout $script:defaultBranch *>$null
         }
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 }
 
 AfterAll {
     # Clean up - remove the test repository
-    if (Test-Path -Path $script:testRepoPath) {
+    if (Test-Path -Path $script:testRepoPath)
+    {
         $previousProgressPreference = $ProgressPreference
         $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -106,10 +125,13 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
     Context 'When renaming a local branch successfully' {
         BeforeEach {
             # Ensure we start with the feature branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout feature/original-branch >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout feature/original-branch >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 git checkout 'feature/original-branch' *>$null
             }
@@ -117,24 +139,31 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
         AfterEach {
             # Clean up any renamed branches for next test
-            try {
+            try
+            {
                 $currentBranch = git rev-parse --abbrev-ref HEAD 2>&1
-                if ($LASTEXITCODE -eq 0 -and $currentBranch -eq 'feature/renamed-branch') {
-                    if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                if ($LASTEXITCODE -eq 0 -and $currentBranch -eq 'feature/renamed-branch')
+                {
+                    if ($PSVersionTable.PSEdition -eq 'Desktop')
+                    {
                         # Windows PowerShell - use cmd.exe for reliable output suppression
                         & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-                    } else {
+                    }
+                    else
+                    {
                         # PowerShell 7+ - use direct redirection
                         git checkout $script:defaultBranch *>$null
                     }
                     git branch -D 'feature/renamed-branch' *> $null
                 }
                 $existingBranches = git branch --list 'feature/renamed-branch' 2>&1
-                if ($LASTEXITCODE -eq 0 -and $existingBranches) {
+                if ($LASTEXITCODE -eq 0 -and $existingBranches)
+                {
                     git branch -D 'feature/renamed-branch' *> $null
                 }
             }
-            catch {
+            catch
+            {
                 # Ignore cleanup errors
             }
         }
@@ -149,7 +178,8 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             # Verify the old branch no longer exists
             $oldBranch = git branch --list 'feature/original-branch' 2>&1
-            if ($LASTEXITCODE -eq 0) {
+            if ($LASTEXITCODE -eq 0)
+            {
                 $oldBranch | Should -BeNullOrEmpty
             }
 
@@ -164,17 +194,27 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
         It 'Should preserve commit history when renaming a branch' {
             # Make sure we have a fresh branch for this test
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
                 & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 git checkout $script:defaultBranch *>$null
             }
-            git checkout -b 'feature/original-branch' --quiet 2>$null
-            "Feature content" | Out-File -FilePath 'feature2.txt' -Encoding utf8
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git checkout -b feature/original-branch --quiet >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git checkout -b 'feature/original-branch' --quiet 2>&1
+            }
+            'Feature content' | Out-File -FilePath 'feature2.txt' -Encoding utf8
             git add feature2.txt *> $null
-            git commit -m "Feature commit" *> $null
+            git commit -m 'Feature commit' *> $null
 
             # Get the commit hash before renaming
             $originalCommit = git rev-parse HEAD
@@ -193,23 +233,51 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             $commitMessage | Should -Be 'Feature commit'
 
             # Clean up the extra file
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
                 & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 git checkout $script:defaultBranch *>$null
             }
-            try { git branch -D 'feature/renamed-branch' *> $null } catch { }
-            try { Remove-Item -Path 'feature2.txt' -Force -ErrorAction SilentlyContinue } catch { }
+
+            try
+            {
+                git branch -D 'feature/renamed-branch' *> $null
+            }
+            catch
+            {
+            }
+
+            try
+            {
+
+                $previousProgressPreference = $ProgressPreference
+                $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
+                Remove-Item -Path 'feature2.txt' -Force -ErrorAction SilentlyContinue
+                $ProgressPreference = $previousProgressPreference
+            }
+            catch
+            {
+            }
         }
 
         It 'Should handle branch names with special characters' {
             # Create a branch with special characters
-            git checkout -b 'feature/test-123_special.branch' --quiet 2>$null
-            "Special content" | Out-File -FilePath 'special.txt' -Encoding utf8
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git checkout -b feature/test-123_special.branch --quiet >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git checkout -b 'feature/test-123_special.branch' --quiet 2>&1
+            }
+            'Special content' | Out-File -FilePath 'special.txt' -Encoding utf8
             git add special.txt *> $null
-            git commit -m "Special commit" *> $null
+            git commit -m 'Special commit' *> $null
 
             # Rename the branch
             { Rename-GitLocalBranch -Name 'feature/test-123_special.branch' -NewName 'feature/renamed-special' } | Should -Not -Throw
@@ -219,12 +287,21 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             $currentBranch | Should -Be 'feature/renamed-special'
 
             # Clean up
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 $gitOutput = git checkout $script:defaultBranch 2>&1
             }
-            try { git branch -D 'feature/renamed-special' *> $null } catch { }
+            try
+            {
+                git branch -D 'feature/renamed-special' *> $null
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -232,44 +309,75 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
         It 'Should throw error when trying to rename non-existent branch' {
             {
                 Rename-GitLocalBranch -Name 'non-existent-branch' -NewName 'new-branch-name' -ErrorAction Stop
-            } | Should -Throw -ExpectedMessage "*Failed to rename branch*"
+            } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
         }
 
         It 'Should throw error when trying to rename to existing branch name' {
             # Create two branches
-            git checkout -b 'branch-one' --quiet 2>$null
-            git checkout -b 'branch-two' --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git checkout -b branch-one --quiet >nul 2>&1'
+                & cmd.exe /c 'git checkout -b branch-two --quiet >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git checkout -b 'branch-one' --quiet 2>&1
+                $gitOutput = git checkout -b 'branch-two' --quiet 2>&1
+            }
 
             # Try to rename branch-two to branch-one (which already exists)
             {
                 Rename-GitLocalBranch -Name 'branch-two' -NewName 'branch-one' -ErrorAction Stop
-            } | Should -Throw -ExpectedMessage "*Failed to rename branch*"
+            } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
 
             # Clean up
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
-                $gitOutput = git checkout $script:defaultBranch 2>&1
+                & cmd.exe /c 'git branch -D branch-one >nul 2>&1'
+                & cmd.exe /c 'git branch -D branch-two >nul 2>&1'
             }
-            git branch -D 'branch-one' 2>$null
-            git branch -D 'branch-two' 2>$null
+            else
+            {
+                $gitOutput = git checkout $script:defaultBranch 2>&1
+                $gitOutput = git branch -D 'branch-one' 2>&1
+                $gitOutput = git branch -D 'branch-two' 2>&1
+            }
         }
 
         It 'Should throw error when trying to rename branch with invalid characters' {
-            git checkout -b 'valid-branch' --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git checkout -b valid-branch --quiet >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git checkout -b 'valid-branch' --quiet 2>&1
+            }
 
             # Try to rename to an invalid branch name (contains spaces and special chars)
             {
                 Rename-GitLocalBranch -Name 'valid-branch' -NewName 'invalid branch name with spaces!' -ErrorAction Stop
-            } | Should -Throw -ExpectedMessage "*Failed to rename branch*"
+            } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
 
             # Clean up
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 $gitOutput = git checkout $script:defaultBranch 2>&1
             }
-            git branch -D 'valid-branch' 2>$null
+
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git branch -D valid-branch >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git branch -D 'valid-branch' 2>&1
+            }
         }
     }
 
@@ -277,35 +385,112 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
         BeforeEach {
             # Create a bare repository to act as a remote
             $script:bareRepoPath = Join-Path -Path $TestDrive -ChildPath 'BareTestRepo'
-            git init --bare --initial-branch=main $script:bareRepoPath *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c "git init --bare --initial-branch=main $script:bareRepoPath >nul 2>&1"
+            }
+            else
+            {
+                $gitOutput = git init --bare --initial-branch=main $script:bareRepoPath 2>&1
+            }
 
             # Add the bare repo as origin remote
-            git remote add origin $script:bareRepoPath 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c "git remote add origin $script:bareRepoPath >nul 2>&1"
+            }
+            else
+            {
+                $gitOutput = git remote add origin $script:bareRepoPath 2>&1
+            }
 
             # Create and push a branch to remote
-            git checkout -b 'remote-test-branch' --quiet 2>$null
-            "Remote test content" | Out-File -FilePath 'remote-test.txt' -Encoding utf8
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git checkout -b remote-test-branch --quiet >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git checkout -b 'remote-test-branch' --quiet 2>&1
+            }
+            'Remote test content' | Out-File -FilePath 'remote-test.txt' -Encoding utf8
             git add remote-test.txt *> $null
-            git commit -m "Remote test commit" *> $null
-            git push origin remote-test-branch *> $null
+            git commit -m 'Remote test commit' *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git push origin remote-test-branch >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git push origin remote-test-branch 2>&1
+            }
         }
 
         AfterEach {
             # Clean up remote and branches
-            $currentBranch = git rev-parse --abbrev-ref HEAD 2>$null
-            if ($currentBranch -ne $script:defaultBranch) {
-                git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                $currentBranch = & cmd.exe /c 'git rev-parse --abbrev-ref HEAD 2>nul'
+            }
+            else
+            {
+                $currentBranch = git rev-parse --abbrev-ref HEAD 2>$null
+            }
+            if ($currentBranch -ne $script:defaultBranch)
+            {
+                if ($PSVersionTable.PSEdition -eq 'Desktop')
+                {
+                    & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+                }
+                else
+                {
+                    $gitOutput = git checkout $script:defaultBranch 2>&1
+                }
             }
 
             # Remove test branches
-            git branch -D 'remote-test-branch' 2>$null
-            git branch -D 'renamed-remote-branch' 2>$null
+            try
+            {
+                if ($PSVersionTable.PSEdition -eq 'Desktop')
+                {
+                    & cmd.exe /c 'git branch -D remote-test-branch >nul 2>&1'
+                }
+                else
+                {
+                    $gitOutput = git branch -D 'remote-test-branch' 2>&1
+                }
+            }
+            catch
+            {
+            }
+            try
+            {
+                if ($PSVersionTable.PSEdition -eq 'Desktop')
+                {
+                    & cmd.exe /c 'git branch -D renamed-remote-branch >nul 2>&1'
+                }
+                else
+                {
+                    $gitOutput = git branch -D 'renamed-remote-branch' 2>&1
+                }
+            }
+            catch
+            {
+            }
 
             # Remove remote
-            git remote remove origin 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git remote remove origin >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git remote remove origin 2>&1
+            }
 
             # Remove bare repository
-            if (Test-Path -Path $script:bareRepoPath) {
+            if (Test-Path -Path $script:bareRepoPath)
+            {
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:bareRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -315,7 +500,13 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
         It 'Should rename branch with TrackUpstream when remote branch exists' {
             # First push the branch to remote if not already there
-            try { git push origin remote-test-branch *> $null } catch { }
+            try
+            {
+                git push origin remote-test-branch *> $null
+            }
+            catch
+            {
+            }
 
             # Rename with upstream tracking - this will fail because the upstream doesn't exist yet
             # but we test that the error is handled correctly
@@ -327,7 +518,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             # Switch back to see if branch was renamed before the upstream tracking failed
             git checkout $script:defaultBranch *> $null
             $branchExists = git branch --list 'renamed-remote-branch'
-            $branchExists | Should -Not -BeNullOrEmpty -Because "Branch should still be renamed even if upstream tracking fails"
+            $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if upstream tracking fails'
         }
 
         It 'Should handle SetDefault parameter without throwing error' {
@@ -336,19 +527,45 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             # but in our test setup, it will fail because there's no remote HEAD to determine
             {
                 Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -SetDefault
-            } | Should -Throw -Because "Cannot determine remote HEAD in test setup"
+            } | Should -Throw -Because 'Cannot determine remote HEAD in test setup'
 
             # Verify the branch was renamed despite the set-head failure
             git checkout $script:defaultBranch *> $null
             $branchExists = git branch --list 'renamed-remote-branch'
-            $branchExists | Should -Not -BeNullOrEmpty -Because "Branch should still be renamed even if set-head fails"
+            $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if set-head fails'
         }
 
         It 'Should handle custom remote name' {
             # Add another remote with different name
             $script:upstreamRepoPath = Join-Path -Path $TestDrive -ChildPath 'UpstreamTestRepo'
-            try { git init --bare --initial-branch=main $script:upstreamRepoPath *> $null } catch { }
-            try { git remote add upstream $script:upstreamRepoPath *> $null } catch { }
+            try
+            {
+                if ($PSVersionTable.PSEdition -eq 'Desktop')
+                {
+                    & cmd.exe /c "git init --bare --initial-branch=main $script:upstreamRepoPath >nul 2>&1"
+                }
+                else
+                {
+                    $gitOutput = git init --bare --initial-branch=main $script:upstreamRepoPath 2>&1
+                }
+            }
+            catch
+            {
+            }
+            try
+            {
+                if ($PSVersionTable.PSEdition -eq 'Desktop')
+                {
+                    & cmd.exe /c "git remote add upstream $script:upstreamRepoPath >nul 2>&1"
+                }
+                else
+                {
+                    $gitOutput = git remote add upstream $script:upstreamRepoPath 2>&1
+                }
+            }
+            catch
+            {
+            }
 
             # Test with custom remote name - this will fail due to missing upstream branch
             {
@@ -356,8 +573,22 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             } | Should -Throw -Because "Upstream branch doesn't exist"
 
             # Clean up additional remote
-            try { git remote remove upstream *> $null } catch { }
-            if (Test-Path -Path $script:upstreamRepoPath) {
+            try
+            {
+                if ($PSVersionTable.PSEdition -eq 'Desktop')
+                {
+                    & cmd.exe /c 'git remote remove upstream >nul 2>&1'
+                }
+                else
+                {
+                    $gitOutput = git remote remove upstream 2>&1
+                }
+            }
+            catch
+            {
+            }
+            if (Test-Path -Path $script:upstreamRepoPath)
+            {
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:upstreamRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -369,7 +600,14 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
     Context 'When testing edge cases' {
         It 'Should work when renaming current branch' {
             # Create and switch to a test branch
-            git checkout -b 'current-branch-test' --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git checkout -b current-branch-test --quiet >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git checkout -b 'current-branch-test' --quiet 2>&1
+            }
 
             # Rename the current branch
             { Rename-GitLocalBranch -Name 'current-branch-test' -NewName 'renamed-current-branch' } | Should -Not -Throw
@@ -380,13 +618,28 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             # Clean up
             git checkout $script:defaultBranch *> $null
-            git branch -D 'renamed-current-branch' 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git branch -D renamed-current-branch >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git branch -D 'renamed-current-branch' 2>&1
+            }
         }
 
         It 'Should work when renaming branch that is not current' {
             # Create two test branches
-            git checkout -b 'branch-to-rename' --quiet 2>$null
-            git checkout -b 'other-branch' --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git checkout -b branch-to-rename --quiet >nul 2>&1'
+                & cmd.exe /c 'git checkout -b other-branch --quiet >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git checkout -b 'branch-to-rename' --quiet 2>&1
+                $gitOutput = git checkout -b 'other-branch' --quiet 2>&1
+            }
 
             # Rename a branch we're not currently on
             { Rename-GitLocalBranch -Name 'branch-to-rename' -NewName 'renamed-other-branch' } | Should -Not -Throw
@@ -401,8 +654,16 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             # Clean up
             git checkout $script:defaultBranch *> $null
-            git branch -D 'other-branch' 2>$null
-            git branch -D 'renamed-other-branch' 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
+                & cmd.exe /c 'git branch -D other-branch >nul 2>&1'
+                & cmd.exe /c 'git branch -D renamed-other-branch >nul 2>&1'
+            }
+            else
+            {
+                $gitOutput = git branch -D 'other-branch' 2>&1
+                $gitOutput = git branch -D 'renamed-other-branch' 2>&1
+            }
         }
     }
 }
