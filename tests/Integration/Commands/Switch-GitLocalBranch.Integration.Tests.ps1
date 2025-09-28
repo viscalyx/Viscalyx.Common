@@ -147,7 +147,7 @@ Describe 'Switch-GitLocalBranch Integration Tests' -Tag 'Integration' {
             $nonExistentBranch = 'non-existent-branch'
 
             {
-                Switch-GitLocalBranch -Name $nonExistentBranch -Force 2>$null
+                Switch-GitLocalBranch -Name $nonExistentBranch -Force
             } | Should -Throw -ExpectedMessage "*Failed to checkout the local branch '$nonExistentBranch'*"
         }
     }
@@ -159,7 +159,7 @@ Describe 'Switch-GitLocalBranch Integration Tests' -Tag 'Integration' {
             & git add test.txt
 
             {
-                Switch-GitLocalBranch -Name 'feature/test-branch' -Force 2>$null
+                Switch-GitLocalBranch -Name 'feature/test-branch' -Force
             } | Should -Throw -ExpectedMessage '*There are unstaged or staged changes*'
 
             # Clean up
@@ -172,7 +172,7 @@ Describe 'Switch-GitLocalBranch Integration Tests' -Tag 'Integration' {
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Modified README'
 
             {
-                Switch-GitLocalBranch -Name 'feature/test-branch' -Force 2>$null
+                Switch-GitLocalBranch -Name 'feature/test-branch' -Force
             } | Should -Throw -ExpectedMessage '*There are unstaged or staged changes*'
 
             # Clean up

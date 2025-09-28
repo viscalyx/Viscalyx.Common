@@ -97,7 +97,11 @@ BeforeAll {
         }
 
         # Push to origin
-        git push --set-upstream origin $currentBranch --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git push --set-upstream origin $currentBranch --quiet >nul 2>&1"
+        } else {
+            $gitOutput = git push --set-upstream origin $currentBranch --quiet 2>&1
+        }
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Failed to push to origin'
@@ -108,7 +112,11 @@ BeforeAll {
         git tag 'v1.1.0' *> $null
         git tag 'v2.0.0' *> $null
 
-        git push origin --tags *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git push origin --tags >nul 2>&1"
+        } else {
+            $gitOutput = git push origin --tags 2>&1
+        }
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Failed to push tags to origin'
@@ -427,8 +435,13 @@ Describe 'Request-GitTag Integration Tests' {
                     throw 'Failed to determine current branch name'
                 }
 
-                git push upstream $currentBranch --quiet 2>$null
-                git push upstream --tags --quiet 2>$null
+                if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                    & cmd.exe /c "git push upstream $currentBranch --quiet >nul 2>&1"
+                    & cmd.exe /c "git push upstream --tags --quiet >nul 2>&1"
+                } else {
+                    $gitOutput = git push upstream $currentBranch --quiet 2>&1
+                    $gitOutput = git push upstream --tags --quiet 2>&1
+                }
             }
             finally
             {
