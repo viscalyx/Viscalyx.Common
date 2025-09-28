@@ -66,14 +66,26 @@ BeforeAll {
         git push -u origin main --quiet 2>$null
 
         # Create a feature branch
-        git checkout -b feature/test --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            # Windows PowerShell - use cmd.exe for reliable output suppression
+            & cmd.exe /c "git checkout -b feature/test --quiet >nul 2>&1"
+        } else {
+            # PowerShell 7+ - capture output in variables
+            $gitOutput = git checkout -b feature/test --quiet 2>&1
+        }
         "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
         git commit -m "Feature commit" *> $null
         git push -u origin feature/test --quiet 2>$null
 
         # Switch back to main branch
-        git checkout main --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            # Windows PowerShell - use cmd.exe for reliable output suppression
+            & cmd.exe /c "git checkout main --quiet >nul 2>&1"
+        } else {
+            # PowerShell 7+ - capture output in variables
+            $gitOutput = git checkout main --quiet 2>&1
+        }
 
         # Store the initial branch for reference
         $script:initialBranch = git rev-parse --abbrev-ref HEAD
@@ -120,7 +132,13 @@ Describe 'Receive-GitBranch Integration Tests' {
     Context 'When checking out and pulling a branch' {
         It 'Should successfully checkout and pull main branch with -Checkout parameter' {
             # Start from feature branch
-            git checkout feature/test *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout feature/test >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git checkout feature/test *>$null
+            }
 
             # Use Receive-GitBranch to switch to main and pull
             { Receive-GitBranch -Checkout -BranchName 'main' -Force } | Should -Not -Throw
@@ -132,7 +150,13 @@ Describe 'Receive-GitBranch Integration Tests' {
 
         It 'Should successfully checkout and pull specified branch' {
             # Start from main branch
-            git checkout main --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout main --quiet >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = git checkout main --quiet 2>&1
+            }
 
             # Use Receive-GitBranch to switch to feature branch and pull
             { Receive-GitBranch -Checkout -BranchName 'feature/test' -Force } | Should -Not -Throw
@@ -146,7 +170,13 @@ Describe 'Receive-GitBranch Integration Tests' {
     Context 'When using rebase mode' {
         It 'Should successfully checkout, fetch, and rebase with main branch' {
             # Start from feature branch
-            git checkout feature/test *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout feature/test >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git checkout feature/test *>$null
+            }
 
             # Use Receive-GitBranch with rebase to switch to main
             { Receive-GitBranch -Checkout -BranchName 'main' -Rebase -Force } | Should -Not -Throw
@@ -158,7 +188,13 @@ Describe 'Receive-GitBranch Integration Tests' {
 
         It 'Should successfully checkout and rebase feature branch with main upstream' {
             # Start from main branch
-            git checkout main --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout main --quiet >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = git checkout main --quiet 2>&1
+            }
 
             # Use Receive-GitBranch with rebase on feature branch
             { Receive-GitBranch -Checkout -BranchName 'feature/test' -UpstreamBranchName 'main' -Rebase -Force } | Should -Not -Throw
@@ -178,7 +214,13 @@ Describe 'Receive-GitBranch Integration Tests' {
     Context 'When using WhatIf parameter' {
         It 'Should not change current branch when WhatIf is specified' {
             # Start from feature branch
-            git checkout feature/test *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout feature/test >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git checkout feature/test *>$null
+            }
             $originalBranch = git rev-parse --abbrev-ref HEAD
 
             # Run with WhatIf (need to use -Checkout if we want to test checkout behavior)
@@ -193,7 +235,13 @@ Describe 'Receive-GitBranch Integration Tests' {
     Context 'When testing in a repository with local changes' {
         It 'Should successfully work when there are no local changes' {
             # Ensure clean working directory
-            git checkout main --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout main --quiet >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = git checkout main --quiet 2>&1
+            }
             git reset --hard HEAD *> $null
 
             # This should work without issues
@@ -229,7 +277,13 @@ Describe 'Receive-GitBranch Integration Tests' {
             # Add additional content to remote to test pulling
             Push-Location -Path $script:testRepoPath
             try {
-                git checkout main --quiet 2>$null
+                if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                    # Windows PowerShell - use cmd.exe for reliable output suppression
+                    & cmd.exe /c "git checkout main --quiet >nul 2>&1"
+                } else {
+                    # PowerShell 7+ - capture output in variables
+                    $gitOutput = git checkout main --quiet 2>&1
+                }
                 "Additional content" | Out-File -FilePath 'additional.txt' -Encoding utf8
                 git add additional.txt *> $null
                 git commit -m "Additional commit" *> $null

@@ -116,12 +116,24 @@ Describe 'New-SamplerGitHubReleaseTag Integration Tests' -Tag 'Integration' {
     Context 'When creating a release tag with existing preview tag' {
         BeforeEach {
             # Add a remote origin for this specific test
-            & git remote add origin "file://$script:testRepoPath/.git" 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git remote add origin file://$script:testRepoPath/.git >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git remote add origin "file://$script:testRepoPath/.git" 2>&1
+            }
         }
 
         AfterEach {
             # Remove remote after test
-            & git remote remove origin 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git remote remove origin >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git remote remove origin 2>&1
+            }
         }
 
         It 'Should create a release tag from preview tag automatically' {
@@ -145,12 +157,24 @@ Describe 'New-SamplerGitHubReleaseTag Integration Tests' -Tag 'Integration' {
     Context 'When using ShouldProcess functionality' {
         BeforeEach {
             # Add a local remote for this specific test
-            & git remote add origin "file://$script:testRepoPath/.git" 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git remote add origin file://$script:testRepoPath/.git >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git remote add origin "file://$script:testRepoPath/.git" 2>&1
+            }
         }
 
         AfterEach {
             # Remove remote after test
-            & git remote remove origin 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git remote remove origin >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git remote remove origin 2>&1
+            }
         }
 
         It 'Should not create tag when WhatIf is specified' {
@@ -212,32 +236,64 @@ Describe 'New-SamplerGitHubReleaseTag Integration Tests' -Tag 'Integration' {
             }
 
             # Remove local preview tag and add remote pointing to empty repository
-            & git tag -d 'v1.0.0-preview0001' 2>$null
-            & git remote add origin "file://$emptyRemotePath/.git" 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git tag -d v1.0.0-preview0001 >nul 2>&1"
+                & cmd.exe /c "git remote add origin file://$emptyRemotePath/.git >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git tag -d 'v1.0.0-preview0001' 2>&1
+                $gitOutput = & git remote add origin "file://$emptyRemotePath/.git" 2>&1
+            }
 
             { New-SamplerGitHubReleaseTag -Force -ErrorAction Stop } | Should -Throw
 
             # Restore the preview tag and remove the remote for other tests
             & git tag 'v1.0.0-preview0001'
-            & git remote remove origin 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git remote remove origin >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git remote remove origin 2>&1
+            }
         }
     }
 
     Context 'When working with different branch names' {
         BeforeEach {
             # Add a local remote for this specific test
-            & git remote add origin "file://$script:testRepoPath/.git" 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git remote add origin file://$script:testRepoPath/.git >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git remote add origin "file://$script:testRepoPath/.git" 2>&1
+            }
         }
 
         AfterEach {
             # Remove remote after test
-            & git remote remove origin 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git remote remove origin >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git remote remove origin 2>&1
+            }
         }
 
         It 'Should work with non-default branch name' {
             # Create a develop branch and switch to it
-            & git checkout -b develop --quiet 2>$null
-            & git checkout main --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout -b develop --quiet >nul 2>&1"
+                & cmd.exe /c "git checkout main --quiet >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                & git checkout -b develop --quiet *>$null
+                & git checkout main --quiet *>$null
+            }
 
             { New-SamplerGitHubReleaseTag -DefaultBranchName 'main' -ReleaseTag 'v1.2.0' -Force -ErrorAction Stop } | Should -Not -Throw
 
@@ -250,17 +306,35 @@ Describe 'New-SamplerGitHubReleaseTag Integration Tests' -Tag 'Integration' {
     Context 'When using ReturnToCurrentBranch functionality' {
         BeforeEach {
             # Add a local remote for this specific test
-            & git remote add origin "file://$script:testRepoPath/.git" 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git remote add origin file://$script:testRepoPath/.git >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git remote add origin "file://$script:testRepoPath/.git" 2>&1
+            }
         }
 
         AfterEach {
             # Remove remote after test
-            & git remote remove origin 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git remote remove origin >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git remote remove origin 2>&1
+            }
         }
 
         It 'Should return to the current branch after tagging' {
             # Create and switch to a feature branch
-            & git checkout -b feature-branch --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout -b feature-branch --quiet >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                & git checkout -b feature-branch --quiet *>$null
+            }
             $originalBranch = & git branch --show-current 2>$null
 
             { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.3.0' -ReturnToCurrentBranch -Force -ErrorAction Stop } | Should -Not -Throw
