@@ -50,7 +50,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Initial commit"')
 
             # Get the default branch name (main or master)
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -Verbose -Debug -PassThru
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
             $script:defaultBranch = $result.Output
         }
         finally
