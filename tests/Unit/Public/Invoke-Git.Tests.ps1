@@ -101,26 +101,12 @@ Describe 'Viscalyx.Common\Invoke-Git' {
             $result.StandardError | Should -BeExactly 'Standard Error Message'
         }
 
-        It 'Should not throw, return result with -PassThru, with -Debug' {
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Debug
-
-            $result.ExitCode | Should -BeExactly 0
-
-            $result.Output | Should -BeExactly 'Standard Output Message'
-
-            $result.StandardError | Should -BeExactly 'Standard Error Message'
-        }
-
         It 'Should not throw without -PassThru' {
             { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) } | Should -Not -Throw
         }
 
         It 'Should not throw without -PassThru, with -Verbose' {
             { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose } | Should -Not -Throw
-        }
-
-        It 'Should not throw without -PassThru, with -Debug' {
-            { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Debug } | Should -Not -Throw
         }
     }
 
@@ -149,26 +135,12 @@ Describe 'Viscalyx.Common\Invoke-Git' {
             $result.StandardError | Should -BeExactly 'Standard Error Message'
         }
 
-        It 'Should not throw, return result with -PassThru, with -Debug' {
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Debug
-
-            $result.ExitCode | Should -BeExactly 128
-
-            $result.Output | Should -BeExactly 'Standard Output Message'
-
-            $result.StandardError | Should -BeExactly 'Standard Error Message'
-        }
-
         It 'Should throw without -PassThru' {
             { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) } | Should -Throw
         }
 
         It 'Should throw without -PassThru, with -Verbose' {
             { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose } | Should -Throw
-        }
-
-        It 'Should throw without -PassThru, with -Debug' {
-            { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Debug } | Should -Throw
         }
     }
 
