@@ -109,14 +109,14 @@ Describe 'Get-GitLocalBranchName Integration Tests' {
 
         It 'Should return correct branch name after switching branches' {
             # Switch to feature branch
-            git checkout feature/branch1 *> $null
+            $gitOutput = git checkout feature/branch1 2>&1
 
             $result = Get-GitLocalBranchName -Current -ErrorAction Stop
 
             $result | Should -Be 'feature/branch1'
 
             # Switch back to default branch
-            git checkout $script:defaultBranch *> $null
+            $gitOutput = git checkout $script:defaultBranch 2>&1
         }
     }
 
@@ -243,7 +243,7 @@ Describe 'Get-GitLocalBranchName Integration Tests' {
             $result | Should -Be 'test-branch_123'
 
             # Clean up
-            git checkout $script:defaultBranch *> $null
+            $gitOutput = git checkout $script:defaultBranch 2>&1
             git branch -D 'test-branch_123' *> $null
         }
 

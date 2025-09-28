@@ -384,7 +384,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
                 # Switch back to current branch and get range
                 $currentGitBranch = git rev-parse --abbrev-ref HEAD 2>$null
                 if ($currentGitBranch -ne $script:currentBranch) {
-                    & cmd.exe /c "git checkout $script:currentBranch >nul 2>&1"
+                    $gitOutput = git checkout $script:currentBranch 2>&1
                 }
 
                 $result = Get-GitBranchCommit -From $script:currentBranch -To 'test-range-branch' -ErrorAction Stop
@@ -401,7 +401,7 @@ Describe 'Get-GitBranchCommit Integration Tests' {
                 # Clean up
                 $currentGitBranch = git rev-parse --abbrev-ref HEAD 2>$null
                 if ($currentGitBranch -ne $script:currentBranch) {
-                    & cmd.exe /c "git checkout $script:currentBranch >nul 2>&1"
+                    $gitOutput = git checkout $script:currentBranch 2>&1
                 }
                 git branch -D 'test-range-branch' 2>$null
                 Remove-Item -Path 'test-range-file.txt' -ErrorAction SilentlyContinue
