@@ -5,11 +5,11 @@
     .DESCRIPTION
         Redacts the token from the specified git command so that the command can be safely outputted in logs.
 
-    .PARAMETER Command
-        Command passed to Invoke-Git
+    .PARAMETER InputString
+        The input string to redact token from.
 
     .EXAMPLE
-        Hide-GitToken -Command @( 'remote', 'add', 'origin', 'https://user:1b7270718ad84857b52941b36a632f369d18ff72@github.com/Owner/Repo.git' )
+        Hide-GitToken -InputString @( 'remote', 'add', 'origin', 'https://user:1b7270718ad84857b52941b36a632f369d18ff72@github.com/Owner/Repo.git' )
 
         Returns a string to be used for logs.
 #>
