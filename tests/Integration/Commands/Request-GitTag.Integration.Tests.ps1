@@ -47,7 +47,7 @@ BeforeAll {
     Push-Location -Path $script:bareRepoPath
     try
     {
-        git init --bare *> $null
+        git init --bare --initial-branch=main *> $null
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Failed to initialize bare repository'
@@ -402,7 +402,7 @@ Describe 'Request-GitTag Integration Tests' {
             Push-Location -Path $script:upstreamRepoPath
             try
             {
-                git init --bare *> $null
+                git init --bare --initial-branch=main *> $null
                 if ($LASTEXITCODE -ne 0)
                 {
                     throw 'Failed to initialize upstream repository'

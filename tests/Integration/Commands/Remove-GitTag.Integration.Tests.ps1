@@ -38,7 +38,7 @@ BeforeAll {
     # Initialize the bare repository (simulates a remote)
     Push-Location -Path $script:bareRepoPath
     try {
-        git init --bare *> $null
+        git init --bare --initial-branch=main *> $null
     }
     finally {
         Pop-Location

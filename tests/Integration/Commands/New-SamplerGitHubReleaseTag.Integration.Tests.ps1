@@ -49,7 +49,7 @@ Describe 'New-SamplerGitHubReleaseTag Integration Tests' -Tag 'Integration' {
             & git init --quiet --initial-branch=main 2>$null
             if ($LASTEXITCODE -ne 0) {
                 # Fallback for older git versions
-                & git init --quiet
+                & git init --quiet --initial-branch=main
                 & git checkout -b main --quiet 2>$null
             }
             & git config user.name "Test User"

@@ -46,7 +46,7 @@ Describe 'New-GitTag Integration Tests' -Tag 'Integration' {
         # Initialize a git repository
         Push-Location -Path $script:testRepoPath
         try {
-            & git init --quiet
+            & git init --quiet --initial-branch=main
             & git config user.name "Test User"
             & git config user.email "test@example.com"
             

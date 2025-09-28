@@ -36,7 +36,7 @@ BeforeAll {
     Push-Location -Path $script:testRepoPath
     try {
         # Initialize git repository
-        git init *> $null
+        git init --initial-branch=main *> $null
         git config user.email "test@example.com" *> $null
         git config user.name "Test User" *> $null
 

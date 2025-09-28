@@ -227,7 +227,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
         BeforeEach {
             # Create a bare repository to act as a remote
             $script:bareRepoPath = Join-Path -Path $TestDrive -ChildPath 'BareTestRepo'
-            git init --bare $script:bareRepoPath *> $null
+            git init --bare --initial-branch=main $script:bareRepoPath *> $null
 
             # Add the bare repo as origin remote
             git remote add origin $script:bareRepoPath 2>$null
@@ -297,7 +297,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
         It 'Should handle custom remote name' {
             # Add another remote with different name
             $script:upstreamRepoPath = Join-Path -Path $TestDrive -ChildPath 'UpstreamTestRepo'
-            try { git init --bare $script:upstreamRepoPath *> $null } catch { }
+            try { git init --bare --initial-branch=main $script:upstreamRepoPath *> $null } catch { }
             try { git remote add upstream $script:upstreamRepoPath *> $null } catch { }
 
             # Test with custom remote name - this will fail due to missing upstream branch
