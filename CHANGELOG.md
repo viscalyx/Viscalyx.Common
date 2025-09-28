@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Get-GitRemote`
   - `Get-GitRemoteBranch`
   - `Get-GitTag`
+  - `Invoke-Git`
   - `New-GitTag`
   - `Push-GitTag`
   - `Receive-GitBranch` ([#5](https://github.com/johlju/Viscalyx.Common/issues/5))

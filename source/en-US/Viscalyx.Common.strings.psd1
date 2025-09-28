@@ -308,4 +308,12 @@ ConvertFrom-StringData @'
 
     ## ConvertTo-DifferenceString
     ConvertTo_DifferenceString_ReferenceLabelTruncated = Reference label '{0}' is longer than the maximum width of {1} characters and has been truncated to '{2}'. (CTDS0001)
+
+    ## Invoke-Git
+    Invoke_Git_InvokingGitMessage = Invoking Git using arguments '{0}'.
+    Invoke_Git_StandardOutputMessage = Output: '{0}'
+    Invoke_Git_StandardErrorMessage = Error: '{0}'
+    Invoke_Git_ExitCodeMessage = Exit code: '{0}'
+    Invoke_Git_CommandDebug = Command: {0}
+    Invoke_Git_WorkingDirectoryDebug = Working Directory: '{0}'
 '@
