@@ -109,14 +109,26 @@ Describe 'Get-GitLocalBranchName Integration Tests' {
 
         It 'Should return correct branch name after switching branches' {
             # Switch to feature branch
-            $gitOutput = git checkout feature/branch1 2>&1
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout feature/branch1 >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git checkout feature/branch1 *>$null
+            }
 
             $result = Get-GitLocalBranchName -Current -ErrorAction Stop
 
             $result | Should -Be 'feature/branch1'
 
             # Switch back to default branch
-            $gitOutput = git checkout $script:defaultBranch 2>&1
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git checkout $script:defaultBranch *>$null
+            }
         }
     }
 
@@ -243,7 +255,13 @@ Describe 'Get-GitLocalBranchName Integration Tests' {
             $result | Should -Be 'test-branch_123'
 
             # Clean up
-            $gitOutput = git checkout $script:defaultBranch 2>&1
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git checkout $script:defaultBranch *>$null
+            }
             git branch -D 'test-branch_123' *> $null
         }
 
