@@ -45,13 +45,23 @@ BeforeAll {
         {
             $gitOutput = git init --initial-branch=main --quiet 2>&1
         }
-        git config user.email 'test@example.com' *> $null
-        git config user.name 'Test User' *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git config user.email test@example.com >nul 2>&1"
+            & cmd.exe /c "git config user.name 'Test User' >nul 2>&1"
+        } else {
+            $gitOutput = git config user.email 'test@example.com' 2>&1
+            $gitOutput = git config user.name 'Test User' 2>&1
+        }
 
         # Create initial commit
         'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
-        git add test.txt *> $null
-        git commit -m 'Initial commit' *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git add test.txt >nul 2>&1"
+            & cmd.exe /c "git commit -m 'Initial commit' >nul 2>&1"
+        } else {
+            $gitOutput = git add test.txt 2>&1
+            $gitOutput = git commit -m 'Initial commit' 2>&1
+        }
 
         # Get the default branch name (main or master)
         $script:defaultBranch = git rev-parse --abbrev-ref HEAD
@@ -66,8 +76,13 @@ BeforeAll {
             $gitOutput = git checkout -b 'feature/original-branch' --quiet 2>&1
         }
         'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
-        git add feature.txt *> $null
-        git commit -m 'Feature commit' *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git add feature.txt >nul 2>&1"
+            & cmd.exe /c "git commit -m 'Feature commit' >nul 2>&1"
+        } else {
+            $gitOutput = git add feature.txt 2>&1
+            $gitOutput = git commit -m 'Feature commit' 2>&1
+        }
 
         # Create another test branch for remote scenarios
         if ($PSVersionTable.PSEdition -eq 'Desktop')
@@ -79,8 +94,13 @@ BeforeAll {
             $gitOutput = git checkout -b 'develop' --quiet 2>&1
         }
         'Develop content' | Out-File -FilePath 'develop.txt' -Encoding utf8
-        git add develop.txt *> $null
-        git commit -m 'Develop commit' *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git add develop.txt >nul 2>&1"
+            & cmd.exe /c "git commit -m 'Develop commit' >nul 2>&1"
+        } else {
+            $gitOutput = git add develop.txt 2>&1
+            $gitOutput = git commit -m 'Develop commit' 2>&1
+        }
 
         # Switch back to default branch
         if ($PSVersionTable.PSEdition -eq 'Desktop')
@@ -91,7 +111,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - use direct redirection
-            git checkout $script:defaultBranch *>$null
+            $gitOutput = git checkout $script:defaultBranch 2>&1
         }
     }
     finally
@@ -133,7 +153,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             else
             {
                 # PowerShell 7+ - use direct redirection
-                git checkout 'feature/original-branch' *>$null
+                $gitOutput = git checkout 'feature/original-branch' 2>&1
             }
         }
 
@@ -152,7 +172,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
                     else
                     {
                         # PowerShell 7+ - use direct redirection
-                        git checkout $script:defaultBranch *>$null
+                        $gitOutput = git checkout $script:defaultBranch 2>&1
                     }
                     git branch -D 'feature/renamed-branch' *> $null
                 }
@@ -202,7 +222,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             else
             {
                 # PowerShell 7+ - use direct redirection
-                git checkout $script:defaultBranch *>$null
+                $gitOutput = git checkout $script:defaultBranch 2>&1
             }
             if ($PSVersionTable.PSEdition -eq 'Desktop')
             {
@@ -241,7 +261,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             else
             {
                 # PowerShell 7+ - use direct redirection
-                git checkout $script:defaultBranch *>$null
+                $gitOutput = git checkout $script:defaultBranch 2>&1
             }
 
             try
@@ -414,8 +434,13 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
                 $gitOutput = git checkout -b 'remote-test-branch' --quiet 2>&1
             }
             'Remote test content' | Out-File -FilePath 'remote-test.txt' -Encoding utf8
-            git add remote-test.txt *> $null
-            git commit -m 'Remote test commit' *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git add remote-test.txt >nul 2>&1"
+                & cmd.exe /c "git commit -m 'Remote test commit' >nul 2>&1"
+            } else {
+                $gitOutput = git add remote-test.txt 2>&1
+                $gitOutput = git commit -m 'Remote test commit' 2>&1
+            }
             if ($PSVersionTable.PSEdition -eq 'Desktop')
             {
                 & cmd.exe /c 'git push origin remote-test-branch >nul 2>&1'
@@ -434,7 +459,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             }
             else
             {
-                $currentBranch = git rev-parse --abbrev-ref HEAD 2>$null
+                $currentBranch = git rev-parse --abbrev-ref HEAD 2>&1
             }
             if ($currentBranch -ne $script:defaultBranch)
             {
@@ -516,7 +541,11 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             # Verify the branch was renamed despite the upstream tracking failure
             # Switch back to see if branch was renamed before the upstream tracking failed
-            git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                $gitOutput = git checkout $script:defaultBranch 2>&1
+            }
             $branchExists = git branch --list 'renamed-remote-branch'
             $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if upstream tracking fails'
         }
@@ -530,7 +559,11 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             } | Should -Throw -Because 'Cannot determine remote HEAD in test setup'
 
             # Verify the branch was renamed despite the set-head failure
-            git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                $gitOutput = git checkout $script:defaultBranch 2>&1
+            }
             $branchExists = git branch --list 'renamed-remote-branch'
             $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if set-head fails'
         }
@@ -617,7 +650,11 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             $currentBranch | Should -Be 'renamed-current-branch'
 
             # Clean up
-            git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                $gitOutput = git checkout $script:defaultBranch 2>&1
+            }
             if ($PSVersionTable.PSEdition -eq 'Desktop')
             {
                 & cmd.exe /c 'git branch -D renamed-current-branch >nul 2>&1'
@@ -653,7 +690,11 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             $currentBranch | Should -Be 'other-branch'
 
             # Clean up
-            git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                $gitOutput = git checkout $script:defaultBranch 2>&1
+            }
             if ($PSVersionTable.PSEdition -eq 'Desktop')
             {
                 & cmd.exe /c 'git branch -D other-branch >nul 2>&1'
