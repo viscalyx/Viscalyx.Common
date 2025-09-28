@@ -63,7 +63,13 @@ BeforeAll {
 
         # Set up main branch and push to remote
         git branch -M main *> $null
-        git push -u origin main --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            # Windows PowerShell - use cmd.exe for reliable output suppression
+            & cmd.exe /c "git push -u origin main --quiet >nul 2>&1"
+        } else {
+            # PowerShell 7+ - capture output in variables
+            $gitOutput = git push -u origin main --quiet 2>&1
+        }
 
         # Create a feature branch
         if ($PSVersionTable.PSEdition -eq 'Desktop') {
@@ -76,7 +82,13 @@ BeforeAll {
         "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
         git commit -m "Feature commit" *> $null
-        git push -u origin feature/test --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            # Windows PowerShell - use cmd.exe for reliable output suppression
+            & cmd.exe /c "git push -u origin feature/test --quiet >nul 2>&1"
+        } else {
+            # PowerShell 7+ - capture output in variables
+            $gitOutput = git push -u origin feature/test --quiet 2>&1
+        }
 
         # Switch back to main branch
         if ($PSVersionTable.PSEdition -eq 'Desktop') {
@@ -287,7 +299,13 @@ Describe 'Receive-GitBranch Integration Tests' {
                 "Additional content" | Out-File -FilePath 'additional.txt' -Encoding utf8
                 git add additional.txt *> $null
                 git commit -m "Additional commit" *> $null
-                git push origin main *> $null
+                if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                    # Windows PowerShell - use cmd.exe for reliable output suppression
+                    & cmd.exe /c "git push origin main >nul 2>&1"
+                } else {
+                    # PowerShell 7+ - use direct redirection
+                    git push origin main *>$null
+                }
 
                 # Reset local main to simulate being behind
                 git reset --hard HEAD~1 *> $null
