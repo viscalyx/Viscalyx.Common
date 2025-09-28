@@ -62,7 +62,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
         # Need to add StartInfo property and its nested properties
         $mockStartInfo = New-Object -TypeName 'Object'
-        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'Arguments' -Value '' -Force
+        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'Arguments' -Value @() -Force
         $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'CreateNoWindow' -Value $false -Force
         $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'FileName' -Value '' -Force
         $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardOutput' -Value $false -Force
@@ -174,6 +174,68 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                             "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $TestDrive)`n"
 
             { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments $Command } | Should -Throw $throwMessage
+        }
+    }
+
+    Context 'When arguments contain spaces' {
+        BeforeAll {
+            $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+        }
+
+        It 'Should quote arguments containing spaces that are not already quoted' {
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', 'John Doe' ) -PassThru
+
+            # Verify that the processed arguments array contains properly quoted arguments
+            $processedArgs = $mockProcess.StartInfo.Arguments
+            $processedArgs | Should -Contain 'config'
+            $processedArgs | Should -Contain 'user.name'
+            $processedArgs | Should -Contain '"John Doe"'
+            $processedArgs | Should -Not -Contain 'John Doe'
+        }
+
+        It 'Should not add quotes to arguments that are already quoted' {
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', '"John Doe"' ) -PassThru
+
+            # Verify that already quoted arguments are not double-quoted
+            $processedArgs = $mockProcess.StartInfo.Arguments
+            $processedArgs | Should -Contain 'config'
+            $processedArgs | Should -Contain 'user.name'
+            $processedArgs | Should -Contain '"John Doe"'
+            $processedArgs | Should -Not -Contain '""John Doe""'
+        }
+
+        It 'Should not quote arguments without spaces' {
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', 'JohnDoe' ) -PassThru
+
+            # Verify that arguments without spaces are not quoted
+            $processedArgs = $mockProcess.StartInfo.Arguments
+            $processedArgs | Should -Contain 'config'
+            $processedArgs | Should -Contain 'user.name'
+            $processedArgs | Should -Contain 'JohnDoe'
+            $processedArgs | Should -Not -Contain '"JohnDoe"'
+        }
+
+        It 'Should handle mixed arguments with and without spaces' {
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'commit', '-m', 'Fix bug in module', '--author', 'John Doe <john@example.com>' ) -PassThru
+
+            # Verify mixed argument handling
+            $processedArgs = $mockProcess.StartInfo.Arguments
+            $processedArgs | Should -Contain 'commit'
+            $processedArgs | Should -Contain '-m'
+            $processedArgs | Should -Contain '"Fix bug in module"'
+            $processedArgs | Should -Contain '--author'
+            $processedArgs | Should -Contain '"John Doe <john@example.com>"'
+        }
+
+        It 'Should handle arguments with different types of whitespace' {
+            $messageWithWhitespace = "Fix`tbug`nwith`rwhitespace"
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'commit', '-m', $messageWithWhitespace ) -PassThru
+
+            # Verify that tab, newline, and carriage return characters trigger quoting
+            $processedArgs = $mockProcess.StartInfo.Arguments
+            $processedArgs | Should -Contain 'commit'
+            $processedArgs | Should -Contain '-m'
+            $processedArgs | Should -Contain "`"$messageWithWhitespace`""
         }
     }
 }

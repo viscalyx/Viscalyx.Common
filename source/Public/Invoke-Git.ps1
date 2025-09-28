@@ -73,14 +73,25 @@ function Invoke-Git
         'StandardError'    = $null
     }
 
-    # TODO: If an argument in the array contains a space, it needs to be quoted with double quotes unless it's already quoted.
+    # Process arguments to add quotes around arguments containing spaces if not already quoted
+    $processedArguments = foreach ($argument in $Arguments)
+    {
+        if ($argument -match '\s' -and $argument -notmatch '^".*"$')
+        {
+            '"{0}"' -f $argument
+        }
+        else
+        {
+            $argument
+        }
+    }
 
-    Write-Verbose -Message ($script:localizedData.Invoke_Git_InvokingGitMessage -f (Hide-GitToken -InputString $Arguments))
+    Write-Verbose -Message ($script:localizedData.Invoke_Git_InvokingGitMessage -f (Hide-GitToken -InputString $processedArguments))
 
     try
     {
         $process = New-Object -TypeName System.Diagnostics.Process
-        $process.StartInfo.Arguments = $Arguments
+        $process.StartInfo.Arguments = $processedArguments
         $process.StartInfo.CreateNoWindow = $true
         $process.StartInfo.FileName = 'git'
         $process.StartInfo.RedirectStandardOutput = $true
@@ -119,13 +130,13 @@ function Invoke-Git
             Write-Verbose -Message ($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)
             Write-Verbose -Message ($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)
 
-            Write-Debug -Message ($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $Arguments)))
+            Write-Debug -Message ($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))
             Write-Debug -Message ($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $WorkingDirectory)
         }
 
         if ($gitResult.ExitCode -ne 0 -and $PassThru -eq $false)
         {
-            $throwMessage = "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $Arguments)))`n" +`
+            $throwMessage = "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))`n" +`
                             "$($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)`n" +`
                             "$($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.Output)`n" +`
                             "$($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)`n" +`
