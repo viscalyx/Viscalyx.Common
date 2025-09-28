@@ -42,12 +42,12 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             # Initialize git repository
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('init', '--initial-branch=main', '--quiet')
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.email', 'test@example.com')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.name', '"Test User"')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.name', 'Test User')
 
             # Create initial commit
             'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'test.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Initial commit"')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Initial commit')
 
             # Get the default branch name (main or master)
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
@@ -89,7 +89,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'feature/original-branch', '--quiet')
             'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'feature.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Feature commit"')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Feature commit')
         }
 
         AfterEach {
@@ -123,7 +123,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             'Feature content' | Out-File -FilePath 'feature2.txt' -Encoding utf8
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'feature2.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Feature commit"')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Feature commit')
 
             # Get the commit hash before renaming
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
@@ -151,7 +151,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             'Special content' | Out-File -FilePath 'special.txt' -Encoding utf8
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'special.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Special commit"')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Special commit')
 
             # Rename the branch
             { Rename-GitLocalBranch -Name 'feature/test-123_special.branch' -NewName 'feature/renamed-branch' } | Should -Not -Throw
@@ -215,7 +215,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             'Remote test content' | Out-File -FilePath 'remote-test.txt' -Encoding utf8
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'remote-test.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Remote test commit"')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Remote test commit')
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('push', 'origin', 'remote-test-branch')
         }
 
