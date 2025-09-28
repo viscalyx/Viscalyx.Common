@@ -43,7 +43,7 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
             Set-Location -Path $script:testRepoPath
 
             # Initialize git repository
-            $null = git init --quiet 2>&1
+            $null = git init --quiet --initial-branch=main 2>&1
             $null = git config user.email "test@example.com" 2>&1
             $null = git config user.name "Test User" 2>&1
 
@@ -186,7 +186,7 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
             Set-Location -Path $script:testRepoPath
 
             # Initialize git repository without any remotes
-            $null = git init --quiet 2>&1
+            $null = git init --quiet --initial-branch=main 2>&1
             $null = git config user.email "test@example.com" 2>&1
             $null = git config user.name "Test User" 2>&1
 
@@ -249,7 +249,7 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
             Set-Location -Path $script:testRepoPath
 
             # Initialize git repository
-            $null = git init --quiet 2>&1
+            $null = git init --quiet --initial-branch=main 2>&1
             $null = git config user.email "test@example.com" 2>&1
             $null = git config user.name "Test User" 2>&1
 

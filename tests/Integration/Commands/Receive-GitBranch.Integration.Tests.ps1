@@ -39,7 +39,7 @@ BeforeAll {
     # Initialize the remote repository first
     Push-Location -Path $script:remoteRepoPath
     try {
-        git init --bare *> $null
+        git init --bare --initial-branch=main *> $null
     }
     finally {
         Pop-Location

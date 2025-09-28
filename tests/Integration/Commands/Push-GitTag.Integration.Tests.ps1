@@ -49,7 +49,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
         # Initialize a bare remote repository (simulates GitHub/GitLab etc.)
         Push-Location -Path $script:remoteRepoPath
         try {
-            & git init --bare --quiet
+            & git init --bare --quiet --initial-branch=main
         }
         catch {
             throw "Failed to setup test remote git repository: $($_.Exception.Message)"
@@ -61,7 +61,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
         # Initialize a local git repository and set up remote
         Push-Location -Path $script:testRepoPath
         try {
-            & git init --quiet
+            & git init --quiet --initial-branch=main
             & git config user.name "Test User"
             & git config user.email "test@example.com"
             

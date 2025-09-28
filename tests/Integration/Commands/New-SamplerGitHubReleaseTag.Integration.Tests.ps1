@@ -194,7 +194,7 @@ Describe 'New-SamplerGitHubReleaseTag Integration Tests' -Tag 'Integration' {
 
             Push-Location -Path $script:invalidRepoPath
             try {
-                & git init --quiet
+                & git init --quiet --initial-branch=main
                 & git config user.name "Test User"
                 & git config user.email "test@example.com"
 
@@ -229,7 +229,7 @@ Describe 'New-SamplerGitHubReleaseTag Integration Tests' -Tag 'Integration' {
             Push-Location -Path $emptyRemotePath
             try {
                 # Initialize empty remote repository
-                & git init --bare --quiet 2>$null
+                & git init --bare --quiet --initial-branch=main 2>$null
             }
             finally {
                 Pop-Location
