@@ -58,7 +58,11 @@ BeforeAll {
     Push-Location -Path $script:testRepoPath
     try {
         # Initialize git repository
-        git init --initial-branch=main --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git init --initial-branch=main --quiet >nul 2>&1"
+        } else {
+            $gitOutput = git init --initial-branch=main --quiet 2>&1
+        }
         git config user.email "test@example.com" *> $null
         git config user.name "Test User" *> $null
 
@@ -72,14 +76,32 @@ BeforeAll {
         git remote add upstream $script:upstreamRepoPath *> $null
 
         # Push to remotes to establish them
-        git push -u myremote main --quiet 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            git push -u myremote master --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            # Windows PowerShell - use cmd.exe for reliable output suppression
+            & cmd.exe /c "git push -u myremote main --quiet >nul 2>&1"
+            if ($LASTEXITCODE -ne 0) {
+                & cmd.exe /c "git push -u myremote master --quiet >nul 2>&1"
+            }
+        } else {
+            # PowerShell 7+ - capture output in variables
+            $gitOutput = git push -u myremote main --quiet 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                $gitOutput = git push -u myremote master --quiet 2>&1
+            }
         }
 
-        git push upstream main *> $null 2> $null
-        if ($LASTEXITCODE -ne 0) {
-            git push upstream master *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            # Windows PowerShell - use cmd.exe for reliable output suppression
+            & cmd.exe /c "git push upstream main >nul 2>&1"
+            if ($LASTEXITCODE -ne 0) {
+                & cmd.exe /c "git push upstream master >nul 2>&1"
+            }
+        } else {
+            # PowerShell 7+ - capture output in variables
+            $gitOutput = git push upstream main 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                $gitOutput = git push upstream master 2>&1
+            }
         }
     }
     finally {
@@ -182,7 +204,13 @@ Describe 'Rename-GitRemote Integration Tests' {
 
             # Set up upstream tracking for the current branch and push
             $currentBranch = git branch --show-current
-            git push --set-upstream origin $currentBranch --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git push --set-upstream origin $currentBranch --quiet >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = git push --set-upstream origin $currentBranch --quiet 2>&1
+            }
 
             # Now a regular push should work without errors
             { git push origin } | Should -Not -Throw

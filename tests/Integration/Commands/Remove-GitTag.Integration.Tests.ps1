@@ -72,7 +72,13 @@ BeforeAll {
         git tag 'test-tag-3' *> $null
 
         # Push tags to remote
-        git push origin --tags *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            # Windows PowerShell - use cmd.exe for reliable output suppression
+            & cmd.exe /c "git push origin --tags >nul 2>&1"
+        } else {
+            # PowerShell 7+ - use direct redirection
+            git push origin --tags *>$null
+        }
     }
     finally {
         Pop-Location
@@ -104,7 +110,13 @@ Describe 'Remove-GitTag Integration Tests' {
             git tag -l | ForEach-Object { git tag -d $_ *> $null 2>&1 }
             git ls-remote --tags origin 2>$null | ForEach-Object {
                 if ($_ -match 'refs/tags/(.+?)(\^{})?$') {
-                    git push origin ":refs/tags/$($matches[1])" *> $null 2>&1
+                    if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                        # Windows PowerShell - use cmd.exe for reliable output suppression
+                        & cmd.exe /c "git push origin :refs/tags/$($matches[1]) >nul 2>&1"
+                    } else {
+                        # PowerShell 7+ - use direct redirection
+                        git push origin ":refs/tags/$($matches[1])" *>$null
+                    }
                 }
             }
             Start-Sleep -Milliseconds 100
@@ -113,9 +125,17 @@ Describe 'Remove-GitTag Integration Tests' {
             git tag 'test-tag-1' *> $null
             git tag 'test-tag-2' *> $null
             git tag 'test-tag-3' *> $null
-            git push origin 'test-tag-1' *> $null 2>&1
-            git push origin 'test-tag-2' *> $null 2>&1
-            git push origin 'test-tag-3' *> $null 2>&1
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git push origin test-tag-1 >nul 2>&1"
+                & cmd.exe /c "git push origin test-tag-2 >nul 2>&1"
+                & cmd.exe /c "git push origin test-tag-3 >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git push origin 'test-tag-1' *>$null
+                git push origin 'test-tag-2' *>$null
+                git push origin 'test-tag-3' *>$null
+            }
             Start-Sleep -Milliseconds 100
         }
 
@@ -174,7 +194,13 @@ Describe 'Remove-GitTag Integration Tests' {
             git tag -l | ForEach-Object { git tag -d $_ *> $null 2>&1 }
             git ls-remote --tags origin 2>$null | ForEach-Object {
                 if ($_ -match 'refs/tags/(.+?)(\^{})?$') {
-                    git push origin ":refs/tags/$($matches[1])" *> $null 2>&1
+                    if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                        # Windows PowerShell - use cmd.exe for reliable output suppression
+                        & cmd.exe /c "git push origin :refs/tags/$($matches[1]) >nul 2>&1"
+                    } else {
+                        # PowerShell 7+ - use direct redirection
+                        git push origin ":refs/tags/$($matches[1])" *>$null
+                    }
                 }
             }
             Start-Sleep -Milliseconds 100
@@ -187,7 +213,13 @@ Describe 'Remove-GitTag Integration Tests' {
         It 'Should remove a single tag from remote repository' {
             # Create a tag for this specific test
             git tag 'remote-test-tag' *> $null
-            git push origin 'remote-test-tag' *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git push origin remote-test-tag >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git push origin 'remote-test-tag' *>$null
+            }
             Start-Sleep -Milliseconds 200
 
             # Verify tag exists on remote
@@ -248,7 +280,13 @@ Describe 'Remove-GitTag Integration Tests' {
             git tag -l | ForEach-Object { git tag -d $_ *> $null 2>&1 }
             git ls-remote --tags origin 2>$null | ForEach-Object {
                 if ($_ -match 'refs/tags/(.+?)(\^{})?$') {
-                    git push origin ":refs/tags/$($matches[1])" *> $null 2>&1
+                    if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                        # Windows PowerShell - use cmd.exe for reliable output suppression
+                        & cmd.exe /c "git push origin :refs/tags/$($matches[1]) >nul 2>&1"
+                    } else {
+                        # PowerShell 7+ - use direct redirection
+                        git push origin ":refs/tags/$($matches[1])" *>$null
+                    }
                 }
             }
             Start-Sleep -Milliseconds 100
@@ -261,7 +299,13 @@ Describe 'Remove-GitTag Integration Tests' {
         It 'Should remove tag from both local and remote when both are specified' {
             # Create a tag for this specific test
             git tag 'both-test-tag' *> $null
-            git push origin 'both-test-tag' *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git push origin both-test-tag >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git push origin 'both-test-tag' *>$null
+            }
             Start-Sleep -Milliseconds 200
 
             # Verify tag exists both locally and remotely
@@ -289,7 +333,13 @@ Describe 'Remove-GitTag Integration Tests' {
             # Setup clean environment with base tags
             git tag -l | ForEach-Object { git tag -d $_ *> $null 2>&1 }
             git tag 'test-tag-1' *> $null
-            git push origin 'test-tag-1' *> $null 2>&1
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git push origin test-tag-1 >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = git push origin 'test-tag-1' 2>&1
+            }
         }
 
         AfterEach {

@@ -61,7 +61,13 @@ BeforeAll {
         git commit -m "Develop commit" *> $null
 
         # Switch back to default branch
-        git checkout $script:defaultBranch *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            # Windows PowerShell - use cmd.exe for reliable output suppression
+            & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+        } else {
+            # PowerShell 7+ - use direct redirection
+            git checkout $script:defaultBranch *>$null
+        }
     }
     finally {
         Pop-Location
@@ -92,7 +98,13 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
     Context 'When renaming a local branch successfully' {
         BeforeEach {
             # Ensure we start with the feature branch
-            git checkout 'feature/original-branch' *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout feature/original-branch >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git checkout 'feature/original-branch' *>$null
+            }
         }
 
         AfterEach {
@@ -100,7 +112,13 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             try {
                 $currentBranch = git rev-parse --abbrev-ref HEAD 2>&1
                 if ($LASTEXITCODE -eq 0 -and $currentBranch -eq 'feature/renamed-branch') {
-                    git checkout $script:defaultBranch *> $null
+                    if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                        # Windows PowerShell - use cmd.exe for reliable output suppression
+                        & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+                    } else {
+                        # PowerShell 7+ - use direct redirection
+                        git checkout $script:defaultBranch *>$null
+                    }
                     git branch -D 'feature/renamed-branch' *> $null
                 }
                 $existingBranches = git branch --list 'feature/renamed-branch' 2>&1
@@ -138,7 +156,13 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
         It 'Should preserve commit history when renaming a branch' {
             # Make sure we have a fresh branch for this test
-            git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git checkout $script:defaultBranch *>$null
+            }
             git checkout -b 'feature/original-branch' --quiet 2>$null
             "Feature content" | Out-File -FilePath 'feature2.txt' -Encoding utf8
             git add feature2.txt *> $null
@@ -161,7 +185,13 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             $commitMessage | Should -Be 'Feature commit'
 
             # Clean up the extra file
-            git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                # PowerShell 7+ - use direct redirection
+                git checkout $script:defaultBranch *>$null
+            }
             try { git branch -D 'feature/renamed-branch' *> $null } catch { }
             try { Remove-Item -Path 'feature2.txt' -Force -ErrorAction SilentlyContinue } catch { }
         }
