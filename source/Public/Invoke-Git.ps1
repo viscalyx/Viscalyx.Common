@@ -105,8 +105,18 @@ function Invoke-Git
             if ($process.WaitForExit($TimeOut) -eq $true)
             {
                 $gitResult.ExitCode = $process.ExitCode
-                $gitResult.Output = $process.StandardOutput.ReadToEnd().Trim() # Trim to remove trailing newline
                 $gitResult.StandardError = $process.StandardError.ReadToEnd()
+
+                $rawOutput = $process.StandardOutput.ReadToEnd()
+
+                $gitResult.Output = foreach ($line in ($rawOutput -split '\r?\n'))
+                {
+                    $trimmed = $line.Trim()
+                    if (-not [System.String]::IsNullOrEmpty($trimmed))
+                    {
+                        $trimmed
+                    }
+                }
             }
         }
     }
