@@ -238,4 +238,215 @@ Describe 'Viscalyx.Common\Invoke-Git' {
             $processedArgs | Should -Contain "`"$messageWithWhitespace`""
         }
     }
+
+    Context 'When git output contains multiple lines with whitespace' {
+        BeforeAll {
+            $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+        }
+
+        It 'Should split CRLF lines and trim whitespace, filtering empty lines' {
+            Mock -CommandName New-Object -MockWith {
+                $testMockProcess = New-MockObject -Type System.Diagnostics.Process
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Start' -Value { return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'WaitForExit' -Value { param($timeout) return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Dispose' -Value { } -Force
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+
+                # Mock StandardOutput to return multi-line string with CRLF, whitespace, and empty lines
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "  line1  `r`n`r`n  line2  `r`n   `r`n  line3  `r`n" } -PassThru -Force
+                } -Force
+
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                } -Force
+
+                # Need to add StartInfo property and its nested properties
+                $testMockStartInfo = New-Object -TypeName 'Object'
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'Arguments' -Value @() -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'CreateNoWindow' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'FileName' -Value '' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardOutput' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardError' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'UseShellExecute' -Value $true -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WindowStyle' -Value 'Normal' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WorkingDirectory' -Value '' -Force
+
+                $testMockProcess | Add-Member -MemberType NoteProperty -Name 'StartInfo' -Value $testMockStartInfo -Force
+                return $testMockProcess
+            } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
+
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+
+            $result.Output | Should -HaveCount 3
+            $result.Output[0] | Should -BeExactly 'line1'
+            $result.Output[1] | Should -BeExactly 'line2'
+            $result.Output[2] | Should -BeExactly 'line3'
+        }
+
+        It 'Should split LF lines and trim whitespace, filtering empty lines' {
+            Mock -CommandName New-Object -MockWith {
+                $testMockProcess = New-MockObject -Type System.Diagnostics.Process
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Start' -Value { return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'WaitForExit' -Value { param($timeout) return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Dispose' -Value { } -Force
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+
+                # Mock StandardOutput to return multi-line string with LF, whitespace, and empty lines
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "  line1  `n`n  line2  `n   `n  line3  `n" } -PassThru -Force
+                } -Force
+
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                } -Force
+
+                # Need to add StartInfo property and its nested properties
+                $testMockStartInfo = New-Object -TypeName 'Object'
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'Arguments' -Value @() -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'CreateNoWindow' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'FileName' -Value '' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardOutput' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardError' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'UseShellExecute' -Value $true -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WindowStyle' -Value 'Normal' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WorkingDirectory' -Value '' -Force
+
+                $testMockProcess | Add-Member -MemberType NoteProperty -Name 'StartInfo' -Value $testMockStartInfo -Force
+                return $testMockProcess
+            } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
+
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+
+            $result.Output | Should -HaveCount 3
+            $result.Output[0] | Should -BeExactly 'line1'
+            $result.Output[1] | Should -BeExactly 'line2'
+            $result.Output[2] | Should -BeExactly 'line3'
+        }
+
+        It 'Should handle mixed CRLF and LF line endings' {
+            Mock -CommandName New-Object -MockWith {
+                $testMockProcess = New-MockObject -Type System.Diagnostics.Process
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Start' -Value { return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'WaitForExit' -Value { param($timeout) return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Dispose' -Value { } -Force
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+
+                # Mock StandardOutput with mixed line endings
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "line1`r`nline2`nline3`r`n" } -PassThru -Force
+                } -Force
+
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                } -Force
+
+                # Need to add StartInfo property and its nested properties
+                $testMockStartInfo = New-Object -TypeName 'Object'
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'Arguments' -Value @() -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'CreateNoWindow' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'FileName' -Value '' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardOutput' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardError' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'UseShellExecute' -Value $true -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WindowStyle' -Value 'Normal' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WorkingDirectory' -Value '' -Force
+
+                $testMockProcess | Add-Member -MemberType NoteProperty -Name 'StartInfo' -Value $testMockStartInfo -Force
+                return $testMockProcess
+            } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
+
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+
+            $result.Output | Should -HaveCount 3
+            $result.Output[0] | Should -BeExactly 'line1'
+            $result.Output[1] | Should -BeExactly 'line2'
+            $result.Output[2] | Should -BeExactly 'line3'
+        }
+
+        It 'Should return $null when all lines are empty or whitespace' {
+            Mock -CommandName New-Object -MockWith {
+                $testMockProcess = New-MockObject -Type System.Diagnostics.Process
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Start' -Value { return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'WaitForExit' -Value { param($timeout) return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Dispose' -Value { } -Force
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+
+                # Mock StandardOutput with only empty lines and whitespace
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "`r`n   `r`n`t`r`n  " } -PassThru -Force
+                } -Force
+
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                } -Force
+
+                # Need to add StartInfo property and its nested properties
+                $testMockStartInfo = New-Object -TypeName 'Object'
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'Arguments' -Value @() -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'CreateNoWindow' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'FileName' -Value '' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardOutput' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardError' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'UseShellExecute' -Value $true -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WindowStyle' -Value 'Normal' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WorkingDirectory' -Value '' -Force
+
+                $testMockProcess | Add-Member -MemberType NoteProperty -Name 'StartInfo' -Value $testMockStartInfo -Force
+                return $testMockProcess
+            } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
+
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+
+            $result.Output | Should -BeNullOrEmpty
+        }
+
+        It 'Should handle single line with whitespace (returns string for backward compatibility)' {
+            Mock -CommandName New-Object -MockWith {
+                $testMockProcess = New-MockObject -Type System.Diagnostics.Process
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Start' -Value { return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'WaitForExit' -Value { param($timeout) return [bool]$true } -Force
+                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Dispose' -Value { } -Force
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+
+                # Mock StandardOutput with single line containing whitespace
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "  single line  " } -PassThru -Force
+                } -Force
+
+                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                    New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                } -Force
+
+                # Need to add StartInfo property and its nested properties
+                $testMockStartInfo = New-Object -TypeName 'Object'
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'Arguments' -Value @() -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'CreateNoWindow' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'FileName' -Value '' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardOutput' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardError' -Value $false -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'UseShellExecute' -Value $true -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WindowStyle' -Value 'Normal' -Force
+                $testMockStartInfo | Add-Member -MemberType NoteProperty -Name 'WorkingDirectory' -Value '' -Force
+
+                $testMockProcess | Add-Member -MemberType NoteProperty -Name 'StartInfo' -Value $testMockStartInfo -Force
+                return $testMockProcess
+            } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
+
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+
+            $result.Output | Should -BeOfType [System.String]
+            $result.Output | Should -BeExactly 'single line'
+        }
+    }
 }
