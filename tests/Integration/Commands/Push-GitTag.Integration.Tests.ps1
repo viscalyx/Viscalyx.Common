@@ -76,7 +76,13 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
             & git commit -m "Initial commit" --quiet
             
             # Push initial commit to remote
-            & git push origin main --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git push origin main --quiet >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git push origin main --quiet 2>&1
+            }
         }
         catch {
             throw "Failed to setup test local git repository: $($_.Exception.Message)"
@@ -105,7 +111,13 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
                 foreach ($tagLine in $remoteTags) {
                     if ($tagLine -match 'refs/tags/(.+)$') {
                         $tagName = $matches[1]
-                        & git push origin --delete "refs/tags/$tagName" 2>$null | Out-Null
+                        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                            # Windows PowerShell - use cmd.exe for reliable output suppression
+                            & cmd.exe /c "git push origin --delete refs/tags/$tagName >nul 2>&1"
+                        } else {
+                            # PowerShell 7+ - capture output in variables
+                            $gitOutput = & git push origin --delete "refs/tags/$tagName" 2>&1
+                        }
                     }
                 }
             }
@@ -131,7 +143,13 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
                 foreach ($tagLine in $remoteTags) {
                     if ($tagLine -match 'refs/tags/(.+)$') {
                         $tagName = $matches[1]
-                        & git push origin --delete "refs/tags/$tagName" 2>$null | Out-Null
+                        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                            # Windows PowerShell - use cmd.exe for reliable output suppression
+                            & cmd.exe /c "git push origin --delete refs/tags/$tagName >nul 2>&1"
+                        } else {
+                            # PowerShell 7+ - capture output in variables
+                            $gitOutput = & git push origin --delete "refs/tags/$tagName" 2>&1
+                        }
                     }
                 }
             }
@@ -287,8 +305,15 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
     Context 'When tag already exists on remote' {
         BeforeEach {
             # Create a local tag and push it first
-            & git tag 'v1.0.0' 2>$null
-            & git push origin 'refs/tags/v1.0.0' 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git tag v1.0.0 >nul 2>&1"
+                & cmd.exe /c "git push origin refs/tags/v1.0.0 >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $gitOutput = & git tag 'v1.0.0' 2>&1
+                $gitOutput = & git push origin 'refs/tags/v1.0.0' 2>&1
+            }
         }
 
         It 'Should succeed when pushing the same tag again (idempotent operation)' {
