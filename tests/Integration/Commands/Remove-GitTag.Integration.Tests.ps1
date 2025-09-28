@@ -61,9 +61,18 @@ BeforeAll {
         git commit -m "Initial commit" *> $null
 
         # Push to remote
-        git push -u origin main --quiet 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            git push -u origin master --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            # Windows PowerShell - use cmd.exe for reliable output suppression
+            & cmd.exe /c "git push -u origin main --quiet >nul 2>&1"
+            if ($LASTEXITCODE -ne 0) {
+                & cmd.exe /c "git push -u origin master --quiet >nul 2>&1"
+            }
+        } else {
+            # PowerShell 7+ - capture output in variables
+            $gitOutput = git push -u origin main --quiet 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                $gitOutput = git push -u origin master --quiet 2>&1
+            }
         }
 
         # Create test tags locally and push them
@@ -245,9 +254,17 @@ Describe 'Remove-GitTag Integration Tests' {
             git tag 'remote-test-tag-2' *> $null
 
             # Push tags individually with error checking
-            $result1 = git push origin 'remote-test-tag-1' 2>&1
-            Start-Sleep -Milliseconds 100
-            $result2 = git push origin 'remote-test-tag-2' 2>&1
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell - use cmd.exe for reliable output suppression
+                & cmd.exe /c "git push origin remote-test-tag-1 >nul 2>&1"
+                Start-Sleep -Milliseconds 100
+                & cmd.exe /c "git push origin remote-test-tag-2 >nul 2>&1"
+            } else {
+                # PowerShell 7+ - capture output in variables
+                $result1 = git push origin 'remote-test-tag-1' 2>&1
+                Start-Sleep -Milliseconds 100
+                $result2 = git push origin 'remote-test-tag-2' 2>&1
+            }
             Start-Sleep -Milliseconds 300  # Increased wait time
 
             # Verify tags exist on remote

@@ -49,13 +49,21 @@ BeforeAll {
         $script:defaultBranch = git rev-parse --abbrev-ref HEAD
 
         # Create feature branches for testing
-        git checkout -b 'feature/original-branch' --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git checkout -b feature/original-branch --quiet >nul 2>&1"
+        } else {
+            $gitOutput = git checkout -b 'feature/original-branch' --quiet 2>&1
+        }
         "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
         git commit -m "Feature commit" *> $null
 
         # Create another test branch for remote scenarios
-        git checkout -b 'develop' --quiet 2>$null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git checkout -b develop --quiet >nul 2>&1"
+        } else {
+            $gitOutput = git checkout -b 'develop' --quiet 2>&1
+        }
         "Develop content" | Out-File -FilePath 'develop.txt' -Encoding utf8
         git add develop.txt *> $null
         git commit -m "Develop commit" *> $null
@@ -211,7 +219,11 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             $currentBranch | Should -Be 'feature/renamed-special'
 
             # Clean up
-            git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                $gitOutput = git checkout $script:defaultBranch 2>&1
+            }
             try { git branch -D 'feature/renamed-special' *> $null } catch { }
         }
     }
@@ -219,7 +231,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
     Context 'When handling error scenarios' {
         It 'Should throw error when trying to rename non-existent branch' {
             {
-                Rename-GitLocalBranch -Name 'non-existent-branch' -NewName 'new-branch-name' -ErrorAction Stop 2>$null
+                Rename-GitLocalBranch -Name 'non-existent-branch' -NewName 'new-branch-name' -ErrorAction Stop
             } | Should -Throw -ExpectedMessage "*Failed to rename branch*"
         }
 
@@ -230,11 +242,15 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             # Try to rename branch-two to branch-one (which already exists)
             {
-                Rename-GitLocalBranch -Name 'branch-two' -NewName 'branch-one' -ErrorAction Stop 2>$null
+                Rename-GitLocalBranch -Name 'branch-two' -NewName 'branch-one' -ErrorAction Stop
             } | Should -Throw -ExpectedMessage "*Failed to rename branch*"
 
             # Clean up
-            git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                $gitOutput = git checkout $script:defaultBranch 2>&1
+            }
             git branch -D 'branch-one' 2>$null
             git branch -D 'branch-two' 2>$null
         }
@@ -244,11 +260,15 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             # Try to rename to an invalid branch name (contains spaces and special chars)
             {
-                Rename-GitLocalBranch -Name 'valid-branch' -NewName 'invalid branch name with spaces!' -ErrorAction Stop 2>$null
+                Rename-GitLocalBranch -Name 'valid-branch' -NewName 'invalid branch name with spaces!' -ErrorAction Stop
             } | Should -Throw -ExpectedMessage "*Failed to rename branch*"
 
             # Clean up
-            git checkout $script:defaultBranch *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
+            } else {
+                $gitOutput = git checkout $script:defaultBranch 2>&1
+            }
             git branch -D 'valid-branch' 2>$null
         }
     }
@@ -300,7 +320,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             # Rename with upstream tracking - this will fail because the upstream doesn't exist yet
             # but we test that the error is handled correctly
             {
-                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -TrackUpstream 2>$null
+                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -TrackUpstream
             } | Should -Throw -Because "The upstream branch doesn't exist in our test setup"
 
             # Verify the branch was renamed despite the upstream tracking failure
@@ -315,7 +335,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             # In a real repository with proper remote setup, this would set the default branch
             # but in our test setup, it will fail because there's no remote HEAD to determine
             {
-                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -SetDefault 2>$null
+                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -SetDefault
             } | Should -Throw -Because "Cannot determine remote HEAD in test setup"
 
             # Verify the branch was renamed despite the set-head failure
@@ -332,7 +352,7 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
             # Test with custom remote name - this will fail due to missing upstream branch
             {
-                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -RemoteName 'upstream' -TrackUpstream 2>$null
+                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -RemoteName 'upstream' -TrackUpstream
             } | Should -Throw -Because "Upstream branch doesn't exist"
 
             # Clean up additional remote
