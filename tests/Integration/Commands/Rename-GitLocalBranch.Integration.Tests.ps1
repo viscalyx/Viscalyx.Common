@@ -27,111 +27,49 @@ BeforeAll {
     $script:moduleName = 'Viscalyx.Common'
 
     Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
-
-    # Create a temporary Git repository for testing
-    $script:testRepoPath = Join-Path -Path $TestDrive -ChildPath 'TestGitRepo'
-    New-Item -Path $script:testRepoPath -ItemType Directory -Force | Out-Null
-
-    # Initialize the test repository and create test structure
-    Push-Location -Path $script:testRepoPath
-    try
-    {
-        # Initialize git repository
-        if ($PSVersionTable.PSEdition -eq 'Desktop')
-        {
-            & cmd.exe /c 'git init --initial-branch=main --quiet >nul 2>&1'
-        }
-        else
-        {
-            $gitOutput = git init --initial-branch=main --quiet 2>&1
-        }
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
-            & cmd.exe /c "git config user.email test@example.com >nul 2>&1"
-            & cmd.exe /c "git config user.name 'Test User' >nul 2>&1"
-        } else {
-            $gitOutput = git config user.email 'test@example.com' 2>&1
-            $gitOutput = git config user.name 'Test User' 2>&1
-        }
-
-        # Create initial commit
-        'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
-            & cmd.exe /c "git add test.txt >nul 2>&1"
-            & cmd.exe /c "git commit -m 'Initial commit' >nul 2>&1"
-        } else {
-            $gitOutput = git add test.txt 2>&1
-            $gitOutput = git commit -m 'Initial commit' 2>&1
-        }
-
-        # Get the default branch name (main or master)
-        $script:defaultBranch = git rev-parse --abbrev-ref HEAD
-
-        # Create feature branches for testing
-        if ($PSVersionTable.PSEdition -eq 'Desktop')
-        {
-            & cmd.exe /c 'git checkout -b feature/original-branch --quiet >nul 2>&1'
-        }
-        else
-        {
-            $gitOutput = git checkout -b 'feature/original-branch' --quiet 2>&1
-        }
-        'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
-            & cmd.exe /c "git add feature.txt >nul 2>&1"
-            & cmd.exe /c "git commit -m 'Feature commit' >nul 2>&1"
-        } else {
-            $gitOutput = git add feature.txt 2>&1
-            $gitOutput = git commit -m 'Feature commit' 2>&1
-        }
-
-        # Create another test branch for remote scenarios
-        if ($PSVersionTable.PSEdition -eq 'Desktop')
-        {
-            & cmd.exe /c 'git checkout -b develop --quiet >nul 2>&1'
-        }
-        else
-        {
-            $gitOutput = git checkout -b 'develop' --quiet 2>&1
-        }
-        'Develop content' | Out-File -FilePath 'develop.txt' -Encoding utf8
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
-            & cmd.exe /c "git add develop.txt >nul 2>&1"
-            & cmd.exe /c "git commit -m 'Develop commit' >nul 2>&1"
-        } else {
-            $gitOutput = git add develop.txt 2>&1
-            $gitOutput = git commit -m 'Develop commit' 2>&1
-        }
-
-        # Switch back to default branch
-        if ($PSVersionTable.PSEdition -eq 'Desktop')
-        {
-            # Windows PowerShell - use cmd.exe for reliable output suppression
-            & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-        }
-        else
-        {
-            # PowerShell 7+ - use direct redirection
-            $gitOutput = git checkout $script:defaultBranch 2>&1
-        }
-    }
-    finally
-    {
-        Pop-Location
-    }
-}
-
-AfterAll {
-    # Clean up - remove the test repository
-    if (Test-Path -Path $script:testRepoPath)
-    {
-        $previousProgressPreference = $ProgressPreference
-        $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
-        Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
-        $ProgressPreference = $previousProgressPreference
-    }
 }
 
 Describe 'Rename-GitLocalBranch Integration Tests' {
+    BeforeAll {
+        # Create a temporary Git repository for testing
+        $script:testRepoPath = Join-Path -Path $TestDrive -ChildPath 'TestGitRepo'
+        New-Item -Path $script:testRepoPath -ItemType Directory -Force | Out-Null
+
+        # Initialize the test repository and create test structure
+        Push-Location -Path $script:testRepoPath
+        try
+        {
+            # Initialize git repository
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('init', '--initial-branch=main', '--quiet')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.email', 'test@example.com')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.name', '"Test User"')
+
+            # Create initial commit
+            'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'test.txt')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Initial commit"')
+
+            # Get the default branch name (main or master)
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -Verbose -Debug -PassThru
+            $script:defaultBranch = $result.Output
+        }
+        finally
+        {
+            Pop-Location
+        }
+    }
+
+    AfterAll {
+        # Clean up - remove the test repository
+        if (Test-Path -Path $script:testRepoPath)
+        {
+            $previousProgressPreference = $ProgressPreference
+            $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
+            Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
+            $ProgressPreference = $previousProgressPreference
+        }
+    }
+
     BeforeEach {
         # Change to test repository for each test
         Push-Location -Path $script:testRepoPath
@@ -145,183 +83,83 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
     Context 'When renaming a local branch successfully' {
         BeforeEach {
             # Ensure we start with the feature branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c 'git checkout feature/original-branch >nul 2>&1'
-            }
-            else
-            {
-                # PowerShell 7+ - use direct redirection
-                $gitOutput = git checkout 'feature/original-branch' 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+
+            # Create feature branches for testing
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'feature/original-branch', '--quiet')
+            'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'feature.txt')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Feature commit"')
         }
 
         AfterEach {
             # Clean up any renamed branches for next test
-            try
-            {
-                $currentBranch = git rev-parse --abbrev-ref HEAD 2>&1
-                if ($LASTEXITCODE -eq 0 -and $currentBranch -eq 'feature/renamed-branch')
-                {
-                    if ($PSVersionTable.PSEdition -eq 'Desktop')
-                    {
-                        # Windows PowerShell - use cmd.exe for reliable output suppression
-                        & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-                    }
-                    else
-                    {
-                        # PowerShell 7+ - use direct redirection
-                        $gitOutput = git checkout $script:defaultBranch 2>&1
-                    }
-                    git branch -D 'feature/renamed-branch' *> $null
-                }
-                $existingBranches = git branch --list 'feature/renamed-branch' 2>&1
-                if ($LASTEXITCODE -eq 0 -and $existingBranches)
-                {
-                    git branch -D 'feature/renamed-branch' *> $null
-                }
-            }
-            catch
-            {
-                # Ignore cleanup errors
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'feature/renamed-branch')
         }
 
         It 'Should rename a local branch successfully' {
-            # Verify the original branch exists
-            $originalBranches = git branch --list 'feature/original-branch'
-            $originalBranches | Should -Not -BeNullOrEmpty
-
-            # Rename the branch
             { Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' } | Should -Not -Throw
 
             # Verify the old branch no longer exists
-            $oldBranch = git branch --list 'feature/original-branch' 2>&1
-            if ($LASTEXITCODE -eq 0)
-            {
-                $oldBranch | Should -BeNullOrEmpty
-            }
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'feature/original-branch') -PassThru
+            $oldBranch = $result.Output
+            $oldBranch | Should -BeNullOrEmpty
 
             # Verify the new branch exists
-            $newBranch = git branch --list 'feature/renamed-branch'
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'feature/renamed-branch') -PassThru
+            $newBranch = $result.Output
             $newBranch | Should -Not -BeNullOrEmpty
 
             # Verify we're currently on the renamed branch
-            $currentBranch = git rev-parse --abbrev-ref HEAD
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $currentBranch = $result.Output
             $currentBranch | Should -Be 'feature/renamed-branch'
         }
 
         It 'Should preserve commit history when renaming a branch' {
             # Make sure we have a fresh branch for this test
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            }
-            else
-            {
-                # PowerShell 7+ - use direct redirection
-                $gitOutput = git checkout $script:defaultBranch 2>&1
-            }
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git checkout -b feature/original-branch --quiet >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git checkout -b 'feature/original-branch' --quiet 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', 'feature/original-branch', '--quiet')
+
             'Feature content' | Out-File -FilePath 'feature2.txt' -Encoding utf8
-            git add feature2.txt *> $null
-            git commit -m 'Feature commit' *> $null
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'feature2.txt')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Feature commit"')
 
             # Get the commit hash before renaming
-            $originalCommit = git rev-parse HEAD
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
+            $originalCommit = $result.Output
 
             # Rename the branch
             Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch'
 
             # Get the commit hash after renaming
-            $newCommit = git rev-parse HEAD
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
+            $newCommit = $result.Output
 
             # Verify the commit history is preserved
             $originalCommit | Should -Be $newCommit
 
             # Verify the commit message is preserved
-            $commitMessage = git log -1 --pretty=format:"%s"
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('log', '-1', '--pretty=format:%s') -PassThru
+            $commitMessage = $result.Output
             $commitMessage | Should -Be 'Feature commit'
-
-            # Clean up the extra file
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            }
-            else
-            {
-                # PowerShell 7+ - use direct redirection
-                $gitOutput = git checkout $script:defaultBranch 2>&1
-            }
-
-            try
-            {
-                git branch -D 'feature/renamed-branch' *> $null
-            }
-            catch
-            {
-            }
-
-            try
-            {
-
-                $previousProgressPreference = $ProgressPreference
-                $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
-                Remove-Item -Path 'feature2.txt' -Force -ErrorAction SilentlyContinue
-                $ProgressPreference = $previousProgressPreference
-            }
-            catch
-            {
-            }
         }
 
         It 'Should handle branch names with special characters' {
             # Create a branch with special characters
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git checkout -b feature/test-123_special.branch --quiet >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git checkout -b 'feature/test-123_special.branch' --quiet 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'feature/test-123_special.branch', '--quiet')
+
             'Special content' | Out-File -FilePath 'special.txt' -Encoding utf8
-            git add special.txt *> $null
-            git commit -m 'Special commit' *> $null
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'special.txt')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Special commit"')
 
             # Rename the branch
-            { Rename-GitLocalBranch -Name 'feature/test-123_special.branch' -NewName 'feature/renamed-special' } | Should -Not -Throw
+            { Rename-GitLocalBranch -Name 'feature/test-123_special.branch' -NewName 'feature/renamed-branch' } | Should -Not -Throw
 
             # Verify the rename worked
-            $currentBranch = git rev-parse --abbrev-ref HEAD
-            $currentBranch | Should -Be 'feature/renamed-special'
-
-            # Clean up
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            }
-            else
-            {
-                $gitOutput = git checkout $script:defaultBranch 2>&1
-            }
-            try
-            {
-                git branch -D 'feature/renamed-special' *> $null
-            }
-            catch
-            {
-            }
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $currentBranch = $result.Output
+            $currentBranch | Should -Be 'feature/renamed-branch'
         }
     }
 
@@ -334,16 +172,8 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
         It 'Should throw error when trying to rename to existing branch name' {
             # Create two branches
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git checkout -b branch-one --quiet >nul 2>&1'
-                & cmd.exe /c 'git checkout -b branch-two --quiet >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git checkout -b 'branch-one' --quiet 2>&1
-                $gitOutput = git checkout -b 'branch-two' --quiet 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'branch-one', '--quiet')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'branch-two', '--quiet')
 
             # Try to rename branch-two to branch-one (which already exists)
             {
@@ -351,29 +181,13 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
 
             # Clean up
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-                & cmd.exe /c 'git branch -D branch-one >nul 2>&1'
-                & cmd.exe /c 'git branch -D branch-two >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git checkout $script:defaultBranch 2>&1
-                $gitOutput = git branch -D 'branch-one' 2>&1
-                $gitOutput = git branch -D 'branch-two' 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'branch-one')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'branch-two')
         }
 
         It 'Should throw error when trying to rename branch with invalid characters' {
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git checkout -b valid-branch --quiet >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git checkout -b 'valid-branch' --quiet 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'valid-branch', '--quiet')
 
             # Try to rename to an invalid branch name (contains spaces and special chars)
             {
@@ -381,23 +195,9 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
 
             # Clean up
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            }
-            else
-            {
-                $gitOutput = git checkout $script:defaultBranch 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
 
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git branch -D valid-branch >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git branch -D 'valid-branch' 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'valid-branch')
         }
     }
 
@@ -405,113 +205,31 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
         BeforeEach {
             # Create a bare repository to act as a remote
             $script:bareRepoPath = Join-Path -Path $TestDrive -ChildPath 'BareTestRepo'
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c "git init --bare --initial-branch=main $script:bareRepoPath >nul 2>&1"
-            }
-            else
-            {
-                $gitOutput = git init --bare --initial-branch=main $script:bareRepoPath 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @('init', '--bare', '--initial-branch=main', $script:bareRepoPath)
 
             # Add the bare repo as origin remote
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c "git remote add origin $script:bareRepoPath >nul 2>&1"
-            }
-            else
-            {
-                $gitOutput = git remote add origin $script:bareRepoPath 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'add', 'origin', $script:bareRepoPath)
 
             # Create and push a branch to remote
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git checkout -b remote-test-branch --quiet >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git checkout -b 'remote-test-branch' --quiet 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'remote-test-branch', '--quiet')
+
             'Remote test content' | Out-File -FilePath 'remote-test.txt' -Encoding utf8
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
-                & cmd.exe /c "git add remote-test.txt >nul 2>&1"
-                & cmd.exe /c "git commit -m 'Remote test commit' >nul 2>&1"
-            } else {
-                $gitOutput = git add remote-test.txt 2>&1
-                $gitOutput = git commit -m 'Remote test commit' 2>&1
-            }
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git push origin remote-test-branch >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git push origin remote-test-branch 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'remote-test.txt')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', '"Remote test commit"')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('push', 'origin', 'remote-test-branch')
         }
 
         AfterEach {
-            # Clean up remote and branches
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                $currentBranch = & cmd.exe /c 'git rev-parse --abbrev-ref HEAD 2>nul'
-            }
-            else
-            {
-                $currentBranch = git rev-parse --abbrev-ref HEAD 2>&1
-            }
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $currentBranch = $result.Output
             if ($currentBranch -ne $script:defaultBranch)
             {
-                if ($PSVersionTable.PSEdition -eq 'Desktop')
-                {
-                    & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-                }
-                else
-                {
-                    $gitOutput = git checkout $script:defaultBranch 2>&1
-                }
+                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
             }
 
             # Remove test branches
-            try
-            {
-                if ($PSVersionTable.PSEdition -eq 'Desktop')
-                {
-                    & cmd.exe /c 'git branch -D remote-test-branch >nul 2>&1'
-                }
-                else
-                {
-                    $gitOutput = git branch -D 'remote-test-branch' 2>&1
-                }
-            }
-            catch
-            {
-            }
-            try
-            {
-                if ($PSVersionTable.PSEdition -eq 'Desktop')
-                {
-                    & cmd.exe /c 'git branch -D renamed-remote-branch >nul 2>&1'
-                }
-                else
-                {
-                    $gitOutput = git branch -D 'renamed-remote-branch' 2>&1
-                }
-            }
-            catch
-            {
-            }
-
-            # Remove remote
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git remote remove origin >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git remote remove origin 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'renamed-remote-branch')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'remove', 'origin')
 
             # Remove bare repository
             if (Test-Path -Path $script:bareRepoPath)
@@ -525,28 +243,19 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
 
         It 'Should rename branch with TrackUpstream when remote branch exists' {
             # First push the branch to remote if not already there
-            try
-            {
-                git push origin remote-test-branch *> $null
-            }
-            catch
-            {
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('push', 'origin', 'remote-test-branch')
 
             # Rename with upstream tracking - this will fail because the upstream doesn't exist yet
             # but we test that the error is handled correctly
             {
-                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -TrackUpstream
+                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -TrackUpstream -ErrorAction 'Stop'
             } | Should -Throw -Because "The upstream branch doesn't exist in our test setup"
 
             # Verify the branch was renamed despite the upstream tracking failure
             # Switch back to see if branch was renamed before the upstream tracking failed
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
-                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
-                $gitOutput = git checkout $script:defaultBranch 2>&1
-            }
-            $branchExists = git branch --list 'renamed-remote-branch'
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-remote-branch') -PassThru
+            $branchExists = $result.Output
             $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if upstream tracking fails'
         }
 
@@ -559,46 +268,17 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             } | Should -Throw -Because 'Cannot determine remote HEAD in test setup'
 
             # Verify the branch was renamed despite the set-head failure
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
-                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
-                $gitOutput = git checkout $script:defaultBranch 2>&1
-            }
-            $branchExists = git branch --list 'renamed-remote-branch'
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-remote-branch') -PassThru
+            $branchExists = $result.Output
             $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if set-head fails'
         }
 
         It 'Should handle custom remote name' {
             # Add another remote with different name
             $script:upstreamRepoPath = Join-Path -Path $TestDrive -ChildPath 'UpstreamTestRepo'
-            try
-            {
-                if ($PSVersionTable.PSEdition -eq 'Desktop')
-                {
-                    & cmd.exe /c "git init --bare --initial-branch=main $script:upstreamRepoPath >nul 2>&1"
-                }
-                else
-                {
-                    $gitOutput = git init --bare --initial-branch=main $script:upstreamRepoPath 2>&1
-                }
-            }
-            catch
-            {
-            }
-            try
-            {
-                if ($PSVersionTable.PSEdition -eq 'Desktop')
-                {
-                    & cmd.exe /c "git remote add upstream $script:upstreamRepoPath >nul 2>&1"
-                }
-                else
-                {
-                    $gitOutput = git remote add upstream $script:upstreamRepoPath 2>&1
-                }
-            }
-            catch
-            {
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @('init', '--bare', '--initial-branch=main', $script:upstreamRepoPath)
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'add', 'upstream', $script:upstreamRepoPath)
 
             # Test with custom remote name - this will fail due to missing upstream branch
             {
@@ -606,20 +286,8 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
             } | Should -Throw -Because "Upstream branch doesn't exist"
 
             # Clean up additional remote
-            try
-            {
-                if ($PSVersionTable.PSEdition -eq 'Desktop')
-                {
-                    & cmd.exe /c 'git remote remove upstream >nul 2>&1'
-                }
-                else
-                {
-                    $gitOutput = git remote remove upstream 2>&1
-                }
-            }
-            catch
-            {
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'remove', 'upstream')
+
             if (Test-Path -Path $script:upstreamRepoPath)
             {
                 $previousProgressPreference = $ProgressPreference
@@ -633,78 +301,43 @@ Describe 'Rename-GitLocalBranch Integration Tests' {
     Context 'When testing edge cases' {
         It 'Should work when renaming current branch' {
             # Create and switch to a test branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git checkout -b current-branch-test --quiet >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git checkout -b 'current-branch-test' --quiet 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'current-branch-test', '--quiet')
 
             # Rename the current branch
             { Rename-GitLocalBranch -Name 'current-branch-test' -NewName 'renamed-current-branch' } | Should -Not -Throw
 
             # Verify we're now on the renamed branch
-            $currentBranch = git rev-parse --abbrev-ref HEAD
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $currentBranch = $result.Output
             $currentBranch | Should -Be 'renamed-current-branch'
 
             # Clean up
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
-                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
-                $gitOutput = git checkout $script:defaultBranch 2>&1
-            }
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git branch -D renamed-current-branch >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git branch -D 'renamed-current-branch' 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'renamed-current-branch')
         }
 
         It 'Should work when renaming branch that is not current' {
             # Create two test branches
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git checkout -b branch-to-rename --quiet >nul 2>&1'
-                & cmd.exe /c 'git checkout -b other-branch --quiet >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git checkout -b 'branch-to-rename' --quiet 2>&1
-                $gitOutput = git checkout -b 'other-branch' --quiet 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'branch-to-rename', '--quiet')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'other-branch', '--quiet')
 
             # Rename a branch we're not currently on
             { Rename-GitLocalBranch -Name 'branch-to-rename' -NewName 'renamed-other-branch' } | Should -Not -Throw
 
             # Verify the branch was renamed (should exist in branch list)
-            $branchExists = git branch --list 'renamed-other-branch'
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-other-branch') -PassThru
+            $branchExists = $result.Output
             $branchExists | Should -Not -BeNullOrEmpty
 
             # Verify we're still on the other branch
-            $currentBranch = git rev-parse --abbrev-ref HEAD
+            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $currentBranch = $result.Output
             $currentBranch | Should -Be 'other-branch'
 
             # Clean up
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
-                & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
-                $gitOutput = git checkout $script:defaultBranch 2>&1
-            }
-            if ($PSVersionTable.PSEdition -eq 'Desktop')
-            {
-                & cmd.exe /c 'git branch -D other-branch >nul 2>&1'
-                & cmd.exe /c 'git branch -D renamed-other-branch >nul 2>&1'
-            }
-            else
-            {
-                $gitOutput = git branch -D 'other-branch' 2>&1
-                $gitOutput = git branch -D 'renamed-other-branch' 2>&1
-            }
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'other-branch')
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'renamed-other-branch')
         }
     }
 }
