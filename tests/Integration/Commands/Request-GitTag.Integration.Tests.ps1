@@ -47,7 +47,11 @@ BeforeAll {
     Push-Location -Path $script:bareRepoPath
     try
     {
-        git init --bare --initial-branch=main *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git init --bare --initial-branch=main >nul 2>&1"
+        } else {
+            $gitOutput = git init --bare --initial-branch=main 2>&1
+        }
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Failed to initialize bare repository'
@@ -70,20 +74,34 @@ BeforeAll {
         }
 
         # Configure git user for testing
-        git config user.name 'Test User' *> $null
-        git config user.email 'test@example.com' *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git config user.name 'Test User' >nul 2>&1"
+            & cmd.exe /c "git config user.email test@example.com >nul 2>&1"
+        } else {
+            $gitOutput = git config user.name 'Test User' 2>&1
+            $gitOutput = git config user.email 'test@example.com' 2>&1
+        }
 
         # Create initial commit
         'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
-        git add . *> $null
-        git commit -m 'Initial commit' *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git add . >nul 2>&1"
+            & cmd.exe /c "git commit -m 'Initial commit' >nul 2>&1"
+        } else {
+            $gitOutput = git add . 2>&1
+            $gitOutput = git commit -m 'Initial commit' 2>&1
+        }
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Failed to create initial commit'
         }
 
         # Add the bare repository as origin remote
-        git remote add origin $script:bareRepoPath *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git remote add origin $script:bareRepoPath >nul 2>&1"
+        } else {
+            $gitOutput = git remote add origin $script:bareRepoPath 2>&1
+        }
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Failed to add origin remote'
@@ -108,9 +126,15 @@ BeforeAll {
         }
 
         # Create and push tags
-        git tag 'v1.0.0' *> $null
-        git tag 'v1.1.0' *> $null
-        git tag 'v2.0.0' *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git tag v1.0.0 >nul 2>&1"
+            & cmd.exe /c "git tag v1.1.0 >nul 2>&1"
+            & cmd.exe /c "git tag v2.0.0 >nul 2>&1"
+        } else {
+            $gitOutput = git tag 'v1.0.0' 2>&1
+            $gitOutput = git tag 'v1.1.0' 2>&1
+            $gitOutput = git tag 'v2.0.0' 2>&1
+        }
 
         if ($PSVersionTable.PSEdition -eq 'Desktop') {
             & cmd.exe /c "git push origin --tags >nul 2>&1"
@@ -135,21 +159,34 @@ BeforeAll {
     try
     {
         # Clone the bare repository
-        git clone $script:bareRepoPath . *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git clone $script:bareRepoPath . >nul 2>&1"
+        } else {
+            $gitOutput = git clone $script:bareRepoPath . 2>&1
+        }
         if ($LASTEXITCODE -ne 0)
         {
             throw 'Failed to clone repository'
         }
 
         # Configure git user for testing
-        git config user.name 'Test User' *> $null
-        git config user.email 'test@example.com' *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            & cmd.exe /c "git config user.name 'Test User' >nul 2>&1"
+            & cmd.exe /c "git config user.email test@example.com >nul 2>&1"
+        } else {
+            $gitOutput = git config user.name 'Test User' 2>&1
+            $gitOutput = git config user.email 'test@example.com' 2>&1
+        }
 
         # Remove all local tags to test fetching
         $tags = git tag
         if ($tags)
         {
-            git tag -d $tags *> $null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git tag -d $tags >nul 2>&1"
+            } else {
+                $gitOutput = git tag -d $tags 2>&1
+            }
         }
     }
     finally

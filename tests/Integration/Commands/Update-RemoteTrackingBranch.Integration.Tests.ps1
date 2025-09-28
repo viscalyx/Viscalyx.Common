@@ -210,12 +210,20 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
 
         It 'Should successfully fetch all branches from origin remote' {
             # Verify current state before fetch
-            $beforeBranches = & git branch -r 2>$null
+            $beforeBranches = if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git branch -r 2>nul"
+            } else {
+                & git branch -r 2>$null
+            }
 
             Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false -ErrorAction Stop
 
             # Verify branches were fetched
-            $afterBranches = & git branch -r 2>$null
+            $afterBranches = if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git branch -r 2>nul"
+            } else {
+                & git branch -r 2>$null
+            }
             $afterBranches | Should -Contain '  origin/main'
             $afterBranches | Should -Contain '  origin/develop'
             $afterBranches | Should -Contain '  origin/feature/test-branch'
@@ -223,12 +231,20 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
 
         It 'Should update remote tracking references' {
             # Get current commit ID of remote main
-            $beforeRemoteCommit = & git rev-parse origin/main 2>$null
+            $beforeRemoteCommit = if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git rev-parse origin/main 2>nul"
+            } else {
+                & git rev-parse origin/main 2>$null
+            }
 
             Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false -ErrorAction Stop
 
             # Get commit ID after fetch - it should be updated
-            $afterRemoteCommit = & git rev-parse origin/main 2>$null
+            $afterRemoteCommit = if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git rev-parse origin/main 2>nul"
+            } else {
+                & git rev-parse origin/main 2>$null
+            }
 
             # The commit should still exist (may be same or different depending on setup)
             $afterRemoteCommit | Should -Not -BeNullOrEmpty
@@ -248,7 +264,11 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
 
         It 'Should successfully fetch main branch from origin remote' {
             # First try to clean up any potential repository issues
-            & git gc --quiet 2>$null
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                & cmd.exe /c "git gc --quiet >nul 2>&1"
+            } else {
+                $gitOutput = & git gc --quiet 2>&1
+            }
 
             <#
                 The try-catch block is necessary due to intermittent Git repository corruption that can occur
@@ -264,7 +284,11 @@ Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
             catch
             {
                 # If there's a repository corruption, try to recover by re-fetching all references
-                & git fetch origin --quiet 2>$null
+                if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                    & cmd.exe /c "git fetch origin --quiet >nul 2>&1"
+                } else {
+                    $gitOutput = & git fetch origin --quiet 2>&1
+                }
                 Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false -ErrorAction Stop
             }
 
