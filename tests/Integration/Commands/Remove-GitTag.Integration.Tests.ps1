@@ -378,7 +378,12 @@ Describe 'Remove-GitTag' {
         It 'Should handle non-existent remote tag removal gracefully' {
             # Git doesn't actually throw an error when trying to remove a non-existent remote tag
             # It just reports a warning, so this test ensures the command completes without throwing
-            { Remove-GitTag -Tag 'non-existent-tag' -Remote 'origin' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Remove-GitTag -Tag 'non-existent-tag' -Remote 'origin' -Force -ErrorAction Stop
+
+            # Verify the command completed successfully without throwing
+            # Check that the non-existent tag is still not present in remote
+            $remoteTags = git ls-remote --tags origin
+            $remoteTags | Should -Not -Match 'non-existent-tag'
         }
     }
 
