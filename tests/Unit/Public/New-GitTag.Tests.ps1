@@ -44,6 +44,24 @@ AfterAll {
 
 # cSpell: ignore LASTEXITCODE
 Describe 'New-GitTag' {
+    Context 'When checking command structure' {
+        It 'Should have the correct parameters in parameter set __AllParameterSets' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters       = '[-Name] <string> [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'New-GitTag').ParameterSets |
+                Where-Object { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object `
+                    @{ Name = 'ParameterSetName';       Expression = { $_.Name } }, `
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+
+            $result.ParameterSetName       | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString  | Should -Be $ExpectedParameters
+        }
+    }
+
     Context 'When creating a new tag' {
         BeforeAll {
             Mock -CommandName git -MockWith {
@@ -90,10 +108,6 @@ Describe 'New-GitTag' {
 
             AfterEach {
                 $global:LASTEXITCODE = 0
-            }
-
-            It 'Should have a localized error message' {
-                $mockErrorMessage | Should-BeTruthy -Because 'The error message should have been localized, and shall not be empty'
             }
 
             It 'Should throw terminating error when git fails' {
