@@ -155,8 +155,8 @@ function Get-GitBranchCommit
 
             if ($exitCode -eq 0)
             {
-                # Calculate the number of commits to skip.
-                $skipCommits = $totalCommits - $First
+                # Calculate the number of commits to skip, ensuring it's not negative.
+                $skipCommits = [System.Math]::Max(0, $totalCommits - $First)
 
                 # Return the first X number of commits.
                 $commitId = git log --skip $skipCommits --reverse -n $First --pretty=format:"%H" $BranchName

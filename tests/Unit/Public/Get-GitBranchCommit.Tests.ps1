@@ -338,6 +338,34 @@ Describe 'Get-GitBranchCommit' {
                     $result | Should -Be @('oldest123')
                 }
             }
+
+            It 'Should handle First parameter set when First is greater than total commits' {
+                InModuleScope -ScriptBlock {
+                    Mock -CommandName 'Get-GitLocalBranchName' -MockWith {
+                        return 'main'
+                    }
+
+                    # Mock git commands - simulate branch with only 2 commits but First=5
+                    Mock -CommandName 'git' -MockWith {
+                        $global:LASTEXITCODE = 0
+                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count') {
+                            return '2'  # Only 2 commits in branch
+                        }
+                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip') {
+                            # With current bug, --skip would be -3 (2-5=-3), which should fail
+                            # With fix, --skip should be 0 (max(0, 2-5)=0)
+                            return @('commit1', 'commit2')
+                        }
+                    }
+
+                    $result = Get-GitBranchCommit -First 5
+
+                    Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter { $args[0] -eq 'rev-list' -and $args[1] -eq '--count' -and $args[2] -eq 'main' }
+                    # This should verify --skip is 0, not -3
+                    Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter { $args[0] -eq 'log' -and $args[1] -eq '--skip' -and $args[2] -eq 0 -and $args[3] -eq '--reverse' -and $args[4] -eq '-n' -and $args[5] -eq 5 -and $args[6] -eq '--pretty=format:%H' -and $args[7] -eq 'main' }
+                    $result | Should -Be @('commit1', 'commit2')
+                }
+            }
         }
 
         Context 'When testing Range parameter set' {
