@@ -91,17 +91,17 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return true when testing existing remote branch' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch -ErrorAction 'Stop'
             $result | Should -BeTrue
         }
 
         It 'Should return false when testing non-existent remote branch' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'nonexistent-branch' 2>$null
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'nonexistent-branch' -ErrorAction 'Stop' 2>$null
             $result | Should -BeFalse
         }
 
         It 'Should return true when testing remote without specifying branch name and branches exist' {
-            $result = Test-GitRemoteBranch -RemoteName 'origin'
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -ErrorAction 'Stop'
             $result | Should -BeTrue
         }
 
@@ -129,21 +129,21 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
             }
 
             It 'Should return true when testing specific existing branches' {
-                Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch | Should -BeTrue
-                Test-GitRemoteBranch -RemoteName 'origin' -Name 'develop' | Should -BeTrue
-                Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test' | Should -BeTrue
+                Test-GitRemoteBranch -RemoteName 'origin' -Name $script:defaultBranch -ErrorAction 'Stop' | Should -BeTrue
+                Test-GitRemoteBranch -RemoteName 'origin' -Name 'develop' -ErrorAction 'Stop' | Should -BeTrue
+                Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test' -ErrorAction 'Stop' | Should -BeTrue
             }
 
             It 'Should return true when testing with wildcard patterns' {
-                Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*' | Should -BeTrue
+                Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*' -ErrorAction 'Stop' | Should -BeTrue
             }
 
             It 'Should return false for non-matching wildcard patterns' {
-                Test-GitRemoteBranch -RemoteName 'origin' -Name 'hotfix/*' 2>$null | Should -BeFalse
+                Test-GitRemoteBranch -RemoteName 'origin' -Name 'hotfix/*' -ErrorAction 'Stop' 2>$null | Should -BeFalse
             }
 
             It 'Should return true when checking any branches exist for remote' {
-                Test-GitRemoteBranch -RemoteName 'origin' | Should -BeTrue
+                Test-GitRemoteBranch -RemoteName 'origin' -ErrorAction 'Stop' | Should -BeTrue
             }
         }
 
@@ -156,7 +156,7 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
                 $null = git commit -m "Special commit" --quiet 2>&1
                 $null = git push origin "feature/test-branch_v1.0" --quiet 2>&1
 
-                Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test-branch_v1.0' | Should -BeTrue
+                Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test-branch_v1.0' -ErrorAction 'Stop' | Should -BeTrue
             }
 
             It 'Should handle branch names with case sensitivity' {
@@ -167,8 +167,8 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
                 $null = git commit -m "Feature commit" --quiet 2>&1
                 $null = git push origin "FeatureBranch" --quiet 2>&1
 
-                Test-GitRemoteBranch -RemoteName 'origin' -Name 'FeatureBranch' | Should -BeTrue
-                Test-GitRemoteBranch -RemoteName 'origin' -Name 'featurebranch' 2>$null | Should -BeFalse
+                Test-GitRemoteBranch -RemoteName 'origin' -Name 'FeatureBranch' -ErrorAction 'Stop' | Should -BeTrue
+                Test-GitRemoteBranch -RemoteName 'origin' -Name 'featurebranch' -ErrorAction 'Stop' 2>$null | Should -BeFalse
             }
         }
     }
