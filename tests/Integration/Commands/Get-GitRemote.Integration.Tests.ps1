@@ -72,34 +72,34 @@ Describe 'Get-GitRemote' -Tag 'Integration' {
         }
 
         It 'Should return all remote names when no parameters specified' {
-            $result = Get-GitRemote
+            $result = Get-GitRemote -ErrorAction Stop
             $result | Should -Contain 'origin'
             $result | Should -Contain 'upstream'
             $result.Count | Should -Be 2
         }
 
         It 'Should return specific remote name when Name parameter is provided and remote exists' {
-            $result = Get-GitRemote -Name 'origin'
+            $result = Get-GitRemote -Name 'origin' -ErrorAction Stop
             $result | Should -Be 'origin'
         }
 
         It 'Should return empty when Name parameter is provided and remote does not exist' {
-            $result = Get-GitRemote -Name 'nonexistent'
+            $result = Get-GitRemote -Name 'nonexistent' -ErrorAction Stop
             $result | Should -BeNullOrEmpty
         }
 
         It 'Should return fetch URL when FetchUrl switch is specified' {
-            $result = Get-GitRemote -Name 'origin' -FetchUrl
+            $result = Get-GitRemote -Name 'origin' -FetchUrl -ErrorAction Stop
             $result | Should -Be 'https://github.com/test/repo.git'
         }
 
         It 'Should return push URL when PushUrl switch is specified' {
-            $result = Get-GitRemote -Name 'origin' -PushUrl
+            $result = Get-GitRemote -Name 'origin' -PushUrl -ErrorAction Stop
             $result | Should -Be 'git@github.com:test/repo.git'
         }
 
         It 'Should return fetch URL when push URL is not specifically set' {
-            $result = Get-GitRemote -Name 'upstream' -PushUrl
+            $result = Get-GitRemote -Name 'upstream' -PushUrl -ErrorAction Stop
             $result | Should -Be 'https://github.com/upstream/repo.git'
         }
 
@@ -149,12 +149,12 @@ Describe 'Get-GitRemote' -Tag 'Integration' {
         }
 
         It 'Should return empty array when no remotes exist' {
-            $result = Get-GitRemote
+            $result = Get-GitRemote -ErrorAction Stop
             $result | Should -BeNullOrEmpty
         }
 
         It 'Should return empty when searching for specific remote name' {
-            $result = Get-GitRemote -Name 'origin'
+            $result = Get-GitRemote -Name 'origin' -ErrorAction Stop
             $result | Should -BeNullOrEmpty
         }
 
