@@ -123,7 +123,7 @@ function New-SamplerGitHubReleaseTag
     catch
     {
         # If something failed, revert back to the previous branch if requested.
-        if ($switchedBranch)
+        if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
         {
             # This command will also assert that there are no local changes if not in WhatIf mode.
             Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
@@ -189,7 +189,7 @@ function New-SamplerGitHubReleaseTag
         }
         catch
         {
-            if ($switchedBranch)
+            if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
             {
                 Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
             }
@@ -242,7 +242,7 @@ function New-SamplerGitHubReleaseTag
         }
         catch
         {
-            if ($switchedBranch)
+            if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
             {
                 Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
             }
@@ -251,7 +251,7 @@ function New-SamplerGitHubReleaseTag
         }
     }
 
-    if ($switchedBranch)
+    if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
     {
         Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
     }
