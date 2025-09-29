@@ -112,12 +112,10 @@ Describe 'Test-GitRemoteBranch' {
                 return @('refs/heads/main', 'refs/heads/develop')
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch
-                $result | Should -BeTrue
-                Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
-                    $RemoveRefsHeads -eq $true
-                }
+            $result = Test-GitRemoteBranch
+            $result | Should -BeTrue
+            Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
+                $RemoveRefsHeads -eq $true
             }
         }
 
@@ -126,11 +124,9 @@ Describe 'Test-GitRemoteBranch' {
                 return @()
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch
-                $result | Should -BeFalse
-                Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly
-            }
+            $result = Test-GitRemoteBranch
+            $result | Should -BeFalse
+            Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly
         }
 
         It 'Should return false when Get-GitRemoteBranch returns null' {
@@ -138,11 +134,9 @@ Describe 'Test-GitRemoteBranch' {
                 return $null
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch
-                $result | Should -BeFalse
-                Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly
-            }
+            $result = Test-GitRemoteBranch
+            $result | Should -BeFalse
+            Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly
         }
     }
 
@@ -152,12 +146,10 @@ Describe 'Test-GitRemoteBranch' {
                 return 'refs/heads/main'
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch -RemoteName 'origin'
-                $result | Should -BeTrue
-                Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
-                    $RemoteName -eq 'origin' -and $RemoveRefsHeads -eq $true
-                }
+            $result = Test-GitRemoteBranch -RemoteName 'origin'
+            $result | Should -BeTrue
+            Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
+                $RemoteName -eq 'origin' -and $RemoveRefsHeads -eq $true
             }
         }
 
@@ -166,12 +158,10 @@ Describe 'Test-GitRemoteBranch' {
                 return $null
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch -RemoteName 'upstream'
-                $result | Should -BeFalse
-                Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
-                    $RemoteName -eq 'upstream' -and $RemoveRefsHeads -eq $true
-                }
+            $result = Test-GitRemoteBranch -RemoteName 'upstream'
+            $result | Should -BeFalse
+            Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
+                $RemoteName -eq 'upstream' -and $RemoveRefsHeads -eq $true
             }
         }
     }
@@ -182,12 +172,10 @@ Describe 'Test-GitRemoteBranch' {
                 return 'refs/heads/feature/test'
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test'
-                $result | Should -BeTrue
-                Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
-                    $RemoteName -eq 'origin' -and $Name -eq 'feature/test' -and $RemoveRefsHeads -eq $true
-                }
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test'
+            $result | Should -BeTrue
+            Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
+                $RemoteName -eq 'origin' -and $Name -eq 'feature/test' -and $RemoveRefsHeads -eq $true
             }
         }
 
@@ -196,12 +184,10 @@ Describe 'Test-GitRemoteBranch' {
                 return $null
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'nonexistent-branch'
-                $result | Should -BeFalse
-                Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
-                    $RemoteName -eq 'origin' -and $Name -eq 'nonexistent-branch' -and $RemoveRefsHeads -eq $true
-                }
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'nonexistent-branch'
+            $result | Should -BeFalse
+            Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
+                $RemoteName -eq 'origin' -and $Name -eq 'nonexistent-branch' -and $RemoveRefsHeads -eq $true
             }
         }
 
@@ -210,12 +196,10 @@ Describe 'Test-GitRemoteBranch' {
                 return @('refs/heads/feature/test1', 'refs/heads/feature/test2')
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*'
-                $result | Should -BeTrue
-                Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
-                    $RemoteName -eq 'origin' -and $Name -eq 'feature/*' -and $RemoveRefsHeads -eq $true
-                }
+            $result = Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*'
+            $result | Should -BeTrue
+            Should -Invoke -CommandName 'Get-GitRemoteBranch' -Times 1 -Exactly -ParameterFilter {
+                $RemoteName -eq 'origin' -and $Name -eq 'feature/*' -and $RemoveRefsHeads -eq $true
             }
         }
     }
@@ -226,10 +210,8 @@ Describe 'Test-GitRemoteBranch' {
                 return ''
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch -RemoteName 'origin'
-                $result | Should -BeFalse
-            }
+            $result = Test-GitRemoteBranch -RemoteName 'origin'
+            $result | Should -BeFalse
         }
 
         It 'Should handle single space from Get-GitRemoteBranch as true' {
@@ -237,10 +219,8 @@ Describe 'Test-GitRemoteBranch' {
                 return ' '
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch -RemoteName 'origin'
-                $result | Should -BeTrue
-            }
+            $result = Test-GitRemoteBranch -RemoteName 'origin'
+            $result | Should -BeTrue
         }
 
         It 'Should handle array with empty string as false' {
@@ -248,10 +228,8 @@ Describe 'Test-GitRemoteBranch' {
                 return @('')
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch -RemoteName 'origin'
-                $result | Should -BeFalse
-            }
+            $result = Test-GitRemoteBranch -RemoteName 'origin'
+            $result | Should -BeFalse
         }
 
         It 'Should handle array with null values as false' {
@@ -259,10 +237,8 @@ Describe 'Test-GitRemoteBranch' {
                 return @($null)
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemoteBranch -RemoteName 'origin'
-                $result | Should -BeFalse
-            }
+            $result = Test-GitRemoteBranch -RemoteName 'origin'
+            $result | Should -BeFalse
         }
     }
 
@@ -270,35 +246,27 @@ Describe 'Test-GitRemoteBranch' {
         It 'Should accept valid RemoteName values' {
             Mock -CommandName 'Get-GitRemoteBranch' -MockWith { return 'refs/heads/main' }
 
-            InModuleScope -ScriptBlock {
-                { Test-GitRemoteBranch -RemoteName 'origin' } | Should -Not -Throw
-                { Test-GitRemoteBranch -RemoteName 'upstream' } | Should -Not -Throw
-                { Test-GitRemoteBranch -RemoteName 'remote-with-dashes' } | Should -Not -Throw
-            }
+            { Test-GitRemoteBranch -RemoteName 'origin' } | Should -Not -Throw
+            { Test-GitRemoteBranch -RemoteName 'upstream' } | Should -Not -Throw
+            { Test-GitRemoteBranch -RemoteName 'remote-with-dashes' } | Should -Not -Throw
         }
 
         It 'Should accept valid Name values' {
             Mock -CommandName 'Get-GitRemoteBranch' -MockWith { return 'refs/heads/main' }
 
-            InModuleScope -ScriptBlock {
-                { Test-GitRemoteBranch -RemoteName 'origin' -Name 'main' } | Should -Not -Throw
-                { Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test' } | Should -Not -Throw
-                { Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*' } | Should -Not -Throw
-            }
+            { Test-GitRemoteBranch -RemoteName 'origin' -Name 'main' } | Should -Not -Throw
+            { Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test' } | Should -Not -Throw
+            { Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*' } | Should -Not -Throw
         }
 
         It 'Should not accept null or empty RemoteName when Name is specified' {
-            InModuleScope -ScriptBlock {
-                { Test-GitRemoteBranch -RemoteName '' -Name 'main' } | Should -Throw
-                { Test-GitRemoteBranch -RemoteName $null -Name 'main' } | Should -Throw
-            }
+            { Test-GitRemoteBranch -RemoteName '' -Name 'main' } | Should -Throw
+            { Test-GitRemoteBranch -RemoteName $null -Name 'main' } | Should -Throw
         }
 
         It 'Should not accept null or empty Name when specified' {
-            InModuleScope -ScriptBlock {
-                { Test-GitRemoteBranch -RemoteName 'origin' -Name '' } | Should -Throw
-                { Test-GitRemoteBranch -RemoteName 'origin' -Name $null } | Should -Throw
-            }
+            { Test-GitRemoteBranch -RemoteName 'origin' -Name '' } | Should -Throw
+            { Test-GitRemoteBranch -RemoteName 'origin' -Name $null } | Should -Throw
         }
     }
 }
