@@ -10,6 +10,7 @@
         System.Boolean
 
         Returns $true if there are unstaged or staged changes, otherwise returns $false.
+        Returns $null if the git status command fails.
 
     .INPUTS
         None
@@ -35,6 +36,20 @@ function Test-GitLocalChanges
 
     # Check for unstaged or staged changes
     $status = git status --porcelain # cSpell: ignore unstaged
+
+    if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
+    {
+        $errorMessageParameters = @{
+            Message = $script:localizedData.Test_GitLocalChanges_GitFailed
+            Category = 'InvalidOperation'
+            ErrorId = 'TGLC0001' # cspell: disable-line
+            TargetObject = $null
+        }
+
+        Write-Error @errorMessageParameters
+
+        return $null
+    }
 
     $result = $false
 

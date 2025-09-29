@@ -26,6 +26,9 @@ ConvertFrom-StringData @'
     ## Assert-GitLocalChange
     Assert_GitLocalChanges_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
 
+    ## Test-GitLocalChanges
+    Test_GitLocalChanges_GitFailed = Failed to execute git status. Make sure git is installed and the current directory is a valid git repository.
+
     ## Assert-GitRemote
     Assert_GitRemote_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (AGR0001)
 

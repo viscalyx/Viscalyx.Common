@@ -141,4 +141,58 @@ Describe 'Test-GitLocalChanges' {
             $result | Should -BeOfType [System.Boolean]
         }
     }
+
+    Context 'When git command fails' {
+        BeforeAll {
+            Mock -CommandName 'git' -MockWith {
+                if ($args[0] -eq 'status' -and $args[1] -eq '--porcelain')
+                {
+                    $global:LASTEXITCODE = 1
+                    return $null
+                }
+                else
+                {
+                    throw "Mock git unexpected args: $($args -join ' ')"
+                }
+            }
+
+            Mock -CommandName 'Write-Error'
+
+            $mockErrorMessage = InModuleScope -ScriptBlock {
+                $script:localizedData.Test_GitLocalChanges_GitFailed
+            }
+        }
+
+        AfterEach {
+            $global:LASTEXITCODE = 0
+        }
+
+        It 'Should have a localized error message' {
+            $mockErrorMessage | Should -Not -BeNullOrEmpty -Because 'The error message should have been localized, and shall not be empty'
+        }
+
+        It 'Should return null when git status fails' {
+            $result = Test-GitLocalChanges
+
+            $result | Should -BeNullOrEmpty
+        }
+
+        It 'Should call Write-Error with localized message when git fails' {
+            Test-GitLocalChanges
+
+            Should -Invoke -CommandName 'Write-Error' -ParameterFilter {
+                $Message -eq $mockErrorMessage -and
+                $Category -eq 'InvalidOperation' -and
+                $ErrorId -eq 'TGLC0001'
+            } -Exactly -Times 1
+        }
+
+        It 'Should call git status with correct parameters even when it fails' {
+            Test-GitLocalChanges
+
+            Should -Invoke -CommandName 'git' -ParameterFilter {
+                $args[0] -eq 'status' -and $args[1] -eq '--porcelain'
+            } -Exactly -Times 1
+        }
+    }
 }
