@@ -269,6 +269,9 @@ ConvertFrom-StringData @'
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Update_GitLocalBranch_Pull_ShouldProcessCaption = Pull into local branch
     Update_GitLocalBranch_FailedRebase = Failed to rebase the local branch '{0}' from remote '{1}'. Make sure the branch exists and is accessible.
+    Update_GitLocalBranch_FailedPull = Failed to pull into the local branch '{0}' from remote '{1}'. Make sure the branch exists and is accessible.
+    Update_GitLocalBranch_MergeConflictMessage = Merge conflict detected, when conflicts are resolved run `Resume-GitRebase` or to abort rebase run `Stop-GitRebase`.
+    Update_GitLocalBranch_ReturnToBranchMessage = After rebase is finished run `Switch-GitLocalBranch -Name {0}` to return to the original branch.
 
     ## Update-RemoteTrackingBranch
     Update_RemoteTrackingBranch_FailedFetchBranchFromRemote = Failed to fetch from '{0}'. Make sure the branch exists in the remote git repository and the remote is accessible.

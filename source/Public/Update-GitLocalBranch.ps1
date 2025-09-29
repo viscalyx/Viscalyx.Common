@@ -212,11 +212,6 @@ function Update-GitLocalBranch
                 $exitCode = $LASTEXITCODE
             }
 
-            if ($ReturnToCurrentBranch.IsPresent -and $BranchName -ne $currentLocalBranchName)
-            {
-                Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference  -ErrorAction 'Stop'
-            }
-
             if ($exitCode -ne 0)
             {
                 $mergeConflicts = git ls-files --unmerged
@@ -224,33 +219,42 @@ function Update-GitLocalBranch
                 # TODO: Handle when error is rebase conflict resolution - THIS SHOULD BE MOVED TO START-GITREBASE
                 if ($mergeConflicts)
                 {
-                    Write-Information -MessageData 'Merge conflict detected, when conflicts are resolved run `Resume-GitRebase` or to abort rebase run `Stop-GitRebase`.' -InformationAction 'Continue'
+                    Write-Information -MessageData $script:localizedData.Update_GitLocalBranch_MergeConflictMessage -InformationAction 'Continue'
 
                     if ($ReturnToCurrentBranch.IsPresent -and $BranchName -ne $currentLocalBranchName)
                     {
                         $ReturnToCurrentBranch = $false
 
-                        Write-Information -MessageData ('After rebase is finished run `Switch-GitLocalBranch -Name {0}` to return to the original branch.' -f $currentLocalBranchName) -InformationAction 'Continue'
+                        Write-Information -MessageData ($script:localizedData.Update_GitLocalBranch_ReturnToBranchMessage -f $currentLocalBranchName) -InformationAction 'Continue'
                     }
 
                     return
                 }
 
+                $errorMessage = if ($Rebase)
+                {
+                    $script:localizedData.Update_GitLocalBranch_FailedRebase -f $BranchName, $RemoteName
+                }
+                else
+                {
+                    $script:localizedData.Update_GitLocalBranch_FailedPull -f $BranchName, $RemoteName
+                }
+
                 $PSCmdlet.ThrowTerminatingError(
                     [System.Management.Automation.ErrorRecord]::new(
-                        ($script:localizedData.Update_GitLocalBranch_FailedRebase -f $BranchName, $RemoteName),
+                        $errorMessage,
                         'UGLB0001', # cspell: disable-line
                         [System.Management.Automation.ErrorCategory]::InvalidOperation,
                         $argument -join ' '
                     )
                 )
             }
-        }
-    }
 
-    # Switch back to the original branch if specified
-    if ($ReturnToCurrentBranch.IsPresent -and $BranchName -ne $currentLocalBranchName)
-    {
-        Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+            # Only switch back to the original branch if the operation succeeded
+            if ($ReturnToCurrentBranch.IsPresent -and $BranchName -ne $currentLocalBranchName)
+            {
+                Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+            }
+        }
     }
 }
