@@ -270,9 +270,14 @@ Describe 'Switch-GitLocalBranch' {
                 }
             }
 
-            { Switch-GitLocalBranch -Name 'main' -Force } | Should -Not -Throw
-            { Switch-GitLocalBranch -Name 'feature/branch-name' -Force } | Should -Not -Throw
-            { Switch-GitLocalBranch -Name 'hotfix/fix-123' -Force } | Should -Not -Throw
+            Switch-GitLocalBranch -Name 'main' -Force
+            Switch-GitLocalBranch -Name 'feature/branch-name' -Force
+            Switch-GitLocalBranch -Name 'hotfix/fix-123' -Force
+
+            Should -Invoke -CommandName Assert-GitLocalChange -Times 3 -Exactly
+            Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'checkout' -and $args[1] -eq 'main' } -Times 1 -Exactly
+            Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'checkout' -and $args[1] -eq 'feature/branch-name' } -Times 1 -Exactly
+            Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'checkout' -and $args[1] -eq 'hotfix/fix-123' } -Times 1 -Exactly
         }
 
         It 'Should accept valid branch names without Force parameter' {
@@ -284,8 +289,12 @@ Describe 'Switch-GitLocalBranch' {
                 }
             }
 
-            { Switch-GitLocalBranch -Name 'main' -Confirm:$false } | Should -Not -Throw
-            { Switch-GitLocalBranch -Name 'feature/branch-name' -Confirm:$false } | Should -Not -Throw
+            Switch-GitLocalBranch -Name 'main' -Confirm:$false
+            Switch-GitLocalBranch -Name 'feature/branch-name' -Confirm:$false
+
+            Should -Invoke -CommandName Assert-GitLocalChange -Times 2 -Exactly
+            Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'checkout' -and $args[1] -eq 'main' } -Times 1 -Exactly
+            Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'checkout' -and $args[1] -eq 'feature/branch-name' } -Times 1 -Exactly
         }
 
         It 'Should accept positional parameter for Name' {
@@ -297,7 +306,10 @@ Describe 'Switch-GitLocalBranch' {
                 }
             }
 
-            { Switch-GitLocalBranch 'main' -Force } | Should -Not -Throw
+            Switch-GitLocalBranch 'main' -Force
+
+            Should -Invoke -CommandName Assert-GitLocalChange -Times 1 -Exactly
+            Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'checkout' -and $args[1] -eq 'main' } -Times 1 -Exactly
         }
     }
 }
