@@ -135,59 +135,38 @@ AfterAll {
     # Force cleanup of git repositories to prevent TestDrive deletion issues
     if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath))
     {
-        try
-        {
-            # Remove read-only attributes from .git directory recursively
-            Get-ChildItem -Path $script:testRepoPath -Recurse -Force | ForEach-Object {
-                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
-                {
-                    $_.Attributes = $_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
-                }
+        # Remove read-only attributes from .git directory recursively
+        Get-ChildItem -Path $script:testRepoPath -Recurse -Force | ForEach-Object {
+            if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
+            {
+                $_.Attributes = $_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
             }
-            Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         }
-        catch
-        {
-            # Ignore cleanup errors - TestDrive will handle remaining cleanup
-        }
+        Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
     }
 
     if ($script:secondRepoPath -and (Test-Path -Path $script:secondRepoPath))
     {
-        try
-        {
-            # Remove read-only attributes from .git directory recursively
-            Get-ChildItem -Path $script:secondRepoPath -Recurse -Force | ForEach-Object {
-                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
-                {
-                    $_.Attributes = $_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
-                }
+        # Remove read-only attributes from .git directory recursively
+        Get-ChildItem -Path $script:secondRepoPath -Recurse -Force | ForEach-Object {
+            if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
+            {
+                $_.Attributes = $_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
             }
-            Remove-Item -Path $script:secondRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         }
-        catch
-        {
-            # Ignore cleanup errors - TestDrive will handle remaining cleanup
-        }
+        Remove-Item -Path $script:secondRepoPath -Recurse -Force -ErrorAction SilentlyContinue
     }
 
     if ($script:bareRepoPath -and (Test-Path -Path $script:bareRepoPath))
     {
-        try
-        {
-            # Remove read-only attributes from .git directory recursively
-            Get-ChildItem -Path $script:bareRepoPath -Recurse -Force | ForEach-Object {
-                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
-                {
-                    $_.Attributes = $_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
-                }
+        # Remove read-only attributes from .git directory recursively
+        Get-ChildItem -Path $script:bareRepoPath -Recurse -Force | ForEach-Object {
+            if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
+            {
+                $_.Attributes = $_.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
             }
-            Remove-Item -Path $script:bareRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         }
-        catch
-        {
-            # Ignore cleanup errors - TestDrive will handle remaining cleanup
-        }
+        Remove-Item -Path $script:bareRepoPath -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -245,7 +224,7 @@ Describe 'Request-GitTag' {
 
         It 'Should handle non-existent tag gracefully' {
             # Attempt to fetch a non-existent tag (redirect errors to suppress console noise)
-            { Request-GitTag -RemoteName 'origin' -Name 'non-existent-tag' -Force } |
+            { Request-GitTag -RemoteName 'origin' -Name 'non-existent-tag' -Force -ErrorAction Stop } |
                 Should -Throw -ErrorId 'RGT0001,Request-GitTag'
         }
     }
