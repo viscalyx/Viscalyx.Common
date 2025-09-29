@@ -45,6 +45,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
 
         # Initialize a git repository
         Push-Location -Path $script:testRepoPath
+        $script:pushedTestRepo = $true
         try
         {
             & git init --quiet --initial-branch=main
@@ -177,6 +178,13 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
     }
 
     AfterAll {
+        # Pop location stack if we pushed earlier
+        if ($script:pushedTestRepo)
+        {
+            Pop-Location -ErrorAction SilentlyContinue
+            $script:pushedTestRepo = $false
+        }
+
         # Always return to original location
         Set-Location -Path $script:originalLocation
 
