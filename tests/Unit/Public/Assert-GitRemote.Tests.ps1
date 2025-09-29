@@ -70,7 +70,7 @@ Describe 'Assert-GitRemote' {
         }
 
         It 'Should not throw an exception' {
-            { Assert-GitRemote -Name 'origin' } | Should -Not -Throw
+            $null = Assert-GitRemote -Name 'origin'
         }
 
         It 'Should call Test-GitRemote once' {
@@ -158,7 +158,7 @@ Describe 'Assert-GitRemote' {
             @{ RemoteName = 'fork' }
             @{ RemoteName = 'my-remote' }
         ) {
-            { Assert-GitRemote -Name $RemoteName } | Should -Not -Throw
+            $null = Assert-GitRemote -Name $RemoteName
 
             Should -Invoke -CommandName 'Test-GitRemote' -ParameterFilter { $Name -eq $RemoteName } -Exactly -Times 1
         }
