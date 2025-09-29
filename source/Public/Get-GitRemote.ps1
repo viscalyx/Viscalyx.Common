@@ -93,6 +93,8 @@ function Get-GitRemote
         }
 
         Write-Error @errorMessageParameters
+
+        return
     }
 
     if ($PSCmdlet.ParameterSetName -eq 'Default')
