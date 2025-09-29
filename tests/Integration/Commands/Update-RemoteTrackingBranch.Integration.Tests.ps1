@@ -369,7 +369,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
                 # Use Start-Transcript temporarily to capture all output
                 $tempTranscriptPath = Join-Path $TestDrive 'whatif-test.txt'
                 Start-Transcript -Path $tempTranscriptPath -Force
-                Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -WhatIf
+                $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -WhatIf
                 Stop-Transcript
 
                 # Read the transcript to get the actual output
@@ -415,7 +415,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
         }
 
         It 'Should throw error when not in a git repository' {
-            { Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false -ErrorAction Stop 2>$null } | Should -Throw
+            { Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false -ErrorAction Stop } | Should -Throw
         }
     }
 
