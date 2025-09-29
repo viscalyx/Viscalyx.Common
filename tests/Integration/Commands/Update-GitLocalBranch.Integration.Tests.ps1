@@ -358,7 +358,7 @@ Describe 'Update-GitLocalBranch' -Tag 'Integration' {
             $beforeCommit = & git rev-parse HEAD
             $beforeBranch = & git branch --show-current
 
-            Update-GitLocalBranch -BranchName 'develop' -WhatIf
+            $null = Update-GitLocalBranch -BranchName 'develop' -WhatIf
 
             # Verify no changes were made
             $afterCommit = & git rev-parse HEAD

@@ -96,7 +96,7 @@ Describe 'Rename-GitRemote' {
         }
 
         It 'Should rename a Git remote from "my" to "origin"' {
-            Rename-GitRemote -Name 'my' -NewName 'origin' -Force
+            $null = Rename-GitRemote -Name 'my' -NewName 'origin' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'remote' -and $args[1] -eq 'rename' -and $args[2] -eq 'my' -and $args[3] -eq 'origin'
@@ -104,7 +104,7 @@ Describe 'Rename-GitRemote' {
         }
 
         It 'Should rename a Git remote from "upstream" to "fork"' {
-            Rename-GitRemote -Name 'upstream' -NewName 'fork' -Force
+            $null = Rename-GitRemote -Name 'upstream' -NewName 'fork' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'remote' -and $args[1] -eq 'rename' -and $args[2] -eq 'upstream' -and $args[3] -eq 'fork'
@@ -137,14 +137,14 @@ Describe 'Rename-GitRemote' {
 
         It 'Should throw terminating error when remote rename fails' {
             {
-                Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
+                $null = Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
             } | Should -Throw -ExpectedMessage $mockErrorMessage
         }
 
         It 'Should throw error with correct error ID' {
             try
             {
-                Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
+                $null = Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
             }
             catch
             {
@@ -155,7 +155,7 @@ Describe 'Rename-GitRemote' {
         It 'Should throw error with correct error category' {
             try
             {
-                Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
+                $null = Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
             }
             catch
             {
@@ -166,7 +166,7 @@ Describe 'Rename-GitRemote' {
         It 'Should throw error with correct target object' {
             try
             {
-                Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
+                $null = Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
             }
             catch
             {

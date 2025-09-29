@@ -158,7 +158,7 @@ Describe 'Remove-GitTag' {
             $tagsBefore | Should -Be 'test-tag-1'
 
             # Remove the tag
-            Remove-GitTag -Tag 'test-tag-1' -Force -ErrorAction Stop
+            $null = Remove-GitTag -Tag 'test-tag-1' -Force -ErrorAction Stop
 
             # Verify tag is removed
             $tagsAfter = git tag -l 'test-tag-1'
@@ -172,7 +172,7 @@ Describe 'Remove-GitTag' {
             $tagsBefore | Should -Contain 'test-tag-2'
 
             # Remove multiple tags
-            Remove-GitTag -Tag @('test-tag-1', 'test-tag-2') -Force -ErrorAction Stop
+            $null = Remove-GitTag -Tag @('test-tag-1', 'test-tag-2') -Force -ErrorAction Stop
 
             # Verify tags are removed
             $tagsAfter = git tag -l
@@ -187,7 +187,7 @@ Describe 'Remove-GitTag' {
             $tagsBefore | Should -Be 'test-tag-1'
 
             # Remove the tag with Local switch
-            Remove-GitTag -Tag 'test-tag-1' -Local -Force -ErrorAction Stop
+            $null = Remove-GitTag -Tag 'test-tag-1' -Local -Force -ErrorAction Stop
 
             # Verify tag is removed
             $tagsAfter = git tag -l 'test-tag-1'
@@ -236,7 +236,7 @@ Describe 'Remove-GitTag' {
             $remoteTagsBefore | Should -Match 'refs/tags/remote-test-tag'
 
             # Remove the tag from remote only
-            Remove-GitTag -Tag 'remote-test-tag' -Remote 'origin' -Force -ErrorAction Stop
+            $null = Remove-GitTag -Tag 'remote-test-tag' -Remote 'origin' -Force -ErrorAction Stop
             Start-Sleep -Milliseconds 200
 
             # Verify tag is removed from remote
@@ -274,7 +274,7 @@ Describe 'Remove-GitTag' {
             ($remoteTagsBefore -join ' ') | Should -Match 'refs/tags/remote-test-tag-2'
 
             # Remove multiple tags from remote
-            Remove-GitTag -Tag @('remote-test-tag-1', 'remote-test-tag-2') -Remote 'origin' -Force -ErrorAction Stop
+            $null = Remove-GitTag -Tag @('remote-test-tag-1', 'remote-test-tag-2') -Remote 'origin' -Force -ErrorAction Stop
             Start-Sleep -Milliseconds 300  # Increased wait time
 
             # Verify tags are removed from remote
@@ -332,7 +332,7 @@ Describe 'Remove-GitTag' {
             $remoteTagsBefore | Should -Match 'refs/tags/both-test-tag'
 
             # Remove the tag from both
-            Remove-GitTag -Tag 'both-test-tag' -Local -Remote 'origin' -Force -ErrorAction Stop
+            $null = Remove-GitTag -Tag 'both-test-tag' -Local -Remote 'origin' -Force -ErrorAction Stop
             Start-Sleep -Milliseconds 200
 
             # Verify tag is removed from both
@@ -401,7 +401,7 @@ Describe 'Remove-GitTag' {
             $tagsBefore | Should -Be 'test-tag-1'
 
             # Use WhatIf
-            Remove-GitTag -Tag 'test-tag-1' -WhatIf -ErrorAction Stop
+            $null = Remove-GitTag -Tag 'test-tag-1' -WhatIf -ErrorAction Stop
 
             # Verify tag still exists
             $tagsAfter = git tag -l 'test-tag-1'

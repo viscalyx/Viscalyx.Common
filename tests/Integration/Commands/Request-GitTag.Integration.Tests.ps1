@@ -212,8 +212,8 @@ Describe 'Request-GitTag' {
             $existingTags | Should -Not -Contain 'v2.0.0'
 
             # Fetch specific tags
-            Request-GitTag -RemoteName 'origin' -Name 'v1.1.0' -Force -ErrorAction Stop
-            Request-GitTag -RemoteName 'origin' -Name 'v2.0.0' -Force -ErrorAction Stop
+            $null = Request-GitTag -RemoteName 'origin' -Name 'v1.1.0' -Force -ErrorAction Stop
+            $null = Request-GitTag -RemoteName 'origin' -Name 'v2.0.0' -Force -ErrorAction Stop
 
             # Verify the tags now exist locally
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
@@ -265,7 +265,7 @@ Describe 'Request-GitTag' {
 
         It 'Should work when tags already exist locally' {
             # First fetch all tags
-            Request-GitTag -RemoteName 'origin' -Force
+            $null = Request-GitTag -RemoteName 'origin' -Force
 
             # Verify tags exist
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
@@ -327,7 +327,7 @@ Describe 'Request-GitTag' {
             $tagsBeforeWhatIf = $result.Output
 
             # WhatIf should not perform the actual operation
-            Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -WhatIf 2>$null
+            $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -WhatIf 2>$null
 
             # Verify that no tags were actually fetched
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
@@ -341,7 +341,7 @@ Describe 'Request-GitTag' {
             $tagsBeforeWhatIf = $result.Output
 
             # WhatIf should not perform the actual operation
-            Request-GitTag -RemoteName 'origin' -WhatIf 2>$null
+            $null = Request-GitTag -RemoteName 'origin' -WhatIf 2>$null
 
             # Verify that no tags were actually fetched
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
@@ -429,7 +429,7 @@ Describe 'Request-GitTag' {
             }
 
             # Fetch from origin
-            Request-GitTag -RemoteName 'origin' -Force -ErrorAction Stop
+            $null = Request-GitTag -RemoteName 'origin' -Force -ErrorAction Stop
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
             $originTags = $result.Output
             $originTags | Should -Contain 'v1.0.0'
@@ -441,7 +441,7 @@ Describe 'Request-GitTag' {
             }
 
             # Fetch from upstream
-            Request-GitTag -RemoteName 'upstream' -Force -ErrorAction Stop
+            $null = Request-GitTag -RemoteName 'upstream' -Force -ErrorAction Stop
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
             $upstreamTags = $result.Output
             $upstreamTags | Should -Contain 'upstream-v1.0.0'
@@ -457,7 +457,7 @@ Describe 'Request-GitTag' {
             }
 
             # Fetch specific upstream tag
-            Request-GitTag -RemoteName 'upstream' -Name 'upstream-v1.0.0' -Force -ErrorAction Stop
+            $null = Request-GitTag -RemoteName 'upstream' -Name 'upstream-v1.0.0' -Force -ErrorAction Stop
 
             # Verify the tag was fetched
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru

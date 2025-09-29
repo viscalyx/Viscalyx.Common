@@ -110,7 +110,7 @@ Describe 'Switch-GitLocalBranch' {
         }
 
         It 'Should switch to the branch successfully' {
-            Switch-GitLocalBranch -Name 'feature/test-branch' -Force
+            $null = Switch-GitLocalBranch -Name 'feature/test-branch' -Force
 
             Should -Invoke -CommandName Assert-GitLocalChange -Times 1
             Should -Invoke -CommandName git -ParameterFilter {
@@ -119,7 +119,7 @@ Describe 'Switch-GitLocalBranch' {
         }
 
         It 'Should call Assert-GitLocalChange to check for uncommitted changes' {
-            Switch-GitLocalBranch -Name 'main' -Force
+            $null = Switch-GitLocalBranch -Name 'main' -Force
 
             Should -Invoke -CommandName Assert-GitLocalChange -Times 1
         }
@@ -210,7 +210,7 @@ Describe 'Switch-GitLocalBranch' {
         }
 
         It 'Should bypass confirmation when Force is used' {
-            Switch-GitLocalBranch -Name 'feature/test-branch' -Force
+            $null = Switch-GitLocalBranch -Name 'feature/test-branch' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'checkout' -and $args[1] -eq 'feature/test-branch'
@@ -270,9 +270,9 @@ Describe 'Switch-GitLocalBranch' {
                 }
             }
 
-            Switch-GitLocalBranch -Name 'main' -Force
-            Switch-GitLocalBranch -Name 'feature/branch-name' -Force
-            Switch-GitLocalBranch -Name 'hotfix/fix-123' -Force
+            $null = Switch-GitLocalBranch -Name 'main' -Force
+            $null = Switch-GitLocalBranch -Name 'feature/branch-name' -Force
+            $null = Switch-GitLocalBranch -Name 'hotfix/fix-123' -Force
 
             Should -Invoke -CommandName Assert-GitLocalChange -Times 3 -Exactly
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'checkout' -and $args[1] -eq 'main' } -Times 1 -Exactly
@@ -289,8 +289,8 @@ Describe 'Switch-GitLocalBranch' {
                 }
             }
 
-            Switch-GitLocalBranch -Name 'main' -Confirm:$false
-            Switch-GitLocalBranch -Name 'feature/branch-name' -Confirm:$false
+            $null = Switch-GitLocalBranch -Name 'main' -Confirm:$false
+            $null = Switch-GitLocalBranch -Name 'feature/branch-name' -Confirm:$false
 
             Should -Invoke -CommandName Assert-GitLocalChange -Times 2 -Exactly
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'checkout' -and $args[1] -eq 'main' } -Times 1 -Exactly
@@ -306,7 +306,7 @@ Describe 'Switch-GitLocalBranch' {
                 }
             }
 
-            Switch-GitLocalBranch 'main' -Force
+            $null = Switch-GitLocalBranch 'main' -Force
 
             Should -Invoke -CommandName Assert-GitLocalChange -Times 1 -Exactly
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'checkout' -and $args[1] -eq 'main' } -Times 1 -Exactly

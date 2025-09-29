@@ -63,7 +63,7 @@ Describe 'Remove-GitTag' {
         }
 
         It 'Should remove a tag from local repository when only Tag is specified' {
-            Remove-GitTag -Tag 'v1.0.0' -Force
+            $null = Remove-GitTag -Tag 'v1.0.0' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'tag' -and $args[1] -eq '-d' -and $args[2] -eq 'v1.0.0'
@@ -71,7 +71,7 @@ Describe 'Remove-GitTag' {
         }
 
         It 'Should remove a tag from local repository when Local switch is specified' {
-            Remove-GitTag -Tag 'v1.0.0' -Local -Force
+            $null = Remove-GitTag -Tag 'v1.0.0' -Local -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'tag' -and $args[1] -eq '-d' -and $args[2] -eq 'v1.0.0'
@@ -79,7 +79,7 @@ Describe 'Remove-GitTag' {
         }
 
         It 'Should remove multiple tags from local repository' {
-            Remove-GitTag -Tag @('v1.0.0', 'v1.1.0') -Force
+            $null = Remove-GitTag -Tag @('v1.0.0', 'v1.1.0') -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'tag' -and $args[1] -eq '-d' -and $args[2] -eq 'v1.0.0'
@@ -110,7 +110,7 @@ Describe 'Remove-GitTag' {
         }
 
         It 'Should remove a tag from a single remote repository' {
-            Remove-GitTag -Tag 'v1.0.0' -Remote 'origin' -Force
+            $null = Remove-GitTag -Tag 'v1.0.0' -Remote 'origin' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push' -and $args[1] -eq 'origin' -and $args[2] -eq ':refs/tags/v1.0.0'
@@ -118,7 +118,7 @@ Describe 'Remove-GitTag' {
         }
 
         It 'Should remove a tag from multiple remote repositories' {
-            Remove-GitTag -Tag 'v1.0.0' -Remote @('origin', 'upstream') -Force
+            $null = Remove-GitTag -Tag 'v1.0.0' -Remote @('origin', 'upstream') -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push' -and $args[1] -eq 'origin' -and $args[2] -eq ':refs/tags/v1.0.0'
@@ -130,7 +130,7 @@ Describe 'Remove-GitTag' {
         }
 
         It 'Should remove multiple tags from multiple remote repositories' {
-            Remove-GitTag -Tag @('v1.0.0', 'v1.1.0') -Remote @('origin', 'upstream') -Force
+            $null = Remove-GitTag -Tag @('v1.0.0', 'v1.1.0') -Remote @('origin', 'upstream') -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push' -and $args[1] -eq 'origin' -and $args[2] -eq ':refs/tags/v1.0.0'
@@ -173,7 +173,7 @@ Describe 'Remove-GitTag' {
         }
 
         It 'Should remove a tag from both local and remote repositories' {
-            Remove-GitTag -Tag 'v1.0.0' -Local -Remote 'origin' -Force
+            $null = Remove-GitTag -Tag 'v1.0.0' -Local -Remote 'origin' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'tag' -and $args[1] -eq '-d' -and $args[2] -eq 'v1.0.0'

@@ -104,7 +104,7 @@ Describe 'Update-RemoteTrackingBranch' {
         }
 
         It 'Should successfully fetch all branches from specified remote' {
-            Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false
 
             Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
                 $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args.Count -eq 2
@@ -112,7 +112,7 @@ Describe 'Update-RemoteTrackingBranch' {
         }
 
         It 'Should work with different remote names' {
-            Update-RemoteTrackingBranch -RemoteName 'upstream' -Confirm:$false
+            $null = Update-RemoteTrackingBranch -RemoteName 'upstream' -Confirm:$false
 
             Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
                 $args[0] -eq 'fetch' -and $args[1] -eq 'upstream' -and $args.Count -eq 2
@@ -139,7 +139,7 @@ Describe 'Update-RemoteTrackingBranch' {
         }
 
         It 'Should successfully fetch specific branch from specified remote' {
-            Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false
 
             Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
                 $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args[2] -eq 'main' -and $args.Count -eq 3
@@ -147,7 +147,7 @@ Describe 'Update-RemoteTrackingBranch' {
         }
 
         It 'Should work with different branch and remote combinations' {
-            Update-RemoteTrackingBranch -RemoteName 'upstream' -BranchName 'develop' -Confirm:$false
+            $null = Update-RemoteTrackingBranch -RemoteName 'upstream' -BranchName 'develop' -Confirm:$false
 
             Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
                 $args[0] -eq 'fetch' -and $args[1] -eq 'upstream' -and $args[2] -eq 'develop' -and $args.Count -eq 3
@@ -155,7 +155,7 @@ Describe 'Update-RemoteTrackingBranch' {
         }
 
         It 'Should work with feature branch names' {
-            Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'feature/new-functionality' -Confirm:$false
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'feature/new-functionality' -Confirm:$false
 
             Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
                 $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args[2] -eq 'feature/new-functionality' -and $args.Count -eq 3
@@ -226,7 +226,7 @@ Describe 'Update-RemoteTrackingBranch' {
         }
 
         It 'Should not execute git fetch when using -WhatIf' {
-            Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -WhatIf
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -WhatIf
 
             Should -Invoke -CommandName git -Times 0
         }

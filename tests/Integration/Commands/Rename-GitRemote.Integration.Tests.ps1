@@ -160,7 +160,7 @@ Describe 'Rename-GitRemote' {
             $remotesBefore | Should -Not -Contain 'origin'
 
             # Rename the remote using the command
-            Rename-GitRemote -Name 'myremote' -NewName 'origin' -Force -ErrorAction Stop
+            $null = Rename-GitRemote -Name 'myremote' -NewName 'origin' -Force -ErrorAction Stop
 
             # Verify the remote was renamed
             $remotesAfter = git remote
@@ -180,7 +180,7 @@ Describe 'Rename-GitRemote' {
             $remotesBefore | Should -Not -Contain 'fork'
 
             # Rename the remote using the command
-            Rename-GitRemote -Name 'upstream' -NewName 'fork' -Force -ErrorAction Stop
+            $null = Rename-GitRemote -Name 'upstream' -NewName 'fork' -Force -ErrorAction Stop
 
             # Verify the remote was renamed
             $remotesAfter = git remote
@@ -195,7 +195,7 @@ Describe 'Rename-GitRemote' {
 
         It 'Should preserve tracking branches after renaming remote' {
             # Rename the remote
-            Rename-GitRemote -Name 'myremote' -NewName 'origin' -Force -ErrorAction Stop
+            $null = Rename-GitRemote -Name 'myremote' -NewName 'origin' -Force -ErrorAction Stop
 
             # Verify that branches can still be pushed and tracked
             "Modified content" | Out-File -FilePath 'test2.txt' -Encoding utf8

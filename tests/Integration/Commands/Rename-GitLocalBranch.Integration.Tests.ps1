@@ -130,7 +130,7 @@ Describe 'Rename-GitLocalBranch' {
             $originalCommit = $result.Output
 
             # Rename the branch
-            Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force
+            $null = Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force
 
             # Get the commit hash after renaming
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru

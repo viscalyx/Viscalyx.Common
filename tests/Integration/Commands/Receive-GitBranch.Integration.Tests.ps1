@@ -236,7 +236,7 @@ Describe 'Receive-GitBranch' {
             $originalBranch = git rev-parse --abbrev-ref HEAD
 
             # Run with WhatIf (need to use -Checkout if we want to test checkout behavior)
-            Receive-GitBranch -Checkout -BranchName 'main' -WhatIf
+            $null = Receive-GitBranch -Checkout -BranchName 'main' -WhatIf
 
             # Verify branch hasn't changed
             $currentBranch = git rev-parse --abbrev-ref HEAD

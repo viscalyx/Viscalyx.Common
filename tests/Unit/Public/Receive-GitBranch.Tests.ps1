@@ -97,7 +97,7 @@ Describe 'Receive-GitBranch' {
         }
 
         It 'Should only pull changes by default without checkout' {
-            Receive-GitBranch -Force
+            $null = Receive-GitBranch -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'pull'
@@ -109,7 +109,7 @@ Describe 'Receive-GitBranch' {
         }
 
         It 'Should checkout specified branch and pull changes when -Checkout is used' {
-            Receive-GitBranch -Checkout -BranchName 'feature-branch' -Force
+            $null = Receive-GitBranch -Checkout -BranchName 'feature-branch' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'checkout' -and $args[1] -eq 'feature-branch'
@@ -133,7 +133,7 @@ Describe 'Receive-GitBranch' {
         }
 
         It 'Should fetch and rebase without checkout by default' {
-            Receive-GitBranch -Rebase -Force
+            $null = Receive-GitBranch -Rebase -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args[2] -eq 'main'
@@ -149,7 +149,7 @@ Describe 'Receive-GitBranch' {
         }
 
         It 'Should checkout, fetch, and rebase when -Checkout is used' {
-            Receive-GitBranch -Checkout -Rebase -BranchName 'feature-branch' -Force
+            $null = Receive-GitBranch -Checkout -Rebase -BranchName 'feature-branch' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'checkout' -and $args[1] -eq 'feature-branch'
@@ -165,7 +165,7 @@ Describe 'Receive-GitBranch' {
         }
 
         It 'Should checkout, fetch, and rebase with custom branches' {
-            Receive-GitBranch -Checkout -BranchName 'feature' -UpstreamBranchName 'develop' -Rebase -Force
+            $null = Receive-GitBranch -Checkout -BranchName 'feature' -UpstreamBranchName 'develop' -Rebase -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'checkout' -and $args[1] -eq 'feature'
@@ -181,7 +181,7 @@ Describe 'Receive-GitBranch' {
         }
 
         It 'Should use custom remote name when specified' {
-            Receive-GitBranch -RemoteName 'upstream' -UpstreamBranchName 'main' -Rebase -Force
+            $null = Receive-GitBranch -RemoteName 'upstream' -UpstreamBranchName 'main' -Rebase -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'upstream' -and $args[2] -eq 'main'
@@ -218,7 +218,7 @@ Describe 'Receive-GitBranch' {
         It 'Should handle non-terminating error correctly when checkout is used' {
             Mock -CommandName Write-Error
 
-            Receive-GitBranch -Checkout -BranchName 'nonexistent-branch' -Force
+            $null = Receive-GitBranch -Checkout -BranchName 'nonexistent-branch' -Force
 
             Should -Invoke -CommandName Write-Error -ParameterFilter {
                 $Message -eq $mockErrorMessage
@@ -261,7 +261,7 @@ Describe 'Receive-GitBranch' {
         It 'Should handle non-terminating error correctly' {
             Mock -CommandName Write-Error
 
-            Receive-GitBranch -Rebase -Force
+            $null = Receive-GitBranch -Rebase -Force
 
             Should -Invoke -CommandName Write-Error -ParameterFilter {
                 $Message -eq $mockErrorMessage
@@ -308,7 +308,7 @@ Describe 'Receive-GitBranch' {
         It 'Should handle non-terminating error correctly' {
             Mock -CommandName Write-Error
 
-            Receive-GitBranch -Rebase -Force
+            $null = Receive-GitBranch -Rebase -Force
 
             Should -Invoke -CommandName Write-Error -ParameterFilter {
                 $Message -eq $mockErrorMessage
@@ -351,7 +351,7 @@ Describe 'Receive-GitBranch' {
         It 'Should handle non-terminating error correctly' {
             Mock -CommandName Write-Error
 
-            Receive-GitBranch -Force
+            $null = Receive-GitBranch -Force
 
             Should -Invoke -CommandName Write-Error -ParameterFilter {
                 $Message -eq $mockErrorMessage
@@ -377,7 +377,7 @@ Describe 'Receive-GitBranch' {
         }
 
         It 'Should not execute git commands when WhatIf is specified' {
-            Receive-GitBranch -WhatIf
+            $null = Receive-GitBranch -WhatIf
 
             Should -Not -Invoke -CommandName git
         }

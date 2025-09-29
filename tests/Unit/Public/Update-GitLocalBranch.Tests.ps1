@@ -120,7 +120,7 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should successfully update main branch with pull' {
-            Update-GitLocalBranch -Force
+            $null = Update-GitLocalBranch -Force
 
             Should -Invoke -CommandName Assert-GitRemote -Times 1 -ParameterFilter { $Name -eq 'origin' }
             Should -Invoke -CommandName Get-GitLocalBranchName -Times 1 -ParameterFilter { $Current -eq $true }
@@ -130,7 +130,7 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should use specified branch name and remote' {
-            Update-GitLocalBranch -BranchName 'develop' -RemoteName 'upstream' -Force
+            $null = Update-GitLocalBranch -BranchName 'develop' -RemoteName 'upstream' -Force
 
             Should -Invoke -CommandName Assert-GitRemote -Times 1 -ParameterFilter { $Name -eq 'upstream' }
             Should -Invoke -CommandName Switch-GitLocalBranch -Times 1 -ParameterFilter { $Name -eq 'develop' }
@@ -139,14 +139,14 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should use different upstream branch name when specified' {
-            Update-GitLocalBranch -BranchName 'feature' -UpstreamBranchName 'main' -Force
+            $null = Update-GitLocalBranch -BranchName 'feature' -UpstreamBranchName 'main' -Force
 
             Should -Invoke -CommandName Update-RemoteTrackingBranch -Times 1 -ParameterFilter { $RemoteName -eq 'origin' -and $BranchName -eq 'main' }
             Should -Invoke -CommandName git -Times 1 -ParameterFilter { $args[0] -eq 'pull' -and $args[1] -eq 'origin' -and $args[2] -eq 'main' }
         }
 
         It 'Should handle current branch indicator "."' {
-            Update-GitLocalBranch -BranchName '.' -Force
+            $null = Update-GitLocalBranch -BranchName '.' -Force
 
             Should -Invoke -CommandName Get-GitLocalBranchName -Times 1 -ParameterFilter { $Current -eq $true }
             Should -Invoke -CommandName Switch-GitLocalBranch -Times 0 # Should not switch if already on current branch
@@ -181,7 +181,7 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should successfully rebase branch' {
-            Update-GitLocalBranch -BranchName 'feature' -Rebase -Force
+            $null = Update-GitLocalBranch -BranchName 'feature' -Rebase -Force
 
             Should -Invoke -CommandName Update-RemoteTrackingBranch -Times 1 -ParameterFilter { $RemoteName -eq 'origin' -and $BranchName -eq 'feature' }
             Should -Invoke -CommandName git -Times 1 -ParameterFilter { $args[0] -eq 'rebase' -and $args[1] -eq 'origin/feature' }
@@ -215,7 +215,7 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should not switch branches when SkipSwitchingBranch is specified' {
-            Update-GitLocalBranch -BranchName 'main' -SkipSwitchingBranch -Force
+            $null = Update-GitLocalBranch -BranchName 'main' -SkipSwitchingBranch -Force
 
             Should -Invoke -CommandName Switch-GitLocalBranch -Times 0
         }
@@ -231,7 +231,7 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should only update remote tracking branch and skip local update' {
-            Update-GitLocalBranch -BranchName 'main' -OnlyUpdateRemoteTrackingBranch -Force
+            $null = Update-GitLocalBranch -BranchName 'main' -OnlyUpdateRemoteTrackingBranch -Force
 
             Should -Invoke -CommandName Update-RemoteTrackingBranch -Times 1
             Should -Invoke -CommandName git -Times 0
@@ -265,7 +265,7 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should not update remote tracking branch when UseExistingTrackingBranch is specified' {
-            Update-GitLocalBranch -BranchName 'main' -UseExistingTrackingBranch -Force
+            $null = Update-GitLocalBranch -BranchName 'main' -UseExistingTrackingBranch -Force
 
             Should -Invoke -CommandName Update-RemoteTrackingBranch -Times 0
             Should -Invoke -CommandName git -Times 1 -ParameterFilter { $args[0] -eq 'pull' }
@@ -299,7 +299,7 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should return to original branch when ReturnToCurrentBranch is specified' {
-            Update-GitLocalBranch -BranchName 'main' -ReturnToCurrentBranch -Force
+            $null = Update-GitLocalBranch -BranchName 'main' -ReturnToCurrentBranch -Force
 
             Should -Invoke -CommandName Switch-GitLocalBranch -Times 2
             Should -Invoke -CommandName Switch-GitLocalBranch -Times 1 -ParameterFilter { $Name -eq 'main' }
@@ -309,7 +309,7 @@ Describe 'Update-GitLocalBranch' {
         It 'Should not return to original branch if it is the same as target branch' {
             Mock -CommandName Get-GitLocalBranchName -MockWith { 'main' }
 
-            Update-GitLocalBranch -BranchName 'main' -ReturnToCurrentBranch -Force
+            $null = Update-GitLocalBranch -BranchName 'main' -ReturnToCurrentBranch -Force
 
             Should -Invoke -CommandName Switch-GitLocalBranch -Times 0
         }
@@ -415,13 +415,13 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should handle merge conflicts gracefully during rebase' {
-            Update-GitLocalBranch -Rebase -Force
+            $null = Update-GitLocalBranch -Rebase -Force
 
             Should -Invoke -CommandName Write-Information -Times 1 -ParameterFilter { $MessageData -match 'Merge conflict detected' }
         }
 
         It 'Should provide instructions for resolving conflicts' {
-            Update-GitLocalBranch -Rebase -ReturnToCurrentBranch -Force
+            $null = Update-GitLocalBranch -Rebase -ReturnToCurrentBranch -Force
 
             Should -Invoke -CommandName Write-Information -Times 1 -ParameterFilter { $MessageData -match 'Resume-GitRebase.*Stop-GitRebase' }
             Should -Invoke -CommandName Write-Information -Times 1 -ParameterFilter { $MessageData -match 'Switch-GitLocalBranch.*current-branch' }
@@ -438,19 +438,19 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should not execute git commands when WhatIf is specified' {
-            Update-GitLocalBranch -WhatIf
+            $null = Update-GitLocalBranch -WhatIf
 
             Should -Invoke -CommandName git -Times 0
         }
 
         It 'Should not call Assert-GitRemote when WhatIf is specified' {
-            Update-GitLocalBranch -WhatIf
+            $null = Update-GitLocalBranch -WhatIf
 
             Should -Invoke -CommandName Assert-GitRemote -Times 0
         }
 
         It 'Should not update remote tracking branch when WhatIf is specified' {
-            Update-GitLocalBranch -WhatIf
+            $null = Update-GitLocalBranch -WhatIf
 
             Should -Invoke -CommandName Update-RemoteTrackingBranch -Times 0
         }
@@ -483,7 +483,7 @@ Describe 'Update-GitLocalBranch' {
         }
 
         It 'Should bypass confirmation when Force is used' {
-            Update-GitLocalBranch -BranchName 'main' -Force
+            $null = Update-GitLocalBranch -BranchName 'main' -Force
 
             Should -Invoke -CommandName git -Times 1 -ParameterFilter { $args[0] -eq 'pull' }
         }

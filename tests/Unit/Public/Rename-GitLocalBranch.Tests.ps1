@@ -63,7 +63,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should rename the branch successfully' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -Force
+            $null = Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'branch' -and $args[1] -eq '-m' -and $args[2] -eq 'old-branch' -and $args[3] -eq 'new-branch'
@@ -127,7 +127,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should update upstream tracking when TrackUpstream is specified' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -Confirm:$false
+            $null = Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -Confirm:$false
 
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'fetch' }
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'branch' -and $args[1] -eq '-u' }
@@ -253,7 +253,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should set the new branch as default for the remote' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault -Confirm:$false
+            $null = Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault -Confirm:$false
             Should -Invoke -CommandName git -ParameterFilter {
                 $args -contains 'remote' -and $args -contains 'set-head' -and $args -contains '--auto'
             }
@@ -317,7 +317,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should update upstream tracking when TrackUpstream is specified' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -Confirm:$false
+            $null = Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -Confirm:$false
 
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'fetch' -and $args[1] -eq 'origin' }
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'branch' -and $args[1] -eq '-u' -and $args[2] -eq 'origin/new-branch' -and $args[3] -eq 'new-branch' }
@@ -336,7 +336,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should update upstream tracking when TrackUpstream is specified' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -RemoteName 'upstream' -TrackUpstream -Confirm:$false
+            $null = Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -RemoteName 'upstream' -TrackUpstream -Confirm:$false
 
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'fetch' -and $args[1] -eq 'upstream' }
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'branch' -and $args[1] -eq '-u' -and $args[2] -eq 'upstream/new-branch' -and $args[3] -eq 'new-branch' }
@@ -374,7 +374,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should not rename branch when WhatIf is specified' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -WhatIf
+            $null = Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -WhatIf
 
             Should -Invoke -CommandName git -Times 0
         }
@@ -404,7 +404,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should execute when Force is used' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -Force
+            $null = Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'branch' -and $args[1] -eq '-m' -and $args[2] -eq 'old-branch' -and $args[3] -eq 'new-branch'

@@ -108,7 +108,7 @@ Describe 'Request-GitTag' {
         }
 
         It 'Should call git fetch with correct arguments for specific tag' {
-            Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force
+            $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force
 
             Should -Invoke -CommandName git -ModuleName $script:moduleName -Times 1
         }
@@ -142,7 +142,7 @@ Describe 'Request-GitTag' {
         }
 
         It 'Should call git fetch with correct arguments for all tags' {
-            Request-GitTag -RemoteName 'upstream' -Force
+            $null = Request-GitTag -RemoteName 'upstream' -Force
 
             Should -Invoke -CommandName git -ModuleName $script:moduleName -ParameterFilter {
                 $args[0] -eq 'fetch' -and
@@ -249,19 +249,19 @@ Describe 'Request-GitTag' {
         }
 
         It 'Should support WhatIf for specific tag' {
-            Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -WhatIf
+            $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -WhatIf
 
             Should -Invoke -CommandName git -Times 0
         }
 
         It 'Should support WhatIf for all tags' {
-            Request-GitTag -RemoteName 'upstream' -WhatIf
+            $null = Request-GitTag -RemoteName 'upstream' -WhatIf
 
             Should -Invoke -CommandName git -Times 0
         }
 
         It 'Should proceed when Force is specified with Confirm:$false' {
-            Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force -Confirm:$false
+            $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force -Confirm:$false
 
             Should -Invoke -CommandName git -Times 1
         }

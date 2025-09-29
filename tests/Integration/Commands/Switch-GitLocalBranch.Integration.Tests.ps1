@@ -186,7 +186,7 @@ Describe 'Switch-GitLocalBranch' -Tag 'Integration' {
             $originalBranch = & git branch --show-current
 
             # Run with WhatIf
-            Switch-GitLocalBranch -Name 'feature/test-branch' -WhatIf
+            $null = Switch-GitLocalBranch -Name 'feature/test-branch' -WhatIf
 
             # Verify we're still on the original branch
             $currentBranch = & git branch --show-current

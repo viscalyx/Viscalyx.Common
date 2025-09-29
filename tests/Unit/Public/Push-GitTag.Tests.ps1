@@ -63,7 +63,7 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should push the specified tag to the default remote' {
-            Push-GitTag -Name 'v1.0.0' -Force
+            $null = Push-GitTag -Name 'v1.0.0' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push' -and $args[1] -eq 'origin' -and $args[2] -eq 'refs/tags/v1.0.0'
@@ -71,7 +71,7 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should push the specified tag to a custom remote' {
-            Push-GitTag -RemoteName 'upstream' -Name 'v1.0.0' -Force
+            $null = Push-GitTag -RemoteName 'upstream' -Name 'v1.0.0' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push' -and $args[1] -eq 'upstream' -and $args[2] -eq 'refs/tags/v1.0.0'
@@ -145,7 +145,7 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should push all tags to the default remote' {
-            Push-GitTag -Force
+            $null = Push-GitTag -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push' -and $args[1] -eq 'origin' -and $args[2] -eq '--tags'
@@ -153,7 +153,7 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should push all tags to a custom remote' {
-            Push-GitTag -RemoteName 'upstream' -Force
+            $null = Push-GitTag -RemoteName 'upstream' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push' -and $args[1] -eq 'upstream' -and $args[2] -eq '--tags'
@@ -319,13 +319,13 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should not push tag when WhatIf is specified' {
-            Push-GitTag -Name 'v1.0.0' -WhatIf
+            $null = Push-GitTag -Name 'v1.0.0' -WhatIf
 
             Should -Invoke -CommandName git -Times 0
         }
 
         It 'Should not push all tags when WhatIf is specified' {
-            Push-GitTag -WhatIf
+            $null = Push-GitTag -WhatIf
 
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'push' } -Times 0
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'tag' } -Times 1
@@ -357,7 +357,7 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should bypass confirmation when Force is used with specific tag' {
-            Push-GitTag -Name 'v1.0.0' -Force
+            $null = Push-GitTag -Name 'v1.0.0' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push' -and $args[1] -eq 'origin' -and $args[2] -eq 'refs/tags/v1.0.0'
@@ -365,7 +365,7 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should bypass confirmation when Force is used with all tags' {
-            Push-GitTag -Force
+            $null = Push-GitTag -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push' -and $args[1] -eq 'origin' -and $args[2] -eq '--tags'
@@ -514,7 +514,7 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should use origin as default RemoteName when not specified' {
-            Push-GitTag -Name 'v1.0.0' -Force
+            $null = Push-GitTag -Name 'v1.0.0' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[1] -eq 'origin'

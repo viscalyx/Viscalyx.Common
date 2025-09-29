@@ -63,7 +63,7 @@ Describe 'New-GitTag' {
         }
 
         It 'Should create a new tag successfully' {
-            New-GitTag -Name 'v1.0.0' -Force
+            $null = New-GitTag -Name 'v1.0.0' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'tag' -and $args[1] -eq 'v1.0.0'
@@ -123,7 +123,7 @@ Describe 'New-GitTag' {
         }
 
         It 'Should not create tag when WhatIf is specified' {
-            New-GitTag -Name 'v1.0.0' -WhatIf
+            $null = New-GitTag -Name 'v1.0.0' -WhatIf
 
             Should -Invoke -CommandName git -Times 0
         }
@@ -148,7 +148,7 @@ Describe 'New-GitTag' {
         }
 
         It 'Should bypass confirmation when Force is used' {
-            New-GitTag -Name 'v1.0.0' -Force
+            $null = New-GitTag -Name 'v1.0.0' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'tag' -and $args[1] -eq 'v1.0.0'
