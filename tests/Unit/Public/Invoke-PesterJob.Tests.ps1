@@ -141,6 +141,34 @@ Describe 'Invoke-PesterJob' {
 
             { Invoke-PesterJob @params } | Should -Throw -ErrorId 'ParameterArgumentValidationError,Invoke-PesterJob'
         }
+
+        It 'Should throw localized error when Pester import fails and build script not found' {
+            # Create a valid build script file first to pass parameter validation
+            $buildScriptPath = Join-Path -Path $TestDrive -ChildPath 'build.ps1'
+            New-Item -Path $buildScriptPath -ItemType File -Force
+
+            # Mock Import-Module to always throw an error
+            Mock -CommandName Import-Module -ParameterFilter { $Name -eq 'Pester' } -MockWith {
+                throw 'Mocked Pester import failure'
+            }
+
+            # Mock Test-Path to return true for parameter validation but false for internal check
+            Mock -CommandName Test-Path -MockWith { 
+                param($Path, $PathType)
+                if ($PathType -eq 'Leaf') {
+                    return $true  # For parameter validation
+                } else {
+                    return $false  # For internal check (Test-Path -Path $BuildScriptPath)
+                }
+            }
+
+            $params = @{
+                Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                BuildScriptPath = $buildScriptPath
+            }
+
+            { Invoke-PesterJob @params } | Should -Throw -ErrorId 'IPJ0005,Invoke-PesterJob'
+        }
     }
 
     Context 'When using Pester v4' {

@@ -410,7 +410,14 @@ function Invoke-PesterJob
             }
             else
             {
-                $PSCmdlet.ThrowTerminatingError($_)
+                $PSCmdlet.ThrowTerminatingError(
+                    [System.Management.Automation.ErrorRecord]::new(
+                        [System.InvalidOperationException]::new(($script:localizedData.Invoke_PesterJob_PesterImportFailed -f 'Pester'), $_.Exception),
+                        'IPJ0005', # cspell: disable-line
+                        [System.Management.Automation.ErrorCategory]::NotInstalled,
+                        'Pester'
+                    )
+                )
             }
         }
     } until ($importedPesterModule)

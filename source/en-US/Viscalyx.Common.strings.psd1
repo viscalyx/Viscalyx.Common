@@ -243,6 +243,7 @@ ConvertFrom-StringData @'
     Invoke_PesterJob_AllLinesCovered = All lines are covered by tests. (IPJ0002)
     Invoke_PesterJob_AllLinesCoveredFiltered = All lines are covered by tests based on filtering criteria. (IPJ0003)
     Invoke_PesterJob_NoPesterObjectReturned = Unable to determine code coverage result because no Pester object was returned from the test execution. (IPJ0004)
+    Invoke_PesterJob_PesterImportFailed = Failed to import Pester module at {0}. (IPJ0005)
 
     ## Switch-GitLocalBranch
     Switch_GitLocalBranch_FailedCheckoutLocalBranch = Failed to checkout the local branch '{0}'. Make sure the branch exists and is accessible.
