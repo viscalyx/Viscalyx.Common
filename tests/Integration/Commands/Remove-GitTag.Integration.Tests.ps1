@@ -158,7 +158,7 @@ Describe 'Remove-GitTag Integration Tests' {
             $tagsBefore | Should -Be 'test-tag-1'
 
             # Remove the tag
-            Remove-GitTag -Tag 'test-tag-1' -Force
+            Remove-GitTag -Tag 'test-tag-1' -Force -ErrorAction Stop
 
             # Verify tag is removed
             $tagsAfter = git tag -l 'test-tag-1'
@@ -172,7 +172,7 @@ Describe 'Remove-GitTag Integration Tests' {
             $tagsBefore | Should -Contain 'test-tag-2'
 
             # Remove multiple tags
-            Remove-GitTag -Tag @('test-tag-1', 'test-tag-2') -Force
+            Remove-GitTag -Tag @('test-tag-1', 'test-tag-2') -Force -ErrorAction Stop
 
             # Verify tags are removed
             $tagsAfter = git tag -l
@@ -187,7 +187,7 @@ Describe 'Remove-GitTag Integration Tests' {
             $tagsBefore | Should -Be 'test-tag-1'
 
             # Remove the tag with Local switch
-            Remove-GitTag -Tag 'test-tag-1' -Local -Force
+            Remove-GitTag -Tag 'test-tag-1' -Local -Force -ErrorAction Stop
 
             # Verify tag is removed
             $tagsAfter = git tag -l 'test-tag-1'
@@ -236,7 +236,7 @@ Describe 'Remove-GitTag Integration Tests' {
             $remoteTagsBefore | Should -Match 'refs/tags/remote-test-tag'
 
             # Remove the tag from remote only
-            Remove-GitTag -Tag 'remote-test-tag' -Remote 'origin' -Force
+            Remove-GitTag -Tag 'remote-test-tag' -Remote 'origin' -Force -ErrorAction Stop
             Start-Sleep -Milliseconds 200
 
             # Verify tag is removed from remote
@@ -274,7 +274,7 @@ Describe 'Remove-GitTag Integration Tests' {
             ($remoteTagsBefore -join ' ') | Should -Match 'refs/tags/remote-test-tag-2'
 
             # Remove multiple tags from remote
-            Remove-GitTag -Tag @('remote-test-tag-1', 'remote-test-tag-2') -Remote 'origin' -Force
+            Remove-GitTag -Tag @('remote-test-tag-1', 'remote-test-tag-2') -Remote 'origin' -Force -ErrorAction Stop
             Start-Sleep -Milliseconds 300  # Increased wait time
 
             # Verify tags are removed from remote
@@ -332,7 +332,7 @@ Describe 'Remove-GitTag Integration Tests' {
             $remoteTagsBefore | Should -Match 'refs/tags/both-test-tag'
 
             # Remove the tag from both
-            Remove-GitTag -Tag 'both-test-tag' -Local -Remote 'origin' -Force
+            Remove-GitTag -Tag 'both-test-tag' -Local -Remote 'origin' -Force -ErrorAction Stop
             Start-Sleep -Milliseconds 200
 
             # Verify tag is removed from both
@@ -365,20 +365,20 @@ Describe 'Remove-GitTag Integration Tests' {
 
         It 'Should throw error when trying to remove non-existent local tag' {
             {
-                Remove-GitTag -Tag 'non-existent-tag' -Force 2>$null
+                Remove-GitTag -Tag 'non-existent-tag' -Force -ErrorAction Stop 2>$null
             } | Should -Throw
         }
 
         It 'Should throw error when trying to remove from non-existent remote' {
             {
-                Remove-GitTag -Tag 'test-tag-1' -Remote 'non-existent-remote' -Force 2>$null
+                Remove-GitTag -Tag 'test-tag-1' -Remote 'non-existent-remote' -Force -ErrorAction Stop 2>$null
             } | Should -Throw
         }
 
         It 'Should handle non-existent remote tag removal gracefully' {
             # Git doesn't actually throw an error when trying to remove a non-existent remote tag
             # It just reports a warning, so this test ensures the command completes without throwing
-            { Remove-GitTag -Tag 'non-existent-tag' -Remote 'origin' -Force } | Should -Not -Throw
+            { Remove-GitTag -Tag 'non-existent-tag' -Remote 'origin' -Force -ErrorAction Stop } | Should -Not -Throw
         }
     }
 
@@ -401,7 +401,7 @@ Describe 'Remove-GitTag Integration Tests' {
             $tagsBefore | Should -Be 'test-tag-1'
 
             # Use WhatIf
-            Remove-GitTag -Tag 'test-tag-1' -WhatIf
+            Remove-GitTag -Tag 'test-tag-1' -WhatIf -ErrorAction Stop
 
             # Verify tag still exists
             $tagsAfter = git tag -l 'test-tag-1'
