@@ -107,7 +107,17 @@ function ConvertTo-RelativePath
         $normalizedCurrentLocation = $CurrentLocation -replace '[/\\]', $DirectorySeparator
 
         # 2. Check if normalized AbsolutePath starts with CurrentLocation
-        if ($normalizedAbsolutePath.StartsWith($normalizedCurrentLocation, [System.StringComparison]::OrdinalIgnoreCase))
+        # Use case-insensitive comparison on Windows, case-sensitive on other platforms
+        $stringComparison = if ($IsWindows -or $PSVersionTable.PSEdition -eq 'Desktop')
+        {
+            [System.StringComparison]::OrdinalIgnoreCase
+        }
+        else
+        {
+            [System.StringComparison]::Ordinal
+        }
+
+        if ($normalizedAbsolutePath.StartsWith($normalizedCurrentLocation, $stringComparison))
         {
             # Remove CurrentLocation from the start of AbsolutePath
             $strippedPath = $normalizedAbsolutePath.Substring($normalizedCurrentLocation.Length)
