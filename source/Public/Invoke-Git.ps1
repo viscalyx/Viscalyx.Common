@@ -112,11 +112,33 @@ function Invoke-Git
 
         if ($process.Start() -eq $true)
         {
-            if ($process.WaitForExit($Timeout) -eq $true)
-            {
-                $gitResult.ExitCode = $process.ExitCode
-                $gitResult.StandardError = $process.StandardError.ReadToEnd()
+            $processTimedOut = $false
 
+            if ($process.WaitForExit($Timeout) -eq $false)
+            {
+                # Timeout occurred - kill the process if it's still running
+                $processTimedOut = $true
+
+                if (-not $process.HasExited)
+                {
+                    try
+                    {
+                        $process.Kill()
+                        # Wait for process to fully terminate after kill
+                        [void] $process.WaitForExit()
+                    }
+                    catch
+                    {
+                        # Process may have exited between HasExited check and Kill()
+                        Write-Verbose -Message ($script:localizedData.Invoke_Git_KillProcessFailed -f $_.Exception.Message)
+                    }
+                }
+            }
+
+            # Read streams after process has exited (normal or after timeout)
+            try
+            {
+                $gitResult.StandardError = $process.StandardError.ReadToEnd()
                 $rawOutput = $process.StandardOutput.ReadToEnd()
 
                 $gitResult.Output = foreach ($line in ($rawOutput -split '\r?\n'))
@@ -127,6 +149,33 @@ function Invoke-Git
                         $trimmed
                     }
                 }
+            }
+            catch
+            {
+                # If stream reading fails, set empty values
+                $gitResult.StandardError = ''
+                $gitResult.Output = @()
+            }
+
+            # Set exit code and throw error if timeout occurred
+            if ($processTimedOut)
+            {
+                $gitResult.ExitCode = -1
+
+                $errorMessage = $script:localizedData.Invoke_Git_TimeoutError -f $Timeout, (Hide-GitToken -InputString $processedArguments)
+
+                $PSCmdlet.ThrowTerminatingError(
+                    [System.Management.Automation.ErrorRecord]::new(
+                        [System.InvalidOperationException]::new($errorMessage),
+                        'IG0007',
+                        [System.Management.Automation.ErrorCategory]::OperationTimeout,
+                        $Arguments
+                    )
+                )
+            }
+            else
+            {
+                $gitResult.ExitCode = $process.ExitCode
             }
         }
     }

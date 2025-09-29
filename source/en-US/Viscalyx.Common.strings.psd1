@@ -332,4 +332,6 @@ ConvertFrom-StringData @'
     Invoke_Git_ExitCodeMessage = Exit code: '{0}' (IG0004)
     Invoke_Git_CommandDebug = Command: {0} (IG0005)
     Invoke_Git_WorkingDirectoryDebug = Working Directory: '{0}' (IG0006)
+    Invoke_Git_TimeoutError = Git command timed out after {0} milliseconds. Command: git {1} (IG0007)
+    Invoke_Git_KillProcessFailed = Failed to kill git process: {0} (IG0008)
 '@
