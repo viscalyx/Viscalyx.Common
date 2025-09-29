@@ -212,6 +212,8 @@ function Get-GitBranchCommit
         }
 
         Write-Error @errorMessageParameters
+
+        return
     }
 
     return $commitId
