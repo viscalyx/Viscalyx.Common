@@ -216,7 +216,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
                 & git branch -r 2>$null
             }
 
-            Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false -ErrorAction Stop
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -Force -Confirm:$false -ErrorAction Stop
 
             # Verify branches were fetched
             $afterBranches = if ($PSVersionTable.PSEdition -eq 'Desktop') {
@@ -237,7 +237,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
                 & git rev-parse origin/main 2>$null
             }
 
-            Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false -ErrorAction Stop
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -Force -Confirm:$false -ErrorAction Stop
 
             # Get commit ID after fetch - it should be updated
             $afterRemoteCommit = if ($PSVersionTable.PSEdition -eq 'Desktop') {
@@ -279,7 +279,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
             #>
             try
             {
-                Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false -ErrorAction Stop
+                $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Force -Confirm:$false -ErrorAction Stop
             }
             catch
             {
@@ -289,7 +289,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
                 } else {
                     $gitOutput = & git fetch origin --quiet 2>&1
                 }
-                Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false -ErrorAction Stop
+                $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Force -Confirm:$false -ErrorAction Stop
             }
 
             # Verify the specific branch reference exists
@@ -298,7 +298,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
         }
 
         It 'Should successfully fetch develop branch from origin remote' {
-            Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'develop' -Confirm:$false -ErrorAction Stop
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'develop' -Force -Confirm:$false -ErrorAction Stop
 
             # Verify the specific branch reference exists
             $remoteBranches = & git branch -r 2>$null
@@ -306,7 +306,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
         }
 
         It 'Should successfully fetch feature branch from origin remote' {
-            Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'feature/test-branch' -Confirm:$false -ErrorAction Stop
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'feature/test-branch' -Force -Confirm:$false -ErrorAction Stop
 
             # Verify the specific branch reference exists
             $remoteBranches = & git branch -r 2>$null
@@ -450,7 +450,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
         }
 
         It 'Should successfully fetch from upstream remote' {
-            Update-RemoteTrackingBranch -RemoteName 'upstream' -Confirm:$false -ErrorAction Stop
+            $null = Update-RemoteTrackingBranch -RemoteName 'upstream' -Force -Confirm:$false -ErrorAction Stop
 
             # Verify upstream branches were fetched
             $remoteBranches = & git branch -r 2>$null
@@ -458,7 +458,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
         }
 
         It 'Should successfully fetch specific branch from upstream remote' {
-            Update-RemoteTrackingBranch -RemoteName 'upstream' -BranchName 'develop' -Confirm:$false -ErrorAction Stop
+            $null = Update-RemoteTrackingBranch -RemoteName 'upstream' -BranchName 'develop' -Force -Confirm:$false -ErrorAction Stop
 
             # Verify specific upstream branch was fetched
             $remoteBranches = & git branch -r 2>$null
