@@ -102,7 +102,7 @@ Describe 'Remove-PSReadLineHistory' {
 
                 if ($compareResult)
                 {
-                    Out-Difference -Difference $Value -Reference $expectedContent
+                    $null = Out-Difference -Difference $Value -Reference $expectedContent
                 }
 
                 # Compare-Object returns $null (no output) when equal.
@@ -133,7 +133,7 @@ Describe 'Remove-PSReadLineHistory' {
 
                 if ($compareResult)
                 {
-                    Out-Difference -Difference $Value -Reference $expectedContent
+                    $null = Out-Difference -Difference $Value -Reference $expectedContent
                 }
 
                 # Compare-Object returns $null (no output) when equal.
