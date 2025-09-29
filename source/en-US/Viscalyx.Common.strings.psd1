@@ -55,6 +55,9 @@ ConvertFrom-StringData @'
     Rename_GitLocalBranch_FailedSetUpstreamTracking = Failed to set upstream tracking for branch '{0}' against remote '{1}'. Make sure the local repository is accessible.
     Rename_GitLocalBranch_FailedSetDefaultBranchForRemote = Failed to set '{0}' as the default branch for remote '{1}'. Make sure the local repository is accessible.
     Rename_GitLocalBranch_RenamedBranch = Successfully renamed branch '{0}' to '{1}'.
+    Rename_GitLocalBranch_Rename_ShouldProcessDescription = Renaming Git branch '{0}' to '{1}'.
+    Rename_GitLocalBranch_Rename_ShouldProcessConfirmation = Are you sure you want to rename Git branch '{0}' to '{1}'?
+    Rename_GitLocalBranch_Rename_ShouldProcessCaption = Rename Git branch
 
     ## Rename-GitRemote
     Rename_GitRemote_FailedToRename = Failed to rename remote '{0}' to '{1}'. Make sure the remote exists and the local repository is accessible.

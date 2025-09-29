@@ -7,6 +7,9 @@
         This function renames a local Git branch. It can also update the upstream
         tracking and set the new branch as the default for the remote repository.
 
+        This function supports ShouldProcess functionality for safe operations and
+        includes a Force parameter to bypass confirmation prompts.
+
     .PARAMETER Name
         The current name of the branch to be renamed.
 
@@ -22,6 +25,10 @@
 
     .PARAMETER TrackUpstream
         If specified, sets up the newly renamed branch to track the upstream branch.
+
+    .PARAMETER Force
+        Forces the operation to proceed without confirmation prompts, similar to
+        -Confirm:$false.
 
     .INPUTS
         None
@@ -52,12 +59,18 @@
         This example renames a branch from "bugfix/issue-123" to "hotfix/critical-fix",
         sets up tracking with a remote named "upstream", but does not change the default branch.
 
+    .EXAMPLE
+        Rename-GitLocalBranch -Name "feature/old-name" -NewName "feature/new-name" -Force
+
+        This example renames a branch with the Force parameter, bypassing confirmation
+        prompts when used with -Confirm:$false.
+
     .NOTES
         This function requires Git to be installed and accessible in the system PATH.
 #>
 function Rename-GitLocalBranch
 {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType()]
     param
     (
@@ -79,81 +92,96 @@ function Rename-GitLocalBranch
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
-        $TrackUpstream
+        $TrackUpstream,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
     )
 
-    # Rename the local branch
-    git branch -m $Name $NewName
-
-    if ($LASTEXITCODE -eq 0) # cSpell: ignore LASTEXITCODE
+    if ($Force.IsPresent -and -not $Confirm)
     {
-        Write-Verbose -Message ($script:localizedData.Rename_GitLocalBranch_RenamedBranch -f $Name, $NewName)
-    }
-    else
-    {
-        $PSCmdlet.ThrowTerminatingError(
-            [System.Management.Automation.ErrorRecord]::new(
-                ($script:localizedData.Rename_GitLocalBranch_FailedToRename -f $Name, $NewName),
-                'RGLB0001', # cspell: disable-line
-                [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                $Name
-            )
-        )
+        $ConfirmPreference = 'None'
     }
 
+    $descriptionMessage = $script:localizedData.Rename_GitLocalBranch_Rename_ShouldProcessDescription -f $Name, $NewName
+    $confirmationMessage = $script:localizedData.Rename_GitLocalBranch_Rename_ShouldProcessConfirmation -f $Name, $NewName
+    $captionMessage = $script:localizedData.Rename_GitLocalBranch_Rename_ShouldProcessCaption
 
-    # Only fetch if either switch parameter is passed
-    if ($SetDefault.IsPresent -or $TrackUpstream.IsPresent)
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
-        # Fetch the remote to ensure we have the latest information
-        git fetch $RemoteName
+        # Rename the local branch
+        git branch -m $Name $NewName
 
-        if ($LASTEXITCODE -ne 0)
+        if ($LASTEXITCODE -eq 0) # cSpell: ignore LASTEXITCODE
         {
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    ($script:localizedData.Rename_GitLocalBranch_FailedFetch -f $RemoteName),
-                    'RGLB0002', # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $RemoteName
-                )
-            )
+            Write-Verbose -Message ($script:localizedData.Rename_GitLocalBranch_RenamedBranch -f $Name, $NewName)
         }
-    }
-
-    if ($TrackUpstream.IsPresent)
-    {
-        # Set up the new branch to track the upstream branch
-        git branch -u "$RemoteName/$NewName" $NewName
-
-        if ($LASTEXITCODE -ne 0)
+        else
         {
             $PSCmdlet.ThrowTerminatingError(
                 [System.Management.Automation.ErrorRecord]::new(
-                    ($script:localizedData.Rename_GitLocalBranch_FailedSetUpstreamTracking -f $NewName, $RemoteName),
-                    'RGLB0003', # cspell: disable-line
+                    ($script:localizedData.Rename_GitLocalBranch_FailedToRename -f $Name, $NewName),
+                    'RGLB0001', # cspell: disable-line
                     [System.Management.Automation.ErrorCategory]::InvalidOperation,
                     $Name
                 )
             )
         }
-    }
 
-    if ($SetDefault.IsPresent)
-    {
-        # Set the new branch as the default for the remote
-        git remote set-head $RemoteName --auto
-
-        if ($LASTEXITCODE -ne 0)
+        # Only fetch if either switch parameter is passed
+        if ($SetDefault.IsPresent -or $TrackUpstream.IsPresent)
         {
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    ($script:localizedData.Rename_GitLocalBranch_FailedSetDefaultBranchForRemote -f $NewName, $RemoteName),
-                    'RGLB0004', # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $RemoteName
+            # Fetch the remote to ensure we have the latest information
+            git fetch $RemoteName
+
+            if ($LASTEXITCODE -ne 0)
+            {
+                $PSCmdlet.ThrowTerminatingError(
+                    [System.Management.Automation.ErrorRecord]::new(
+                        ($script:localizedData.Rename_GitLocalBranch_FailedFetch -f $RemoteName),
+                        'RGLB0002', # cspell: disable-line
+                        [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                        $RemoteName
+                    )
                 )
-            )
+            }
+        }
+
+        if ($TrackUpstream.IsPresent)
+        {
+            # Set up the new branch to track the upstream branch
+            git branch -u "$RemoteName/$NewName" $NewName
+
+            if ($LASTEXITCODE -ne 0)
+            {
+                $PSCmdlet.ThrowTerminatingError(
+                    [System.Management.Automation.ErrorRecord]::new(
+                        ($script:localizedData.Rename_GitLocalBranch_FailedSetUpstreamTracking -f $NewName, $RemoteName),
+                        'RGLB0003', # cspell: disable-line
+                        [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                        $Name
+                    )
+                )
+            }
+        }
+
+        if ($SetDefault.IsPresent)
+        {
+            # Set the new branch as the default for the remote
+            git remote set-head $RemoteName --auto
+
+            if ($LASTEXITCODE -ne 0)
+            {
+                $PSCmdlet.ThrowTerminatingError(
+                    [System.Management.Automation.ErrorRecord]::new(
+                        ($script:localizedData.Rename_GitLocalBranch_FailedSetDefaultBranchForRemote -f $NewName, $RemoteName),
+                        'RGLB0004', # cspell: disable-line
+                        [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                        $RemoteName
+                    )
+                )
+            }
         }
     }
 }

@@ -63,7 +63,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should rename the branch successfully' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch'
+            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'branch' -and $args[1] -eq '-m' -and $args[2] -eq 'old-branch' -and $args[3] -eq 'new-branch'
@@ -100,13 +100,13 @@ Describe 'Rename-GitLocalBranch' {
 
             It 'Should throw terminating error regardless of ErrorAction' {
                 {
-                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -ErrorAction 'SilentlyContinue'
+                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -ErrorAction 'SilentlyContinue' -Confirm:$false
                 } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
 
             It 'Should handle terminating error correctly' {
                 {
-                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -ErrorAction 'Stop'
+                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -ErrorAction 'Stop' -Confirm:$false
                 } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
         }
@@ -131,7 +131,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should update upstream tracking when TrackUpstream is specified' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream
+            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -Confirm:$false
 
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'fetch' }
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'branch' -and $args[1] -eq '-u' }
@@ -172,13 +172,13 @@ Describe 'Rename-GitLocalBranch' {
 
                 It 'Should throw terminating error regardless of ErrorAction' {
                     {
-                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'SilentlyContinue'
+                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'SilentlyContinue' -Confirm:$false
                     } | Should -Throw -ExpectedMessage $mockErrorMessage
                 }
 
                 It 'Should handle terminating error correctly' {
                     {
-                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'Stop'
+                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'Stop' -Confirm:$false
                     } | Should -Throw -ExpectedMessage $mockErrorMessage
                 }
             }
@@ -221,13 +221,13 @@ Describe 'Rename-GitLocalBranch' {
 
                 It 'Should throw terminating error regardless of ErrorAction when setting upstream tracking fails' {
                     {
-                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'SilentlyContinue'
+                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'SilentlyContinue' -Confirm:$false
                     } | Should -Throw -ExpectedMessage $mockErrorMessage
                 }
 
                 It 'Should handle terminating error correctly when setting upstream tracking fails' {
                     {
-                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'Stop'
+                        Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -ErrorAction 'Stop' -Confirm:$false
                     } | Should -Throw -ExpectedMessage $mockErrorMessage
                 }
             }
@@ -257,7 +257,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should set the new branch as default for the remote' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault
+            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault -Confirm:$false
             Should -Invoke -CommandName git -ParameterFilter {
                 $args -contains 'remote' -and $args -contains 'set-head' -and $args -contains '--auto'
             }
@@ -297,13 +297,13 @@ Describe 'Rename-GitLocalBranch' {
 
             It 'Should throw terminating error regardless of ErrorAction when setting default branch fails' {
                 {
-                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault -ErrorAction 'SilentlyContinue'
+                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault -ErrorAction 'SilentlyContinue' -Confirm:$false
                 } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
 
             It 'Should handle terminating error correctly when setting default branch fails' {
                 {
-                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault -ErrorAction 'Stop'
+                    Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -SetDefault -ErrorAction 'Stop' -Confirm:$false
                 } | Should -Throw -ExpectedMessage $mockErrorMessage
             }
         }
@@ -321,7 +321,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should update upstream tracking when TrackUpstream is specified' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream
+            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -TrackUpstream -Confirm:$false
 
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'fetch' -and $args[1] -eq 'origin' }
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'branch' -and $args[1] -eq '-u' -and $args[2] -eq 'origin/new-branch' -and $args[3] -eq 'new-branch' }
@@ -340,10 +340,79 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should update upstream tracking when TrackUpstream is specified' {
-            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -RemoteName 'upstream' -TrackUpstream
+            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -RemoteName 'upstream' -TrackUpstream -Confirm:$false
 
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'fetch' -and $args[1] -eq 'upstream' }
             Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'branch' -and $args[1] -eq '-u' -and $args[2] -eq 'upstream/new-branch' -and $args[3] -eq 'new-branch' }
+        }
+    }
+
+    Context 'When ShouldProcess is used' {
+        BeforeAll {
+            Mock -CommandName git -MockWith {
+                if ($args[0] -eq 'branch' -and $args[1] -eq '-m')
+                {
+                    $global:LASTEXITCODE = 0
+                }
+                else
+                {
+                    throw "Mock git unexpected args: $($args -join ' ')"
+                }
+            }
+        }
+
+        AfterEach {
+            $global:LASTEXITCODE = 0
+        }
+
+        It 'Should support ShouldProcess' {
+            $commandInfo = Get-Command -Name 'Rename-GitLocalBranch'
+            $commandInfo.Parameters.ContainsKey('WhatIf') | Should -BeTrue
+            $commandInfo.Parameters.ContainsKey('Confirm') | Should -BeTrue
+        }
+
+        It 'Should support ConfirmImpact Medium' {
+            $commandInfo = Get-Command -Name 'Rename-GitLocalBranch'
+            $confirmImpact = $commandInfo.Definition -match 'ConfirmImpact\s*=\s*[''"]?Medium[''"]?'
+            $confirmImpact | Should -BeTrue
+        }
+
+        It 'Should not rename branch when WhatIf is specified' {
+            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -WhatIf
+
+            Should -Invoke -CommandName git -Times 0
+        }
+    }
+
+    Context 'When Force parameter is used' {
+        BeforeAll {
+            Mock -CommandName git -MockWith {
+                if ($args[0] -eq 'branch' -and $args[1] -eq '-m')
+                {
+                    $global:LASTEXITCODE = 0
+                }
+                else
+                {
+                    throw "Mock git unexpected args: $($args -join ' ')"
+                }
+            }
+        }
+
+        AfterEach {
+            $global:LASTEXITCODE = 0
+        }
+
+        It 'Should have Force parameter' {
+            $commandInfo = Get-Command -Name 'Rename-GitLocalBranch'
+            $commandInfo.Parameters.ContainsKey('Force') | Should -BeTrue
+        }
+
+        It 'Should execute when Force is used' {
+            Rename-GitLocalBranch -Name 'old-branch' -NewName 'new-branch' -Force
+
+            Should -Invoke -CommandName git -ParameterFilter {
+                $args[0] -eq 'branch' -and $args[1] -eq '-m' -and $args[2] -eq 'old-branch' -and $args[3] -eq 'new-branch'
+            }
         }
     }
 }
