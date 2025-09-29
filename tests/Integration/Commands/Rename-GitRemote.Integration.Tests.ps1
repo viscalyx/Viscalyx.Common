@@ -131,7 +131,7 @@ AfterAll {
     }
 }
 
-Describe 'Rename-GitRemote Integration Tests' {
+Describe 'Rename-GitRemote' {
     BeforeEach {
         # Change to test repository for each test
         Push-Location -Path $script:testRepoPath

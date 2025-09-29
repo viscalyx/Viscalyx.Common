@@ -32,7 +32,7 @@ BeforeAll {
     $script:esc = [System.Char] 0x1b
 }
 
-Describe 'Clear-AnsiSequence Integration Tests' {
+Describe 'Clear-AnsiSequence' {
     Context 'When clearing basic escaped ANSI sequences' {
         It 'Should remove simple color sequences' {
             $inputString = "$($script:esc)[32mGreen text$($script:esc)[0m"

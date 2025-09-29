@@ -89,7 +89,7 @@ AfterAll {
     }
 }
 
-Describe 'Get-GitBranchCommit Integration Tests' {
+Describe 'Get-GitBranchCommit' {
     BeforeEach {
         # Change to test repository for each test
         Push-Location -Path $script:testRepoPath

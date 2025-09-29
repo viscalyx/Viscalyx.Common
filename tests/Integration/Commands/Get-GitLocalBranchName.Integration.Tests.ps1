@@ -87,7 +87,7 @@ AfterAll {
     }
 }
 
-Describe 'Get-GitLocalBranchName Integration Tests' {
+Describe 'Get-GitLocalBranchName' {
     BeforeEach {
         # Change to test repository for each test
         Push-Location -Path $script:testRepoPath

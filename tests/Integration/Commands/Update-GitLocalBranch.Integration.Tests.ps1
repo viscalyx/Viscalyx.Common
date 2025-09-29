@@ -34,7 +34,7 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
+Describe 'Update-GitLocalBranch' -Tag 'Integration' {
     BeforeAll {
         # Store original location
         $script:originalLocation = Get-Location

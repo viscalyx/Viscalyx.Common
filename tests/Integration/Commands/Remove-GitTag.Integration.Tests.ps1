@@ -110,7 +110,7 @@ AfterAll {
     }
 }
 
-Describe 'Remove-GitTag Integration Tests' {
+Describe 'Remove-GitTag' {
     Context 'When removing tags from local repository' {
         BeforeEach {
             Push-Location -Path $script:testRepoPath

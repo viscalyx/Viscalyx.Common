@@ -29,7 +29,7 @@ BeforeAll {
     Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 }
 
-Describe 'Get-LinkLayerAddress Integration Tests' {
+Describe 'Get-LinkLayerAddress' {
     Context 'When querying a reachable IP address' {
         BeforeAll {
             # Use a common gateway IP that should be reachable in most environments

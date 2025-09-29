@@ -34,7 +34,7 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe 'New-SamplerGitHubReleaseTag Integration Tests' -Tag 'Integration' {
+Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
     BeforeAll {
         # Store original location
         $script:originalLocation = Get-Location

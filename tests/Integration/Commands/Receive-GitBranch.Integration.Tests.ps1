@@ -123,7 +123,7 @@ AfterAll {
     }
 }
 
-Describe 'Receive-GitBranch Integration Tests' {
+Describe 'Receive-GitBranch' {
     BeforeEach {
         # Change to test repository for each test
         Push-Location -Path $script:testRepoPath

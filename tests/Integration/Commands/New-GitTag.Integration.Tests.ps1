@@ -34,22 +34,22 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe 'New-GitTag Integration Tests' -Tag 'Integration' {
+Describe 'New-GitTag' -Tag 'Integration' {
     BeforeAll {
         # Store original location
         $script:originalLocation = Get-Location
-        
+
         # Create a temporary directory for our test repository
         $script:testRepoPath = Join-Path -Path $TestDrive -ChildPath 'TestRepo'
         $null = New-Item -Path $script:testRepoPath -ItemType Directory -Force
-        
+
         # Initialize a git repository
         Push-Location -Path $script:testRepoPath
         try {
             & git init --quiet --initial-branch=main
             & git config user.name "Test User"
             & git config user.email "test@example.com"
-            
+
             # Create an initial commit
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Test Repository'
@@ -67,7 +67,7 @@ Describe 'New-GitTag Integration Tests' -Tag 'Integration' {
     BeforeEach {
         # Change to the test repository directory for each test
         Push-Location -Path $script:testRepoPath
-        
+
         # Clean up any existing tags before each test
         try {
             $tags = & git tag 2>$null
@@ -95,7 +95,7 @@ Describe 'New-GitTag Integration Tests' -Tag 'Integration' {
         catch {
             # Ignore cleanup errors
         }
-        
+
         # Return to original location
         try {
             Pop-Location
@@ -108,7 +108,7 @@ Describe 'New-GitTag Integration Tests' -Tag 'Integration' {
     Context 'When creating a new tag successfully' {
         It 'Should create a simple tag' {
             { New-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
-            
+
             # Verify the tag was created
             $tags = & git tag
             $tags | Should -Contain 'v1.0.0'
@@ -117,7 +117,7 @@ Describe 'New-GitTag Integration Tests' -Tag 'Integration' {
         It 'Should create multiple tags' {
             { New-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
             { New-GitTag -Name 'v1.1.0' -Force -ErrorAction Stop } | Should -Not -Throw
-            
+
             # Verify both tags were created
             $tags = & git tag
             $tags | Should -Contain 'v1.0.0'
@@ -126,11 +126,11 @@ Describe 'New-GitTag Integration Tests' -Tag 'Integration' {
 
         It 'Should work with different tag naming patterns' {
             $tagNames = @('v1.0.0', 'release-2023', 'feature-tag', '1.0.0-beta')
-            
+
             foreach ($tagName in $tagNames) {
                 { New-GitTag -Name $tagName -Force -ErrorAction Stop } | Should -Not -Throw
             }
-            
+
             # Verify all tags were created
             $tags = & git tag
             foreach ($tagName in $tagNames) {
@@ -153,7 +153,7 @@ Describe 'New-GitTag Integration Tests' -Tag 'Integration' {
     Context 'When using ShouldProcess functionality' {
         It 'Should not create tag when WhatIf is specified' {
             { New-GitTag -Name 'whatif-tag' -WhatIf } | Should -Not -Throw
-            
+
             # Verify the tag was NOT created
             $tags = & git tag
             $tags | Should -Not -Contain 'whatif-tag'

@@ -47,25 +47,25 @@ BeforeAll {
 
         # Create test tags for various scenarios
         git tag v1.0.0 *> $null
-        
+
         # Create another commit and tag
         "Second content" | Out-File -FilePath 'test2.txt' -Encoding utf8
         git add test2.txt *> $null
         git commit -m "Second commit" *> $null
         git tag v1.1.0 *> $null
-        
+
         # Create another commit and tag
         "Third content" | Out-File -FilePath 'test3.txt' -Encoding utf8
         git add test3.txt *> $null
         git commit -m "Third commit" *> $null
         git tag v2.0.0 *> $null
-        
+
         # Create another commit and tag
         "Fourth content" | Out-File -FilePath 'test4.txt' -Encoding utf8
         git add test4.txt *> $null
         git commit -m "Fourth commit" *> $null
         git tag v2.1.0 *> $null
-        
+
         # Create some non-version tags
         git tag release-candidate *> $null
         git tag stable *> $null
@@ -78,7 +78,7 @@ BeforeAll {
 AfterAll {
     try {
         Pop-Location -ErrorAction SilentlyContinue
-        
+
         # Force cleanup of Git repository to avoid permission issues
         if (Test-Path $script:testRepoPath) {
             # Remove read-only attributes from .git files
@@ -96,12 +96,12 @@ AfterAll {
     catch {
         # Ignore cleanup errors
     }
-    
+
     # Unload the module being tested so that it doesn't impact any other tests.
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe 'Get-GitTag Integration Tests' {
+Describe 'Get-GitTag' {
     Context 'When retrieving all tags' {
         It 'Should return all tags from the repository' {
             $result = Get-GitTag -ErrorAction Stop

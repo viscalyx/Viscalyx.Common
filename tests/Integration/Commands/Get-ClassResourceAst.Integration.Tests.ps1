@@ -29,7 +29,7 @@ BeforeAll {
     Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 }
 
-Describe 'Get-ClassResourceAst Integration Tests' {
+Describe 'Get-ClassResourceAst' {
     Context 'When parsing real DSC resource classes' {
         BeforeAll {
             $script:dscResourceContent = @'

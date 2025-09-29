@@ -191,7 +191,7 @@ AfterAll {
     }
 }
 
-Describe 'Request-GitTag Integration Tests' {
+Describe 'Request-GitTag' {
     Context 'When fetching a specific tag from origin remote' {
         BeforeEach {
             Push-Location -Path $script:secondRepoPath

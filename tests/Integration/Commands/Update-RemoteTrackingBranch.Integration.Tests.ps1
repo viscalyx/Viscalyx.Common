@@ -34,7 +34,7 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe 'Update-RemoteTrackingBranch Integration Tests' -Tag 'Integration' {
+Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
     BeforeAll {
         # Store original location
         $script:originalLocation = Get-Location

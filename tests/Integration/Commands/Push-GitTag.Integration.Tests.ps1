@@ -34,18 +34,18 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
+Describe 'Push-GitTag' -Tag 'Integration' {
     BeforeAll {
         # Store original location
         $script:originalLocation = Get-Location
-        
+
         # Create a temporary directory for our test repositories
         $script:testRepoPath = Join-Path -Path $TestDrive -ChildPath 'TestRepo'
         $script:remoteRepoPath = Join-Path -Path $TestDrive -ChildPath 'RemoteRepo'
-        
+
         $null = New-Item -Path $script:testRepoPath -ItemType Directory -Force
         $null = New-Item -Path $script:remoteRepoPath -ItemType Directory -Force
-        
+
         # Initialize a bare remote repository (simulates GitHub/GitLab etc.)
         Push-Location -Path $script:remoteRepoPath
         try {
@@ -57,24 +57,24 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
         finally {
             Pop-Location
         }
-        
+
         # Initialize a local git repository and set up remote
         Push-Location -Path $script:testRepoPath
         try {
             & git init --quiet --initial-branch=main
             & git config user.name "Test User"
             & git config user.email "test@example.com"
-            
+
             # Add the test remote repository
             & git remote add origin $script:remoteRepoPath
             & git remote add upstream $script:remoteRepoPath
-            
+
             # Create an initial commit
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Test Repository'
             & git add README.md
             & git commit -m "Initial commit" --quiet
-            
+
             # Push initial commit to remote
             if ($PSVersionTable.PSEdition -eq 'Desktop') {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
@@ -95,7 +95,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
     BeforeEach {
         # Change to the test repository directory for each test
         Push-Location -Path $script:testRepoPath
-        
+
         # Clean up any existing tags before each test
         try {
             $localTags = & git tag 2>$null
@@ -104,7 +104,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
                     & git tag -d $tag 2>$null | Out-Null
                 }
             }
-            
+
             # Clean up remote tags
             $remoteTags = & git ls-remote --tags origin 2>$null
             if ($remoteTags) {
@@ -136,7 +136,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
                     & git tag -d $tag 2>$null | Out-Null
                 }
             }
-            
+
             # Clean up remote tags
             $remoteTags = & git ls-remote --tags origin 2>$null
             if ($remoteTags) {
@@ -157,7 +157,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
         catch {
             # Ignore cleanup errors
         }
-        
+
         # Return to original location
         try {
             Pop-Location
@@ -175,7 +175,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
 
         It 'Should push a specific tag to the default remote' {
             { Push-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
-            
+
             # Verify the tag was pushed to the remote
             $remoteTags = & git ls-remote --tags origin
             ($remoteTags | Where-Object { $_ -match 'refs/tags/v1.0.0' }) | Should -Not -BeNullOrEmpty
@@ -183,7 +183,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
 
         It 'Should push a specific tag to a custom remote' {
             { Push-GitTag -RemoteName 'upstream' -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
-            
+
             # Verify the tag was pushed to the upstream remote
             $remoteTags = & git ls-remote --tags upstream
             ($remoteTags | Where-Object { $_ -match 'refs/tags/v1.0.0' }) | Should -Not -BeNullOrEmpty
@@ -191,15 +191,15 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
 
         It 'Should work with different tag naming patterns' {
             $tagNames = @('v2.0.0', 'release-2023', 'feature-tag')
-            
+
             foreach ($tagName in $tagNames) {
                 # Create local tag
                 & git tag $tagName 2>$null
-                
+
                 # Push the tag
                 { Push-GitTag -Name $tagName -Force -ErrorAction Stop } | Should -Not -Throw
             }
-            
+
             # Verify all tags were pushed
             $remoteTags = & git ls-remote --tags origin
             foreach ($tagName in $tagNames) {
@@ -218,7 +218,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
 
         It 'Should push all tags to the default remote' {
             { Push-GitTag -Force -ErrorAction Stop } | Should -Not -Throw
-            
+
             # Verify all tags were pushed to the remote
             $remoteTags = & git ls-remote --tags origin
             ($remoteTags | Where-Object { $_ -match 'refs/tags/v1.0.0' }) | Should -Not -BeNullOrEmpty
@@ -228,7 +228,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
 
         It 'Should push all tags to a custom remote' {
             { Push-GitTag -RemoteName 'upstream' -Force -ErrorAction Stop } | Should -Not -Throw
-            
+
             # Verify all tags were pushed to the upstream remote
             $remoteTags = & git ls-remote --tags upstream
             ($remoteTags | Where-Object { $_ -match 'refs/tags/v1.0.0' }) | Should -Not -BeNullOrEmpty
@@ -245,7 +245,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
 
         It 'Should not push tag when WhatIf is specified' {
             { Push-GitTag -Name 'v1.0.0' -WhatIf } | Should -Not -Throw
-            
+
             # Verify the tag was NOT pushed to the remote
             $remoteTags = & git ls-remote --tags origin 2>$null
             ($remoteTags | Where-Object { $_ -match 'refs/tags/v1.0.0' }) | Should -BeNullOrEmpty
@@ -253,7 +253,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
 
         It 'Should not push all tags when WhatIf is specified' {
             { Push-GitTag -WhatIf } | Should -Not -Throw
-            
+
             # Verify no tags were pushed to the remote
             $remoteTags = & git ls-remote --tags origin 2>$null
             ($remoteTags | Where-Object { $_ -match 'refs/tags/v1.0.0' }) | Should -BeNullOrEmpty
@@ -268,7 +268,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
         It 'Should throw an error when remote does not exist' {
             # Create a local tag
             & git tag 'v1.0.0' 2>$null
-            
+
             { Push-GitTag -RemoteName 'non-existent-remote' -Name 'v1.0.0' -Force -ErrorAction Stop 2>$null } | Should -Throw
         }
 
@@ -318,7 +318,7 @@ Describe 'Push-GitTag Integration Tests' -Tag 'Integration' {
 
         It 'Should succeed when pushing the same tag again (idempotent operation)' {
             { Push-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
-            
+
             # Verify the tag still exists on the remote
             $remoteTags = & git ls-remote --tags origin
             ($remoteTags | Where-Object { $_ -match 'refs/tags/v1.0.0' }) | Should -Not -BeNullOrEmpty

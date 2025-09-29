@@ -29,7 +29,7 @@ BeforeAll {
     Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 }
 
-Describe 'Rename-GitLocalBranch Integration Tests' {
+Describe 'Rename-GitLocalBranch' {
     BeforeAll {
         # Create a temporary Git repository for testing
         $script:testRepoPath = Join-Path -Path $TestDrive -ChildPath 'TestGitRepo'
