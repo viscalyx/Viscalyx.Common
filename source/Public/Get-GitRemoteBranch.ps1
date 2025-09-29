@@ -159,13 +159,11 @@ function Get-GitRemoteBranch
 
     if ($result)
     {
-        $oidArray = @()
         $headsArray = @()
 
         $result | ForEach-Object -Process {
             $oid, $heads = $_ -split "`t"
 
-            $oidArray += $oid
             $headsArray += $heads
         }
 
