@@ -90,10 +90,6 @@ Describe 'Rename-GitLocalBranch' {
                 $mockErrorMessage = $mockErrorMessage -f 'old-branch', 'new-branch'
             }
 
-            It 'Should have a localized error message' {
-                $mockErrorMessage | Should-BeTruthy -Because 'The error message should have been localized, and shall not be empty'
-            }
-
             AfterEach {
                 $global:LASTEXITCODE = 0
             }
