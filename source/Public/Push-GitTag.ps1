@@ -129,7 +129,6 @@ function Push-GitTag
 
     if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
-
         git push @arguments
 
         if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
