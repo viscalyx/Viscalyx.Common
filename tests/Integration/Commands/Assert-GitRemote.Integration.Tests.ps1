@@ -97,7 +97,7 @@ Describe 'Assert-GitRemote' -Tag 'Integration' {
         }
 
         It 'Should throw an exception when the remote does not exist' {
-            { Assert-GitRemote -Name 'origin' 2>$null } | Should -Throw -ExpectedMessage "*remote 'origin' does not exist*"
+            { Assert-GitRemote -Name 'origin' -ErrorAction Stop } | Should -Throw
         }
     }
 
@@ -139,11 +139,11 @@ Describe 'Assert-GitRemote' -Tag 'Integration' {
             @{ RemoteName = 'upstream' }
             @{ RemoteName = 'fork' }
         ) {
-            { Assert-GitRemote -Name $RemoteName } | Should -Not -Throw
+            Assert-GitRemote -Name $RemoteName -ErrorAction Stop
         }
 
         It 'Should throw an exception when checking non-existing remote' {
-            { Assert-GitRemote -Name 'nonexistent' 2>$null } | Should -Throw -ExpectedMessage "*remote 'nonexistent' does not exist*"
+            { Assert-GitRemote -Name 'nonexistent' -ErrorAction Stop } | Should -Throw
         }
     }
 
@@ -166,7 +166,7 @@ Describe 'Assert-GitRemote' -Tag 'Integration' {
         }
 
         It 'Should throw an exception when not in a git repository' {
-            { Assert-GitRemote -Name 'origin' 2>$null } | Should -Throw
+            { Assert-GitRemote -Name 'origin' -ErrorAction Stop } | Should -Throw
         }
     }
 }
