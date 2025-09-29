@@ -70,7 +70,7 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
         It 'Should return false when repository has no changes' {
             $result = Test-GitLocalChanges -ErrorAction Stop
 
-            $result | Should -Be $false
+            $result | Should -BeFalse
         }
     }
 
@@ -117,7 +117,7 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
         It 'Should return true when repository has unstaged changes' {
             $result = Test-GitLocalChanges -ErrorAction Stop
 
-            $result | Should -Be $true
+            $result | Should -BeTrue
         }
     }
 
@@ -165,7 +165,7 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
         It 'Should return true when repository has staged changes' {
             $result = Test-GitLocalChanges -ErrorAction Stop
 
-            $result | Should -Be $true
+            $result | Should -BeTrue
         }
     }
 
@@ -216,7 +216,7 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
         It 'Should return true when repository has both staged and unstaged changes' {
             $result = Test-GitLocalChanges -ErrorAction Stop
 
-            $result | Should -Be $true
+            $result | Should -BeTrue
         }
     }
 

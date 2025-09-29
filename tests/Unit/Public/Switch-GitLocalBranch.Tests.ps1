@@ -216,7 +216,7 @@ Describe 'Switch-GitLocalBranch' {
 
             $nameParameter.Attributes | Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] } |
                 Select-Object -First 1 | ForEach-Object {
-                    $_.Mandatory | Should -Be $true -Because 'Name parameter should be mandatory'
+                    $_.Mandatory | Should -BeTrue -Because 'Name parameter should be mandatory'
                 }
         }
 

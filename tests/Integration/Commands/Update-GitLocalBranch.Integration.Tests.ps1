@@ -243,7 +243,7 @@ Describe 'Update-GitLocalBranch Integration Tests' -Tag 'Integration' {
             $currentBranch | Should -Be 'develop'
 
             # Verify develop.txt exists (from our setup)
-            Test-Path (Join-Path -Path $script:testRepoPath -ChildPath 'develop.txt') | Should -Be $true
+            Test-Path (Join-Path -Path $script:testRepoPath -ChildPath 'develop.txt') | Should -BeTrue
         }
 
         It 'Should handle current branch indicator "." correctly' {

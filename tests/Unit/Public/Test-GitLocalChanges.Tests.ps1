@@ -66,7 +66,7 @@ Describe 'Test-GitLocalChanges' {
         It 'Should return false when git status returns empty' {
             $result = Test-GitLocalChanges
 
-            $result | Should -Be $false
+            $result | Should -BeFalse
         }
 
         It 'Should call git status with correct parameters' {
@@ -88,7 +88,7 @@ Describe 'Test-GitLocalChanges' {
         It 'Should return true when git status returns changes' {
             $result = Test-GitLocalChanges
 
-            $result | Should -Be $true
+            $result | Should -BeTrue
         }
 
         It 'Should call git status with correct parameters' {
@@ -110,7 +110,7 @@ Describe 'Test-GitLocalChanges' {
         It 'Should return true for staged changes' {
             $result = Test-GitLocalChanges
 
-            $result | Should -Be $true
+            $result | Should -BeTrue
         }
     }
 
@@ -124,7 +124,7 @@ Describe 'Test-GitLocalChanges' {
         It 'Should return true for unstaged changes' {
             $result = Test-GitLocalChanges
 
-            $result | Should -Be $true
+            $result | Should -BeTrue
         }
     }
 
