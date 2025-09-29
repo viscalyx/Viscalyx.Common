@@ -89,12 +89,12 @@ ConvertFrom-StringData @'
     New_SamplerGitHubReleaseTag_TagCreatedNotPushed = [32mTag[0m [1;37;44m{0}[0m[32m has been created, but not pushed. To push the tag to the remote repository, run '[39mgit push {1} --tags[32m'.[0m (NSGRT0031)
 
     ## Push-GitTag
-    Push_GitTag_PushTag_ShouldProcessVerboseDescription = Pushing tag '{0}' to remote '{1}'. (PGT0001)
-    Push_GitTag_PushTag_ShouldProcessVerboseWarning = Are you sure you want to push tag '{0}' to remote '{1}'? (PGT0002)
+    Push_GitTag_PushTag_ShouldProcessDescription = Pushing tag '{0}' to remote '{1}'. (PGT0001)
+    Push_GitTag_PushTag_ShouldProcessConfirmation = Are you sure you want to push tag '{0}' to remote '{1}'? (PGT0002)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Push_GitTag_PushTag_ShouldProcessCaption = Push tag (PGT0003)
-    Push_GitTag_PushAllTags_ShouldProcessVerboseDescription = Pushing all tags to remote '{0}'. (PGT0004)
-    Push_GitTag_PushAllTags_ShouldProcessVerboseWarning = Are you sure you want to push all tags to remote '{0}'? (PGT0005)
+    Push_GitTag_PushAllTags_ShouldProcessDescription = Pushing all tags to remote '{0}'. (PGT0004)
+    Push_GitTag_PushAllTags_ShouldProcessConfirmation = Are you sure you want to push all tags to remote '{0}'? (PGT0005)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Push_GitTag_PushAllTags_ShouldProcessCaption = Push all tags (PGT0006)
     Push_GitTag_FailedPushTag = Failed to push tag '{0}' to remote '{1}'. (PGT0007)

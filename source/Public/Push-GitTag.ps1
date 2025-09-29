@@ -116,14 +116,14 @@ function Push-GitTag
 
     if ($PSBoundParameters.ContainsKey('Name'))
     {
-        $descriptionMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessVerboseDescription -f $Name, $RemoteName
-        $confirmationMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessVerboseWarning -f $Name, $RemoteName
+        $descriptionMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessDescription -f $Name, $RemoteName
+        $confirmationMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessConfirmation -f $Name, $RemoteName
         $captionMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessCaption
     }
     else
     {
-        $descriptionMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessVerboseDescription -f $RemoteName
-        $confirmationMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessVerboseWarning -f $RemoteName
+        $descriptionMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessDescription -f $RemoteName
+        $confirmationMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessConfirmation -f $RemoteName
         $captionMessage = $script:localizedData.Push_GitTag_PushAllTags_ShouldProcessCaption
     }
 
