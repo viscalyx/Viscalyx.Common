@@ -280,7 +280,7 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should succeed without calling git push when no local tags exist' {
-            { Push-GitTag -Force } | Should -Not -Throw
+            $null = Push-GitTag -Force
 
             # Verify git tag was called to check for tags
             Should -Invoke -CommandName git -ParameterFilter {
@@ -475,7 +475,7 @@ Describe 'Push-GitTag' {
 
         It 'Should have ConfirmImpact set to Medium' {
             $functionInfo = Get-Command -Name 'Push-GitTag'
-            $cmdletBindingAttribute = $functionInfo.ScriptBlock.Attributes | 
+            $cmdletBindingAttribute = $functionInfo.ScriptBlock.Attributes |
                 Where-Object -FilterScript { $_ -is [System.Management.Automation.CmdletBindingAttribute] }
             $cmdletBindingAttribute.ConfirmImpact | Should -Be 'Medium'
         }
@@ -506,11 +506,11 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should accept valid RemoteName parameter' {
-            { Push-GitTag -RemoteName 'upstream' -WhatIf } | Should -Not -Throw
+            $null = Push-GitTag -RemoteName 'upstream' -WhatIf
         }
 
         It 'Should accept valid Name parameter' {
-            { Push-GitTag -Name 'v1.0.0' -WhatIf } | Should -Not -Throw
+            $null = Push-GitTag -Name 'v1.0.0' -WhatIf
         }
 
         It 'Should use origin as default RemoteName when not specified' {
