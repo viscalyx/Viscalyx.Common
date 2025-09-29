@@ -73,19 +73,19 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
         }
 
         It 'Should return true when testing for existing remote "origin"' {
-            $result = Test-GitRemote -Name 'origin'
+            $result = Test-GitRemote -Name 'origin' -ErrorAction Stop
             $result | Should -BeTrue
             $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should return true when testing for existing remote "upstream"' {
-            $result = Test-GitRemote -Name 'upstream'
+            $result = Test-GitRemote -Name 'upstream' -ErrorAction Stop
             $result | Should -BeTrue
             $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should return true when testing for existing remote "fork"' {
-            $result = Test-GitRemote -Name 'fork'
+            $result = Test-GitRemote -Name 'fork' -ErrorAction Stop
             $result | Should -BeTrue
             $result | Should -BeOfType [System.Boolean]
         }
@@ -110,25 +110,25 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
         }
 
         It 'Should work with positional parameter' {
-            $result = Test-GitRemote 'origin'
+            $result = Test-GitRemote 'origin' -ErrorAction Stop
             $result | Should -BeTrue
             $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should handle remote names with special characters' {
             # Add a remote with special characters
-            $null = git remote add 'remote-with-dash' 'https://github.com/special/repo.git' 2>&1
+            git remote add 'remote-with-dash' 'https://github.com/special/repo.git' -ErrorAction Stop | Out-Null
 
-            $result = Test-GitRemote -Name 'remote-with-dash'
+            $result = Test-GitRemote -Name 'remote-with-dash' -ErrorAction Stop
             $result | Should -BeTrue
             $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should handle remote names with underscores' {
             # Add a remote with underscores
-            $null = git remote add 'remote_with_underscore' 'https://github.com/underscore/repo.git' 2>&1
+            git remote add 'remote_with_underscore' 'https://github.com/underscore/repo.git' -ErrorAction Stop | Out-Null
 
-            $result = Test-GitRemote -Name 'remote_with_underscore'
+            $result = Test-GitRemote -Name 'remote_with_underscore' -ErrorAction Stop
             $result | Should -BeTrue
             $result | Should -BeOfType [System.Boolean]
         }
@@ -280,19 +280,19 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
             $resultBefore | Should -BeFalse
 
             # Add the remote
-            $null = git remote add 'newremote' 'https://github.com/new/repo.git' 2>&1
+            git remote add 'newremote' 'https://github.com/new/repo.git' -ErrorAction Stop | Out-Null
 
             # Test after adding remote
-            $resultAfter = Test-GitRemote -Name 'newremote'
+            $resultAfter = Test-GitRemote -Name 'newremote' -ErrorAction Stop
             $resultAfter | Should -BeTrue
         }
 
         It 'Should return true before removing remote, then false after removing remote' {
             # Add a remote first
-            $null = git remote add 'tempremote' 'https://github.com/temp/repo.git' 2>&1
+            git remote add 'tempremote' 'https://github.com/temp/repo.git' -ErrorAction Stop | Out-Null
 
             # Test before removing remote
-            $resultBefore = Test-GitRemote -Name 'tempremote'
+            $resultBefore = Test-GitRemote -Name 'tempremote' -ErrorAction Stop
             $resultBefore | Should -BeTrue
 
             # Remove the remote
@@ -305,10 +305,10 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
 
         It 'Should return true after renaming from old name to new name' {
             # Add a remote first
-            $null = git remote add 'oldname' 'https://github.com/test/repo.git' 2>&1
+            git remote add 'oldname' 'https://github.com/test/repo.git' -ErrorAction Stop | Out-Null
 
             # Verify it exists with old name
-            $resultOldBefore = Test-GitRemote -Name 'oldname'
+            $resultOldBefore = Test-GitRemote -Name 'oldname' -ErrorAction Stop
             $resultOldBefore | Should -BeTrue
 
             # Verify it doesn't exist with new name
@@ -323,7 +323,7 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
             $resultOldAfter | Should -BeFalse
 
             # Verify it exists with new name
-            $resultNewAfter = Test-GitRemote -Name 'newname'
+            $resultNewAfter = Test-GitRemote -Name 'newname' -ErrorAction Stop
             $resultNewAfter | Should -BeTrue
         }
     }
