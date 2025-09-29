@@ -76,6 +76,73 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 Mock -CommandName New-Object -MockWith { return $mockProcess } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
             }
 
+            Context 'Parameter Set Validation' {
+                It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+                    @{
+                        ExpectedParameterSetName = '__AllParameterSets'
+                        ExpectedParameters       = '[-WorkingDirectory] <string> [[-Timeout] <int>] [[-Arguments] <string[]>] [-PassThru] [<CommonParameters>]'
+                    }
+                ) {
+                    $result = (Get-Command -Name 'Invoke-Git').ParameterSets |
+                        Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                        Select-Object -Property @(
+                            @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                            @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                        )
+
+                    $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+
+                    if ($PSVersionTable.PSVersion.Major -eq 5)
+                    {
+                        # Windows PowerShell 5.1 shows <int32> for System.Int32 type
+                        $ExpectedParameters = $ExpectedParameters -replace '<int>', '<int32>'
+                    }
+
+                    $result.ParameterListAsString | Should -Be $ExpectedParameters
+                }
+            }
+
+            Context 'Parameter Properties' {
+                It 'Should have WorkingDirectory as a mandatory parameter' {
+                    $parameterInfo = (Get-Command -Name 'Invoke-Git').Parameters['WorkingDirectory']
+                    $parameterInfo.Attributes.Mandatory | Should -Contain $true
+                }
+
+                It 'Should have Timeout as a non-mandatory parameter' {
+                    $parameterInfo = (Get-Command -Name 'Invoke-Git').Parameters['Timeout']
+                    $parameterInfo.Attributes.Mandatory | Should -BeFalse
+                }
+
+                It 'Should have PassThru as a non-mandatory parameter' {
+                    $parameterInfo = (Get-Command -Name 'Invoke-Git').Parameters['PassThru']
+                    $parameterInfo.Attributes.Mandatory | Should -BeFalse
+                }
+
+                It 'Should have Arguments as a non-mandatory parameter' {
+                    $parameterInfo = (Get-Command -Name 'Invoke-Git').Parameters['Arguments']
+                    $parameterInfo.Attributes.Mandatory | Should -BeFalse
+                }
+
+                It 'Should have Arguments parameter with ValueFromRemainingArguments' {
+                    $parameterInfo = (Get-Command -Name 'Invoke-Git').Parameters['Arguments']
+                    $parameterInfo.Attributes.ValueFromRemainingArguments | Should -BeTrue
+                }
+
+                It 'Should have correct parameter types' {
+                    $command = Get-Command -Name 'Invoke-Git'
+
+                    $command.Parameters['WorkingDirectory'].ParameterType | Should -Be ([System.String])
+                    $command.Parameters['Timeout'].ParameterType | Should -Be ([System.Int32])
+                    $command.Parameters['PassThru'].ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
+                    $command.Parameters['Arguments'].ParameterType | Should -Be ([System.String[]])
+                }
+
+                It 'Should have correct output type' {
+                    $outputType = (Get-Command -Name 'Invoke-Git').OutputType
+                    $outputType.Type | Should -Be ([System.Collections.Hashtable])
+                }
+            }
+
             Context 'When git ExitCode -eq 0' {
                 BeforeAll {
                     $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
