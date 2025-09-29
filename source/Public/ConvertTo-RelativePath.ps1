@@ -39,9 +39,8 @@
     .EXAMPLE
         ConvertTo-RelativePath -AbsolutePath 'C:\Projects\MyApp\src\file.txt' -CurrentLocation 'C:\Projects\MyApp'
 
-        On Windows, returns ".\src\file.txt". On non-Windows platforms, returns the
-        original path unchanged since Windows-style paths are not valid absolute paths
-        on those platforms.
+        Returns a relative path (".\src\file.txt" on Windows, "./src/file.txt" on Unix-like systems).
+        Use -DirectorySeparator to override the separator if needed.
 
     .EXAMPLE
         ConvertTo-RelativePath -AbsolutePath 'C:\Projects\MyApp\src\file.txt' -CurrentLocation 'C:\Projects\MyApp' -DirectorySeparator '/'
