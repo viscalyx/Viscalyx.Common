@@ -184,7 +184,6 @@ Describe 'Request-GitTag' {
             # Verify tag doesn't exist locally
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
             $existingTags = $result.Output
-            # $existingTags = if ($result.Output) { $result.Output -split "`n" | Where-Object { $_.Trim() } } else { @() }
             $existingTags | Should -Not -Contain 'v1.0.0'
 
             # Fetch the specific tag
