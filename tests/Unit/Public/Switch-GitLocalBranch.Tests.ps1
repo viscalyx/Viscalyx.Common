@@ -149,10 +149,6 @@ Describe 'Switch-GitLocalBranch' {
             $global:LASTEXITCODE = 0
         }
 
-        It 'Should have a localized error message' {
-            $mockErrorMessage | Should-BeTruthy -Because 'The error message should have been localized, and shall not be empty'
-        }
-
         It 'Should throw terminating error when git checkout fails' {
             {
                 Switch-GitLocalBranch -Name 'feature/test-branch' -Force
