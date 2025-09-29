@@ -99,35 +99,31 @@ Describe 'Get-GitLocalBranchName' {
 
     Context 'When getting current branch' {
         It 'Should call git rev-parse --abbrev-ref HEAD when Current parameter is used' {
-            InModuleScope -ScriptBlock {
-                Mock -CommandName 'git' -MockWith {
-                    return 'main'
-                }
-                
-                $global:LASTEXITCODE = 0
-                
-                $result = Get-GitLocalBranchName -Current
-
-                Should -Invoke -CommandName 'git' -ParameterFilter { 
-                    $args -contains 'rev-parse' -and $args -contains '--abbrev-ref' -and $args -contains 'HEAD'
-                } -Times 1 -Exactly
-                
-                $result | Should -Be 'main'
+            Mock -CommandName 'git' -MockWith {
+                return 'main'
             }
+            
+            $global:LASTEXITCODE = 0
+            
+            $result = Get-GitLocalBranchName -Current
+
+            Should -Invoke -CommandName 'git' -ParameterFilter { 
+                $args -contains 'rev-parse' -and $args -contains '--abbrev-ref' -and $args -contains 'HEAD'
+            } -Times 1 -Exactly
+            
+            $result | Should -Be 'main'
         }
 
         It 'Should return the current branch name successfully' {
-            InModuleScope -ScriptBlock {
-                Mock -CommandName 'git' -MockWith {
-                    return 'feature/new-feature'
-                }
-                
-                $global:LASTEXITCODE = 0
-                
-                $result = Get-GitLocalBranchName -Current
-
-                $result | Should -Be 'feature/new-feature'
+            Mock -CommandName 'git' -MockWith {
+                return 'feature/new-feature'
             }
+            
+            $global:LASTEXITCODE = 0
+            
+            $result = Get-GitLocalBranchName -Current
+
+            $result | Should -Be 'feature/new-feature'
         }
     }
 
