@@ -239,7 +239,7 @@ Describe 'Rename-GitRemote' {
             }
 
             # Now a regular push should work without errors
-            { git push origin } | Should -Not -Throw
+            $null = git push origin
         }
     }
 

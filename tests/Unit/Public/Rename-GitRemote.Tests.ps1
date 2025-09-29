@@ -191,7 +191,7 @@ Describe 'Rename-GitRemote' {
 
         It 'Should use correct ShouldProcess messages' {
             # Test the ShouldProcess call indirectly by ensuring it doesn't error out
-            { Rename-GitRemote -Name 'my' -NewName 'origin' -Confirm:$false } | Should -Not -Throw
+            $null = Rename-GitRemote -Name 'my' -NewName 'origin' -Confirm:$false
         }
     }
 }

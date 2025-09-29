@@ -250,7 +250,7 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
         It 'Should handle non-git directories gracefully' {
             # This test verifies the command handles git errors properly
             # The actual behavior depends on how git responds to --porcelain in non-git directories
-            { Test-GitLocalChanges -ErrorAction Stop } | Should -Not -Throw
+            $null = Test-GitLocalChanges -ErrorAction Stop
         }
     }
 }

@@ -138,11 +138,11 @@ Describe 'Get-GitBranchCommit' {
 
     Context 'When testing parameter validation' {
         It 'Should accept positive values for Last parameter' {
-            { Get-Command -Name 'Get-GitBranchCommit' | ForEach-Object { $_.Parameters['Last'].Attributes.Where({ $_.TypeId.Name -eq 'ValidateRangeAttribute' }) } } | Should -Not -Throw
+            $null = Get-Command -Name 'Get-GitBranchCommit' | ForEach-Object { $_.Parameters['Last'].Attributes.Where({ $_.TypeId.Name -eq 'ValidateRangeAttribute' }) }
         }
 
         It 'Should accept positive values for First parameter' {
-            { Get-Command -Name 'Get-GitBranchCommit' | ForEach-Object { $_.Parameters['First'].Attributes.Where({ $_.TypeId.Name -eq 'ValidateRangeAttribute' }) } } | Should -Not -Throw
+            $null = Get-Command -Name 'Get-GitBranchCommit' | ForEach-Object { $_.Parameters['First'].Attributes.Where({ $_.TypeId.Name -eq 'ValidateRangeAttribute' }) }
         }
     }
 

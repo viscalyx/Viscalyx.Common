@@ -263,7 +263,7 @@ Describe 'Remove-GitTag' {
                 $global:LASTEXITCODE = 0
             }
 
-            { Remove-GitTag -Tag @('v1.0.0', 'v1.1.0') -Force } | Should -Not -Throw
+            $null = Remove-GitTag -Tag @('v1.0.0', 'v1.1.0') -Force
         }
 
         It 'Should accept string array for Remote parameter' {
@@ -271,7 +271,7 @@ Describe 'Remove-GitTag' {
                 $global:LASTEXITCODE = 0
             }
 
-            { Remove-GitTag -Tag 'v1.0.0' -Remote @('origin', 'upstream') -Force } | Should -Not -Throw
+            $null = Remove-GitTag -Tag 'v1.0.0' -Remote @('origin', 'upstream') -Force
         }
     }
 }

@@ -114,7 +114,7 @@ Describe 'Request-GitTag' {
         }
 
         It 'Should not throw an error when git command succeeds' {
-            { Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force } | Should -Not -Throw
+            $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force
         }
     }
 
@@ -152,7 +152,7 @@ Describe 'Request-GitTag' {
         }
 
         It 'Should not throw an error when git command succeeds' {
-            { Request-GitTag -RemoteName 'upstream' -Force } | Should -Not -Throw
+            $null = Request-GitTag -RemoteName 'upstream' -Force
         }
     }
 
@@ -286,7 +286,7 @@ Describe 'Request-GitTag' {
                 $command.Parameters['RemoteName'].Attributes.Mandatory | Should -BeTrue
             }
 
-            $scriptBlock | Should -Not -Throw
+            $null = & $scriptBlock
         }
     }
 

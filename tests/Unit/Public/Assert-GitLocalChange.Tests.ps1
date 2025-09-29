@@ -70,7 +70,7 @@ Describe 'Assert-GitLocalChange' {
         }
 
         It 'Should not throw an exception' {
-            { Assert-GitLocalChange } | Should -Not -Throw
+            $null = Assert-GitLocalChange
         }
 
         It 'Should call Test-GitLocalChanges once' {

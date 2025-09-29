@@ -246,17 +246,17 @@ Describe 'Test-GitRemoteBranch' {
         It 'Should accept valid RemoteName values' {
             Mock -CommandName 'Get-GitRemoteBranch' -MockWith { return 'refs/heads/main' }
 
-            { Test-GitRemoteBranch -RemoteName 'origin' } | Should -Not -Throw
-            { Test-GitRemoteBranch -RemoteName 'upstream' } | Should -Not -Throw
-            { Test-GitRemoteBranch -RemoteName 'remote-with-dashes' } | Should -Not -Throw
+            $null = Test-GitRemoteBranch -RemoteName 'origin'
+            $null = Test-GitRemoteBranch -RemoteName 'upstream'
+            $null = Test-GitRemoteBranch -RemoteName 'remote-with-dashes'
         }
 
         It 'Should accept valid Name values' {
             Mock -CommandName 'Get-GitRemoteBranch' -MockWith { return 'refs/heads/main' }
 
-            { Test-GitRemoteBranch -RemoteName 'origin' -Name 'main' } | Should -Not -Throw
-            { Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test' } | Should -Not -Throw
-            { Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*' } | Should -Not -Throw
+            $null = Test-GitRemoteBranch -RemoteName 'origin' -Name 'main'
+            $null = Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test'
+            $null = Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*'
         }
 
         It 'Should not accept null or empty RemoteName when Name is specified' {

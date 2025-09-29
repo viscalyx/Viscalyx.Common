@@ -59,7 +59,7 @@ Describe 'Assert-GitLocalChange' -Tag 'Integration' {
         }
 
         It 'Should not throw when repository is clean' {
-            { Assert-GitLocalChange -ErrorAction Stop } | Should -Not -Throw
+            $null = Assert-GitLocalChange -ErrorAction Stop
         }
 
         It 'Should not throw when all changes are committed' {
@@ -68,7 +68,7 @@ Describe 'Assert-GitLocalChange' -Tag 'Integration' {
             $null = git add README.md 2>&1
             $null = git commit -m 'Add new content' --quiet 2>&1
 
-            { Assert-GitLocalChange -ErrorAction Stop } | Should -Not -Throw
+            $null = Assert-GitLocalChange -ErrorAction Stop
         }
     }
 

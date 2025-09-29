@@ -99,7 +99,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should rename a local branch successfully' {
-            { Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force } | Should -Not -Throw
+            $null = Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force
 
             # Verify the old branch no longer exists
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'feature/original-branch') -PassThru
@@ -154,7 +154,7 @@ Describe 'Rename-GitLocalBranch' {
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Special commit')
 
             # Rename the branch
-            { Rename-GitLocalBranch -Name 'feature/test-123_special.branch' -NewName 'feature/renamed-branch' -Force } | Should -Not -Throw
+            $null = Rename-GitLocalBranch -Name 'feature/test-123_special.branch' -NewName 'feature/renamed-branch' -Force
 
             # Verify the rename worked
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
@@ -304,7 +304,7 @@ Describe 'Rename-GitLocalBranch' {
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'current-branch-test', '--quiet')
 
             # Rename the current branch
-            { Rename-GitLocalBranch -Name 'current-branch-test' -NewName 'renamed-current-branch' -Force } | Should -Not -Throw
+            $null = Rename-GitLocalBranch -Name 'current-branch-test' -NewName 'renamed-current-branch' -Force
 
             # Verify we're now on the renamed branch
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
@@ -322,7 +322,7 @@ Describe 'Rename-GitLocalBranch' {
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'other-branch', '--quiet')
 
             # Rename a branch we're not currently on
-            { Rename-GitLocalBranch -Name 'branch-to-rename' -NewName 'renamed-other-branch' -Force } | Should -Not -Throw
+            $null = Rename-GitLocalBranch -Name 'branch-to-rename' -NewName 'renamed-other-branch' -Force
 
             # Verify the branch was renamed (should exist in branch list)
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-other-branch') -PassThru

@@ -233,12 +233,12 @@ Describe 'Update-RemoteTrackingBranch' {
 
         It 'Should use correct ShouldProcess messages with branch' {
             # Test the ShouldProcess call indirectly by ensuring it doesn't error out
-            { Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false } | Should -Not -Throw
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false
         }
 
         It 'Should use correct ShouldProcess messages without branch' {
             # Test the ShouldProcess call indirectly by ensuring it doesn't error out
-            { Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false } | Should -Not -Throw
+            $null = Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false
         }
     }
 

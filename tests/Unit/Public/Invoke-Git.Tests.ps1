@@ -102,11 +102,11 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should not throw without -PassThru' {
-                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) } | Should -Not -Throw
+                    $null = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' )
                 }
 
                 It 'Should not throw without -PassThru, with -Verbose' {
-                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose } | Should -Not -Throw
+                    $null = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose
                 }
             }
 

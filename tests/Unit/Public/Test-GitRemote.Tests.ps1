@@ -130,11 +130,11 @@ Describe 'Test-GitRemote' {
         It 'Should accept valid remote name strings' {
             Mock -CommandName 'Get-GitRemote' -MockWith { return 'validname' }
 
-            { Test-GitRemote -Name 'validname' } | Should -Not -Throw
-            { Test-GitRemote -Name 'origin' } | Should -Not -Throw
-            { Test-GitRemote -Name 'upstream' } | Should -Not -Throw
-            { Test-GitRemote -Name 'my-remote' } | Should -Not -Throw
-            { Test-GitRemote -Name 'remote_with_underscores' } | Should -Not -Throw
+            $null = Test-GitRemote -Name 'validname'
+            $null = Test-GitRemote -Name 'origin'
+            $null = Test-GitRemote -Name 'upstream'
+            $null = Test-GitRemote -Name 'my-remote'
+            $null = Test-GitRemote -Name 'remote_with_underscores'
         }
 
         It 'Should work with positional parameter' {

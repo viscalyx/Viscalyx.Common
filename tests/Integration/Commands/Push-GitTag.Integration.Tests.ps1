@@ -205,7 +205,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         }
 
         It 'Should push a specific tag to the default remote' {
-            { Push-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Push-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop
 
             # Verify the tag was pushed to the remote
             $remoteTags = & git ls-remote --tags origin
@@ -213,7 +213,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         }
 
         It 'Should push a specific tag to a custom remote' {
-            { Push-GitTag -RemoteName 'upstream' -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Push-GitTag -RemoteName 'upstream' -Name 'v1.0.0' -Force -ErrorAction Stop
 
             # Verify the tag was pushed to the upstream remote
             $remoteTags = & git ls-remote --tags upstream
@@ -229,7 +229,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
                 & git tag $tagName 2>$null
 
                 # Push the tag
-                { Push-GitTag -Name $tagName -Force -ErrorAction Stop } | Should -Not -Throw
+                $null = Push-GitTag -Name $tagName -Force -ErrorAction Stop
             }
 
             # Verify all tags were pushed
@@ -250,7 +250,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         }
 
         It 'Should push all tags to the default remote' {
-            { Push-GitTag -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Push-GitTag -Force -ErrorAction Stop
 
             # Verify all tags were pushed to the remote
             $remoteTags = & git ls-remote --tags origin
@@ -260,7 +260,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         }
 
         It 'Should push all tags to a custom remote' {
-            { Push-GitTag -RemoteName 'upstream' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Push-GitTag -RemoteName 'upstream' -Force -ErrorAction Stop
 
             # Verify all tags were pushed to the upstream remote
             $remoteTags = & git ls-remote --tags upstream
@@ -277,7 +277,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         }
 
         It 'Should not push tag when WhatIf is specified' {
-            { Push-GitTag -Name 'v1.0.0' -WhatIf } | Should -Not -Throw
+            $null = Push-GitTag -Name 'v1.0.0' -WhatIf
 
             # Verify the tag was NOT pushed to the remote
             $remoteTags = & git ls-remote --tags origin 2>$null
@@ -285,7 +285,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         }
 
         It 'Should not push all tags when WhatIf is specified' {
-            { Push-GitTag -WhatIf } | Should -Not -Throw
+            $null = Push-GitTag -WhatIf
 
             # Verify no tags were pushed to the remote
             $remoteTags = & git ls-remote --tags origin 2>$null
@@ -307,7 +307,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
 
         It 'Should succeed when trying to push all tags with no local tags (no-op)' {
             # This should succeed but be a no-op since there are no tags to push
-            { Push-GitTag -Force -ErrorAction Stop 2>$null } | Should -Not -Throw
+            $null = Push-GitTag -Force -ErrorAction Stop 2>$null
         }
     }
 
@@ -353,7 +353,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         }
 
         It 'Should succeed when pushing the same tag again (idempotent operation)' {
-            { Push-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Push-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop
 
             # Verify the tag still exists on the remote
             $remoteTags = & git ls-remote --tags origin

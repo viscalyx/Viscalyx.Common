@@ -188,7 +188,7 @@ Describe 'Request-GitTag' {
             $existingTags | Should -Not -Contain 'v1.0.0'
 
             # Fetch the specific tag
-            { Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force -Verbose } | Should -Not -Throw
+            $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force -Verbose
 
             # Verify the tag now exists locally
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
@@ -253,7 +253,7 @@ Describe 'Request-GitTag' {
             $existingTags | Should -BeNullOrEmpty
 
             # Fetch all tags
-            { Request-GitTag -RemoteName 'origin' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Request-GitTag -RemoteName 'origin' -Force -ErrorAction Stop
 
             # Verify all tags now exist locally
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
@@ -273,7 +273,7 @@ Describe 'Request-GitTag' {
             $tagsBeforeSecondFetch | Should -Contain 'v1.0.0'
 
             # Fetch again - should not fail
-            { Request-GitTag -RemoteName 'origin' -Force } | Should -Not -Throw
+            $null = Request-GitTag -RemoteName 'origin' -Force
 
             # Verify tags still exist
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
@@ -351,7 +351,7 @@ Describe 'Request-GitTag' {
 
         It 'Should respect -Confirm:$false with -Force' {
             # This should execute without prompting
-            { Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force -Confirm:$false } | Should -Not -Throw
+            $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force -Confirm:$false
 
             # Verify the tag was actually fetched
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru

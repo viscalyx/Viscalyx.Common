@@ -158,7 +158,7 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
         It 'Should create a release tag from preview tag automatically' {
             # This should extract version from v1.0.0-preview0001 and create v1.0.0
-            { New-SamplerGitHubReleaseTag -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = New-SamplerGitHubReleaseTag -Force -ErrorAction Stop
 
             # Verify the release tag was created
             $tags = & git tag
@@ -166,7 +166,7 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
         }
 
         It 'Should create a specified release tag' {
-            { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.1.0' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v1.1.0' -Force -ErrorAction Stop
 
             # Verify the specified tag was created
             $tags = & git tag
@@ -204,7 +204,7 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
         }
 
         It 'Should not create tag when WhatIf is specified' {
-            { New-SamplerGitHubReleaseTag -ReleaseTag 'v2.0.0' -WhatIf } | Should -Not -Throw
+            $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v2.0.0' -WhatIf
 
             # Verify the tag was NOT created
             $tags = & git tag
@@ -340,7 +340,7 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
                 & git checkout main --quiet *>$null
             }
 
-            { New-SamplerGitHubReleaseTag -DefaultBranchName 'main' -ReleaseTag 'v1.2.0' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = New-SamplerGitHubReleaseTag -DefaultBranchName 'main' -ReleaseTag 'v1.2.0' -Force -ErrorAction Stop
 
             # Verify the tag was created
             $tags = & git tag
@@ -391,7 +391,7 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
             }
             $originalBranch = & git branch --show-current 2>$null
 
-            { New-SamplerGitHubReleaseTag -ReleaseTag 'v1.3.0' -ReturnToCurrentBranch -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v1.3.0' -ReturnToCurrentBranch -Force -ErrorAction Stop
 
             # Verify we're back on the original branch
             $currentBranch = & git branch --show-current 2>$null

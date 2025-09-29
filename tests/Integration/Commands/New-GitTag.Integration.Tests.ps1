@@ -120,7 +120,7 @@ Describe 'New-GitTag' -Tag 'Integration' {
 
     Context 'When creating a new tag successfully' {
         It 'Should create a simple tag' {
-            { New-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = New-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop
 
             # Verify the tag was created
             $tags = & git tag
@@ -128,8 +128,8 @@ Describe 'New-GitTag' -Tag 'Integration' {
         }
 
         It 'Should create multiple tags' {
-            { New-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop } | Should -Not -Throw
-            { New-GitTag -Name 'v1.1.0' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = New-GitTag -Name 'v1.0.0' -Force -ErrorAction Stop
+            $null = New-GitTag -Name 'v1.1.0' -Force -ErrorAction Stop
 
             # Verify both tags were created
             $tags = & git tag
@@ -142,7 +142,7 @@ Describe 'New-GitTag' -Tag 'Integration' {
 
             foreach ($tagName in $tagNames)
             {
-                { New-GitTag -Name $tagName -Force -ErrorAction Stop } | Should -Not -Throw
+                $null = New-GitTag -Name $tagName -Force -ErrorAction Stop
             }
 
             # Verify all tags were created
@@ -167,7 +167,7 @@ Describe 'New-GitTag' -Tag 'Integration' {
 
     Context 'When using ShouldProcess functionality' {
         It 'Should not create tag when WhatIf is specified' {
-            { New-GitTag -Name 'whatif-tag' -WhatIf } | Should -Not -Throw
+            $null = New-GitTag -Name 'whatif-tag' -WhatIf
 
             # Verify the tag was NOT created
             $tags = & git tag

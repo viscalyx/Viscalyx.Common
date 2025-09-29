@@ -62,7 +62,7 @@ Describe 'Assert-GitRemote' -Tag 'Integration' {
         }
 
         It 'Should not throw an exception when the remote exists' {
-            { Assert-GitRemote -Name 'origin' } | Should -Not -Throw
+            $null = Assert-GitRemote -Name 'origin'
         }
     }
 
