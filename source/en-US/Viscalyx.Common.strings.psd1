@@ -62,6 +62,10 @@ ConvertFrom-StringData @'
     ## Rename-GitRemote
     Rename_GitRemote_FailedToRename = Failed to rename remote '{0}' to '{1}'. Make sure the remote exists and the local repository is accessible.
     Rename_GitRemote_RenamedRemote = Successfully renamed remote '{0}' to '{1}'.
+    Rename_GitRemote_Action_ShouldProcessDescription = Renaming Git remote '{0}' to '{1}'.
+    Rename_GitRemote_Action_ShouldProcessConfirmation = Are you sure you want to rename Git remote '{0}' to '{1}'?
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Rename_GitRemote_Action_ShouldProcessCaption = Rename Git remote
 
     ## New-GitTag
     New_GitTag_ShouldProcessVerboseDescription = Creating tag '{0}'.

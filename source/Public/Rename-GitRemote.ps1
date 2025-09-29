@@ -12,6 +12,9 @@
     .PARAMETER NewName
         The new name for the remote.
 
+    .PARAMETER Force
+        Forces the rename operation to proceed without confirmation prompts.
+
     .INPUTS
         None
 
@@ -32,13 +35,18 @@
 
         This example renames the Git remote from "upstream" to "fork".
 
+    .EXAMPLE
+        Rename-GitRemote -Name "my" -NewName "origin" -Force
+
+        This example renames the Git remote from "my" to "origin" without prompting for confirmation.
+
     .NOTES
         This function requires Git to be installed and accessible in the system PATH.
         The remote being renamed must exist in the current Git repository.
 #>
 function Rename-GitRemote
 {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
     [OutputType()]
     param
     (
@@ -50,25 +58,41 @@ function Rename-GitRemote
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
-        $NewName
+        $NewName,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
     )
 
-    # Rename the Git remote
-    git remote rename $Name $NewName
-
-    if ($LASTEXITCODE -eq 0) # cSpell: ignore LASTEXITCODE
+    if ($Force.IsPresent -and -not $Confirm)
     {
-        Write-Verbose -Message ($script:localizedData.Rename_GitRemote_RenamedRemote -f $Name, $NewName)
+        $ConfirmPreference = 'None'
     }
-    else
+
+    # Rename the Git remote
+    $descriptionMessage = $script:localizedData.Rename_GitRemote_Action_ShouldProcessDescription -f $Name, $NewName
+    $confirmationMessage = $script:localizedData.Rename_GitRemote_Action_ShouldProcessConfirmation -f $Name, $NewName
+    $captionMessage = $script:localizedData.Rename_GitRemote_Action_ShouldProcessCaption
+
+    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
-        $PSCmdlet.ThrowTerminatingError(
-            [System.Management.Automation.ErrorRecord]::new(
-                ($script:localizedData.Rename_GitRemote_FailedToRename -f $Name, $NewName),
-                'RGR0001', # cspell: disable-line
-                [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                $Name
+        git remote rename $Name $NewName
+
+        if ($LASTEXITCODE -eq 0) # cSpell: ignore LASTEXITCODE
+        {
+            Write-Information -MessageData ($script:localizedData.Rename_GitRemote_RenamedRemote -f $Name, $NewName) -InformationAction Continue
+        }
+        else
+        {
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    ($script:localizedData.Rename_GitRemote_FailedToRename -f $Name, $NewName),
+                    'RGR0001', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    $Name
+                )
             )
-        )
+        }
     }
 }

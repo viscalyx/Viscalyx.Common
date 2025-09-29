@@ -64,6 +64,17 @@ Describe 'Rename-GitRemote' {
             $parameterInfo = (Get-Command -Name 'Rename-GitRemote').Parameters['NewName']
             $parameterInfo.Attributes.TypeId.Name | Should -Contain 'ValidateNotNullOrEmptyAttribute'
         }
+
+        It 'Should have Force as a non-mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Rename-GitRemote').Parameters['Force']
+            $parameterInfo.Attributes.Where{ $_ -is [System.Management.Automation.ParameterAttribute] }.Mandatory | Should -Contain $false
+        }
+
+        It 'Should support ShouldProcess' {
+            $commandInfo = Get-Command -Name 'Rename-GitRemote'
+            $commandInfo.Parameters.Keys | Should -Contain 'WhatIf'
+            $commandInfo.Parameters.Keys | Should -Contain 'Confirm'
+        }
     }
 
     Context 'When renaming a Git remote successfully' {
@@ -85,7 +96,7 @@ Describe 'Rename-GitRemote' {
         }
 
         It 'Should rename a Git remote from "my" to "origin"' {
-            Rename-GitRemote -Name 'my' -NewName 'origin'
+            Rename-GitRemote -Name 'my' -NewName 'origin' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'remote' -and $args[1] -eq 'rename' -and $args[2] -eq 'my' -and $args[3] -eq 'origin'
@@ -93,19 +104,19 @@ Describe 'Rename-GitRemote' {
         }
 
         It 'Should rename a Git remote from "upstream" to "fork"' {
-            Rename-GitRemote -Name 'upstream' -NewName 'fork'
+            Rename-GitRemote -Name 'upstream' -NewName 'fork' -Force
 
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'remote' -and $args[1] -eq 'rename' -and $args[2] -eq 'upstream' -and $args[3] -eq 'fork'
             }
         }
 
-        It 'Should write verbose message when remote is renamed successfully' {
+        It 'Should write information message when remote is renamed successfully' {
             $mockSuccessMessage = InModuleScope -ScriptBlock {
                 $script:localizedData.Rename_GitRemote_RenamedRemote -f 'my', 'origin'
             }
 
-            Rename-GitRemote -Name 'my' -NewName 'origin' -Verbose 4>&1 | Should -Be $mockSuccessMessage
+            Rename-GitRemote -Name 'my' -NewName 'origin' -Force 6>&1 | Should -Be $mockSuccessMessage
         }
     }
 
@@ -137,14 +148,14 @@ Describe 'Rename-GitRemote' {
 
         It 'Should throw terminating error when remote rename fails' {
             {
-                Rename-GitRemote -Name 'nonexistent' -NewName 'origin'
+                Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
             } | Should -Throw -ExpectedMessage $mockErrorMessage
         }
 
         It 'Should throw error with correct error ID' {
             try
             {
-                Rename-GitRemote -Name 'nonexistent' -NewName 'origin'
+                Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
             }
             catch
             {
@@ -155,7 +166,7 @@ Describe 'Rename-GitRemote' {
         It 'Should throw error with correct error category' {
             try
             {
-                Rename-GitRemote -Name 'nonexistent' -NewName 'origin'
+                Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
             }
             catch
             {
@@ -166,11 +177,58 @@ Describe 'Rename-GitRemote' {
         It 'Should throw error with correct target object' {
             try
             {
-                Rename-GitRemote -Name 'nonexistent' -NewName 'origin'
+                Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force
             }
             catch
             {
                 $_.TargetObject | Should -Be 'nonexistent'
+            }
+        }
+    }
+
+    Context 'When using ShouldProcess' {
+        BeforeAll {
+            Mock -CommandName git -MockWith {
+                if ($args[0] -eq 'remote' -and $args[1] -eq 'rename')
+                {
+                    $global:LASTEXITCODE = 0
+                }
+                else
+                {
+                    $global:LASTEXITCODE = 1
+                }
+            }
+        }
+
+        It 'Should use correct ShouldProcess messages' {
+            # Test the ShouldProcess call indirectly by ensuring it doesn't error out
+            { Rename-GitRemote -Name 'my' -NewName 'origin' -Confirm:$false } | Should -Not -Throw
+        }
+    }
+
+    Context 'When validating localized strings' {
+        It 'Should have all required localized strings defined' {
+            InModuleScope -ScriptBlock {
+                $script:localizedData.Keys | Should -Contain 'Rename_GitRemote_FailedToRename'
+                $script:localizedData.Keys | Should -Contain 'Rename_GitRemote_RenamedRemote'
+                $script:localizedData.Keys | Should -Contain 'Rename_GitRemote_Action_ShouldProcessDescription'
+                $script:localizedData.Keys | Should -Contain 'Rename_GitRemote_Action_ShouldProcessConfirmation'
+                $script:localizedData.Keys | Should -Contain 'Rename_GitRemote_Action_ShouldProcessCaption'
+            }
+        }
+
+        It 'Should have correctly formatted localized strings' {
+            InModuleScope -ScriptBlock {
+                # Verify error message format
+                $script:localizedData.Rename_GitRemote_FailedToRename | Should -Match '\{0\}.*\{1\}'
+                $script:localizedData.Rename_GitRemote_RenamedRemote | Should -Match '\{0\}.*\{1\}'
+
+                # Verify ShouldProcess messages format
+                $script:localizedData.Rename_GitRemote_Action_ShouldProcessDescription | Should -Match '\{0\}.*\{1\}'
+                $script:localizedData.Rename_GitRemote_Action_ShouldProcessConfirmation | Should -Match '\{0\}.*\{1\}'
+
+                # Verify caption does not end with period
+                $script:localizedData.Rename_GitRemote_Action_ShouldProcessCaption | Should -Not -Match '\.$'
             }
         }
     }

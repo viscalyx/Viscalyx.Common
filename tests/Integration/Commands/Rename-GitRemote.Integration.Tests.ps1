@@ -160,7 +160,7 @@ Describe 'Rename-GitRemote Integration Tests' {
             $remotesBefore | Should -Not -Contain 'origin'
 
             # Rename the remote using the command
-            Rename-GitRemote -Name 'myremote' -NewName 'origin' -ErrorAction Stop
+            Rename-GitRemote -Name 'myremote' -NewName 'origin' -Force -ErrorAction Stop
 
             # Verify the remote was renamed
             $remotesAfter = git remote
@@ -180,7 +180,7 @@ Describe 'Rename-GitRemote Integration Tests' {
             $remotesBefore | Should -Not -Contain 'fork'
 
             # Rename the remote using the command
-            Rename-GitRemote -Name 'upstream' -NewName 'fork' -ErrorAction Stop
+            Rename-GitRemote -Name 'upstream' -NewName 'fork' -Force -ErrorAction Stop
 
             # Verify the remote was renamed
             $remotesAfter = git remote
@@ -195,7 +195,7 @@ Describe 'Rename-GitRemote Integration Tests' {
 
         It 'Should preserve tracking branches after renaming remote' {
             # Rename the remote
-            Rename-GitRemote -Name 'myremote' -NewName 'origin' -ErrorAction Stop
+            Rename-GitRemote -Name 'myremote' -NewName 'origin' -Force -ErrorAction Stop
 
             # Verify that branches can still be pushed and tracked
             "Modified content" | Out-File -FilePath 'test2.txt' -Encoding utf8
@@ -224,7 +224,7 @@ Describe 'Rename-GitRemote Integration Tests' {
             $remotes | Should -Not -Contain 'nonexistent'
 
             # Attempt to rename non-existent remote should throw an error
-            { Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -ErrorAction Stop 2>$null } | Should -Throw
+            { Rename-GitRemote -Name 'nonexistent' -NewName 'origin' -Force -ErrorAction Stop } | Should -Throw
         }
     }
 
@@ -236,17 +236,17 @@ Describe 'Rename-GitRemote Integration Tests' {
             $remotes | Should -Contain 'upstream'
 
             # Attempt to rename to existing name should throw an error
-            { Rename-GitRemote -Name 'myremote' -NewName 'upstream' -ErrorAction Stop 2>$null } | Should -Throw
+            { Rename-GitRemote -Name 'myremote' -NewName 'upstream' -Force -ErrorAction Stop } | Should -Throw
         }
     }
 
-    Context 'When renaming with verbose output' {
-        It 'Should display verbose message when renaming successfully' {
-            # Capture verbose output
-            $verboseOutput = Rename-GitRemote -Name 'myremote' -NewName 'origin' -Verbose -ErrorAction Stop 4>&1
+    Context 'When renaming with information output' {
+        It 'Should display information message when renaming successfully' {
+            # Capture information output
+            $informationOutput = Rename-GitRemote -Name 'myremote' -NewName 'origin' -Force -ErrorAction Stop 6>&1
 
             # Should contain success message
-            $verboseOutput | Should -Match "Successfully renamed remote 'myremote' to 'origin'"
+            $informationOutput | Should -Match "Successfully renamed remote 'myremote' to 'origin'"
         }
     }
 }
