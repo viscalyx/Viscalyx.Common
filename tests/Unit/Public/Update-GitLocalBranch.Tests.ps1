@@ -352,7 +352,7 @@ Describe 'Update-GitLocalBranch' {
             }
 
             $mockErrorMessage = InModuleScope -ScriptBlock {
-                $script:localizedData.Update_GitLocalBranch_FailedRebase -f 'main', 'origin'
+                $script:localizedData.Update_GitLocalBranch_FailedPull -f 'main', 'origin'
             }
 
             {
