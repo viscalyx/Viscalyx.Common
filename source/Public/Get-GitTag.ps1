@@ -154,6 +154,8 @@ function Get-GitTag
         }
 
         Write-Error @errorMessageParameters
+
+        return $null
     }
 
     return $tag
