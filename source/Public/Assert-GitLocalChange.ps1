@@ -40,7 +40,7 @@ function Assert-GitLocalChange
     {
         $PSCmdlet.ThrowTerminatingError(
             [System.Management.Automation.ErrorRecord]::new(
-                $script:localizedData.Assert_GitLocalChanges_FailedUnstagedChanges,
+                $script:localizedData.Assert_GitLocalChange_FailedUnstagedChanges,
                 'AGLC0001', # cspell: disable-line
                 [System.Management.Automation.ErrorCategory]::InvalidResult,
                 'Staged or unstaged changes' # cSpell: ignore unstaged

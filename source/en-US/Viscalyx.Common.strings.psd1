@@ -24,7 +24,7 @@ ConvertFrom-StringData @'
     Disable_CursorShortcutCode_CodeNotFound = File 'code' not found in the Cursor path. Skipping. (DCSC0006)
 
     ## Assert-GitLocalChange
-    Assert_GitLocalChanges_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
+    Assert_GitLocalChange_FailedUnstagedChanges = There are unstaged or staged changes. Please commit or stash your changes before proceeding.
 
     ## Test-GitLocalChanges
     Test_GitLocalChanges_GitFailed = Failed to execute git status. Make sure git is installed and the current directory is a valid git repository.
@@ -44,7 +44,7 @@ ConvertFrom-StringData @'
     Get_GitRemote_Failed = Failed to get the remote '{0}'. Make sure the remote exists and is accessible.
 
     ## Get-GitRemoteBranch
-    Get_GitRemoteBranch_Failed = Failed to get the remote branches'. Make sure the remote branch exists and is accessible.
+    Get_GitRemoteBranch_Failed = Failed to get the remote branches. Make sure the remote branch exists and is accessible.
     Get_GitRemoteBranch_FromRemote_Failed = Failed to get the remote branches from remote '{0}'. Make sure the remote branch exists and is accessible.
     Get_GitRemoteBranch_ByName_Failed = Failed to get the remote branch '{0}' using the remote '{1}'. Make sure the remote branch exists and is accessible.
     Get_GitRemoteBranch_RemoteNotFound = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (GGRB0002)
