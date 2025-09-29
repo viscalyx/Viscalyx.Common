@@ -195,14 +195,14 @@ Describe 'Switch-GitLocalBranch' -Tag 'Integration' {
     }
 
     Context 'When testing ShouldProcess with Confirm parameter' {
-        It 'Should not switch branches when Confirm is false and user declines' {
+        It 'Should switch branches when Force is used to bypass confirmation' {
             # Get current branch
             $originalBranch = & git branch --show-current
 
-            # Mock user declining the prompt by using -Confirm:$false with Force
+            # Force bypasses confirmation and switches the branch
             $null = Switch-GitLocalBranch -Name 'feature/test-branch' -Force -ErrorAction Stop
 
-            # This should succeed as Force bypasses confirmation
+            # Verify the branch was switched
             $currentBranch = & git branch --show-current
             $currentBranch | Should -Be 'feature/test-branch'
 
