@@ -48,7 +48,7 @@
 function Get-GitRemote
 {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
-    [OutputType([System.String])]
+    [OutputType([System.String[]])]
     param
     (
         [Parameter(Position = 0, ParameterSetName = 'Default')]
