@@ -169,6 +169,10 @@ Describe 'Request-GitTag' {
                     throw "Mock git unexpected args: $($args -join ' ')"
                 }
             }
+
+            $mockErrorMessage = InModuleScope -ScriptBlock {
+                $script:localizedData.Request_GitTag_FailedFetchTag -f 'v1.0.0', 'origin'
+            }
         }
 
         BeforeEach {
@@ -183,7 +187,7 @@ Describe 'Request-GitTag' {
             $errorRecord = { Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force } |
                 Should -Throw -PassThru
 
-            $errorRecord.Exception.Message | Should -Be "Failed to fetch tag 'v1.0.0' from remote 'origin'. Make sure the tag exists and remote is accessible."
+            $errorRecord.Exception.Message | Should -Be $mockErrorMessage
             $errorRecord.FullyQualifiedErrorId | Should -Be 'RGT0001,Request-GitTag'
             $errorRecord.CategoryInfo.Category | Should -Be 'InvalidOperation'
             $errorRecord.TargetObject | Should -Be 'v1.0.0'
@@ -203,6 +207,10 @@ Describe 'Request-GitTag' {
                     throw "Mock git unexpected args: $($args -join ' ')"
                 }
             }
+
+            $mockErrorMessage = InModuleScope -ScriptBlock {
+                $script:localizedData.Request_GitTag_FailedFetchAllTags -f 'upstream'
+            }
         }
 
         BeforeEach {
@@ -217,7 +225,7 @@ Describe 'Request-GitTag' {
             $errorRecord = { Request-GitTag -RemoteName 'upstream' -Force } |
                 Should -Throw -PassThru
 
-            $errorRecord.Exception.Message | Should -Be "Failed to fetch all tags from remote 'upstream'."
+            $errorRecord.Exception.Message | Should -Be $mockErrorMessage
             $errorRecord.FullyQualifiedErrorId | Should -Be 'RGT0001,Request-GitTag'
             $errorRecord.CategoryInfo.Category | Should -Be 'InvalidOperation'
             $errorRecord.TargetObject | Should -BeNullOrEmpty
@@ -328,9 +336,9 @@ Describe 'Request-GitTag' {
                 $warning = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessVerboseWarning -f $testName, $testRemote
                 $caption = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessCaption
                 
-                $description | Should -Be "Fetching tag 'v1.0.0' from remote 'origin'."
-                $warning | Should -Be "Are you sure you want to fetch tag 'v1.0.0' from remote 'origin'?"
-                $caption | Should -Be "Fetch tag"
+                $description | Should -Be "Fetching tag 'v1.0.0' from remote 'origin'. (RQT0001)"
+                $warning | Should -Be "Are you sure you want to fetch tag 'v1.0.0' from remote 'origin'? (RQT0002)"
+                $caption | Should -Be "Fetch tag (RQT0003)"
             }
         }
 
@@ -343,9 +351,9 @@ Describe 'Request-GitTag' {
                 $warning = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessVerboseWarning -f $testRemote
                 $caption = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessCaption
                 
-                $description | Should -Be "Fetching all tags from remote 'upstream'."
-                $warning | Should -Be "Are you sure you want to fetch all tags from remote 'upstream'?"
-                $caption | Should -Be "Fetch all tags"
+                $description | Should -Be "Fetching all tags from remote 'upstream'. (RQT0004)"
+                $warning | Should -Be "Are you sure you want to fetch all tags from remote 'upstream'? (RQT0005)"
+                $caption | Should -Be "Fetch all tags (RQT0006)"
             }
         }
     }
