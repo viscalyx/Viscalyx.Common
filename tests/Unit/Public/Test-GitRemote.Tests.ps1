@@ -74,13 +74,11 @@ Describe 'Test-GitRemote' {
                 return 'origin'
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote -Name 'origin'
-                $result | Should -BeTrue
-                $result | Should -BeOfType [System.Boolean]
-                Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly -ParameterFilter {
-                    $Name -eq 'origin'
-                }
+            $result = Test-GitRemote -Name 'origin'
+            $result | Should -BeTrue
+            $result | Should -BeOfType [System.Boolean]
+            Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly -ParameterFilter {
+                $Name -eq 'origin'
             }
         }
 
@@ -89,13 +87,11 @@ Describe 'Test-GitRemote' {
                 return $null
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote -Name 'nonexistent'
-                $result | Should -BeFalse
-                $result | Should -BeOfType [System.Boolean]
-                Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly -ParameterFilter {
-                    $Name -eq 'nonexistent'
-                }
+            $result = Test-GitRemote -Name 'nonexistent'
+            $result | Should -BeFalse
+            $result | Should -BeOfType [System.Boolean]
+            Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly -ParameterFilter {
+                $Name -eq 'nonexistent'
             }
         }
 
@@ -104,11 +100,9 @@ Describe 'Test-GitRemote' {
                 return ''
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote -Name 'empty'
-                $result | Should -BeFalse
-                $result | Should -BeOfType [System.Boolean]
-            }
+            $result = Test-GitRemote -Name 'empty'
+            $result | Should -BeFalse
+            $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should return false when Get-GitRemote returns empty array' {
@@ -116,11 +110,9 @@ Describe 'Test-GitRemote' {
                 return @()
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote -Name 'empty'
-                $result | Should -BeFalse
-                $result | Should -BeOfType [System.Boolean]
-            }
+            $result = Test-GitRemote -Name 'empty'
+            $result | Should -BeFalse
+            $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should return true when Get-GitRemote returns the requested remote name' {
@@ -128,11 +120,9 @@ Describe 'Test-GitRemote' {
                 return 'upstream'
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote -Name 'upstream'
-                $result | Should -BeTrue
-                $result | Should -BeOfType [System.Boolean]
-            }
+            $result = Test-GitRemote -Name 'upstream'
+            $result | Should -BeTrue
+            $result | Should -BeOfType [System.Boolean]
         }
     }
 
@@ -140,24 +130,20 @@ Describe 'Test-GitRemote' {
         It 'Should accept valid remote name strings' {
             Mock -CommandName 'Get-GitRemote' -MockWith { return 'validname' }
 
-            InModuleScope -ScriptBlock {
-                { Test-GitRemote -Name 'validname' } | Should -Not -Throw
-                { Test-GitRemote -Name 'origin' } | Should -Not -Throw
-                { Test-GitRemote -Name 'upstream' } | Should -Not -Throw
-                { Test-GitRemote -Name 'my-remote' } | Should -Not -Throw
-                { Test-GitRemote -Name 'remote_with_underscores' } | Should -Not -Throw
-            }
+            { Test-GitRemote -Name 'validname' } | Should -Not -Throw
+            { Test-GitRemote -Name 'origin' } | Should -Not -Throw
+            { Test-GitRemote -Name 'upstream' } | Should -Not -Throw
+            { Test-GitRemote -Name 'my-remote' } | Should -Not -Throw
+            { Test-GitRemote -Name 'remote_with_underscores' } | Should -Not -Throw
         }
 
         It 'Should work with positional parameter' {
             Mock -CommandName 'Get-GitRemote' -MockWith { return 'origin' }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote 'origin'
-                $result | Should -BeTrue
-                Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly -ParameterFilter {
-                    $Name -eq 'origin'
-                }
+            $result = Test-GitRemote 'origin'
+            $result | Should -BeTrue
+            Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly -ParameterFilter {
+                $Name -eq 'origin'
             }
         }
     }
@@ -168,11 +154,9 @@ Describe 'Test-GitRemote' {
                 return [string]'origin'
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote -Name 'origin'
-                $result | Should -BeTrue
-                $result | Should -BeOfType [System.Boolean]
-            }
+            $result = Test-GitRemote -Name 'origin'
+            $result | Should -BeTrue
+            $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should handle array with single element correctly' {
@@ -180,11 +164,9 @@ Describe 'Test-GitRemote' {
                 return @('origin')
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote -Name 'origin'
-                $result | Should -BeTrue
-                $result | Should -BeOfType [System.Boolean]
-            }
+            $result = Test-GitRemote -Name 'origin'
+            $result | Should -BeTrue
+            $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should handle null return value correctly' {
@@ -192,11 +174,9 @@ Describe 'Test-GitRemote' {
                 return $null
             }
 
-            InModuleScope -ScriptBlock {
-                $result = Test-GitRemote -Name 'nonexistent'
-                $result | Should -BeFalse
-                $result | Should -BeOfType [System.Boolean]
-            }
+            $result = Test-GitRemote -Name 'nonexistent'
+            $result | Should -BeFalse
+            $result | Should -BeOfType [System.Boolean]
         }
     }
 }
