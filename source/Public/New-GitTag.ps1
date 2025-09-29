@@ -11,8 +11,8 @@
         Specifies the name of the Git tag to create. This parameter is mandatory.
 
     .PARAMETER Force
-        Forces the operation to proceed without confirmation prompts when used with
-        -Confirm:$false.
+        Forces the operation to proceed without confirmation prompts when similar
+        to -Confirm:$false.
 
     .INPUTS
         None

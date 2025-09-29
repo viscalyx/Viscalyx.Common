@@ -14,8 +14,8 @@
         left out all tags are pushed.
 
     .PARAMETER Force
-        Forces the operation to proceed without confirmation prompts when used with
-        -Confirm:$false.
+        Forces the operation to proceed without confirmation prompts when similar
+        to -Confirm:$false.
 
     .INPUTS
         None

@@ -14,6 +14,10 @@
         Specifies the name of the branch to update. If not provided, all branches
         will be updated.
 
+    .PARAMETER Force
+        Forces the operation to proceed without confirmation prompts when similar
+        to -Confirm:$false.
+
     .INPUTS
         None
 
@@ -34,6 +38,13 @@
 
         Fetches updates from the 'upstream' remote repository for all branches.
 
+    .EXAMPLE
+        Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Force
+
+        Fetches updates from the 'origin' remote repository for the 'main' branch
+        with the Force parameter, bypassing confirmation prompts when used with
+        -Confirm:$false.
+
     .NOTES
         This function requires Git to be installed and accessible from the command line.
 #>
@@ -49,7 +60,11 @@ function Update-RemoteTrackingBranch
 
         [Parameter(Position = 1)]
         [System.String]
-        $BranchName
+        $BranchName,
+
+        [Parameter()]
+        [System.Management.Automation.SwitchParameter]
+        $Force
     )
 
     $arguments = @(
@@ -61,6 +76,11 @@ function Update-RemoteTrackingBranch
         $arguments += @(
             $BranchName
         )
+    }
+
+    if ($Force.IsPresent -and -not $Confirm)
+    {
+        $ConfirmPreference = 'None'
     }
 
     $verboseDescriptionMessage = $script:localizedData.Update_RemoteTrackingBranch_FetchUpstream_ShouldProcessVerboseDescription -f $BranchName, $RemoteName

@@ -13,8 +13,8 @@
         Specifies the name of the specific tag to fetch. If not provided, all tags will be fetched.
 
     .PARAMETER Force
-        Forces the operation to proceed without confirmation prompts when used with
-        -Confirm:$false.
+        Forces the operation to proceed without confirmation prompts when similar
+        to -Confirm:$false.
 
     .INPUTS
         None

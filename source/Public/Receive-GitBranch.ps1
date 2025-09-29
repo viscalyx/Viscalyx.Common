@@ -29,8 +29,8 @@
         the local branch using the fetched upstream branch instead of merging.
 
     .PARAMETER Force
-        Forces the operation to proceed without confirmation prompts when used with
-        -Confirm:$false.
+        Forces the operation to proceed without confirmation prompts when similar
+        to -Confirm:$false.
 
     .INPUTS
         None
