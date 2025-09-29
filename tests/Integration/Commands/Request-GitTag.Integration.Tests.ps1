@@ -245,7 +245,7 @@ Describe 'Request-GitTag Integration Tests' {
 
         It 'Should handle non-existent tag gracefully' {
             # Attempt to fetch a non-existent tag (redirect errors to suppress console noise)
-            { Request-GitTag -RemoteName 'origin' -Name 'non-existent-tag' -Force 2>$null } |
+            { Request-GitTag -RemoteName 'origin' -Name 'non-existent-tag' -Force } |
                 Should -Throw -ErrorId 'RGT0001,Request-GitTag'
         }
     }
@@ -315,12 +315,12 @@ Describe 'Request-GitTag Integration Tests' {
         }
 
         It 'Should throw error when remote does not exist' {
-            { Request-GitTag -RemoteName 'nonexistent' -Force 2>$null } |
+            { Request-GitTag -RemoteName 'nonexistent' -Force } |
                 Should -Throw -ErrorId 'RGT0001,Request-GitTag'
         }
 
         It 'Should throw error when trying to fetch specific tag from invalid remote' {
-            { Request-GitTag -RemoteName 'invalid-remote' -Name 'v1.0.0' -Force 2>$null } |
+            { Request-GitTag -RemoteName 'invalid-remote' -Name 'v1.0.0' -Force } |
                 Should -Throw -ErrorId 'RGT0001,Request-GitTag'
         }
     }
@@ -504,7 +504,7 @@ Describe 'Request-GitTag Integration Tests' {
 
             try
             {
-                $errorRecord = { Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force 2>$null } |
+                $errorRecord = { Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force } |
                     Should -Throw -PassThru
 
                 $errorRecord.Exception.Message | Should -Match "Failed to fetch tag 'v1.0.0' from remote 'origin'"
@@ -525,7 +525,7 @@ Describe 'Request-GitTag Integration Tests' {
 
             try
             {
-                $errorRecord = { Request-GitTag -RemoteName 'origin' -Force 2>$null } |
+                $errorRecord = { Request-GitTag -RemoteName 'origin' -Force } |
                     Should -Throw -PassThru
 
                 $errorRecord.Exception.Message | Should -Match "Failed to fetch all tags from remote 'origin'"
