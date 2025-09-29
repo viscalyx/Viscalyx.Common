@@ -10,8 +10,8 @@
         Specifies the name of the remote repository. The default value is 'origin'.
 
     .PARAMETER Name
-        Specifies the name of the tag to push. This parameter is optional if, if
-        left out all tags are pushed.
+        Specifies the name of the tag to push. This parameter is optional; if
+        left out, all tags are pushed.
 
     .PARAMETER Force
         Forces the operation to proceed without confirmation prompts when similar
