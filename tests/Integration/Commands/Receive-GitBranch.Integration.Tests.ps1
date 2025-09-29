@@ -176,7 +176,7 @@ Describe 'Receive-GitBranch' {
             }
 
             # Use Receive-GitBranch to switch to main and pull
-            { Receive-GitBranch -Checkout -BranchName 'main' -Force } | Should -Not -Throw
+            $null = Receive-GitBranch -Checkout -BranchName 'main' -Force -ErrorAction Stop
 
             # Verify we're on main branch
             $currentBranch = git rev-parse --abbrev-ref HEAD
@@ -197,7 +197,7 @@ Describe 'Receive-GitBranch' {
             }
 
             # Use Receive-GitBranch to switch to feature branch and pull
-            { Receive-GitBranch -Checkout -BranchName 'feature/test' -Force } | Should -Not -Throw
+            $null = Receive-GitBranch -Checkout -BranchName 'feature/test' -Force -ErrorAction Stop
 
             # Verify we're on feature branch
             $currentBranch = git rev-parse --abbrev-ref HEAD
@@ -220,7 +220,7 @@ Describe 'Receive-GitBranch' {
             }
 
             # Use Receive-GitBranch with rebase to switch to main
-            { Receive-GitBranch -Checkout -BranchName 'main' -Rebase -Force } | Should -Not -Throw
+            $null = Receive-GitBranch -Checkout -BranchName 'main' -Rebase -Force -ErrorAction Stop
 
             # Verify we're on main branch
             $currentBranch = git rev-parse --abbrev-ref HEAD
@@ -241,7 +241,7 @@ Describe 'Receive-GitBranch' {
             }
 
             # Use Receive-GitBranch with rebase on feature branch
-            { Receive-GitBranch -Checkout -BranchName 'feature/test' -UpstreamBranchName 'main' -Rebase -Force } | Should -Not -Throw
+            $null = Receive-GitBranch -Checkout -BranchName 'feature/test' -UpstreamBranchName 'main' -Rebase -Force -ErrorAction Stop
 
             # Verify we're on feature branch
             $currentBranch = git rev-parse --abbrev-ref HEAD
@@ -295,7 +295,7 @@ Describe 'Receive-GitBranch' {
             git reset --hard HEAD *> $null
 
             # This should work without issues
-            { Receive-GitBranch -Checkout -BranchName 'feature/test' -Force } | Should -Not -Throw
+            $null = Receive-GitBranch -Checkout -BranchName 'feature/test' -Force -ErrorAction Stop
         }
 
         It 'Should handle repository with staged changes' {
@@ -373,7 +373,7 @@ Describe 'Receive-GitBranch' {
                 $commitsBefore = @(git log --oneline).Count
 
                 # Use Receive-GitBranch to pull latest changes
-                { Receive-GitBranch -BranchName 'main' -Force } | Should -Not -Throw
+                $null = Receive-GitBranch -BranchName 'main' -Force -ErrorAction Stop
 
                 # Count commits after pull
                 $commitsAfter = @(git log --oneline).Count
