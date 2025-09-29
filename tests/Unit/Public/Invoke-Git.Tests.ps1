@@ -51,12 +51,12 @@ Describe 'Viscalyx.Common\Invoke-Git' {
         $mockProcess | Add-Member -MemberType ScriptProperty -Name WorkingDirectory -Value { '' } -Force
 
         $mockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-            New-Object -TypeName 'Object' | `
+            New-Object -TypeName 'Object' |
                     Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { 'Standard Output Message' } -PassThru -Force
             } -Force
 
             $mockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                New-Object -TypeName 'Object' | `
+                New-Object -TypeName 'Object' |
                         Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { 'Standard Error Message' } -PassThru -Force
                 } -Force
 
@@ -150,7 +150,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
                     $tokenPrefix = ('pousr').ToCharArray() | Get-Random
                     $newTokenLength = Get-Random -Minimum 1 -Maximum 251
-                    $newToken = (1..$newTokenLength | % { ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
+                    $newToken = (1..$newTokenLength | ForEach-Object -Process { ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
                 }
 
                 $testCases = @(
@@ -167,11 +167,13 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 It "Should throw exact with '<ErrorMessage>'" -TestCases $testCases {
                     param( $Command, $ErrorMessage )
 
-                    $throwMessage = "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f $ErrorMessage))`n" + `
-                        "$($script:localizedData.Invoke_Git_ExitCodeMessage -f 128)`n" + `
-                        "$($script:localizedData.Invoke_Git_StandardOutputMessage -f 'Standard Output Message')`n" + `
-                        "$($script:localizedData.Invoke_Git_StandardErrorMessage -f 'Standard Error Message')`n" + `
+                    $throwMessage = (
+                        "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f $ErrorMessage))`n" +
+                        "$($script:localizedData.Invoke_Git_ExitCodeMessage -f 128)`n" +
+                        "$($script:localizedData.Invoke_Git_StandardOutputMessage -f 'Standard Output Message')`n" +
+                        "$($script:localizedData.Invoke_Git_StandardErrorMessage -f 'Standard Error Message')`n" +
                         "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $TestDrive)`n"
+                    )
 
                     { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments $Command } | Should -Throw $throwMessage
                 }
@@ -299,13 +301,13 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 # Mock StandardOutput to return multi-line string with LF, whitespace, and empty lines
                 $testMockProcess |
                     Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-                        New-Object -TypeName 'Object' | `
+                        New-Object -TypeName 'Object' |
                                 Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "  line1  `n`n  line2  `n   `n  line3  `n" } -PassThru -Force
                         } -Force
 
                 $testMockProcess |
                     Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                        New-Object -TypeName 'Object' | `
+                        New-Object -TypeName 'Object' |
                                 Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
                         } -Force
 
@@ -343,13 +345,13 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 # Mock StandardOutput with mixed line endings
                 $testMockProcess |
                     Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-                        New-Object -TypeName 'Object' | `
+                        New-Object -TypeName 'Object' |
                                 Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "line1`r`nline2`nline3`r`n" } -PassThru -Force
                         } -Force
 
                 $testMockProcess |
                     Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                        New-Object -TypeName 'Object' | `
+                        New-Object -TypeName 'Object' |
                                 Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
                         } -Force
 
@@ -387,13 +389,13 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 # Mock StandardOutput with only empty lines and whitespace
                 $testMockProcess |
                     Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-                        New-Object -TypeName 'Object' | `
+                        New-Object -TypeName 'Object' |
                                 Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "`r`n   `r`n`t`r`n  " } -PassThru -Force
                         } -Force
 
                 $testMockProcess |
                     Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                        New-Object -TypeName 'Object' | `
+                        New-Object -TypeName 'Object' |
                                 Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
                         } -Force
 
@@ -428,13 +430,13 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 # Mock StandardOutput with single line containing whitespace
                 $testMockProcess |
                     Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-                        New-Object -TypeName 'Object' | `
+                        New-Object -TypeName 'Object' |
                                 Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '  single line  ' } -PassThru -Force
                         } -Force
 
                 $testMockProcess |
                     Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                        New-Object -TypeName 'Object' | `
+                        New-Object -TypeName 'Object' |
                                 Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
                         } -Force
 
