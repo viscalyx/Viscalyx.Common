@@ -12,6 +12,12 @@
         Hide-GitToken -InputString @( 'remote', 'add', 'origin', 'https://user:1b7270718ad84857b52941b36a632f369d18ff72@github.com/Owner/Repo.git' )
 
         Returns a string to be used for logs.
+
+    .INPUTS
+        System.String[]
+
+    .OUTPUTS
+        System.String
 #>
 
 function Hide-GitToken
