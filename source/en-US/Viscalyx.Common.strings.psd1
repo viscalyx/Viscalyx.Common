@@ -79,7 +79,7 @@ ConvertFrom-StringData @'
 
     ## New-SamplerGitHubReleaseTag
     New_SamplerGitHubReleaseTag_LatestTagIsNotPreview = The latest tag '{0}' is not a preview tag or not a correctly formatted preview tag. Make sure the latest tag is a preview tag, or specify a release tag. (NSGRT0010)
-    New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository = Tags are missing. Make sure that at least one preview tag exist in the local repository, or specify a release tag. (NSGRT0008)
+    New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository = Tags are missing. Make sure that at least one preview tag exist in the local repository, or specify a release tag. (NSGRT0032)
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessDescription = Creating tag '{0}' for commit '{2}' in the local branch '{1}'. (NSGRT0021)
     New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessDescription = Creating tag for commit in the local branch '{1}'. Note: Actual tag name and commit id cannot be determined during -WhatIf. (NSGRT0022)
     New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation = Are you sure you want to create tag '{0}'? (NSGRT0023)

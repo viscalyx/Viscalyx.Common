@@ -161,7 +161,7 @@ function New-SamplerGitHubReleaseTag
             {
                 $errorRecord = [System.Management.Automation.ErrorRecord]::new(
                     [System.InvalidOperationException]::new($script:localizedData.New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository),
-                    'NSGRT0008', # cspell: disable-line
+                    'NSGRT0032', # cspell: disable-line
                     [System.Management.Automation.ErrorCategory]::InvalidOperation,
                     'tag'
                 )
