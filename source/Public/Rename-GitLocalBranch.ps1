@@ -115,7 +115,7 @@ function Rename-GitLocalBranch
 
         if ($LASTEXITCODE -eq 0) # cSpell: ignore LASTEXITCODE
         {
-            Write-Verbose -Message ($script:localizedData.Rename_GitLocalBranch_RenamedBranch -f $Name, $NewName)
+            Write-Information -MessageData ($script:localizedData.Rename_GitLocalBranch_RenamedBranch -f $Name, $NewName) -InformationAction 'Continue'
         }
         else
         {
