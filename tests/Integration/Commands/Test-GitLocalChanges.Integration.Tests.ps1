@@ -250,7 +250,14 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
         It 'Should handle non-git directories gracefully' {
             # This test verifies the command handles git errors properly
             # The actual behavior depends on how git responds to --porcelain in non-git directories
-            $null = Test-GitLocalChanges -ErrorAction Stop
+            $result = Test-GitLocalChanges -ErrorAction SilentlyContinue -ErrorVariable cmdError
+
+            # Should return $null when git fails
+            $result | Should -BeNullOrEmpty
+
+            # Should write an error with the expected message
+            $cmdError | Should -Not -BeNullOrEmpty
+            $cmdError[0].Exception.Message | Should -BeLike '*Failed to execute git status*'
         }
     }
 }
