@@ -225,7 +225,7 @@ Describe 'Update-GitLocalBranch' -Tag 'Integration' {
             $beforeCommit = & git rev-parse HEAD
 
             # Update the local branch
-            { Update-GitLocalBranch -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Update-GitLocalBranch -Force -ErrorAction Stop
 
             # Verify we're still on main branch
             $currentBranch = & git branch --show-current
@@ -236,7 +236,7 @@ Describe 'Update-GitLocalBranch' -Tag 'Integration' {
         }
 
         It 'Should successfully update specified branch' {
-            { Update-GitLocalBranch -BranchName 'develop' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Update-GitLocalBranch -BranchName 'develop' -Force -ErrorAction Stop
 
             # Verify we're on the develop branch
             $currentBranch = & git branch --show-current
@@ -250,7 +250,7 @@ Describe 'Update-GitLocalBranch' -Tag 'Integration' {
             # Switch to feature branch first
             & git checkout 'feature/test-branch' --quiet
 
-            { Update-GitLocalBranch -BranchName '.' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Update-GitLocalBranch -BranchName '.' -Force -ErrorAction Stop
 
             # Should still be on feature branch
             $currentBranch = & git branch --show-current
@@ -263,7 +263,7 @@ Describe 'Update-GitLocalBranch' -Tag 'Integration' {
             # Switch to feature branch
             & git checkout 'feature/test-branch' --quiet
 
-            { Update-GitLocalBranch -BranchName 'feature/test-branch' -Rebase -UseExistingTrackingBranch -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Update-GitLocalBranch -BranchName 'feature/test-branch' -Rebase -UseExistingTrackingBranch -Force -ErrorAction Stop
 
             # Verify we're still on feature branch
             $currentBranch = & git branch --show-current
