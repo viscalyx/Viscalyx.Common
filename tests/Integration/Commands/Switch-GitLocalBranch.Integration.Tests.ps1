@@ -120,7 +120,7 @@ Describe 'Switch-GitLocalBranch' -Tag 'Integration' {
             $currentBranch | Should -Be 'main'
 
             # Switch to feature branch
-            { Switch-GitLocalBranch -Name 'feature/test-branch' -Force } | Should -Not -Throw
+            $null = Switch-GitLocalBranch -Name 'feature/test-branch' -Force -ErrorAction Stop
 
             # Verify we switched branches
             $newBranch = & git branch --show-current
@@ -134,7 +134,7 @@ Describe 'Switch-GitLocalBranch' -Tag 'Integration' {
             $currentBranch | Should -Be 'feature/test-branch'
 
             # Switch back to main branch (we know it's main since we set it explicitly)
-            { Switch-GitLocalBranch -Name 'main' -Force } | Should -Not -Throw
+            $null = Switch-GitLocalBranch -Name 'main' -Force -ErrorAction Stop
 
             # Verify we switched branches
             $newBranch = & git branch --show-current
@@ -200,7 +200,7 @@ Describe 'Switch-GitLocalBranch' -Tag 'Integration' {
             $originalBranch = & git branch --show-current
 
             # Mock user declining the prompt by using -Confirm:$false with Force
-            Switch-GitLocalBranch -Name 'feature/test-branch' -Force
+            $null = Switch-GitLocalBranch -Name 'feature/test-branch' -Force -ErrorAction Stop
 
             # This should succeed as Force bypasses confirmation
             $currentBranch = & git branch --show-current
