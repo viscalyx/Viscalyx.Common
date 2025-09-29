@@ -9,6 +9,7 @@
 
     .PARAMETER RemoteName
         Specifies the name of the remote repository to query for branches.
+        If not provided, uses the default remote.
 
     .PARAMETER Name
         Specifies the name or pattern of the branch to retrieve. Supports wildcard patterns.
