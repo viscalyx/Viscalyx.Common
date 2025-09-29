@@ -222,10 +222,35 @@ Describe 'Get-GitLocalBranchName' {
             }
         }
 
-        It 'Should handle error gracefully when git fails' {
-            # Test in the git repo but with a command that should trigger an error handling path
-            # This test validates that the error handling mechanism works
-            { Get-GitLocalBranchName -Current -ErrorAction Stop } | Should -Not -Throw
+        It 'Should write error when git command fails' {
+            # Temporarily rename .git directory to induce git failure
+            $gitPath = Join-Path -Path $script:testRepoPath -ChildPath '.git'
+            $tempGitPath = Join-Path -Path $script:testRepoPath -ChildPath '.git.temp'
+
+            try {
+                Rename-Item -Path $gitPath -NewName '.git.temp' -ErrorAction Stop
+
+                # Execute and capture all errors (git stderr + PowerShell error)
+                $result = @(Get-GitLocalBranchName -Current 2>&1)
+
+                # Verify both errors were captured
+                $result | Should -HaveCount 2
+
+                # First error is from git (stderr)
+                $result[0] | Should -BeOfType [System.Management.Automation.ErrorRecord]
+                $result[0].Exception.Message | Should -Match 'not a git repository'
+
+                # Second error is from PowerShell Write-Error
+                $result[1] | Should -BeOfType [System.Management.Automation.ErrorRecord]
+                $result[1].Exception.Message | Should -Match 'Failed to get the name of the local branch'
+                $result[1].FullyQualifiedErrorId | Should -Be 'GGLBN0001,Get-GitLocalBranchName'
+            }
+            finally {
+                # Restore .git directory
+                if (Test-Path -Path $tempGitPath) {
+                    Rename-Item -Path $tempGitPath -NewName '.git' -ErrorAction SilentlyContinue
+                }
+            }
         }
     }
 
