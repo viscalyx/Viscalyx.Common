@@ -83,6 +83,7 @@ function ConvertTo-RelativePath
         $AbsolutePath,
 
         [Parameter(Position = 1)]
+        [ValidateNotNullOrEmpty()]
         [System.String]
         $CurrentLocation,
 
@@ -118,14 +119,24 @@ function ConvertTo-RelativePath
 
         if ($normalizedAbsolutePath.StartsWith($normalizedCurrentLocation, $stringComparison))
         {
-            # Remove CurrentLocation from the start of AbsolutePath
-            $strippedPath = $normalizedAbsolutePath.Substring($normalizedCurrentLocation.Length)
+            # Ensure this is a directory boundary match, not just a prefix match
+            $nextCharIndex = $normalizedCurrentLocation.Length
+            if ($nextCharIndex -eq $normalizedAbsolutePath.Length -or $normalizedAbsolutePath[$nextCharIndex] -eq $DirectorySeparator)
+            {
+                # Remove CurrentLocation from the start of AbsolutePath
+                $strippedPath = $normalizedAbsolutePath.Substring($normalizedCurrentLocation.Length)
 
-            # Remove leading separator if present
-            $strippedPath = $strippedPath.TrimStart($DirectorySeparator)
+                # Remove leading separator if present
+                $strippedPath = $strippedPath.TrimStart($DirectorySeparator)
 
-            # 3. Return stripped path with ./ prefix
-            return '.{0}{1}' -f $DirectorySeparator, $strippedPath
+                # 3. Return stripped path with ./ prefix
+                return '.{0}{1}' -f $DirectorySeparator, $strippedPath
+            }
+            else
+            {
+                # Not a directory boundary match - return normalized absolute path unchanged
+                return $normalizedAbsolutePath
+            }
         }
         else
         {

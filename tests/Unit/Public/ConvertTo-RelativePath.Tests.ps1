@@ -86,6 +86,13 @@ Describe 'ConvertTo-RelativePath' {
         $result | Should -Be ('{0}other{0}path{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
+    It 'Should not treat prefix-only matches as within current location' {
+        $abs = '/source/Viscalyx.Common/file.txt'
+        $cur = '/source/Viscalyx'
+        $result = ConvertTo-RelativePath -AbsolutePath $abs -CurrentLocation $cur
+        $result | Should -Be ('{0}source{0}Viscalyx.Common{0}file.txt' -f [System.IO.Path]::DirectorySeparatorChar)
+    }
+
     It 'Should work with pipeline input' {
         $result = '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' | ConvertTo-RelativePath -CurrentLocation '/source/Viscalyx.Common'
         $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
@@ -106,12 +113,6 @@ Describe 'ConvertTo-RelativePath' {
         $mixedAbsolute = '/source\Viscalyx.Common\source/Public/ConvertTo-RelativePath.ps1'
         $mixedCurrent = '\source/Viscalyx.Common'
         $result = ConvertTo-RelativePath -AbsolutePath $mixedAbsolute -CurrentLocation $mixedCurrent
-        $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
-    }
-
-    It 'Should handle empty CurrentLocation parameter correctly' {
-        Mock -CommandName Get-Location -MockWith { @{ Path = '/source/Viscalyx.Common' } }
-        $result = ConvertTo-RelativePath -AbsolutePath '/source/Viscalyx.Common/source/Public/ConvertTo-RelativePath.ps1' -CurrentLocation ''
         $result | Should -Be ('.{0}source{0}Public{0}ConvertTo-RelativePath.ps1' -f [System.IO.Path]::DirectorySeparatorChar)
     }
 
