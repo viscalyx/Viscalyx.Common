@@ -19,13 +19,23 @@
     .PARAMETER Arguments
         The arguments to pass to the Git executable.
 
+    .INPUTS
+        System.String[]
+
+        Arguments can be passed via the pipeline.
+
+    .OUTPUTS
+        System.Collections.Hashtable
+
+        Returns a hashtable when PassThru parameter is specified containing ExitCode, Output, and StandardError.
+
     .EXAMPLE
         Invoke-Git -WorkingDirectory 'C:\SomeDirectory' -Arguments @( 'clone', 'https://github.com/X-Guardian/xActiveDirectory.wiki.git', '--quiet' )
 
         Invokes the Git executable to clone the specified repository to the working directory.
 
     .EXAMPLE
-        Invoke-Git -WorkingDirectory 'C:\SomeDirectory' -Arguments @( 'status' ) -TimeOut 10000 -PassThru
+        Invoke-Git -WorkingDirectory 'C:\SomeDirectory' -Arguments @( 'status' ) -Timeout 10000 -PassThru
 
         Invokes the Git executable to return the status while having a 10000 millisecond timeout.
 
@@ -36,7 +46,7 @@
 
         The $result variable will contain a hashtable with the following keys:
             ExitCode
-            StandardOutput
+            Output
             StandardError
 
     .EXAMPLE
@@ -56,7 +66,7 @@ function Invoke-Git
 
         [Parameter()]
         [System.Int32]
-        $TimeOut = 120000,
+        $Timeout = 120000,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -102,7 +112,7 @@ function Invoke-Git
 
         if ($process.Start() -eq $true)
         {
-            if ($process.WaitForExit($TimeOut) -eq $true)
+            if ($process.WaitForExit($Timeout) -eq $true)
             {
                 $gitResult.ExitCode = $process.ExitCode
                 $gitResult.StandardError = $process.StandardError.ReadToEnd()
