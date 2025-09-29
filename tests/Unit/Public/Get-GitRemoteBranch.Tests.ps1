@@ -121,16 +121,14 @@ Describe 'Get-GitRemoteBranch' {
                 )
             }
 
-            InModuleScope -ScriptBlock {
-                $global:LASTEXITCODE = 0
-                $result = Get-GitRemoteBranch
-                $result | Should -Be @('refs/heads/main', 'refs/heads/feature/test')
-                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
-                    $args[0] -eq 'ls-remote' -and
-                    $args[1] -eq '--branches' -and
-                    $args[2] -eq '--quiet' -and
-                    $args.Count -eq 3
-                }
+            $global:LASTEXITCODE = 0
+            $result = Get-GitRemoteBranch
+            $result | Should -Be @('refs/heads/main', 'refs/heads/feature/test')
+            Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
+                $args[0] -eq 'ls-remote' -and
+                $args[1] -eq '--branches' -and
+                $args[2] -eq '--quiet' -and
+                $args.Count -eq 3
             }
         }
 
@@ -139,11 +137,9 @@ Describe 'Get-GitRemoteBranch' {
                 return @()
             }
 
-            InModuleScope -ScriptBlock {
-                $global:LASTEXITCODE = 0
-                $result = Get-GitRemoteBranch
-                $result | Should -BeNullOrEmpty
-            }
+            $global:LASTEXITCODE = 0
+            $result = Get-GitRemoteBranch
+            $result | Should -BeNullOrEmpty
         }
     }
 
@@ -152,7 +148,7 @@ Describe 'Get-GitRemoteBranch' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return 'origin'
             }
-            
+
             Mock -CommandName 'git' -MockWith {
                 return @(
                     "a1b2c3d4e5f6	refs/heads/main",
@@ -160,17 +156,15 @@ Describe 'Get-GitRemoteBranch' {
                 )
             }
 
-            InModuleScope -ScriptBlock {
-                $global:LASTEXITCODE = 0
-                $result = Get-GitRemoteBranch -RemoteName 'origin'
-                $result | Should -Be @('refs/heads/main', 'refs/heads/develop')
-                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
-                    $args[0] -eq 'ls-remote' -and
-                    $args[1] -eq '--branches' -and
-                    $args[2] -eq '--quiet' -and
-                    $args[3] -eq 'origin' -and
-                    $args.Count -eq 4
-                }
+            $global:LASTEXITCODE = 0
+            $result = Get-GitRemoteBranch -RemoteName 'origin'
+            $result | Should -Be @('refs/heads/main', 'refs/heads/develop')
+            Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
+                $args[0] -eq 'ls-remote' -and
+                $args[1] -eq '--branches' -and
+                $args[2] -eq '--quiet' -and
+                $args[3] -eq 'origin' -and
+                $args.Count -eq 4
             }
         }
     }
@@ -180,23 +174,21 @@ Describe 'Get-GitRemoteBranch' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return 'origin'
             }
-            
+
             Mock -CommandName 'git' -MockWith {
                 return @("a1b2c3d4e5f6	refs/heads/main")
             }
 
-            InModuleScope -ScriptBlock {
-                $global:LASTEXITCODE = 0
-                $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'main'
-                $result | Should -Be 'refs/heads/main'
-                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
-                    $args[0] -eq 'ls-remote' -and
-                    $args[1] -eq '--branches' -and
-                    $args[2] -eq '--quiet' -and
-                    $args[3] -eq 'origin' -and
-                    $args[4] -eq 'main' -and
-                    $args.Count -eq 5
-                }
+            $global:LASTEXITCODE = 0
+            $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'main'
+            $result | Should -Be 'refs/heads/main'
+            Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
+                $args[0] -eq 'ls-remote' -and
+                $args[1] -eq '--branches' -and
+                $args[2] -eq '--quiet' -and
+                $args[3] -eq 'origin' -and
+                $args[4] -eq 'main' -and
+                $args.Count -eq 5
             }
         }
 
@@ -204,7 +196,7 @@ Describe 'Get-GitRemoteBranch' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return 'origin'
             }
-            
+
             Mock -CommandName 'git' -MockWith {
                 return @(
                     "a1b2c3d4e5f6	refs/heads/feature/test1",
@@ -212,18 +204,16 @@ Describe 'Get-GitRemoteBranch' {
                 )
             }
 
-            InModuleScope -ScriptBlock {
-                $global:LASTEXITCODE = 0
-                $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*'
-                $result | Should -Be @('refs/heads/feature/test1', 'refs/heads/feature/test2')
-                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
-                    $args[0] -eq 'ls-remote' -and
-                    $args[1] -eq '--branches' -and
-                    $args[2] -eq '--quiet' -and
-                    $args[3] -eq 'origin' -and
-                    $args[4] -eq '*feature/*' -and
-                    $args.Count -eq 5
-                }
+            $global:LASTEXITCODE = 0
+            $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'feature/*'
+            $result | Should -Be @('refs/heads/feature/test1', 'refs/heads/feature/test2')
+            Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
+                $args[0] -eq 'ls-remote' -and
+                $args[1] -eq '--branches' -and
+                $args[2] -eq '--quiet' -and
+                $args[3] -eq 'origin' -and
+                $args[4] -eq '*feature/*' -and
+                $args.Count -eq 5
             }
         }
 
@@ -231,23 +221,21 @@ Describe 'Get-GitRemoteBranch' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return 'origin'
             }
-            
+
             Mock -CommandName 'git' -MockWith {
                 return @("a1b2c3d4e5f6	refs/heads/main")
             }
 
-            InModuleScope -ScriptBlock {
-                $global:LASTEXITCODE = 0
-                $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'refs/heads/main'
-                $result | Should -Be 'refs/heads/main'
-                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
-                    $args[0] -eq 'ls-remote' -and
-                    $args[1] -eq '--branches' -and
-                    $args[2] -eq '--quiet' -and
-                    $args[3] -eq 'origin' -and
-                    $args[4] -eq 'main' -and
-                    $args.Count -eq 5
-                }
+            $global:LASTEXITCODE = 0
+            $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'refs/heads/main'
+            $result | Should -Be 'refs/heads/main'
+            Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
+                $args[0] -eq 'ls-remote' -and
+                $args[1] -eq '--branches' -and
+                $args[2] -eq '--quiet' -and
+                $args[3] -eq 'origin' -and
+                $args[4] -eq 'main' -and
+                $args.Count -eq 5
             }
         }
 
@@ -255,7 +243,7 @@ Describe 'Get-GitRemoteBranch' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return 'origin'
             }
-            
+
             Mock -CommandName 'git' -MockWith {
                 return @(
                     "a1b2c3d4e5f6	refs/heads/main",
@@ -263,18 +251,16 @@ Describe 'Get-GitRemoteBranch' {
                 )
             }
 
-            InModuleScope -ScriptBlock {
-                $global:LASTEXITCODE = 0
-                $result = Get-GitRemoteBranch -RemoteName 'origin' -Name '*'
-                $result | Should -Be @('refs/heads/main', 'refs/heads/develop')
-                # Should not pass the asterisk to git - should behave same as no Name parameter
-                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
-                    $args[0] -eq 'ls-remote' -and
-                    $args[1] -eq '--branches' -and
-                    $args[2] -eq '--quiet' -and
-                    $args[3] -eq 'origin' -and
-                    $args.Count -eq 4  # No Name parameter should be passed
-                }
+            $global:LASTEXITCODE = 0
+            $result = Get-GitRemoteBranch -RemoteName 'origin' -Name '*'
+            $result | Should -Be @('refs/heads/main', 'refs/heads/develop')
+            # Should not pass the asterisk to git - should behave same as no Name parameter
+            Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
+                $args[0] -eq 'ls-remote' -and
+                $args[1] -eq '--branches' -and
+                $args[2] -eq '--quiet' -and
+                $args[3] -eq 'origin' -and
+                $args.Count -eq 4  # No Name parameter should be passed
             }
         }
     }
@@ -284,7 +270,7 @@ Describe 'Get-GitRemoteBranch' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return 'origin'
             }
-            
+
             Mock -CommandName 'git' -MockWith {
                 return @(
                     "a1b2c3d4e5f6	refs/heads/main",
@@ -292,27 +278,23 @@ Describe 'Get-GitRemoteBranch' {
                 )
             }
 
-            InModuleScope -ScriptBlock {
-                $global:LASTEXITCODE = 0
-                $result = Get-GitRemoteBranch -RemoteName 'origin' -RemoveRefsHeads
-                $result | Should -Be @('main', 'develop')
-            }
+            $global:LASTEXITCODE = 0
+            $result = Get-GitRemoteBranch -RemoteName 'origin' -RemoveRefsHeads
+            $result | Should -Be @('main', 'develop')
         }
 
         It 'Should work with Name parameter and RemoveRefsHeads' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return 'origin'
             }
-            
+
             Mock -CommandName 'git' -MockWith {
                 return @("a1b2c3d4e5f6	refs/heads/main")
             }
 
-            InModuleScope -ScriptBlock {
-                $global:LASTEXITCODE = 0
-                $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'main' -RemoveRefsHeads
-                $result | Should -Be 'main'
-            }
+            $global:LASTEXITCODE = 0
+            $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'main' -RemoveRefsHeads
+            $result | Should -Be 'main'
         }
     }
 
@@ -324,32 +306,28 @@ Describe 'Get-GitRemoteBranch' {
             }
             Mock -CommandName 'Write-Error' -MockWith { }
 
-            InModuleScope -ScriptBlock {
-                $result = Get-GitRemoteBranch -ErrorAction SilentlyContinue
-                $result | Should -BeNullOrEmpty
-                Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly
-            }
+            $result = Get-GitRemoteBranch -ErrorAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+            Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly
         }
 
         It 'Should write error with correct parameters when remote name fails' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return 'nonexistent'  # Remote exists but git command fails
             }
-            
+
             Mock -CommandName 'git' -MockWith {
                 $global:LASTEXITCODE = 1
                 return $null
             }
             Mock -CommandName 'Write-Error' -MockWith { }
 
-            InModuleScope -ScriptBlock {
-                Get-GitRemoteBranch -RemoteName 'nonexistent' -ErrorAction SilentlyContinue
-                Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly -ParameterFilter {
-                    $Message -match 'Failed to get the remote branches from remote.*nonexistent' -and
-                    $Category -eq 'ObjectNotFound' -and
-                    $ErrorId -eq 'GGRB0001' -and
-                    $TargetObject -eq 'RemoteName'
-                }
+            Get-GitRemoteBranch -RemoteName 'nonexistent' -ErrorAction SilentlyContinue
+            Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly -ParameterFilter {
+                $Message -match 'Failed to get the remote branches from remote.*nonexistent' -and
+                $Category -eq 'ObjectNotFound' -and
+                $ErrorId -eq 'GGRB0001' -and
+                $TargetObject -eq 'RemoteName'
             }
         }
 
@@ -357,21 +335,19 @@ Describe 'Get-GitRemoteBranch' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return 'origin'  # Remote exists but git command fails
             }
-            
+
             Mock -CommandName 'git' -MockWith {
                 $global:LASTEXITCODE = 1
                 return $null
             }
             Mock -CommandName 'Write-Error' -MockWith { }
 
-            InModuleScope -ScriptBlock {
-                Get-GitRemoteBranch -RemoteName 'origin' -Name 'nonexistent' -ErrorAction SilentlyContinue
-                Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly -ParameterFilter {
-                    $Message -match 'Failed to get the remote branch.*nonexistent.*using the remote.*origin' -and
-                    $Category -eq 'ObjectNotFound' -and
-                    $ErrorId -eq 'GGRB0001' -and
-                    $TargetObject -eq 'Name'
-                }
+            Get-GitRemoteBranch -RemoteName 'origin' -Name 'nonexistent' -ErrorAction SilentlyContinue
+            Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly -ParameterFilter {
+                $Message -match 'Failed to get the remote branch.*nonexistent.*using the remote.*origin' -and
+                $Category -eq 'ObjectNotFound' -and
+                $ErrorId -eq 'GGRB0001' -and
+                $TargetObject -eq 'Name'
             }
         }
 
@@ -382,14 +358,12 @@ Describe 'Get-GitRemoteBranch' {
             }
             Mock -CommandName 'Write-Error' -MockWith { }
 
-            InModuleScope -ScriptBlock {
-                Get-GitRemoteBranch -ErrorAction SilentlyContinue
-                Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly -ParameterFilter {
-                    $Message -match 'Failed to get the remote branches' -and
-                    $Category -eq 'ObjectNotFound' -and
-                    $ErrorId -eq 'GGRB0001' -and
-                    $TargetObject -eq $null
-                }
+            Get-GitRemoteBranch -ErrorAction SilentlyContinue
+            Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly -ParameterFilter {
+                $Message -match 'Failed to get the remote branches' -and
+                $Category -eq 'ObjectNotFound' -and
+                $ErrorId -eq 'GGRB0001' -and
+                $TargetObject -eq $null
             }
         }
     }
@@ -401,21 +375,19 @@ Describe 'Get-GitRemoteBranch' {
             }
             Mock -CommandName 'Write-Error' -MockWith { }
 
-            InModuleScope -ScriptBlock {
-                $result = Get-GitRemoteBranch -RemoteName 'nonexistent' -ErrorAction SilentlyContinue
-                $result | Should -BeNullOrEmpty
-                Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly -ParameterFilter {
-                    $Name -eq 'nonexistent'
-                }
-                Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly -ParameterFilter {
-                    $Message -match 'The remote.*nonexistent.*does not exist in the local git repository' -and
-                    $Category -eq 'ObjectNotFound' -and
-                    $ErrorId -eq 'GGRB0002' -and
-                    $TargetObject -eq 'nonexistent'
-                }
+            $result = Get-GitRemoteBranch -RemoteName 'nonexistent' -ErrorAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+            Should -Invoke -CommandName 'Get-GitRemote' -Times 1 -Exactly -ParameterFilter {
+                $Name -eq 'nonexistent'
+            }
+            Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly -ParameterFilter {
+                $Message -match 'The remote.*nonexistent.*does not exist in the local git repository' -and
+                $Category -eq 'ObjectNotFound' -and
+                $ErrorId -eq 'GGRB0002' -and
+                $TargetObject -eq 'nonexistent'
             }
         }
-        
+
         It 'Should not call git ls-remote when remote does not exist' {
             Mock -CommandName 'Get-GitRemote' -MockWith {
                 return $null
@@ -425,10 +397,8 @@ Describe 'Get-GitRemoteBranch' {
             }
             Mock -CommandName 'Write-Error' -MockWith { }
 
-            InModuleScope -ScriptBlock {
-                Get-GitRemoteBranch -RemoteName 'nonexistent' -ErrorAction SilentlyContinue
-                Should -Invoke -CommandName 'git' -Times 0 -Exactly
-            }
+            Get-GitRemoteBranch -RemoteName 'nonexistent' -ErrorAction SilentlyContinue
+            Should -Invoke -CommandName 'git' -Times 0 -Exactly
         }
     }
 }
