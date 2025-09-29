@@ -33,7 +33,7 @@ ConvertFrom-StringData @'
     Assert_GitRemote_RemoteMissing = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (AGR0001)
 
     ## Get-GitLocalBranchName
-    Get_GitLocalBranchName_Failed = Failed to get the name of the local branch. Make sure git repository is accessible.
+    Get_GitLocalBranchName_Failed = Failed to get the name of the local branch. Make sure git repository is accessible. (GGLBN0001)
 
     ## Get-GitBranchCommit
     Get_GitBranchCommit_FailedFromBranch = Failed to retrieve commits. Make sure the branch '{0}' exists and is accessible. (GGBC0001)
@@ -41,7 +41,7 @@ ConvertFrom-StringData @'
     Get_GitBranchCommit_FailedFromRange = Failed to retrieve commits from range '{0}..{1}'. Make sure both references exist and are accessible. (GGBC0003)
 
     ## Get-GitRemote
-    Get_GitRemote_Failed = Failed to get the remote '{0}'. Make sure the remote exists and is accessible.
+    Get_GitRemote_Failed = Failed to get the remote '{0}'. Make sure the remote exists and is accessible. (GGR0001)
 
     ## Get-GitRemoteBranch
     Get_GitRemoteBranch_Failed = Failed to get the remote branches. Make sure the remote branch exists and is accessible.
@@ -50,21 +50,21 @@ ConvertFrom-StringData @'
     Get_GitRemoteBranch_RemoteNotFound = The remote '{0}' does not exist in the local git repository. Please add the remote before proceeding. (GGRB0002)
 
     ## Get-GitTag
-    Get_GitTag_FailedToGetTag = Failed to get the tag '{0}'. Make sure the tags exist and is accessible.
+    Get_GitTag_FailedToGetTag = Failed to get the tag '{0}'. Make sure the tag exists and is accessible. (GGT0001)
 
     ## Rename-GitLocalBranch
     Rename_GitLocalBranch_FailedToRename = Failed to rename branch '{0}' to '{1}'. Make sure the local repository is accessible.
     Rename_GitLocalBranch_FailedFetch = Failed to fetch from remote '{0}'. Make sure the remote exists and is accessible.
     Rename_GitLocalBranch_FailedSetUpstreamTracking = Failed to set upstream tracking for branch '{0}' against remote '{1}'. Make sure the local repository is accessible.
     Rename_GitLocalBranch_FailedSetDefaultBranchForRemote = Failed to set '{0}' as the default branch for remote '{1}'. Make sure the local repository is accessible.
-    Rename_GitLocalBranch_RenamedBranch = Successfully renamed branch '{0}' to '{1}'.
-    Rename_GitLocalBranch_Rename_ShouldProcessDescription = Renaming Git branch '{0}' to '{1}'.
-    Rename_GitLocalBranch_Rename_ShouldProcessConfirmation = Are you sure you want to rename Git branch '{0}' to '{1}'?
-    Rename_GitLocalBranch_Rename_ShouldProcessCaption = Rename Git branch
+    Rename_GitLocalBranch_RenamedBranch = Successfully renamed branch '{0}' to '{1}'. (RGLB0001)
+    Rename_GitLocalBranch_Rename_ShouldProcessDescription = Renaming Git branch '{0}' to '{1}'. (RGLB0002)
+    Rename_GitLocalBranch_Rename_ShouldProcessConfirmation = Are you sure you want to rename Git branch '{0}' to '{1}'? (RGLB0003)
+    Rename_GitLocalBranch_Rename_ShouldProcessCaption = Rename Git branch (RGLB0004)
 
     ## Rename-GitRemote
-    Rename_GitRemote_FailedToRename = Failed to rename remote '{0}' to '{1}'. Make sure the remote exists and the local repository is accessible.
-    Rename_GitRemote_RenamedRemote = Successfully renamed remote '{0}' to '{1}'.
+    Rename_GitRemote_FailedToRename = Failed to rename remote '{0}' to '{1}'. Make sure the remote exists and the local repository is accessible. (RGR0001)
+    Rename_GitRemote_RenamedRemote = Successfully renamed remote '{0}' to '{1}'. (RGR0002)
     Rename_GitRemote_Action_ShouldProcessDescription = Renaming Git remote '{0}' to '{1}'.
     Rename_GitRemote_Action_ShouldProcessConfirmation = Are you sure you want to rename Git remote '{0}' to '{1}'?
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
