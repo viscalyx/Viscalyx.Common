@@ -115,7 +115,7 @@ BeforeAll {
         $tags = $result.Output
         if ($tags)
         {
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + ($tags -split("`n"))) -Verbose
+            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + ($tags -split ("`n"))) -Verbose
         }
     }
     finally
@@ -202,7 +202,7 @@ Describe 'Request-GitTag' {
             $existingTags = $result.Output
             if ($existingTags)
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + $existingTags -split("`n"))
+                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + $existingTags -split ("`n"))
             }
 
             # Verify tags don't exist locally
@@ -238,7 +238,7 @@ Describe 'Request-GitTag' {
             $existingTags = $result.Output
             if ($existingTags)
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + ($existingTags -split("`n"))) -Verbose
+                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + ($existingTags -split ("`n"))) -Verbose
             }
         }
 

@@ -47,7 +47,7 @@ Describe 'Assert-GitLocalChange' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[<CommonParameters>]'
+                ExpectedParameters       = '[<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Assert-GitLocalChange').ParameterSets |
@@ -96,28 +96,34 @@ Describe 'Assert-GitLocalChange' {
         }
 
         It 'Should throw a terminating error with the correct error ID' {
-            try {
+            try
+            {
                 Assert-GitLocalChange
             }
-            catch {
+            catch
+            {
                 $_.FullyQualifiedErrorId | Should -Be 'AGLC0001,Assert-GitLocalChange'
             }
         }
 
         It 'Should throw a terminating error with the correct error category' {
-            try {
+            try
+            {
                 Assert-GitLocalChange
             }
-            catch {
+            catch
+            {
                 $_.CategoryInfo.Category | Should -Be 'InvalidResult'
             }
         }
 
         It 'Should call Test-GitLocalChanges once' {
-            try {
+            try
+            {
                 Assert-GitLocalChange
             }
-            catch {
+            catch
+            {
                 # Expected to throw, ignore the error
             }
 

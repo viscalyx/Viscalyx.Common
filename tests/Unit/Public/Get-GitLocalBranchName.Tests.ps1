@@ -26,7 +26,7 @@ BeforeDiscovery {
     $script:parameterSetTestCases = @(
         @{
             ExpectedParameterSetName = '__AllParameterSets'
-            ExpectedParameters = '[[-Name] <string>] [-Current] [<CommonParameters>]'
+            ExpectedParameters       = '[[-Name] <string>] [-Current] [<CommonParameters>]'
         }
     )
 }
@@ -83,7 +83,7 @@ Describe 'Get-GitLocalBranchName' {
 
         It 'Should have correct parameter types' {
             $command = Get-Command -Name 'Get-GitLocalBranchName'
-            
+
             $command.Parameters['Name'].ParameterType | Should -Be ([System.String])
             $command.Parameters['Current'].ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
         }
@@ -102,15 +102,15 @@ Describe 'Get-GitLocalBranchName' {
             Mock -CommandName 'git' -MockWith {
                 return 'main'
             }
-            
+
             $global:LASTEXITCODE = 0
-            
+
             $result = Get-GitLocalBranchName -Current
 
-            Should -Invoke -CommandName 'git' -ParameterFilter { 
+            Should -Invoke -CommandName 'git' -ParameterFilter {
                 $args -contains 'rev-parse' -and $args -contains '--abbrev-ref' -and $args -contains 'HEAD'
             } -Times 1 -Exactly
-            
+
             $result | Should -Be 'main'
         }
 
@@ -118,9 +118,9 @@ Describe 'Get-GitLocalBranchName' {
             Mock -CommandName 'git' -MockWith {
                 return 'feature/new-feature'
             }
-            
+
             $global:LASTEXITCODE = 0
-            
+
             $result = Get-GitLocalBranchName -Current
 
             $result | Should -Be 'feature/new-feature'
@@ -133,15 +133,15 @@ Describe 'Get-GitLocalBranchName' {
                 Mock -CommandName 'git' -MockWith {
                     return 'main'
                 }
-                
+
                 $global:LASTEXITCODE = 0
-                
+
                 $result = Get-GitLocalBranchName -Name 'main'
 
-                Should -Invoke -CommandName 'git' -ParameterFilter { 
+                Should -Invoke -CommandName 'git' -ParameterFilter {
                     $args -contains 'branch' -and $args -contains '--format=%(refname:short)' -and $args -contains '--list' -and $args -contains 'main'
                 } -Times 1 -Exactly
-                
+
                 $result | Should -Be 'main'
             }
         }
@@ -151,15 +151,15 @@ Describe 'Get-GitLocalBranchName' {
                 Mock -CommandName 'git' -MockWith {
                     return @('feature/branch1', 'feature/branch2')
                 }
-                
+
                 $global:LASTEXITCODE = 0
-                
+
                 $result = Get-GitLocalBranchName -Name 'feature/*'
 
-                Should -Invoke -CommandName 'git' -ParameterFilter { 
+                Should -Invoke -CommandName 'git' -ParameterFilter {
                     $args -contains 'branch' -and $args -contains '--format=%(refname:short)' -and $args -contains '--list' -and $args -contains 'feature/*'
                 } -Times 1 -Exactly
-                
+
                 $result | Should -Be @('feature/branch1', 'feature/branch2')
             }
         }
@@ -171,15 +171,15 @@ Describe 'Get-GitLocalBranchName' {
                 Mock -CommandName 'git' -MockWith {
                     return @('main', 'develop', 'feature/test')
                 }
-                
+
                 $global:LASTEXITCODE = 0
-                
+
                 $result = Get-GitLocalBranchName
 
-                Should -Invoke -CommandName 'git' -ParameterFilter { 
+                Should -Invoke -CommandName 'git' -ParameterFilter {
                     $args -contains 'branch' -and $args -contains '--format=%(refname:short)' -and $args -contains '--list' -and $args.Count -eq 3
                 } -Times 1 -Exactly
-                
+
                 $result | Should -Be @('main', 'develop', 'feature/test')
             }
         }
@@ -191,14 +191,14 @@ Describe 'Get-GitLocalBranchName' {
                 Mock -CommandName 'git' -MockWith {
                     return $null
                 }
-                
-                Mock -CommandName 'Write-Error' -MockWith { 
-                    Write-Output "Mocked error"
+
+                Mock -CommandName 'Write-Error' -MockWith {
+                    Write-Output 'Mocked error'
                 }
-                
+
                 # Simulate LASTEXITCODE failure
                 $global:LASTEXITCODE = 128
-                
+
                 $result = Get-GitLocalBranchName -Current -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 
                 Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly
@@ -210,14 +210,14 @@ Describe 'Get-GitLocalBranchName' {
                 Mock -CommandName 'git' -MockWith {
                     return $null
                 }
-                
-                Mock -CommandName 'Write-Error' -MockWith { 
-                    Write-Output "Mocked error"
+
+                Mock -CommandName 'Write-Error' -MockWith {
+                    Write-Output 'Mocked error'
                 }
-                
+
                 # Simulate LASTEXITCODE failure
                 $global:LASTEXITCODE = 128
-                
+
                 $result = Get-GitLocalBranchName -Name 'nonexistent' -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 
                 Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly
@@ -229,19 +229,19 @@ Describe 'Get-GitLocalBranchName' {
                 Mock -CommandName 'git' -MockWith {
                     return $null
                 }
-                
-                Mock -CommandName 'Write-Error' -MockWith { 
+
+                Mock -CommandName 'Write-Error' -MockWith {
                     param($Message, $Category, $ErrorId, $TargetObject)
-                    
+
                     $Message | Should -Be $script:localizedData.Get_GitLocalBranchName_Failed
                     $Category | Should -Be 'ObjectNotFound'
                     $ErrorId | Should -Be 'GGLBN0001'
                     $TargetObject | Should -Be $null
                 }
-                
+
                 # Simulate LASTEXITCODE failure
                 $global:LASTEXITCODE = 128
-                
+
                 Get-GitLocalBranchName -Current -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
 
                 Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly
@@ -253,7 +253,7 @@ Describe 'Get-GitLocalBranchName' {
         It 'Should have correct output type attribute' {
             $command = Get-Command -Name 'Get-GitLocalBranchName'
             $outputType = $command.OutputType
-            
+
             $outputType.Type | Should -Contain ([System.String])
         }
     }

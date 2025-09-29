@@ -64,7 +64,7 @@ function Get-NumericalSequence
 
             $ranges += [PSCustomObject] @{
                 Start = $start
-                End = $end
+                End   = $end
             }
 
             $start = $Number
@@ -83,7 +83,7 @@ function Get-NumericalSequence
 
             $ranges += [PSCustomObject] @{
                 Start = $start
-                End = $end
+                End   = $end
             }
         }
 

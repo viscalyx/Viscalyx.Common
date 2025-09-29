@@ -34,39 +34,40 @@ BeforeAll {
 
     # Initialize the test repository and create test commits
     Push-Location -Path $script:testRepoPath
-    try {
+    try
+    {
         # Initialize git repository
         git init --initial-branch=main --quiet 2>$null
-        git config user.email "test@example.com" 2>$null
-        git config user.name "Test User" 2>$null
+        git config user.email 'test@example.com' 2>$null
+        git config user.name 'Test User' 2>$null
 
         # Create initial commit
-        "Initial content" | Out-File -FilePath 'test1.txt' -Encoding utf8
+        'Initial content' | Out-File -FilePath 'test1.txt' -Encoding utf8
         git add test1.txt 2>$null
-        git commit -m "Initial commit" 2>$null
+        git commit -m 'Initial commit' 2>$null
 
         # Create more commits for testing
-        "Second content" | Out-File -FilePath 'test2.txt' -Encoding utf8
+        'Second content' | Out-File -FilePath 'test2.txt' -Encoding utf8
         git add test2.txt 2>$null
-        git commit -m "Second commit" 2>$null
+        git commit -m 'Second commit' 2>$null
 
-        "Third content" | Out-File -FilePath 'test3.txt' -Encoding utf8
+        'Third content' | Out-File -FilePath 'test3.txt' -Encoding utf8
         git add test3.txt 2>$null
-        git commit -m "Third commit" 2>$null
+        git commit -m 'Third commit' 2>$null
 
-        "Fourth content" | Out-File -FilePath 'test4.txt' -Encoding utf8
+        'Fourth content' | Out-File -FilePath 'test4.txt' -Encoding utf8
         git add test4.txt 2>$null
-        git commit -m "Fourth commit" 2>$null
+        git commit -m 'Fourth commit' 2>$null
 
-        "Fifth content" | Out-File -FilePath 'test5.txt' -Encoding utf8
+        'Fifth content' | Out-File -FilePath 'test5.txt' -Encoding utf8
         git add test5.txt 2>$null
-        git commit -m "Fifth commit" 2>$null
+        git commit -m 'Fifth commit' 2>$null
 
         # Create a feature branch for testing
         git checkout -b feature/test --quiet 2>$null
-        "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
+        'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt 2>$null
-        git commit -m "Feature commit" 2>$null
+        git commit -m 'Feature commit' 2>$null
 
         # Switch back to main branch
         git checkout main --quiet 2>$null
@@ -74,14 +75,16 @@ BeforeAll {
         # Store the current branch name for tests
         $script:currentBranch = git rev-parse --abbrev-ref HEAD
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 }
 
 AfterAll {
     # Clean up - remove the test repository
-    if (Test-Path -Path $script:testRepoPath) {
+    if (Test-Path -Path $script:testRepoPath)
+    {
         $previousProgressPreference = $ProgressPreference
         $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -114,13 +117,15 @@ Describe 'Get-GitBranchCommit' {
 
             # Get the timestamps of the commits to verify order
             $timestamps = @()
-            foreach ($commit in $result) {
+            foreach ($commit in $result)
+            {
                 $timestamp = git log -1 --format="%ct" $commit
                 $timestamps += [int]$timestamp
             }
 
             # Verify timestamps are in descending order (newest first)
-            for ($i = 0; $i -lt ($timestamps.Count - 1); $i++) {
+            for ($i = 0; $i -lt ($timestamps.Count - 1); $i++)
+            {
                 $timestamps[$i] | Should -BeGreaterOrEqual $timestamps[$i + 1]
             }
         }
@@ -170,9 +175,12 @@ Describe 'Get-GitBranchCommit' {
             $result | Should -Not -BeNullOrEmpty
 
             # If result is an array, take the first element for comparison
-            if ($result -is [Array]) {
+            if ($result -is [Array])
+            {
                 $actualCommit = $result[0]
-            } else {
+            }
+            else
+            {
                 $actualCommit = $result
             }
 
@@ -228,13 +236,15 @@ Describe 'Get-GitBranchCommit' {
 
             # Verify these are the oldest commits by checking their timestamps
             $timestamps = @()
-            foreach ($commit in $result) {
+            foreach ($commit in $result)
+            {
                 $timestamp = git log -1 --format="%ct" $commit
                 $timestamps += [int]$timestamp
             }
 
             # Verify timestamps are in ascending order (oldest first)
-            for ($i = 0; $i -lt ($timestamps.Count - 1); $i++) {
+            for ($i = 0; $i -lt ($timestamps.Count - 1); $i++)
+            {
                 $timestamps[$i] | Should -BeLessOrEqual $timestamps[$i + 1]
             }
         }
@@ -248,12 +258,14 @@ Describe 'Get-GitBranchCommit' {
 
             # Verify order (oldest first for First parameter)
             $timestamps = @()
-            foreach ($commit in $result) {
+            foreach ($commit in $result)
+            {
                 $timestamp = git log -1 --format="%ct" $commit
                 $timestamps += [int]$timestamp
             }
 
-            for ($i = 0; $i -lt ($timestamps.Count - 1); $i++) {
+            for ($i = 0; $i -lt ($timestamps.Count - 1); $i++)
+            {
                 $timestamps[$i] | Should -BeLessOrEqual $timestamps[$i + 1]
             }
         }
@@ -279,16 +291,18 @@ Describe 'Get-GitBranchCommit' {
             New-Item -Path $emptyRepoPath -ItemType Directory -Force | Out-Null
 
             Push-Location -Path $emptyRepoPath
-            try {
+            try
+            {
                 git init --initial-branch=main --quiet 2>$null
-                git config user.email "test@example.com" 2>$null
-                git config user.name "Test User" 2>$null
+                git config user.email 'test@example.com' 2>$null
+                git config user.name 'Test User' 2>$null
 
                 # Should throw error from Get-GitLocalBranchName for empty repository
                 { Get-GitBranchCommit -ErrorAction Stop } |
                     Should -Throw -ErrorId 'GGLBN0001,Get-GitLocalBranchName'
             }
-            finally {
+            finally
+            {
                 Pop-Location
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
@@ -304,12 +318,14 @@ Describe 'Get-GitBranchCommit' {
             New-Item -Path $nonGitPath -ItemType Directory -Force | Out-Null
 
             Push-Location -Path $nonGitPath
-            try {
+            try
+            {
                 # Should throw error from Get-GitLocalBranchName for non-git directory
                 { Get-GitBranchCommit -ErrorAction Stop } |
                     Should -Throw -ErrorId 'GGLBN0001,Get-GitLocalBranchName'
             }
-            finally {
+            finally
+            {
                 Pop-Location
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
@@ -355,7 +371,8 @@ Describe 'Get-GitBranchCommit' {
             # Get some commits to work with
             $allCommits = Get-GitBranchCommit -ErrorAction Stop
 
-            if ($allCommits.Count -ge 3) {
+            if ($allCommits.Count -ge 3)
+            {
                 $fromCommit = $allCommits[2]  # Third commit (older)
                 $toCommit = $allCommits[0]    # First commit (newer)
 
@@ -375,19 +392,24 @@ Describe 'Get-GitBranchCommit' {
             # Create a feature branch to test with
             git checkout -b 'test-range-branch' --quiet 2>$null
 
-            try {
+            try
+            {
                 # Make a commit on the feature branch
-                "Test range content" | Out-File -FilePath 'test-range-file.txt' -Encoding UTF8
+                'Test range content' | Out-File -FilePath 'test-range-file.txt' -Encoding UTF8
                 git add . 2>$null
-                git commit -m "Test range commit" 2>$null
+                git commit -m 'Test range commit' 2>$null
 
                 # Switch back to current branch and get range
                 $currentGitBranch = git rev-parse --abbrev-ref HEAD 2>$null
-                if ($currentGitBranch -ne $script:currentBranch) {
-                    if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                if ($currentGitBranch -ne $script:currentBranch)
+                {
+                    if ($PSVersionTable.PSEdition -eq 'Desktop')
+                    {
                         # Windows PowerShell - use cmd.exe for reliable output suppression
                         & cmd.exe /c "git checkout $script:currentBranch >nul 2>&1"
-                    } else {
+                    }
+                    else
+                    {
                         # PowerShell 7+ - use direct redirection
                         git checkout $script:currentBranch *>$null
                     }
@@ -403,14 +425,19 @@ Describe 'Get-GitBranchCommit' {
                     $_ | Should -Match '^[a-f0-9]{40}$'
                 }
             }
-            finally {
+            finally
+            {
                 # Clean up
                 $currentGitBranch = git rev-parse --abbrev-ref HEAD 2>$null
-                if ($currentGitBranch -ne $script:currentBranch) {
-                    if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                if ($currentGitBranch -ne $script:currentBranch)
+                {
+                    if ($PSVersionTable.PSEdition -eq 'Desktop')
+                    {
                         # Windows PowerShell - use cmd.exe for reliable output suppression
                         & cmd.exe /c "git checkout $script:currentBranch >nul 2>&1"
-                    } else {
+                    }
+                    else
+                    {
                         # PowerShell 7+ - use direct redirection
                         git checkout $script:currentBranch *>$null
                     }
@@ -439,7 +466,8 @@ Describe 'Get-GitBranchCommit' {
             # Get some commits to work with
             $allCommits = Get-GitBranchCommit -ErrorAction Stop
 
-            if ($allCommits.Count -ge 2) {
+            if ($allCommits.Count -ge 2)
+            {
                 $olderCommit = $allCommits[1]   # Second commit (older)
                 $newerCommit = $allCommits[0]   # First commit (newer)
 

@@ -54,8 +54,8 @@ Describe 'New-GitTag' {
             $result = (Get-Command -Name 'New-GitTag').ParameterSets |
                 Where-Object { $_.Name -eq $ExpectedParameterSetName } |
                 Select-Object `
-                    @{ Name = 'ParameterSetName';       Expression = { $_.Name } }, `
-                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                @{ Name = 'ParameterSetName'; Expression = { $_.Name } }, `
+                @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
 
             $result.ParameterSetName       | Should -Be $ExpectedParameterSetName
             $result.ParameterListAsString  | Should -Be $ExpectedParameters

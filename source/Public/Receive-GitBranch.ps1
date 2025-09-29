@@ -151,9 +151,9 @@ function Receive-GitBranch
             if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
             {
                 $errorMessageParameters = @{
-                    Message = $script:localizedData.Receive_GitBranch_FailedCheckout -f $BranchName
-                    Category = 'InvalidOperation'
-                    ErrorId = 'RGB0001' # cspell: disable-line
+                    Message      = $script:localizedData.Receive_GitBranch_FailedCheckout -f $BranchName
+                    Category     = 'InvalidOperation'
+                    ErrorId      = 'RGB0001' # cspell: disable-line
                     TargetObject = $BranchName
                 }
 
@@ -172,9 +172,9 @@ function Receive-GitBranch
             if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
             {
                 $errorMessageParameters = @{
-                    Message = $script:localizedData.Receive_GitBranch_FailedFetch -f $RemoteName, $UpstreamBranchName
-                    Category = 'InvalidOperation'
-                    ErrorId = 'RGB0002' # cspell: disable-line
+                    Message      = $script:localizedData.Receive_GitBranch_FailedFetch -f $RemoteName, $UpstreamBranchName
+                    Category     = 'InvalidOperation'
+                    ErrorId      = 'RGB0002' # cspell: disable-line
                     TargetObject = $UpstreamBranchName
                 }
 
@@ -190,9 +190,9 @@ function Receive-GitBranch
             if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
             {
                 $errorMessageParameters = @{
-                    Message = $script:localizedData.Receive_GitBranch_FailedRebase -f $RemoteName, $UpstreamBranchName
-                    Category = 'InvalidOperation'
-                    ErrorId = 'RGB0003' # cspell: disable-line
+                    Message      = $script:localizedData.Receive_GitBranch_FailedRebase -f $RemoteName, $UpstreamBranchName
+                    Category     = 'InvalidOperation'
+                    ErrorId      = 'RGB0003' # cspell: disable-line
                     TargetObject = $UpstreamBranchName
                 }
 
@@ -210,9 +210,9 @@ function Receive-GitBranch
             if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
             {
                 $errorMessageParameters = @{
-                    Message = $script:localizedData.Receive_GitBranch_FailedPull
-                    Category = 'InvalidOperation'
-                    ErrorId = 'RGB0004' # cspell: disable-line
+                    Message      = $script:localizedData.Receive_GitBranch_FailedPull
+                    Category     = 'InvalidOperation'
+                    ErrorId      = 'RGB0004' # cspell: disable-line
                     TargetObject = $null
                 }
 

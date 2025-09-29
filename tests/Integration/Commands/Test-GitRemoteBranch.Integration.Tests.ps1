@@ -50,13 +50,13 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
 
             # Initialize git repository with the specified default branch
             $null = git init --initial-branch $script:defaultBranch --quiet 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
-            "Initial content" | Out-File -FilePath "README.md" -Encoding utf8
+            'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add . 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Create a bare repository to act as our "remote"
             $script:bareRepoPath = Join-Path -Path $TestDrive -ChildPath "BareRepo_$([guid]::NewGuid().Guid)"
@@ -67,24 +67,28 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
 
             # Push initial branch to create remote branch - capture output for debugging
             $pushOutput = git push origin $script:defaultBranch --quiet 2>&1
-            if ($LASTEXITCODE -ne 0) {
+            if ($LASTEXITCODE -ne 0)
+            {
                 Write-Warning "Push failed with exit code $LASTEXITCODE. Output: $pushOutput"
             }
         }
 
         AfterEach {
             # Return to original location
-            if ($script:originalLocation) {
+            if ($script:originalLocation)
+            {
                 Set-Location -Path $script:originalLocation
             }
 
             # Clean up test directories
             $previousProgressPreference = $ProgressPreference
             $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
-            if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath)) {
+            if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath))
+            {
                 Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
             }
-            if ($script:bareRepoPath -and (Test-Path -Path $script:bareRepoPath)) {
+            if ($script:bareRepoPath -and (Test-Path -Path $script:bareRepoPath))
+            {
                 Remove-Item -Path $script:bareRepoPath -Recurse -Force -ErrorAction SilentlyContinue
             }
             $ProgressPreference = $previousProgressPreference
@@ -113,15 +117,15 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
             BeforeEach {
                 # Create additional branches and push them
                 $null = git checkout -b develop --quiet 2>&1
-                "Develop content" | Out-File -FilePath "develop.md" -Encoding utf8
+                'Develop content' | Out-File -FilePath 'develop.md' -Encoding utf8
                 $null = git add . 2>&1
-                $null = git commit -m "Develop commit" --quiet 2>&1
+                $null = git commit -m 'Develop commit' --quiet 2>&1
                 $null = git push origin develop --quiet 2>&1
 
                 $null = git checkout -b feature/test --quiet 2>&1
-                "Feature content" | Out-File -FilePath "feature.md" -Encoding utf8
+                'Feature content' | Out-File -FilePath 'feature.md' -Encoding utf8
                 $null = git add . 2>&1
-                $null = git commit -m "Feature commit" --quiet 2>&1
+                $null = git commit -m 'Feature commit' --quiet 2>&1
                 $null = git push origin feature/test --quiet 2>&1
 
                 # Return to default branch
@@ -150,22 +154,22 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
         Context 'When testing edge cases' {
             It 'Should handle branch names with special characters' {
                 # Create branch with special characters
-                $null = git checkout -b "feature/test-branch_v1.0" --quiet 2>&1
-                "Special content" | Out-File -FilePath "special.md" -Encoding utf8
+                $null = git checkout -b 'feature/test-branch_v1.0' --quiet 2>&1
+                'Special content' | Out-File -FilePath 'special.md' -Encoding utf8
                 $null = git add . 2>&1
-                $null = git commit -m "Special commit" --quiet 2>&1
-                $null = git push origin "feature/test-branch_v1.0" --quiet 2>&1
+                $null = git commit -m 'Special commit' --quiet 2>&1
+                $null = git push origin 'feature/test-branch_v1.0' --quiet 2>&1
 
                 Test-GitRemoteBranch -RemoteName 'origin' -Name 'feature/test-branch_v1.0' -ErrorAction 'Stop' | Should -BeTrue
             }
 
             It 'Should handle branch names with case sensitivity' {
                 # Create branch with specific case
-                $null = git checkout -b "FeatureBranch" --quiet 2>&1
-                "Feature content" | Out-File -FilePath "feature.md" -Encoding utf8
+                $null = git checkout -b 'FeatureBranch' --quiet 2>&1
+                'Feature content' | Out-File -FilePath 'feature.md' -Encoding utf8
                 $null = git add . 2>&1
-                $null = git commit -m "Feature commit" --quiet 2>&1
-                $null = git push origin "FeatureBranch" --quiet 2>&1
+                $null = git commit -m 'Feature commit' --quiet 2>&1
+                $null = git push origin 'FeatureBranch' --quiet 2>&1
 
                 Test-GitRemoteBranch -RemoteName 'origin' -Name 'FeatureBranch' -ErrorAction 'Stop' | Should -BeTrue
                 Test-GitRemoteBranch -RemoteName 'origin' -Name 'featurebranch' -ErrorAction 'Stop' 2>$null | Should -BeFalse
@@ -190,25 +194,27 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
 
             # Initialize git repository with the specified default branch (no remotes)
             $null = git init --initial-branch $script:defaultBranch --quiet 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit
-            "Initial content" | Out-File -FilePath "README.md" -Encoding utf8
+            'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add . 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
         }
 
         AfterEach {
             # Return to original location
-            if ($script:originalLocation) {
+            if ($script:originalLocation)
+            {
                 Set-Location -Path $script:originalLocation
             }
 
             # Clean up test directory
             $previousProgressPreference = $ProgressPreference
             $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
-            if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath)) {
+            if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath))
+            {
                 Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
             }
             $ProgressPreference = $previousProgressPreference
@@ -242,14 +248,16 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
 
         AfterEach {
             # Return to original location
-            if ($script:originalLocation) {
+            if ($script:originalLocation)
+            {
                 Set-Location -Path $script:originalLocation
             }
 
             # Clean up test directory
             $previousProgressPreference = $ProgressPreference
             $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
-            if ($script:nonGitPath -and (Test-Path -Path $script:nonGitPath)) {
+            if ($script:nonGitPath -and (Test-Path -Path $script:nonGitPath))
+            {
                 Remove-Item -Path $script:nonGitPath -Recurse -Force -ErrorAction SilentlyContinue
             }
             $ProgressPreference = $previousProgressPreference
@@ -285,29 +293,31 @@ Describe 'Test-GitRemoteBranch' -Tag 'Integration' {
 
             # Initialize git repository with the specified default branch
             $null = git init --initial-branch $script:defaultBranch --quiet 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit
-            "Initial content" | Out-File -FilePath "README.md" -Encoding utf8
+            'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add . 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Add an unreachable remote (non-existent path)
-            $unreachablePath = "/nonexistent/path/to/repo.git"
+            $unreachablePath = '/nonexistent/path/to/repo.git'
             $null = git remote add origin $unreachablePath 2>&1
         }
 
         AfterEach {
             # Return to original location
-            if ($script:originalLocation) {
+            if ($script:originalLocation)
+            {
                 Set-Location -Path $script:originalLocation
             }
 
             # Clean up test directory
             $previousProgressPreference = $ProgressPreference
             $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
-            if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath)) {
+            if ($script:testRepoPath -and (Test-Path -Path $script:testRepoPath))
+            {
                 Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
             }
             $ProgressPreference = $previousProgressPreference

@@ -111,9 +111,12 @@ Describe 'Push-GitTag' {
             }
 
             It 'Should throw error with correct error code PGT0001' {
-                try {
+                try
+                {
                     Push-GitTag -Name 'v1.0.0' -Force
-                } catch {
+                }
+                catch
+                {
                     $_.FullyQualifiedErrorId | Should -Be 'PGT0001,Push-GitTag'
                 }
             }
@@ -199,9 +202,12 @@ Describe 'Push-GitTag' {
             }
 
             It 'Should throw error with correct error code PGT0001 when pushing all tags' {
-                try {
+                try
+                {
                     Push-GitTag -Force
-                } catch {
+                }
+                catch
+                {
                     $_.FullyQualifiedErrorId | Should -Be 'PGT0001,Push-GitTag'
                 }
             }
@@ -246,9 +252,12 @@ Describe 'Push-GitTag' {
         }
 
         It 'Should throw error with correct error code PGT0010' {
-            try {
+            try
+            {
                 Push-GitTag -Force
-            } catch {
+            }
+            catch
+            {
                 $_.FullyQualifiedErrorId | Should -Be 'PGT0010,Push-GitTag'
             }
         }
@@ -290,7 +299,7 @@ Describe 'Push-GitTag' {
             # Verify git push was NOT called since no tags exist - if this fails, it means the logic needs adjustment
             Should -Invoke -CommandName git -ParameterFilter {
                 $args[0] -eq 'push'
-            } -Times 0 -Because "no git push should occur when no local tags exist"
+            } -Times 0 -Because 'no git push should occur when no local tags exist'
         }
     }
 
@@ -377,11 +386,11 @@ Describe 'Push-GitTag' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = 'AllTags'
-                ExpectedParameters = '[[-RemoteName] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters       = '[[-RemoteName] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
             @{
                 ExpectedParameterSetName = 'SingleTag'
-                ExpectedParameters = '[[-RemoteName] <string>] [[-Name] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters       = '[[-RemoteName] <string>] [[-Name] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Push-GitTag').ParameterSets |

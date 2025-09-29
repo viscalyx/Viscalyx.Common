@@ -48,22 +48,26 @@ Describe 'Push-GitTag' -Tag 'Integration' {
 
         # Initialize a bare remote repository (simulates GitHub/GitLab etc.)
         Push-Location -Path $script:remoteRepoPath
-        try {
+        try
+        {
             & git init --bare --quiet --initial-branch=main
         }
-        catch {
+        catch
+        {
             throw "Failed to setup test remote git repository: $($_.Exception.Message)"
         }
-        finally {
+        finally
+        {
             Pop-Location
         }
 
         # Initialize a local git repository and set up remote
         Push-Location -Path $script:testRepoPath
-        try {
+        try
+        {
             & git init --quiet --initial-branch=main
-            & git config user.name "Test User"
-            & git config user.email "test@example.com"
+            & git config user.name 'Test User'
+            & git config user.email 'test@example.com'
 
             # Add the test remote repository
             & git remote add origin $script:remoteRepoPath
@@ -73,21 +77,26 @@ Describe 'Push-GitTag' -Tag 'Integration' {
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Test Repository'
             & git add README.md
-            & git commit -m "Initial commit" --quiet
+            & git commit -m 'Initial commit' --quiet
 
             # Push initial commit to remote
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git push origin main --quiet >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git push origin main --quiet >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git push origin main --quiet 2>&1
             }
         }
-        catch {
+        catch
+        {
             throw "Failed to setup test local git repository: $($_.Exception.Message)"
         }
-        finally {
+        finally
+        {
             Pop-Location
         }
     }
@@ -97,24 +106,33 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         Push-Location -Path $script:testRepoPath
 
         # Clean up any existing tags before each test
-        try {
+        try
+        {
             $localTags = & git tag 2>$null
-            if ($localTags) {
-                foreach ($tag in $localTags) {
+            if ($localTags)
+            {
+                foreach ($tag in $localTags)
+                {
                     & git tag -d $tag 2>$null | Out-Null
                 }
             }
 
             # Clean up remote tags
             $remoteTags = & git ls-remote --tags origin 2>$null
-            if ($remoteTags) {
-                foreach ($tagLine in $remoteTags) {
-                    if ($tagLine -match 'refs/tags/(.+)$') {
+            if ($remoteTags)
+            {
+                foreach ($tagLine in $remoteTags)
+                {
+                    if ($tagLine -match 'refs/tags/(.+)$')
+                    {
                         $tagName = $matches[1]
-                        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                        if ($PSVersionTable.PSEdition -eq 'Desktop')
+                        {
                             # Windows PowerShell - use cmd.exe for reliable output suppression
                             & cmd.exe /c "git push origin --delete refs/tags/$tagName >nul 2>&1"
-                        } else {
+                        }
+                        else
+                        {
                             # PowerShell 7+ - capture output in variables
                             $gitOutput = & git push origin --delete "refs/tags/$tagName" 2>&1
                         }
@@ -122,31 +140,41 @@ Describe 'Push-GitTag' -Tag 'Integration' {
                 }
             }
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors
         }
     }
 
     AfterEach {
         # Clean up any tags created during testing
-        try {
+        try
+        {
             $localTags = & git tag 2>$null
-            if ($localTags) {
-                foreach ($tag in $localTags) {
+            if ($localTags)
+            {
+                foreach ($tag in $localTags)
+                {
                     & git tag -d $tag 2>$null | Out-Null
                 }
             }
 
             # Clean up remote tags
             $remoteTags = & git ls-remote --tags origin 2>$null
-            if ($remoteTags) {
-                foreach ($tagLine in $remoteTags) {
-                    if ($tagLine -match 'refs/tags/(.+)$') {
+            if ($remoteTags)
+            {
+                foreach ($tagLine in $remoteTags)
+                {
+                    if ($tagLine -match 'refs/tags/(.+)$')
+                    {
                         $tagName = $matches[1]
-                        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                        if ($PSVersionTable.PSEdition -eq 'Desktop')
+                        {
                             # Windows PowerShell - use cmd.exe for reliable output suppression
                             & cmd.exe /c "git push origin --delete refs/tags/$tagName >nul 2>&1"
-                        } else {
+                        }
+                        else
+                        {
                             # PowerShell 7+ - capture output in variables
                             $gitOutput = & git push origin --delete "refs/tags/$tagName" 2>&1
                         }
@@ -154,15 +182,18 @@ Describe 'Push-GitTag' -Tag 'Integration' {
                 }
             }
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors
         }
 
         # Return to original location
-        try {
+        try
+        {
             Pop-Location
         }
-        catch {
+        catch
+        {
             # Ignore location errors
         }
     }
@@ -192,7 +223,8 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         It 'Should work with different tag naming patterns' {
             $tagNames = @('v2.0.0', 'release-2023', 'feature-tag')
 
-            foreach ($tagName in $tagNames) {
+            foreach ($tagName in $tagNames)
+            {
                 # Create local tag
                 & git tag $tagName 2>$null
 
@@ -202,7 +234,8 @@ Describe 'Push-GitTag' -Tag 'Integration' {
 
             # Verify all tags were pushed
             $remoteTags = & git ls-remote --tags origin
-            foreach ($tagName in $tagNames) {
+            foreach ($tagName in $tagNames)
+            {
                 ($remoteTags | Where-Object { $_ -match "refs/tags/$tagName" }) | Should -Not -BeNullOrEmpty -Because "Tag $tagName should be pushed to remote"
             }
         }
@@ -305,11 +338,14 @@ Describe 'Push-GitTag' -Tag 'Integration' {
     Context 'When tag already exists on remote' {
         BeforeEach {
             # Create a local tag and push it first
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git tag v1.0.0 >nul 2>&1"
-                & cmd.exe /c "git push origin refs/tags/v1.0.0 >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git tag v1.0.0 >nul 2>&1'
+                & cmd.exe /c 'git push origin refs/tags/v1.0.0 >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git tag 'v1.0.0' 2>&1
                 $gitOutput = & git push origin 'refs/tags/v1.0.0' 2>&1

@@ -80,7 +80,9 @@ Describe 'Pop-VMLatestSnapshot' {
                 )
             }
 
-            function script:Get-Snapshot {}
+            function script:Get-Snapshot
+            {
+            }
             function script:Set-VM
             {
                 [CmdletBinding()]
@@ -96,7 +98,9 @@ Describe 'Pop-VMLatestSnapshot' {
                 )
             }
 
-            function script:Start-VM {}
+            function script:Start-VM
+            {
+            }
         }
 
         Mock -CommandName Get-VM -MockWith {

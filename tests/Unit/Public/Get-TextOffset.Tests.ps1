@@ -47,7 +47,7 @@ Describe 'Get-TextOffset' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-FilePath] <string> [-TextToFind] <string> [<CommonParameters>]'
+                ExpectedParameters       = '[-FilePath] <string> [-TextToFind] <string> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Get-TextOffset').ParameterSets |

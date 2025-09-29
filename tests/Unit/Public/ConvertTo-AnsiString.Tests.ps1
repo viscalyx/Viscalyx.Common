@@ -51,7 +51,7 @@ Describe 'ConvertTo-AnsiString' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-InputString] <string> [<CommonParameters>]'
+                ExpectedParameters       = '[-InputString] <string> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'ConvertTo-AnsiString').ParameterSets |

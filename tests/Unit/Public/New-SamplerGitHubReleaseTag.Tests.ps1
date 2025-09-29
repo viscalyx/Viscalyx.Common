@@ -148,8 +148,8 @@ Describe 'New-SamplerGitHubReleaseTag' {
         }
 
         It 'Should throw if branch does not exist' {
-            Mock -CommandName Update-GitLocalBranch -MockWith { 
-                throw [System.InvalidOperationException]::new("Failed to update branch")
+            Mock -CommandName Update-GitLocalBranch -MockWith {
+                throw [System.InvalidOperationException]::new('Failed to update branch')
             }
 
             {
@@ -158,8 +158,8 @@ Describe 'New-SamplerGitHubReleaseTag' {
         }
 
         It 'Should throw if remote does not exist' {
-            Mock -CommandName Assert-GitRemote -MockWith { 
-                throw [System.InvalidOperationException]::new("Remote does not exist")
+            Mock -CommandName Assert-GitRemote -MockWith {
+                throw [System.InvalidOperationException]::new('Remote does not exist')
             }
 
             {

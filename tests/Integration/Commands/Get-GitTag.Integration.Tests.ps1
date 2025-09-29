@@ -34,56 +34,61 @@ BeforeAll {
 
     # Initialize the test repository and create test tags
     Push-Location -Path $script:testRepoPath
-    try {
+    try
+    {
         # Initialize git repository
         git init --initial-branch=main *> $null
-        git config user.email "test@example.com" *> $null
-        git config user.name "Test User" *> $null
+        git config user.email 'test@example.com' *> $null
+        git config user.name 'Test User' *> $null
 
         # Create initial commit
-        "Initial content" | Out-File -FilePath 'test1.txt' -Encoding utf8
+        'Initial content' | Out-File -FilePath 'test1.txt' -Encoding utf8
         git add test1.txt *> $null
-        git commit -m "Initial commit" *> $null
+        git commit -m 'Initial commit' *> $null
 
         # Create test tags for various scenarios
         git tag v1.0.0 *> $null
 
         # Create another commit and tag
-        "Second content" | Out-File -FilePath 'test2.txt' -Encoding utf8
+        'Second content' | Out-File -FilePath 'test2.txt' -Encoding utf8
         git add test2.txt *> $null
-        git commit -m "Second commit" *> $null
+        git commit -m 'Second commit' *> $null
         git tag v1.1.0 *> $null
 
         # Create another commit and tag
-        "Third content" | Out-File -FilePath 'test3.txt' -Encoding utf8
+        'Third content' | Out-File -FilePath 'test3.txt' -Encoding utf8
         git add test3.txt *> $null
-        git commit -m "Third commit" *> $null
+        git commit -m 'Third commit' *> $null
         git tag v2.0.0 *> $null
 
         # Create another commit and tag
-        "Fourth content" | Out-File -FilePath 'test4.txt' -Encoding utf8
+        'Fourth content' | Out-File -FilePath 'test4.txt' -Encoding utf8
         git add test4.txt *> $null
-        git commit -m "Fourth commit" *> $null
+        git commit -m 'Fourth commit' *> $null
         git tag v2.1.0 *> $null
 
         # Create some non-version tags
         git tag release-candidate *> $null
         git tag stable *> $null
     }
-    finally {
+    finally
+    {
         # No need to change back directory here as we want to run tests in the repo
     }
 }
 
 AfterAll {
-    try {
+    try
+    {
         Pop-Location -ErrorAction SilentlyContinue
 
         # Force cleanup of Git repository to avoid permission issues
-        if (Test-Path $script:testRepoPath) {
+        if (Test-Path $script:testRepoPath)
+        {
             # Remove read-only attributes from .git files
             Get-ChildItem -Path $script:testRepoPath -Recurse -Force | ForEach-Object {
-                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly) {
+                if ($_.Attributes -band [System.IO.FileAttributes]::ReadOnly)
+                {
                     $_.Attributes = $_.Attributes -bxor [System.IO.FileAttributes]::ReadOnly
                 }
             }
@@ -93,7 +98,8 @@ AfterAll {
             $ProgressPreference = $previousProgressPreference
         }
     }
-    catch {
+    catch
+    {
         # Ignore cleanup errors
     }
 

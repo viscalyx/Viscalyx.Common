@@ -20,7 +20,7 @@ function Hide-GitToken
     [OutputType([System.String])]
     param
     (
-        [Parameter(Mandatory=$true, Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [AllowNull()]
         [AllowEmptyCollection()]
         [AllowEmptyString()]
@@ -32,9 +32,9 @@ function Hide-GitToken
     {
         [System.String] $InputString = $InputString -join ' '
 
-        [System.String] $InputString = $InputString -replace "gh(p|o|u|s|r)_([A-Za-z0-9]{1,251})",'**REDACTED-TOKEN**'
+        [System.String] $InputString = $InputString -replace 'gh(p|o|u|s|r)_([A-Za-z0-9]{1,251})', '**REDACTED-TOKEN**'
 
-        [System.String] $InputString = $InputString -replace "[0-9a-f]{40}",'**REDACTED-TOKEN**'
+        [System.String] $InputString = $InputString -replace '[0-9a-f]{40}', '**REDACTED-TOKEN**'
     }
 
     return $InputString

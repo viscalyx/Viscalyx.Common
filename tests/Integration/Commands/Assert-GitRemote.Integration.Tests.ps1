@@ -44,16 +44,16 @@ Describe 'Assert-GitRemote' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Add a test remote
-            $null = git remote add origin "https://github.com/test/repo.git" 2>&1
+            $null = git remote add origin 'https://github.com/test/repo.git' 2>&1
         }
 
         AfterEach {
@@ -80,13 +80,13 @@ Describe 'Assert-GitRemote' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Note: No remote is added in this test scenario
         }
@@ -115,18 +115,18 @@ Describe 'Assert-GitRemote' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Add multiple test remotes
-            $null = git remote add origin "https://github.com/test/repo.git" 2>&1
-            $null = git remote add upstream "https://github.com/upstream/repo.git" 2>&1
-            $null = git remote add fork "https://github.com/fork/repo.git" 2>&1
+            $null = git remote add origin 'https://github.com/test/repo.git' 2>&1
+            $null = git remote add upstream 'https://github.com/upstream/repo.git' 2>&1
+            $null = git remote add fork 'https://github.com/fork/repo.git' 2>&1
         }
 
         AfterEach {

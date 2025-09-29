@@ -264,13 +264,13 @@ Describe 'Clear-AnsiSequence' {
         }
 
         It 'Should enable accurate visible length calculation' {
-            $formattedString = "[32mHello[0m [31mWorld[0m"
+            $formattedString = '[32mHello[0m [31mWorld[0m'
 
             $result = Clear-AnsiSequence -InputString $formattedString -ErrorAction Stop
             $visibleLength = $result.Length
 
             $visibleLength | Should -BeExactly 11  # "Hello World"
-            $result | Should -BeExactly "Hello World"
+            $result | Should -BeExactly 'Hello World'
         }
 
         It 'Should handle progress bar-like sequences' {

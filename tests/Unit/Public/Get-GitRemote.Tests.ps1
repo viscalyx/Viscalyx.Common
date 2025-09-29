@@ -26,15 +26,15 @@ BeforeDiscovery {
     $script:parameterSetTestCases = @(
         @{
             ExpectedParameterSetName = 'Default'
-            ExpectedParameters = '[[-Name] <string>] [<CommonParameters>]'
+            ExpectedParameters       = '[[-Name] <string>] [<CommonParameters>]'
         },
         @{
             ExpectedParameterSetName = 'FetchUrl'
-            ExpectedParameters = '-Name <string> -FetchUrl [<CommonParameters>]'
+            ExpectedParameters       = '-Name <string> -FetchUrl [<CommonParameters>]'
         },
         @{
             ExpectedParameterSetName = 'PushUrl'
-            ExpectedParameters = '-Name <string> -PushUrl [<CommonParameters>]'
+            ExpectedParameters       = '-Name <string> -PushUrl [<CommonParameters>]'
         }
     )
 }
@@ -111,7 +111,7 @@ Describe 'Get-GitRemote' {
 
         It 'Should have correct parameter types' {
             $command = Get-Command -Name 'Get-GitRemote'
-            
+
             $command.Parameters['Name'].ParameterType | Should -Be ([System.String])
             $command.Parameters['FetchUrl'].ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
             $command.Parameters['PushUrl'].ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
@@ -128,7 +128,7 @@ Describe 'Get-GitRemote' {
 
     Context 'When getting all remotes' {
         It 'Should call git remote without arguments when no Name specified' {
-            Mock -CommandName 'git' -MockWith { 
+            Mock -CommandName 'git' -MockWith {
                 return @('origin', 'upstream')
             }
 
@@ -136,14 +136,14 @@ Describe 'Get-GitRemote' {
                 $global:LASTEXITCODE = 0
                 $result = Get-GitRemote
                 $result | Should -Be @('origin', 'upstream')
-                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter { 
+                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
                     $args[0] -eq 'remote' -and $args.Count -eq 1
                 }
             }
         }
 
         It 'Should return empty array when no remotes exist' {
-            Mock -CommandName 'git' -MockWith { 
+            Mock -CommandName 'git' -MockWith {
                 return @()
             }
 
@@ -157,7 +157,7 @@ Describe 'Get-GitRemote' {
 
     Context 'When getting specific remote by name' {
         It 'Should return remote name when remote exists' {
-            Mock -CommandName 'git' -MockWith { 
+            Mock -CommandName 'git' -MockWith {
                 return @('origin', 'upstream')
             }
 
@@ -169,7 +169,7 @@ Describe 'Get-GitRemote' {
         }
 
         It 'Should return null when remote does not exist' {
-            Mock -CommandName 'git' -MockWith { 
+            Mock -CommandName 'git' -MockWith {
                 return @('origin', 'upstream')
             }
 
@@ -183,7 +183,7 @@ Describe 'Get-GitRemote' {
 
     Context 'When getting fetch URL' {
         It 'Should call git remote get-url for fetch URL' {
-            Mock -CommandName 'git' -MockWith { 
+            Mock -CommandName 'git' -MockWith {
                 return 'https://github.com/user/repo.git'
             }
 
@@ -191,7 +191,7 @@ Describe 'Get-GitRemote' {
                 $global:LASTEXITCODE = 0
                 $result = Get-GitRemote -Name 'origin' -FetchUrl
                 $result | Should -Be 'https://github.com/user/repo.git'
-                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter { 
+                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
                     $args[0] -eq 'remote' -and $args[1] -eq 'get-url' -and $args[2] -eq 'origin' -and $args.Count -eq 3
                 }
             }
@@ -200,7 +200,7 @@ Describe 'Get-GitRemote' {
 
     Context 'When getting push URL' {
         It 'Should call git remote get-url --push for push URL' {
-            Mock -CommandName 'git' -MockWith { 
+            Mock -CommandName 'git' -MockWith {
                 return 'git@github.com:user/repo.git'
             }
 
@@ -208,7 +208,7 @@ Describe 'Get-GitRemote' {
                 $global:LASTEXITCODE = 0
                 $result = Get-GitRemote -Name 'origin' -PushUrl
                 $result | Should -Be 'git@github.com:user/repo.git'
-                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter { 
+                Should -Invoke -CommandName 'git' -Times 1 -Exactly -ParameterFilter {
                     $args[0] -eq 'remote' -and $args[1] -eq 'get-url' -and $args[2] -eq '--push' -and $args[3] -eq 'origin' -and $args.Count -eq 4
                 }
             }
@@ -217,7 +217,7 @@ Describe 'Get-GitRemote' {
 
     Context 'When git command fails' {
         It 'Should write error and not throw when git remote fails' {
-            Mock -CommandName 'git' -MockWith { 
+            Mock -CommandName 'git' -MockWith {
                 $global:LASTEXITCODE = 1
                 return $null
             }
@@ -231,7 +231,7 @@ Describe 'Get-GitRemote' {
         }
 
         It 'Should write error with correct parameters when git fails' {
-            Mock -CommandName 'git' -MockWith { 
+            Mock -CommandName 'git' -MockWith {
                 $global:LASTEXITCODE = 1
                 return $null
             }

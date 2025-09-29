@@ -40,9 +40,9 @@ function Test-GitLocalChanges
     if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
     {
         $errorMessageParameters = @{
-            Message = $script:localizedData.Test_GitLocalChanges_GitFailed
-            Category = 'InvalidOperation'
-            ErrorId = 'TGLC0001' # cspell: disable-line
+            Message      = $script:localizedData.Test_GitLocalChanges_GitFailed
+            Category     = 'InvalidOperation'
+            ErrorId      = 'TGLC0001' # cspell: disable-line
             TargetObject = $null
         }
 

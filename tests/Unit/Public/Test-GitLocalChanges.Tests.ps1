@@ -47,7 +47,7 @@ Describe 'Test-GitLocalChanges' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[<CommonParameters>]'
+                ExpectedParameters       = '[<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Test-GitLocalChanges').ParameterSets | Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName }

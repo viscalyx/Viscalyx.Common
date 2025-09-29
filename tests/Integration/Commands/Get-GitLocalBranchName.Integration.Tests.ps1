@@ -34,37 +34,38 @@ BeforeAll {
 
     # Initialize the test repository and create test structure
     Push-Location -Path $script:testRepoPath
-    try {
+    try
+    {
         # Initialize git repository
         git init --initial-branch=main --quiet 2>$null
-        git config user.email "test@example.com" *> $null
-        git config user.name "Test User" *> $null
+        git config user.email 'test@example.com' *> $null
+        git config user.name 'Test User' *> $null
 
         # Create initial commit
-        "Initial content" | Out-File -FilePath 'test.txt' -Encoding utf8
+        'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
         git add test.txt *> $null
-        git commit -m "Initial commit" *> $null
+        git commit -m 'Initial commit' *> $null
 
         # Create feature branches for testing
         git checkout -b 'feature/branch1' --quiet 2>$null
-        "Feature 1 content" | Out-File -FilePath 'feature1.txt' -Encoding utf8
+        'Feature 1 content' | Out-File -FilePath 'feature1.txt' -Encoding utf8
         git add feature1.txt *> $null
-        git commit -m "Feature 1 commit" *> $null
+        git commit -m 'Feature 1 commit' *> $null
 
         git checkout -b 'feature/branch2' --quiet 2>$null
-        "Feature 2 content" | Out-File -FilePath 'feature2.txt' -Encoding utf8
+        'Feature 2 content' | Out-File -FilePath 'feature2.txt' -Encoding utf8
         git add feature2.txt *> $null
-        git commit -m "Feature 2 commit" *> $null
+        git commit -m 'Feature 2 commit' *> $null
 
         git checkout -b 'bugfix/issue123' --quiet 2>$null
-        "Bug fix content" | Out-File -FilePath 'bugfix.txt' -Encoding utf8
+        'Bug fix content' | Out-File -FilePath 'bugfix.txt' -Encoding utf8
         git add bugfix.txt *> $null
-        git commit -m "Bug fix commit" *> $null
+        git commit -m 'Bug fix commit' *> $null
 
         git checkout -b 'develop' --quiet 2>$null
-        "Develop content" | Out-File -FilePath 'develop.txt' -Encoding utf8
+        'Develop content' | Out-File -FilePath 'develop.txt' -Encoding utf8
         git add develop.txt *> $null
-        git commit -m "Develop commit" *> $null
+        git commit -m 'Develop commit' *> $null
 
         # Switch back to main branch
         git checkout main --quiet 2>$null
@@ -72,14 +73,16 @@ BeforeAll {
         # Store the current branch name for tests
         $script:defaultBranch = git rev-parse --abbrev-ref HEAD
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 }
 
 AfterAll {
     # Clean up - remove the test repository
-    if (Test-Path -Path $script:testRepoPath) {
+    if (Test-Path -Path $script:testRepoPath)
+    {
         $previousProgressPreference = $ProgressPreference
         $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -109,10 +112,13 @@ Describe 'Get-GitLocalBranchName' {
 
         It 'Should return correct branch name after switching branches' {
             # Switch to feature branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout feature/branch1 >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout feature/branch1 >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 git checkout feature/branch1 *>$null
             }
@@ -122,10 +128,13 @@ Describe 'Get-GitLocalBranchName' {
             $result | Should -Be 'feature/branch1'
 
             # Switch back to default branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
                 & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 git checkout $script:defaultBranch *>$null
             }
@@ -214,10 +223,12 @@ Describe 'Get-GitLocalBranchName' {
             New-Item -Path $nonGitPath -ItemType Directory -Force | Out-Null
 
             Push-Location -Path $nonGitPath
-            try {
+            try
+            {
                 { Get-GitLocalBranchName -Current -ErrorAction Stop 2> $null } | Should -Throw
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
         }
@@ -227,7 +238,8 @@ Describe 'Get-GitLocalBranchName' {
             $gitPath = Join-Path -Path $script:testRepoPath -ChildPath '.git'
             $tempGitPath = Join-Path -Path $script:testRepoPath -ChildPath '.git.temp'
 
-            try {
+            try
+            {
                 Rename-Item -Path $gitPath -NewName '.git.temp' -ErrorAction Stop
 
                 # Execute and capture all errors (git stderr + PowerShell error)
@@ -245,9 +257,11 @@ Describe 'Get-GitLocalBranchName' {
                 $result[1].Exception.Message | Should -Match 'Failed to get the name of the local branch'
                 $result[1].FullyQualifiedErrorId | Should -Be 'GGLBN0001,Get-GitLocalBranchName'
             }
-            finally {
+            finally
+            {
                 # Restore .git directory
-                if (Test-Path -Path $tempGitPath) {
+                if (Test-Path -Path $tempGitPath)
+                {
                     Rename-Item -Path $tempGitPath -NewName '.git' -ErrorAction SilentlyContinue
                 }
             }
@@ -280,10 +294,13 @@ Describe 'Get-GitLocalBranchName' {
             $result | Should -Be 'test-branch_123'
 
             # Clean up
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
                 & cmd.exe /c "git checkout $script:defaultBranch >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 git checkout $script:defaultBranch *>$null
             }

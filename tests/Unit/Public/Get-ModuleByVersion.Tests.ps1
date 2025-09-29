@@ -47,7 +47,7 @@ Describe 'Get-ModuleByVersion' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-Name] <string> [-Version] <string> [<CommonParameters>]'
+                ExpectedParameters       = '[-Name] <string> [-Version] <string> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Get-ModuleByVersion').ParameterSets |
@@ -75,7 +75,7 @@ Describe 'Get-ModuleByVersion' {
         BeforeAll {
             Mock -CommandName Get-Module -MockWith {
                 [pscustomobject]@{
-                    Name = 'ExistingModule'
+                    Name    = 'ExistingModule'
                     Version = [version]'1.0.0'
                 }
             }

@@ -48,7 +48,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-RemoteName] <string> [[-BranchName] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters       = '[-RemoteName] <string> [[-BranchName] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Update-RemoteTrackingBranch').ParameterSets |
@@ -106,7 +106,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should successfully fetch all branches from specified remote' {
             $null = Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false
 
-            Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
+            Should -Invoke -CommandName git -Times 1 -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args.Count -eq 2
             }
         }
@@ -114,7 +114,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should work with different remote names' {
             $null = Update-RemoteTrackingBranch -RemoteName 'upstream' -Confirm:$false
 
-            Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
+            Should -Invoke -CommandName git -Times 1 -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'upstream' -and $args.Count -eq 2
             }
         }
@@ -141,7 +141,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should successfully fetch specific branch from specified remote' {
             $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false
 
-            Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
+            Should -Invoke -CommandName git -Times 1 -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args[2] -eq 'main' -and $args.Count -eq 3
             }
         }
@@ -149,7 +149,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should work with different branch and remote combinations' {
             $null = Update-RemoteTrackingBranch -RemoteName 'upstream' -BranchName 'develop' -Confirm:$false
 
-            Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
+            Should -Invoke -CommandName git -Times 1 -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'upstream' -and $args[2] -eq 'develop' -and $args.Count -eq 3
             }
         }
@@ -157,7 +157,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should work with feature branch names' {
             $null = Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'feature/new-functionality' -Confirm:$false
 
-            Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
+            Should -Invoke -CommandName git -Times 1 -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args[2] -eq 'feature/new-functionality' -and $args.Count -eq 3
             }
         }
@@ -185,7 +185,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should throw terminating error when fetch fails without branch' {
             { Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false } | Should -Throw -ErrorId 'URTB0001*'
 
-            Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
+            Should -Invoke -CommandName git -Times 1 -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args.Count -eq 2
             }
         }
@@ -193,7 +193,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should throw terminating error when fetch fails with branch' {
             { Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'main' -Confirm:$false } | Should -Throw -ErrorId 'URTB0001*'
 
-            Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
+            Should -Invoke -CommandName git -Times 1 -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args[2] -eq 'main' -and $args.Count -eq 3
             }
         }
@@ -201,7 +201,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should include remote and branch information in error message when fetch fails' {
             { Update-RemoteTrackingBranch -RemoteName 'upstream' -BranchName 'develop' -Confirm:$false } | Should -Throw -ErrorId 'URTB0001*'
 
-            Should -Invoke -CommandName git -Times 1 -ParameterFilter { 
+            Should -Invoke -CommandName git -Times 1 -ParameterFilter {
                 $args[0] -eq 'fetch' -and $args[1] -eq 'upstream' -and $args[2] -eq 'develop' -and $args.Count -eq 3
             }
         }

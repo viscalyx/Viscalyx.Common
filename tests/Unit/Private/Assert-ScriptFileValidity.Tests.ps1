@@ -42,8 +42,8 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe "Assert-ScriptFileValidity" {
-    It "Should succeed when the file exists and the hash matches" {
+Describe 'Assert-ScriptFileValidity' {
+    It 'Should succeed when the file exists and the hash matches' {
         Mock -CommandName Test-Path -MockWith {
             return $true
         }
@@ -57,7 +57,7 @@ Describe "Assert-ScriptFileValidity" {
         }
     }
 
-    It "Should throw when the hash does not match" {
+    It 'Should throw when the hash does not match' {
         Mock -CommandName Test-Path -MockWith {
             return $true
         }
@@ -74,7 +74,7 @@ Describe "Assert-ScriptFileValidity" {
         }
     }
 
-    It "Should throw when the script file does not exist" {
+    It 'Should throw when the script file does not exist' {
         Mock -CommandName Test-Path -MockWith {
             return $false
         }

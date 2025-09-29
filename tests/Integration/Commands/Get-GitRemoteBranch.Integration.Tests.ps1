@@ -44,13 +44,13 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'test content' | Out-File -FilePath 'test.txt' -Encoding utf8
             $null = git add . 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Add test remotes pointing to actual public repositories for realistic testing
             $null = git remote add origin 'https://github.com/PowerShell/PowerShell.git' 2>&1
@@ -62,7 +62,8 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
             Set-Location -Path $script:originalLocation
 
             # Clean up test repository
-            if (Test-Path -Path $script:testRepoPath) {
+            if (Test-Path -Path $script:testRepoPath)
+            {
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -71,7 +72,8 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should return remote branches when RemoteName is specified' {
-            try {
+            try
+            {
                 $result = Get-GitRemoteBranch -RemoteName 'origin' -ErrorAction Stop
                 $result | Should -Not -BeNullOrEmpty
                 $result | Should -BeOfType [System.String]
@@ -79,14 +81,16 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
                 # Verify that all returned branches have the refs/heads/ prefix
                 $result | ForEach-Object { $_ | Should -Match '^refs/heads/' }
             }
-            catch {
+            catch
+            {
                 # If network issues occur, skip this test
                 Set-ItResult -Skipped -Because "Network connectivity issue: $($_.Exception.Message)"
             }
         }
 
         It 'Should return remote branches without refs/heads/ prefix when RemoveRefsHeads is specified' {
-            try {
+            try
+            {
                 $result = Get-GitRemoteBranch -RemoteName 'origin' -RemoveRefsHeads -ErrorAction Stop
                 $result | Should -Not -BeNullOrEmpty
                 $result | Should -BeOfType [System.String]
@@ -94,7 +98,8 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
                 # Verify that no returned branches have the refs/heads/ prefix
                 $result | ForEach-Object { $_ | Should -Not -Match '^refs/heads/' }
             }
-            catch {
+            catch
+            {
                 # If network issues occur, skip this test
                 Set-ItResult -Skipped -Because "Network connectivity issue: $($_.Exception.Message)"
             }
@@ -104,13 +109,17 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
             # Try to get the main/master branch which should exist in PowerShell repository
             $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'master'
 
-            if ($result) {
+            if ($result)
+            {
                 $result | Should -BeOfType [System.String]
                 $result | Should -Match 'refs/heads/master$'
-            } else {
+            }
+            else
+            {
                 # If master doesn't exist, try main
                 $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'main'
-                if ($result) {
+                if ($result)
+                {
                     $result | Should -BeOfType [System.String]
                     $result | Should -Match 'refs/heads/main$'
                 }
@@ -121,11 +130,14 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
             # Use a more general pattern that's likely to match in most repositories
             $result = Get-GitRemoteBranch -RemoteName 'origin' -Name '*/*'
 
-            if ($result) {
+            if ($result)
+            {
                 $result | Should -BeOfType [System.String]
                 # Verify that results contain paths with forward slashes (feature branches, etc.)
                 $result | Where-Object { $_ -match 'refs/heads/.+/.+' } | Should -Not -BeNullOrEmpty
-            } else {
+            }
+            else
+            {
                 # If no feature branches exist, try a simpler wildcard
                 $result = Get-GitRemoteBranch -RemoteName 'origin' -Name '*'
                 $result | Should -Not -BeNullOrEmpty
@@ -136,13 +148,17 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
             # Try to get the main/master branch using the full refs/heads/ path
             $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'refs/heads/master'
 
-            if ($result) {
+            if ($result)
+            {
                 $result | Should -BeOfType [System.String]
                 $result | Should -Match 'refs/heads/master$'
-            } else {
+            }
+            else
+            {
                 # If master doesn't exist, try main
                 $result = Get-GitRemoteBranch -RemoteName 'origin' -Name 'refs/heads/main'
-                if ($result) {
+                if ($result)
+                {
                     $result | Should -BeOfType [System.String]
                     $result | Should -Match 'refs/heads/main$'
                 }
@@ -155,7 +171,8 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should work with different remote names' {
-            try {
+            try
+            {
                 $originResult = Get-GitRemoteBranch -RemoteName 'origin' -ErrorAction Stop
                 $upstreamResult = Get-GitRemoteBranch -RemoteName 'upstream' -ErrorAction Stop
 
@@ -166,7 +183,8 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
                 $originResult | ForEach-Object { $_ | Should -Match '^refs/heads/' }
                 $upstreamResult | ForEach-Object { $_ | Should -Match '^refs/heads/' }
             }
-            catch {
+            catch
+            {
                 # If network issues occur, skip this test
                 Set-ItResult -Skipped -Because "Network connectivity issue: $($_.Exception.Message)"
             }
@@ -187,13 +205,13 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
 
             # Initialize git repository without any remotes
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit
             'test content' | Out-File -FilePath 'test.txt' -Encoding utf8
             $null = git add . 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
         }
 
         AfterEach {
@@ -201,7 +219,8 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
             Set-Location -Path $script:originalLocation
 
             # Clean up test repository
-            if (Test-Path -Path $script:testRepoPath) {
+            if (Test-Path -Path $script:testRepoPath)
+            {
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -250,13 +269,13 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit
             'test content' | Out-File -FilePath 'test.txt' -Encoding utf8
             $null = git add . 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Add a valid remote for testing
             $null = git remote add origin 'https://github.com/PowerShell/PowerShell.git' 2>&1
@@ -267,7 +286,8 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
             Set-Location -Path $script:originalLocation
 
             # Clean up test repository
-            if (Test-Path -Path $script:testRepoPath) {
+            if (Test-Path -Path $script:testRepoPath)
+            {
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -276,14 +296,16 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
         }
 
         It 'Should handle empty wildcard patterns appropriately' {
-            try {
+            try
+            {
                 $result = Get-GitRemoteBranch -RemoteName 'origin' -Name '*' -ErrorAction Stop
 
                 # This should return all branches (same as not specifying Name)
                 $result | Should -Not -BeNullOrEmpty
                 $result | Should -BeOfType [System.String]
             }
-            catch {
+            catch
+            {
                 # If network issues occur, skip this test
                 Set-ItResult -Skipped -Because "Network connectivity issue: $($_.Exception.Message)"
             }
@@ -294,10 +316,13 @@ Describe 'Get-GitRemoteBranch' -Tag 'Integration' {
 
             # This may or may not return results depending on what branches exist
             # But it should not error
-            if ($result) {
+            if ($result)
+            {
                 $result | Should -BeOfType [System.String]
                 $result | ForEach-Object { $_ | Should -Match 'refs/heads/feature/test' }
-            } else {
+            }
+            else
+            {
                 $result | Should -BeNullOrEmpty
             }
         }

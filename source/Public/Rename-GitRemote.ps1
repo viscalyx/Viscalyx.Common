@@ -46,7 +46,7 @@
 #>
 function Rename-GitRemote
 {
-    [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType()]
     param
     (

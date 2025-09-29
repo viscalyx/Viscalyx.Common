@@ -48,11 +48,11 @@ Describe 'Get-ClassResourceAst' {
             $testCases = @(
                 @{
                     ExpectedParameterSetName = 'String'
-                    ExpectedParameters = '-Path <string[]> [-ClassName <string>] [<CommonParameters>]'
+                    ExpectedParameters       = '-Path <string[]> [-ClassName <string>] [<CommonParameters>]'
                 }
                 @{
                     ExpectedParameterSetName = 'FileInfo'
-                    ExpectedParameters = '-ScriptFile <FileInfo[]> [-ClassName <string>] [<CommonParameters>]'
+                    ExpectedParameters       = '-ScriptFile <FileInfo[]> [-ClassName <string>] [<CommonParameters>]'
                 }
             )
         }
@@ -337,7 +337,7 @@ class FileTestDscResource2
             $unsupportedInput = [System.Collections.Hashtable]@{ SomeProperty = 'Value' }
 
             # The hashtable will be converted to string, then treated as a file path
-            { $unsupportedInput | Get-ClassResourceAst } | Should -Throw "*does not exist*"
+            { $unsupportedInput | Get-ClassResourceAst } | Should -Throw '*does not exist*'
         }
     }
 }

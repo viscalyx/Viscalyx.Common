@@ -47,11 +47,11 @@ Describe 'Install-ModulePatch' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = 'Path'
-                ExpectedParameters = '-Path <string> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters       = '-Path <string> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
             @{
                 ExpectedParameterSetName = 'URI'
-                ExpectedParameters = '-Uri <uri> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters       = '-Uri <uri> [-Force] [-SkipHashValidation] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Install-ModulePatch').ParameterSets |

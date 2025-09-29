@@ -45,29 +45,33 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
         # Initialize a git repository with proper setup
         Push-Location -Path $script:testRepoPath
-        try {
+        try
+        {
             & git init --quiet --initial-branch=main 2>$null
-            if ($LASTEXITCODE -ne 0) {
+            if ($LASTEXITCODE -ne 0)
+            {
                 # Fallback for older git versions
                 & git init --quiet --initial-branch=main
                 & git checkout -b main --quiet 2>$null
             }
-            & git config user.name "Test User"
-            & git config user.email "test@example.com"
+            & git config user.name 'Test User'
+            & git config user.email 'test@example.com'
 
             # Create an initial commit
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Test Sampler Repository'
             & git add README.md
-            & git commit -m "Initial commit" --quiet
+            & git commit -m 'Initial commit' --quiet
 
             # Create a preview tag to simulate a Sampler project state
             & git tag 'v1.0.0-preview0001'
         }
-        catch {
+        catch
+        {
             throw "Failed to setup test git repository: $($_.Exception.Message)"
         }
-        finally {
+        finally
+        {
             Pop-Location
         }
     }
@@ -77,38 +81,48 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
         Push-Location -Path $script:testRepoPath
 
         # Clean up any release tags before each test (but keep preview tags)
-        try {
+        try
+        {
             $tags = & git tag 2>$null | Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
-            if ($tags) {
-                foreach ($tag in $tags) {
+            if ($tags)
+            {
+                foreach ($tag in $tags)
+                {
                     & git tag -d $tag 2>$null | Out-Null
                 }
             }
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors
         }
     }
 
     AfterEach {
         # Clean up any release tags created during testing
-        try {
+        try
+        {
             $tags = & git tag 2>$null | Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
-            if ($tags) {
-                foreach ($tag in $tags) {
+            if ($tags)
+            {
+                foreach ($tag in $tags)
+                {
                     & git tag -d $tag 2>$null | Out-Null
                 }
             }
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors
         }
 
         # Return to original location
-        try {
+        try
+        {
             Pop-Location
         }
-        catch {
+        catch
+        {
             # Ignore location errors
         }
     }
@@ -116,10 +130,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
     Context 'When creating a release tag with existing preview tag' {
         BeforeEach {
             # Add a remote origin for this specific test
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
                 & cmd.exe /c "git remote add origin file://$script:testRepoPath/.git >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git remote add origin "file://$script:testRepoPath/.git" 2>&1
             }
@@ -127,10 +144,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
         AfterEach {
             # Remove remote after test
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git remote remove origin >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git remote remove origin >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git remote remove origin 2>&1
             }
@@ -157,10 +177,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
     Context 'When using ShouldProcess functionality' {
         BeforeEach {
             # Add a local remote for this specific test
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
                 & cmd.exe /c "git remote add origin file://$script:testRepoPath/.git >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git remote add origin "file://$script:testRepoPath/.git" 2>&1
             }
@@ -168,10 +191,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
         AfterEach {
             # Remove remote after test
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git remote remove origin >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git remote remove origin >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git remote remove origin 2>&1
             }
@@ -193,18 +219,20 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
             $null = New-Item -Path $script:invalidRepoPath -ItemType Directory -Force
 
             Push-Location -Path $script:invalidRepoPath
-            try {
+            try
+            {
                 & git init --quiet --initial-branch=main
-                & git config user.name "Test User"
-                & git config user.email "test@example.com"
+                & git config user.name 'Test User'
+                & git config user.email 'test@example.com'
 
                 # Create initial commit but no remote or tags
                 $null = New-Item -Path (Join-Path -Path $script:invalidRepoPath -ChildPath 'README.md') -ItemType File -Force
                 Set-Content -Path (Join-Path -Path $script:invalidRepoPath -ChildPath 'README.md') -Value '# Invalid Repository'
                 & git add README.md
-                & git commit -m "Initial commit" --quiet
+                & git commit -m 'Initial commit' --quiet
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
         }
@@ -227,20 +255,25 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
             $null = New-Item -Path $emptyRemotePath -ItemType Directory -Force
 
             Push-Location -Path $emptyRemotePath
-            try {
+            try
+            {
                 # Initialize empty remote repository
                 & git init --bare --quiet --initial-branch=main 2>$null
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
 
             # Remove local preview tag and add remote pointing to empty repository
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git tag -d v1.0.0-preview0001 >nul 2>&1"
+                & cmd.exe /c 'git tag -d v1.0.0-preview0001 >nul 2>&1'
                 & cmd.exe /c "git remote add origin file://$emptyRemotePath/.git >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git tag -d 'v1.0.0-preview0001' 2>&1
                 $gitOutput = & git remote add origin "file://$emptyRemotePath/.git" 2>&1
@@ -250,10 +283,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
             # Restore the preview tag and remove the remote for other tests
             & git tag 'v1.0.0-preview0001'
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git remote remove origin >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git remote remove origin >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git remote remove origin 2>&1
             }
@@ -263,10 +299,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
     Context 'When working with different branch names' {
         BeforeEach {
             # Add a local remote for this specific test
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
                 & cmd.exe /c "git remote add origin file://$script:testRepoPath/.git >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git remote add origin "file://$script:testRepoPath/.git" 2>&1
             }
@@ -274,10 +313,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
         AfterEach {
             # Remove remote after test
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git remote remove origin >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git remote remove origin >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git remote remove origin 2>&1
             }
@@ -285,11 +327,14 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
         It 'Should work with non-default branch name' {
             # Create a develop branch and switch to it
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout -b develop --quiet >nul 2>&1"
-                & cmd.exe /c "git checkout main --quiet >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout -b develop --quiet >nul 2>&1'
+                & cmd.exe /c 'git checkout main --quiet >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 & git checkout -b develop --quiet *>$null
                 & git checkout main --quiet *>$null
@@ -306,10 +351,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
     Context 'When using ReturnToCurrentBranch functionality' {
         BeforeEach {
             # Add a local remote for this specific test
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
                 & cmd.exe /c "git remote add origin file://$script:testRepoPath/.git >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git remote add origin "file://$script:testRepoPath/.git" 2>&1
             }
@@ -317,10 +365,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
         AfterEach {
             # Remove remote after test
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git remote remove origin >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git remote remove origin >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = & git remote remove origin 2>&1
             }
@@ -328,10 +379,13 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
         It 'Should return to the current branch after tagging' {
             # Create and switch to a feature branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout -b feature-branch --quiet >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout -b feature-branch --quiet >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 & git checkout -b feature-branch --quiet *>$null
             }
@@ -351,10 +405,12 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
 
     AfterAll {
         # Restore original location
-        try {
+        try
+        {
             Set-Location -Path $script:originalLocation
         }
-        catch {
+        catch
+        {
             # Ignore location restore errors
         }
     }

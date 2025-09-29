@@ -47,7 +47,7 @@ Describe 'Test-FileHash' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-Path] <string> [-Algorithm] <string> [-ExpectedHash] <string> [<CommonParameters>]'
+                ExpectedParameters       = '[-Path] <string> [-Algorithm] <string> [-ExpectedHash] <string> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Test-FileHash').ParameterSets |

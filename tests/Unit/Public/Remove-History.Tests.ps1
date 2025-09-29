@@ -73,7 +73,7 @@ Describe 'Remove-History' {
 
     It 'Should remove entries matching a pattern' {
         # Arrange
-        $pattern = ".*\.txt"
+        $pattern = '.*\.txt'
 
         # Act
         $null = Viscalyx.Common\Remove-History -Pattern $pattern

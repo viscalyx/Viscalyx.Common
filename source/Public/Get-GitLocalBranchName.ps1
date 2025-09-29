@@ -79,9 +79,9 @@ function Get-GitLocalBranchName
     if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
     {
         $errorMessageParameters = @{
-            Message = $script:localizedData.Get_GitLocalBranchName_Failed
-            Category = 'ObjectNotFound'
-            ErrorId = 'GGLBN0001' # cspell: disable-line
+            Message      = $script:localizedData.Get_GitLocalBranchName_Failed
+            Category     = 'ObjectNotFound'
+            ErrorId      = 'GGLBN0001' # cspell: disable-line
             TargetObject = $null
         }
 

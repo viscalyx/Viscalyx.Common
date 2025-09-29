@@ -26,11 +26,11 @@ BeforeDiscovery {
     $script:parameterSetTestCases = @(
         @{
             ExpectedParameterSetName = 'Default'
-            ExpectedParameters = '[[-RemoteName] <string>] [-RemoveRefsHeads] [<CommonParameters>]'
+            ExpectedParameters       = '[[-RemoteName] <string>] [-RemoveRefsHeads] [<CommonParameters>]'
         },
         @{
             ExpectedParameterSetName = 'Name'
-            ExpectedParameters = '[-RemoteName] <string> [[-Name] <string>] [-RemoveRefsHeads] [<CommonParameters>]'
+            ExpectedParameters       = '[-RemoteName] <string> [[-Name] <string>] [-RemoveRefsHeads] [<CommonParameters>]'
         }
     )
 }
@@ -116,8 +116,8 @@ Describe 'Get-GitRemoteBranch' {
         It 'Should call git ls-remote --branches with --quiet only' {
             Mock -CommandName 'git' -MockWith {
                 return @(
-                    "a1b2c3d4e5f6	refs/heads/main",
-                    "f6e5d4c3b2a1	refs/heads/feature/test"
+                    'a1b2c3d4e5f6	refs/heads/main',
+                    'f6e5d4c3b2a1	refs/heads/feature/test'
                 )
             }
 
@@ -151,8 +151,8 @@ Describe 'Get-GitRemoteBranch' {
 
             Mock -CommandName 'git' -MockWith {
                 return @(
-                    "a1b2c3d4e5f6	refs/heads/main",
-                    "f6e5d4c3b2a1	refs/heads/develop"
+                    'a1b2c3d4e5f6	refs/heads/main',
+                    'f6e5d4c3b2a1	refs/heads/develop'
                 )
             }
 
@@ -176,7 +176,7 @@ Describe 'Get-GitRemoteBranch' {
             }
 
             Mock -CommandName 'git' -MockWith {
-                return @("a1b2c3d4e5f6	refs/heads/main")
+                return @('a1b2c3d4e5f6	refs/heads/main')
             }
 
             $global:LASTEXITCODE = 0
@@ -199,8 +199,8 @@ Describe 'Get-GitRemoteBranch' {
 
             Mock -CommandName 'git' -MockWith {
                 return @(
-                    "a1b2c3d4e5f6	refs/heads/feature/test1",
-                    "f6e5d4c3b2a1	refs/heads/feature/test2"
+                    'a1b2c3d4e5f6	refs/heads/feature/test1',
+                    'f6e5d4c3b2a1	refs/heads/feature/test2'
                 )
             }
 
@@ -223,7 +223,7 @@ Describe 'Get-GitRemoteBranch' {
             }
 
             Mock -CommandName 'git' -MockWith {
-                return @("a1b2c3d4e5f6	refs/heads/main")
+                return @('a1b2c3d4e5f6	refs/heads/main')
             }
 
             $global:LASTEXITCODE = 0
@@ -246,8 +246,8 @@ Describe 'Get-GitRemoteBranch' {
 
             Mock -CommandName 'git' -MockWith {
                 return @(
-                    "a1b2c3d4e5f6	refs/heads/main",
-                    "f6e5d4c3b2a1	refs/heads/develop"
+                    'a1b2c3d4e5f6	refs/heads/main',
+                    'f6e5d4c3b2a1	refs/heads/develop'
                 )
             }
 
@@ -273,8 +273,8 @@ Describe 'Get-GitRemoteBranch' {
 
             Mock -CommandName 'git' -MockWith {
                 return @(
-                    "a1b2c3d4e5f6	refs/heads/main",
-                    "f6e5d4c3b2a1	refs/heads/develop"
+                    'a1b2c3d4e5f6	refs/heads/main',
+                    'f6e5d4c3b2a1	refs/heads/develop'
                 )
             }
 
@@ -289,7 +289,7 @@ Describe 'Get-GitRemoteBranch' {
             }
 
             Mock -CommandName 'git' -MockWith {
-                return @("a1b2c3d4e5f6	refs/heads/main")
+                return @('a1b2c3d4e5f6	refs/heads/main')
             }
 
             $global:LASTEXITCODE = 0

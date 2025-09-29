@@ -47,7 +47,7 @@ Describe 'ConvertTo-DifferenceString' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-ReferenceString] <string> [-DifferenceString] <string> [[-EqualIndicator] <string>] [[-NotEqualIndicator] <string>] [[-HighlightStart] <string>] [[-HighlightEnd] <string>] [[-ReferenceLabel] <string>] [[-DifferenceLabel] <string>] [[-ReferenceLabelAnsi] <string>] [[-DifferenceLabelAnsi] <string>] [[-ColumnHeaderAnsi] <string>] [[-ColumnHeaderResetAnsi] <string>] [[-EncodingType] <string>] [-NoColumnHeader] [-NoLabels] [-NoHexOutput] [<CommonParameters>]'
+                ExpectedParameters       = '[-ReferenceString] <string> [-DifferenceString] <string> [[-EqualIndicator] <string>] [[-NotEqualIndicator] <string>] [[-HighlightStart] <string>] [[-HighlightEnd] <string>] [[-ReferenceLabel] <string>] [[-DifferenceLabel] <string>] [[-ReferenceLabelAnsi] <string>] [[-DifferenceLabelAnsi] <string>] [[-ColumnHeaderAnsi] <string>] [[-ColumnHeaderResetAnsi] <string>] [[-EncodingType] <string>] [-NoColumnHeader] [-NoLabels] [-NoHexOutput] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'ConvertTo-DifferenceString').ParameterSets |
@@ -121,7 +121,7 @@ Describe 'ConvertTo-DifferenceString' {
 
         # Should emit a warning about truncation
         $warnings | Should -HaveCount 1
-        $warnings[0] | Should -Match "Reference label.*is longer than the maximum width of 64 characters and has been truncated"
+        $warnings[0] | Should -Match 'Reference label.*is longer than the maximum width of 64 characters and has been truncated'
     }
 
     It 'Should align right column precisely at column 72 when visible label length is exactly 72' {

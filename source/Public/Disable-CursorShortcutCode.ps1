@@ -67,9 +67,9 @@ function Disable-CursorShortcutCode
     if ($cursorPath.Count -gt 1)
     {
         $errorMessageParameters = @{
-            Message = $script:localizedData.Disable_CursorShortcutCode_MultipleCursorPaths
-            Category = 'InvalidResult'
-            ErrorId = 'DCSC0002' # cspell: disable-line
+            Message      = $script:localizedData.Disable_CursorShortcutCode_MultipleCursorPaths
+            Category     = 'InvalidResult'
+            ErrorId      = 'DCSC0002' # cspell: disable-line
             TargetObject = 'Path'
         }
 

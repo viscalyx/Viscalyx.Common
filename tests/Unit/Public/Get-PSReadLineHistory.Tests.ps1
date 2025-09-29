@@ -47,7 +47,7 @@ Describe 'Get-PSReadLineHistory' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[[-Pattern] <string>] [<CommonParameters>]'
+                ExpectedParameters       = '[[-Pattern] <string>] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Get-PSReadLineHistory').ParameterSets |

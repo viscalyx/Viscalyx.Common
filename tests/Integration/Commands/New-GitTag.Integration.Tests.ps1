@@ -45,21 +45,24 @@ Describe 'New-GitTag' -Tag 'Integration' {
 
         # Initialize a git repository
         Push-Location -Path $script:testRepoPath
-        try {
+        try
+        {
             & git init --quiet --initial-branch=main
-            & git config user.name "Test User"
-            & git config user.email "test@example.com"
+            & git config user.name 'Test User'
+            & git config user.email 'test@example.com'
 
             # Create an initial commit
             $null = New-Item -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -ItemType File -Force
             Set-Content -Path (Join-Path -Path $script:testRepoPath -ChildPath 'README.md') -Value '# Test Repository'
             & git add README.md
-            & git commit -m "Initial commit" --quiet
+            & git commit -m 'Initial commit' --quiet
         }
-        catch {
+        catch
+        {
             throw "Failed to setup test git repository: $($_.Exception.Message)"
         }
-        finally {
+        finally
+        {
             Pop-Location
         }
     }
@@ -69,38 +72,48 @@ Describe 'New-GitTag' -Tag 'Integration' {
         Push-Location -Path $script:testRepoPath
 
         # Clean up any existing tags before each test
-        try {
+        try
+        {
             $tags = & git tag 2>$null
-            if ($tags) {
-                foreach ($tag in $tags) {
+            if ($tags)
+            {
+                foreach ($tag in $tags)
+                {
                     & git tag -d $tag 2>$null | Out-Null
                 }
             }
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors
         }
     }
 
     AfterEach {
         # Clean up any tags created during testing
-        try {
+        try
+        {
             $tags = & git tag 2>$null
-            if ($tags) {
-                foreach ($tag in $tags) {
+            if ($tags)
+            {
+                foreach ($tag in $tags)
+                {
                     & git tag -d $tag 2>$null | Out-Null
                 }
             }
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors
         }
 
         # Return to original location
-        try {
+        try
+        {
             Pop-Location
         }
-        catch {
+        catch
+        {
             # Ignore location errors
         }
     }
@@ -127,13 +140,15 @@ Describe 'New-GitTag' -Tag 'Integration' {
         It 'Should work with different tag naming patterns' {
             $tagNames = @('v1.0.0', 'release-2023', 'feature-tag', '1.0.0-beta')
 
-            foreach ($tagName in $tagNames) {
+            foreach ($tagName in $tagNames)
+            {
                 { New-GitTag -Name $tagName -Force -ErrorAction Stop } | Should -Not -Throw
             }
 
             # Verify all tags were created
             $tags = & git tag
-            foreach ($tagName in $tagNames) {
+            foreach ($tagName in $tagNames)
+            {
                 $tags | Should -Contain $tagName
             }
         }

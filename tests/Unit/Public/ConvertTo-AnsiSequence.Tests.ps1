@@ -51,7 +51,7 @@ Describe 'ConvertTo-AnsiSequence' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-Value] <string> [<CommonParameters>]'
+                ExpectedParameters       = '[-Value] <string> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'ConvertTo-AnsiSequence').ParameterSets |

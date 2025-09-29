@@ -47,14 +47,17 @@ Describe 'Split-StringAtIndex' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = 'PipelineInput'
-                ExpectedParameters = '-IndexObject <psobject> -InputString <string> [<CommonParameters>]'
+                ExpectedParameters       = '-IndexObject <psobject> -InputString <string> [<CommonParameters>]'
             }
             @{
                 ExpectedParameterSetName = 'StartEndInput'
                 # Windows PowerShell shows uint32, PowerShell 7+ shows uint
-                ExpectedParameters = if ($PSVersionTable.PSVersion.Major -le 5) {
+                ExpectedParameters       = if ($PSVersionTable.PSVersion.Major -le 5)
+                {
                     '-InputString <string> -StartIndex <uint32> -EndIndex <uint32> [<CommonParameters>]'
-                } else {
+                }
+                else
+                {
                     '-InputString <string> -StartIndex <uint> -EndIndex <uint> [<CommonParameters>]'
                 }
             }
@@ -96,19 +99,19 @@ Describe 'Split-StringAtIndex' {
 
     Context 'Using StartIndex and EndIndex parameters' {
         It 'Should split the string correctly with valid indices' {
-            $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 4
+            $result = Split-StringAtIndex -InputString 'Hello, World!' -StartIndex 0 -EndIndex 4
 
             $result | Should-BeEquivalent @('Hello', ', World!')
         }
 
         It 'Should handle indices at the end of the string' {
-            $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 7 -EndIndex 11
+            $result = Split-StringAtIndex -InputString 'Hello, World!' -StartIndex 7 -EndIndex 11
 
             $result | Should-BeEquivalent @('Hello, ', 'World', '!')
         }
 
         It 'Should return the whole string if indices cover the entire string' {
-            $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 12
+            $result = Split-StringAtIndex -InputString 'Hello, World!' -StartIndex 0 -EndIndex 12
 
             $result | Should-BeEquivalent @('Hello, World!')
         }
@@ -116,18 +119,18 @@ Describe 'Split-StringAtIndex' {
 
     Context 'Using pipeline input with IndexObject' {
         It 'Should split the string correctly with valid index objects' {
-            $indexObjects = @(@{Start = 0; End = 4}, @{Start = 7; End = 11})
+            $indexObjects = @(@{Start = 0; End = 4 }, @{Start = 7; End = 11 })
 
-            $result = $indexObjects | Split-StringAtIndex -InputString "Hello, World!"
+            $result = $indexObjects | Split-StringAtIndex -InputString 'Hello, World!'
 
             $result | Should-BeEquivalent @('Hello', ', ', 'World', '!')
         }
 
         It 'Should handle multiple index objects' {
-            $indexObjects = @(@{Start = 0; End = 2}, @{Start = 4; End = $null}, @{Start = 8; End = 10})
+            $indexObjects = @(@{Start = 0; End = 2 }, @{Start = 4; End = $null }, @{Start = 8; End = 10 })
 
             # cSpell:ignore abcdefghijk
-            $result = $indexObjects | Split-StringAtIndex -InputString "abcdefghijk"
+            $result = $indexObjects | Split-StringAtIndex -InputString 'abcdefghijk'
 
             $result | Should-BeEquivalent @('abc', 'd', 'e', 'fgh', 'ijk')
         }
@@ -135,17 +138,17 @@ Describe 'Split-StringAtIndex' {
 
     Context 'Edge cases' {
         It 'Should return the whole string when indices cover the entire range' {
-            $result = Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 12
+            $result = Split-StringAtIndex -InputString 'Hello, World!' -StartIndex 0 -EndIndex 12
 
             $result | Should-BeEquivalent @('Hello, World!')
         }
 
         It 'Should handle empty input string' {
-            {  Split-StringAtIndex -InputString "" } | Should -Throw
+            { Split-StringAtIndex -InputString '' } | Should -Throw
         }
 
         It 'Should throw an error if indices are out of bounds' {
-            { Split-StringAtIndex -InputString "Hello" -StartIndex 10 -EndIndex 15 } | Should -Throw
+            { Split-StringAtIndex -InputString 'Hello' -StartIndex 10 -EndIndex 15 } | Should -Throw
         }
     }
 }

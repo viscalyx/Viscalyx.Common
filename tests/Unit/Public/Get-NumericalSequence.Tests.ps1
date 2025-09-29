@@ -42,12 +42,12 @@ AfterAll {
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }
 
-Describe "Get-NumericalSequence" {
+Describe 'Get-NumericalSequence' {
     Context 'When checking command structure' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-Number] <int> [<CommonParameters>]'
+                ExpectedParameters       = '[-Number] <int> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Get-NumericalSequence').ParameterSets |
@@ -66,7 +66,7 @@ Describe "Get-NumericalSequence" {
         }
     }
 
-    It "should return a single range for consecutive numbers" {
+    It 'should return a single range for consecutive numbers' {
         $numbers = 1, 2, 3
 
         $result = $numbers | Get-NumericalSequence
@@ -76,7 +76,7 @@ Describe "Get-NumericalSequence" {
         $result | Should-BeEquivalent $expected
     }
 
-    It "should return multiple ranges for numbers with gaps" {
+    It 'should return multiple ranges for numbers with gaps' {
         $numbers = 1, 2, 3, 5, 6, 7, 10
 
         $result = $numbers | Get-NumericalSequence
@@ -90,7 +90,7 @@ Describe "Get-NumericalSequence" {
         $result |  Should-BeEquivalent $expected
     }
 
-    It "should return a single range for a single number" {
+    It 'should return a single range for a single number' {
         $numbers = 1
 
         $result = $numbers | Get-NumericalSequence
@@ -100,7 +100,7 @@ Describe "Get-NumericalSequence" {
         $result | Should-BeEquivalent $expected
     }
 
-    It "should return an empty array for no input" {
+    It 'should return an empty array for no input' {
         $numbers = @()
 
         $result = $numbers | Get-NumericalSequence

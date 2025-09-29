@@ -68,9 +68,9 @@ function Invoke-Git
     )
 
     $gitResult = @{
-        'ExitCode'         = -1
-        'Output'           = $null
-        'StandardError'    = $null
+        ExitCode      = -1
+        Output        = $null
+        StandardError = $null
     }
 
     # Process arguments to add quotes around arguments containing spaces if not already quoted
@@ -132,9 +132,9 @@ function Invoke-Git
         }
 
         if ($VerbosePreference -ne 'SilentlyContinue' -or `
-            $DebugPreference -ne 'SilentlyContinue' -or `
-            $PSBoundParameters['Verbose'] -eq $true -or `
-            $PSBoundParameters['Debug'] -eq $true)
+                $DebugPreference -ne 'SilentlyContinue' -or `
+                $PSBoundParameters['Verbose'] -eq $true -or `
+                $PSBoundParameters['Debug'] -eq $true)
         {
             Write-Verbose -Message ($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.Output)
             Write-Verbose -Message ($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)
@@ -146,11 +146,11 @@ function Invoke-Git
 
         if ($gitResult.ExitCode -ne 0 -and $PassThru -eq $false)
         {
-            $throwMessage = "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))`n" +`
-                            "$($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)`n" +`
-                            "$($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.Output)`n" +`
-                            "$($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)`n" +`
-                            "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $WorkingDirectory)`n"
+            $throwMessage = "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))`n" + `
+                "$($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)`n" + `
+                "$($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.Output)`n" + `
+                "$($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)`n" + `
+                "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $WorkingDirectory)`n"
 
             throw $throwMessage
         }

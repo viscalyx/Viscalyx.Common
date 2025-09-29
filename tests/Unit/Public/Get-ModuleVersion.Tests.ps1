@@ -47,7 +47,7 @@ Describe 'Get-ModuleVersion' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-Module] <Object> [<CommonParameters>]'
+                ExpectedParameters       = '[-Module] <Object> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Get-ModuleVersion').ParameterSets |

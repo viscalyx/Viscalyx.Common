@@ -47,7 +47,7 @@ Describe 'Assert-GitRemote' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-Name] <string> [<CommonParameters>]'
+                ExpectedParameters       = '[-Name] <string> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Assert-GitRemote').ParameterSets |
@@ -98,37 +98,45 @@ Describe 'Assert-GitRemote' {
         }
 
         It 'Should throw a terminating error with the correct error ID' {
-            try {
+            try
+            {
                 Assert-GitRemote -Name 'origin'
             }
-            catch {
+            catch
+            {
                 $_.FullyQualifiedErrorId | Should -Be 'AGR0001,Assert-GitRemote'
             }
         }
 
         It 'Should throw a terminating error with the correct error category' {
-            try {
+            try
+            {
                 Assert-GitRemote -Name 'origin'
             }
-            catch {
+            catch
+            {
                 $_.CategoryInfo.Category | Should -Be 'ObjectNotFound'
             }
         }
 
         It 'Should throw a terminating error with the correct target object' {
-            try {
+            try
+            {
                 Assert-GitRemote -Name 'origin'
             }
-            catch {
+            catch
+            {
                 $_.TargetObject | Should -Be 'origin'
             }
         }
 
         It 'Should call Test-GitRemote once' {
-            try {
+            try
+            {
                 Assert-GitRemote -Name 'origin'
             }
-            catch {
+            catch
+            {
                 # Expected to throw, ignore the error
             }
 

@@ -37,8 +37,10 @@ Describe 'Get-LinkLayerAddress' {
             $commonGatewayIPs = @('192.168.1.1', '192.168.0.1', '10.0.0.1', '172.16.0.1')
             $reachableIP = $null
 
-            foreach ($ip in $commonGatewayIPs) {
-                if (Test-Connection -ComputerName $ip -Count 1 -Quiet -ErrorAction SilentlyContinue) {
+            foreach ($ip in $commonGatewayIPs)
+            {
+                if (Test-Connection -ComputerName $ip -Count 1 -Quiet -ErrorAction SilentlyContinue)
+                {
                     $reachableIP = $ip
                     break
                 }

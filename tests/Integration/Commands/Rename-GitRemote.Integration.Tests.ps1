@@ -39,91 +39,113 @@ BeforeAll {
 
     # Initialize the bare repositories (simulates remotes)
     Push-Location -Path $script:bareRepoPath
-    try {
+    try
+    {
         git init --bare --initial-branch=main *> $null
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 
     Push-Location -Path $script:upstreamRepoPath
-    try {
+    try
+    {
         git init --bare --initial-branch=main *> $null
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 
     # Initialize the test repository and create initial content
     Push-Location -Path $script:testRepoPath
-    try {
+    try
+    {
         # Initialize git repository
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
-            & cmd.exe /c "git init --initial-branch=main --quiet >nul 2>&1"
-        } else {
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
+            & cmd.exe /c 'git init --initial-branch=main --quiet >nul 2>&1'
+        }
+        else
+        {
             $gitOutput = git init --initial-branch=main --quiet 2>&1
         }
-        git config user.email "test@example.com" *> $null
-        git config user.name "Test User" *> $null
+        git config user.email 'test@example.com' *> $null
+        git config user.name 'Test User' *> $null
 
         # Create initial commit
-        "Initial content" | Out-File -FilePath 'test.txt' -Encoding utf8
+        'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
         git add test.txt *> $null
-        git commit -m "Initial commit" *> $null
+        git commit -m 'Initial commit' *> $null
 
         # Add multiple remotes for testing
         git remote add myremote $script:bareRepoPath *> $null
         git remote add upstream $script:upstreamRepoPath *> $null
 
         # Push to remotes to establish them
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
             # Windows PowerShell - use cmd.exe for reliable output suppression
-            & cmd.exe /c "git push -u myremote main --quiet >nul 2>&1"
-            if ($LASTEXITCODE -ne 0) {
-                & cmd.exe /c "git push -u myremote master --quiet >nul 2>&1"
+            & cmd.exe /c 'git push -u myremote main --quiet >nul 2>&1'
+            if ($LASTEXITCODE -ne 0)
+            {
+                & cmd.exe /c 'git push -u myremote master --quiet >nul 2>&1'
             }
-        } else {
+        }
+        else
+        {
             # PowerShell 7+ - capture output in variables
             $gitOutput = git push -u myremote main --quiet 2>&1
-            if ($LASTEXITCODE -ne 0) {
+            if ($LASTEXITCODE -ne 0)
+            {
                 $gitOutput = git push -u myremote master --quiet 2>&1
             }
         }
 
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
             # Windows PowerShell - use cmd.exe for reliable output suppression
-            & cmd.exe /c "git push upstream main >nul 2>&1"
-            if ($LASTEXITCODE -ne 0) {
-                & cmd.exe /c "git push upstream master >nul 2>&1"
+            & cmd.exe /c 'git push upstream main >nul 2>&1'
+            if ($LASTEXITCODE -ne 0)
+            {
+                & cmd.exe /c 'git push upstream master >nul 2>&1'
             }
-        } else {
+        }
+        else
+        {
             # PowerShell 7+ - capture output in variables
             $gitOutput = git push upstream main 2>&1
-            if ($LASTEXITCODE -ne 0) {
+            if ($LASTEXITCODE -ne 0)
+            {
                 $gitOutput = git push upstream master 2>&1
             }
         }
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 }
 
 AfterAll {
     # Clean up - remove the test repositories
-    if (Test-Path -Path $script:testRepoPath) {
+    if (Test-Path -Path $script:testRepoPath)
+    {
         $previousProgressPreference = $ProgressPreference
         $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         $ProgressPreference = $previousProgressPreference
     }
-    if (Test-Path -Path $script:bareRepoPath) {
+    if (Test-Path -Path $script:bareRepoPath)
+    {
         $previousProgressPreference = $ProgressPreference
         $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:bareRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         $ProgressPreference = $previousProgressPreference
     }
-    if (Test-Path -Path $script:upstreamRepoPath) {
+    if (Test-Path -Path $script:upstreamRepoPath)
+    {
         $previousProgressPreference = $ProgressPreference
         $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:upstreamRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -138,7 +160,8 @@ Describe 'Rename-GitRemote' {
 
         # Reset remotes to initial state for each test
         $currentRemotes = git remote
-        foreach ($remote in $currentRemotes) {
+        foreach ($remote in $currentRemotes)
+        {
             git remote remove $remote *> $null
         }
 
@@ -198,16 +221,19 @@ Describe 'Rename-GitRemote' {
             $null = Rename-GitRemote -Name 'myremote' -NewName 'origin' -Force -ErrorAction Stop
 
             # Verify that branches can still be pushed and tracked
-            "Modified content" | Out-File -FilePath 'test2.txt' -Encoding utf8
+            'Modified content' | Out-File -FilePath 'test2.txt' -Encoding utf8
             git add test2.txt *> $null
-            git commit -m "Test commit after rename" *> $null
+            git commit -m 'Test commit after rename' *> $null
 
             # Set up upstream tracking for the current branch and push
             $currentBranch = git branch --show-current
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
                 & cmd.exe /c "git push --set-upstream origin $currentBranch --quiet >nul 2>&1"
-            } else {
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = git push --set-upstream origin $currentBranch --quiet 2>&1
             }

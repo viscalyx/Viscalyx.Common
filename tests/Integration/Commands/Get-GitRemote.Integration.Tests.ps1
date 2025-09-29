@@ -44,13 +44,13 @@ Describe 'Get-GitRemote' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'test content' | Out-File -FilePath 'test.txt' -Encoding utf8
             $null = git add . 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Add test remotes
             $null = git remote add origin 'https://github.com/test/repo.git' 2>&1
@@ -63,7 +63,8 @@ Describe 'Get-GitRemote' -Tag 'Integration' {
             Set-Location -Path $script:originalLocation
 
             # Clean up test repository
-            if (Test-Path -Path $script:testRepoPath) {
+            if (Test-Path -Path $script:testRepoPath)
+            {
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -126,13 +127,13 @@ Describe 'Get-GitRemote' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'test content' | Out-File -FilePath 'test.txt' -Encoding utf8
             $null = git add . 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
         }
 
         AfterEach {
@@ -140,7 +141,8 @@ Describe 'Get-GitRemote' -Tag 'Integration' {
             Set-Location -Path $script:originalLocation
 
             # Clean up test repository
-            if (Test-Path -Path $script:testRepoPath) {
+            if (Test-Path -Path $script:testRepoPath)
+            {
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -181,7 +183,8 @@ Describe 'Get-GitRemote' -Tag 'Integration' {
             Set-Location -Path $script:originalLocation
 
             # Clean up test directory
-            if (Test-Path -Path $script:testRepoPath) {
+            if (Test-Path -Path $script:testRepoPath)
+            {
                 $previousProgressPreference = $ProgressPreference
                 $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
                 Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue

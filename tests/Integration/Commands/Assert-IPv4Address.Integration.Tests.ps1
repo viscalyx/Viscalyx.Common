@@ -53,34 +53,34 @@ Describe 'Assert-IPv4Address' {
         BeforeDiscovery {
             $invalidIPAddresses = @(
                 @{
-                    IPAddress = '256.168.1.1'
+                    IPAddress       = '256.168.1.1'
                     ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
-                    Description = 'octet out of range'
+                    Description     = 'octet out of range'
                 },
                 @{
-                    IPAddress = '192.168.01.1'
+                    IPAddress       = '192.168.01.1'
                     ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
-                    Description = 'leading zero'
+                    Description     = 'leading zero'
                 },
                 @{
-                    IPAddress = '192.168.1'
+                    IPAddress       = '192.168.1'
                     ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
-                    Description = 'invalid format'
+                    Description     = 'invalid format'
                 },
                 @{
-                    IPAddress = '192.168.1.1.1'
+                    IPAddress       = '192.168.1.1.1'
                     ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
-                    Description = 'too many octets'
+                    Description     = 'too many octets'
                 },
                 @{
-                    IPAddress = '192.168.1.a'
+                    IPAddress       = '192.168.1.a'
                     ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
-                    Description = 'non-numeric octet'
+                    Description     = 'non-numeric octet'
                 },
                 @{
-                    IPAddress = '999.999.999.999'
+                    IPAddress       = '999.999.999.999'
                     ExpectedErrorId = 'AIV0003,Assert-IPv4Address'
-                    Description = 'all octets out of range'
+                    Description     = 'all octets out of range'
                 }
             )
         }
@@ -116,32 +116,35 @@ Describe 'Assert-IPv4Address' {
         BeforeDiscovery {
             $edgeCaseTests = @(
                 @{
-                    IPAddress = '0.0.0.1'
-                    ShouldPass = $true
+                    IPAddress   = '0.0.0.1'
+                    ShouldPass  = $true
                     Description = 'minimum valid with last octet 1'
                 },
                 @{
-                    IPAddress = '254.254.254.254'
-                    ShouldPass = $true
+                    IPAddress   = '254.254.254.254'
+                    ShouldPass  = $true
                     Description = 'near maximum valid'
                 },
                 @{
-                    IPAddress = '192.168.255.0'
-                    ShouldPass = $true
+                    IPAddress   = '192.168.255.0'
+                    ShouldPass  = $true
                     Description = 'network address with high third octet'
                 },
                 @{
-                    IPAddress = '10.255.255.255'
-                    ShouldPass = $true
+                    IPAddress   = '10.255.255.255'
+                    ShouldPass  = $true
                     Description = 'broadcast address in private range'
                 }
             )
         }
 
         It 'Should handle edge case <Description>: <IPAddress>' -ForEach $edgeCaseTests {
-            if ($_.ShouldPass) {
+            if ($_.ShouldPass)
+            {
                 $null = Assert-IPv4Address -IPAddress $_.IPAddress
-            } else {
+            }
+            else
+            {
                 {
                     Assert-IPv4Address -IPAddress $_.IPAddress
                 } | Should -Throw

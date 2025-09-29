@@ -285,7 +285,7 @@ Describe 'Request-GitTag' {
                 $command = Get-Command Request-GitTag
                 $command.Parameters['RemoteName'].Attributes.Mandatory | Should -BeTrue
             }
-            
+
             $scriptBlock | Should -Not -Throw
         }
     }
@@ -298,28 +298,28 @@ Describe 'Request-GitTag' {
 
             # Mock the ShouldProcess method to capture the messages
             $script:shouldProcessMessages = @()
-            
+
             Mock -CommandName 'Request-GitTag' -ModuleName $script:moduleName -MockWith {
                 param($RemoteName, $Name, $Force)
-                
+
                 # Capture the localized strings that would be used
                 if ($PSBoundParameters.ContainsKey('Name'))
                 {
                     $script:shouldProcessMessages += @{
                         Description = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessVerboseDescription -f $Name, $RemoteName
-                        Warning = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessVerboseWarning -f $Name, $RemoteName
-                        Caption = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessCaption
+                        Warning     = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessVerboseWarning -f $Name, $RemoteName
+                        Caption     = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessCaption
                     }
                 }
                 else
                 {
                     $script:shouldProcessMessages += @{
                         Description = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessVerboseDescription -f $RemoteName
-                        Warning = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessVerboseWarning -f $RemoteName
-                        Caption = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessCaption
+                        Warning     = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessVerboseWarning -f $RemoteName
+                        Caption     = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessCaption
                     }
                 }
-                
+
                 return $true
             } -ParameterFilter { $WhatIf -eq $true }
         }
@@ -327,18 +327,18 @@ Describe 'Request-GitTag' {
         It 'Should use correct localized strings for specific tag WhatIf' {
             InModuleScope -ScriptBlock {
                 $script:shouldProcessMessages = @()
-                
+
                 # Test the actual localized strings exist and can be formatted
                 $testName = 'v1.0.0'
                 $testRemote = 'origin'
-                
+
                 $description = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessVerboseDescription -f $testName, $testRemote
                 $warning = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessVerboseWarning -f $testName, $testRemote
                 $caption = $script:localizedData.Request_GitTag_FetchTag_ShouldProcessCaption
-                
+
                 $description | Should -Be "Fetching tag 'v1.0.0' from remote 'origin'. (RQT0001)"
                 $warning | Should -Be "Are you sure you want to fetch tag 'v1.0.0' from remote 'origin'? (RQT0002)"
-                $caption | Should -Be "Fetch tag (RQT0003)"
+                $caption | Should -Be 'Fetch tag (RQT0003)'
             }
         }
 
@@ -346,14 +346,14 @@ Describe 'Request-GitTag' {
             InModuleScope -ScriptBlock {
                 # Test the actual localized strings exist and can be formatted
                 $testRemote = 'upstream'
-                
+
                 $description = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessVerboseDescription -f $testRemote
                 $warning = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessVerboseWarning -f $testRemote
                 $caption = $script:localizedData.Request_GitTag_FetchAllTags_ShouldProcessCaption
-                
+
                 $description | Should -Be "Fetching all tags from remote 'upstream'. (RQT0004)"
                 $warning | Should -Be "Are you sure you want to fetch all tags from remote 'upstream'? (RQT0005)"
-                $caption | Should -Be "Fetch all tags (RQT0006)"
+                $caption | Should -Be 'Fetch all tags (RQT0006)'
             }
         }
     }

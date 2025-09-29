@@ -26,23 +26,23 @@ BeforeDiscovery {
     $script:parameterSetTestCases = @(
         @{
             ExpectedParameterSetName = 'NoParameter'
-            ExpectedParameters = '[-BranchName <string>] [<CommonParameters>]'
+            ExpectedParameters       = '[-BranchName <string>] [<CommonParameters>]'
         }
         @{
             ExpectedParameterSetName = 'Latest'
-            ExpectedParameters = '[-BranchName <string>] [-Latest] [<CommonParameters>]'
+            ExpectedParameters       = '[-BranchName <string>] [-Latest] [<CommonParameters>]'
         }
         @{
             ExpectedParameterSetName = 'Last'
-            ExpectedParameters = '[-BranchName <string>] [-Last <uint>] [<CommonParameters>]'
+            ExpectedParameters       = '[-BranchName <string>] [-Last <uint>] [<CommonParameters>]'
         }
         @{
             ExpectedParameterSetName = 'First'
-            ExpectedParameters = '[-BranchName <string>] [-First <uint>] [<CommonParameters>]'
+            ExpectedParameters       = '[-BranchName <string>] [-First <uint>] [<CommonParameters>]'
         }
         @{
             ExpectedParameterSetName = 'Range'
-            ExpectedParameters = '-From <string> -To <string> [<CommonParameters>]'
+            ExpectedParameters       = '-From <string> -To <string> [<CommonParameters>]'
         }
     )
 }
@@ -78,7 +78,8 @@ Describe 'Get-GitBranchCommit' {
 
             $result.ParameterSetName | Should -Be $ExpectedParameterSetName
 
-            if ($PSVersionTable.PSVersion.Major -eq 5) {
+            if ($PSVersionTable.PSVersion.Major -eq 5)
+            {
                 # Windows PowerShell 5.1 shows <uint32> for System.UInt32 type
                 $ExpectedParameters = $ExpectedParameters -replace '<uint>', '<uint32>'
             }
@@ -115,12 +116,12 @@ Describe 'Get-GitBranchCommit' {
 
         It 'Should have From as a mandatory parameter in Range parameter set' {
             $parameterInfo = (Get-Command -Name 'Get-GitBranchCommit').Parameters['From']
-            $parameterInfo.Attributes.Where({$_.ParameterSetName -eq 'Range'}).Mandatory | Should -BeTrue
+            $parameterInfo.Attributes.Where({ $_.ParameterSetName -eq 'Range' }).Mandatory | Should -BeTrue
         }
 
         It 'Should have To as a mandatory parameter in Range parameter set' {
             $parameterInfo = (Get-Command -Name 'Get-GitBranchCommit').Parameters['To']
-            $parameterInfo.Attributes.Where({$_.ParameterSetName -eq 'Range'}).Mandatory | Should -BeTrue
+            $parameterInfo.Attributes.Where({ $_.ParameterSetName -eq 'Range' }).Mandatory | Should -BeTrue
         }
 
         It 'Should have correct parameter types' {
@@ -137,11 +138,11 @@ Describe 'Get-GitBranchCommit' {
 
     Context 'When testing parameter validation' {
         It 'Should accept positive values for Last parameter' {
-            { Get-Command -Name 'Get-GitBranchCommit' | ForEach-Object { $_.Parameters['Last'].Attributes.Where({$_.TypeId.Name -eq 'ValidateRangeAttribute'}) } } | Should -Not -Throw
+            { Get-Command -Name 'Get-GitBranchCommit' | ForEach-Object { $_.Parameters['Last'].Attributes.Where({ $_.TypeId.Name -eq 'ValidateRangeAttribute' }) } } | Should -Not -Throw
         }
 
         It 'Should accept positive values for First parameter' {
-            { Get-Command -Name 'Get-GitBranchCommit' | ForEach-Object { $_.Parameters['First'].Attributes.Where({$_.TypeId.Name -eq 'ValidateRangeAttribute'}) } } | Should -Not -Throw
+            { Get-Command -Name 'Get-GitBranchCommit' | ForEach-Object { $_.Parameters['First'].Attributes.Where({ $_.TypeId.Name -eq 'ValidateRangeAttribute' }) } } | Should -Not -Throw
         }
     }
 
@@ -279,10 +280,12 @@ Describe 'Get-GitBranchCommit' {
                     # Mock git commands
                     Mock -CommandName 'git' -MockWith {
                         $global:LASTEXITCODE = 0
-                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count') {
+                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count')
+                        {
                             return '10'
                         }
-                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip') {
+                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip')
+                        {
                             return @('abc123', 'def456', 'ghi789')
                         }
                     }
@@ -303,10 +306,12 @@ Describe 'Get-GitBranchCommit' {
 
                     Mock -CommandName 'git' -MockWith {
                         $global:LASTEXITCODE = 0
-                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count') {
+                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count')
+                        {
                             return '5'
                         }
-                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip') {
+                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip')
+                        {
                             return @('first123', 'second456')
                         }
                     }
@@ -323,10 +328,12 @@ Describe 'Get-GitBranchCommit' {
                 InModuleScope -ScriptBlock {
                     Mock -CommandName 'git' -MockWith {
                         $global:LASTEXITCODE = 0
-                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count') {
+                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count')
+                        {
                             return '8'
                         }
-                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip') {
+                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip')
+                        {
                             return @('oldest123')
                         }
                     }
@@ -348,10 +355,12 @@ Describe 'Get-GitBranchCommit' {
                     # Mock git commands - simulate branch with only 2 commits but First=5
                     Mock -CommandName 'git' -MockWith {
                         $global:LASTEXITCODE = 0
-                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count') {
+                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count')
+                        {
                             return '2'  # Only 2 commits in branch
                         }
-                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip') {
+                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip')
+                        {
                             # With current bug, --skip would be -3 (2-5=-3), which should fail
                             # With fix, --skip should be 0 (max(0, 2-5)=0)
                             return @('commit1', 'commit2')
@@ -524,11 +533,13 @@ Describe 'Get-GitBranchCommit' {
                     }
 
                     Mock -CommandName 'git' -MockWith {
-                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count') {
+                        if ($args[0] -eq 'rev-list' -and $args[1] -eq '--count')
+                        {
                             $global:LASTEXITCODE = 0
                             return '10'
                         }
-                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip') {
+                        elseif ($args[0] -eq 'log' -and $args[1] -eq '--skip')
+                        {
                             $global:LASTEXITCODE = 128
                             return $null
                         }

@@ -48,11 +48,11 @@ Describe 'Get-GitTag' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = 'First'
-                ExpectedParameters = '[[-Name] <string>] [-First <uint>] [-AsVersions] [-Descending] [<CommonParameters>]'
+                ExpectedParameters       = '[[-Name] <string>] [-First <uint>] [-AsVersions] [-Descending] [<CommonParameters>]'
             }
             @{
                 ExpectedParameterSetName = 'Latest'
-                ExpectedParameters = '[-Latest] [<CommonParameters>]'
+                ExpectedParameters       = '[-Latest] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Get-GitTag').ParameterSets |
@@ -63,7 +63,8 @@ Describe 'Get-GitTag' {
                 )
             $result.ParameterSetName | Should -Be $ExpectedParameterSetName
 
-            if ($PSVersionTable.PSVersion.Major -eq 5) {
+            if ($PSVersionTable.PSVersion.Major -eq 5)
+            {
                 # Windows PowerShell 5.1 shows <uint32> for System.UInt32 type
                 $ExpectedParameters = $ExpectedParameters -replace '<uint>', '<uint32>'
             }

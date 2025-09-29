@@ -44,13 +44,13 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
         }
 
         AfterEach {
@@ -88,13 +88,13 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Make changes to the file to create unstaged changes
             'Modified content' | Out-File -FilePath 'README.md' -Encoding utf8
@@ -135,13 +135,13 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Create a new file and stage it
             'New file content' | Out-File -FilePath 'newfile.txt' -Encoding utf8
@@ -183,13 +183,13 @@ Describe 'Test-GitLocalChanges' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
 
             # Create staged changes
             'Staged file content' | Out-File -FilePath 'staged.txt' -Encoding utf8

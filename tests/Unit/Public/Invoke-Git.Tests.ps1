@@ -52,216 +52,218 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
         $mockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
             New-Object -TypeName 'Object' | `
-                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { 'Standard Output Message' } -PassThru -Force
-        } -Force
+                    Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { 'Standard Output Message' } -PassThru -Force
+            } -Force
 
-        $mockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-            New-Object -TypeName 'Object' | `
-                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { 'Standard Error Message' } -PassThru -Force
-        } -Force
+            $mockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                New-Object -TypeName 'Object' | `
+                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { 'Standard Error Message' } -PassThru -Force
+                } -Force
 
-        # Need to add StartInfo property and its nested properties
-        $mockStartInfo = New-Object -TypeName 'Object'
-        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'Arguments' -Value @() -Force
-        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'CreateNoWindow' -Value $false -Force
-        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'FileName' -Value '' -Force
-        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardOutput' -Value $false -Force
-        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardError' -Value $false -Force
-        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'UseShellExecute' -Value $true -Force
-        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'WindowStyle' -Value 'Normal' -Force
-        $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'WorkingDirectory' -Value '' -Force
+                # Need to add StartInfo property and its nested properties
+                $mockStartInfo = New-Object -TypeName 'Object'
+                $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'Arguments' -Value @() -Force
+                $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'CreateNoWindow' -Value $false -Force
+                $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'FileName' -Value '' -Force
+                $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardOutput' -Value $false -Force
+                $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'RedirectStandardError' -Value $false -Force
+                $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'UseShellExecute' -Value $true -Force
+                $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'WindowStyle' -Value 'Normal' -Force
+                $mockStartInfo | Add-Member -MemberType NoteProperty -Name 'WorkingDirectory' -Value '' -Force
 
-        $mockProcess | Add-Member -MemberType NoteProperty -Name 'StartInfo' -Value $mockStartInfo -Force
+                $mockProcess | Add-Member -MemberType NoteProperty -Name 'StartInfo' -Value $mockStartInfo -Force
 
-        Mock -CommandName New-Object -MockWith { return $mockProcess } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
-    }
-
-    Context 'When git ExitCode -eq 0' {
-        BeforeAll {
-            $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
-        }
-
-        It 'Should not throw, return result with -PassThru' {
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru
-
-            $result.ExitCode | Should -BeExactly 0
-
-            $result.Output | Should -BeExactly 'Standard Output Message'
-
-            $result.StandardError | Should -BeExactly 'Standard Error Message'
-        }
-
-        It 'Should not throw, return result with -PassThru, with -Verbose' {
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Verbose
-
-            $result.ExitCode | Should -BeExactly 0
-
-            $result.Output | Should -BeExactly 'Standard Output Message'
-
-            $result.StandardError | Should -BeExactly 'Standard Error Message'
-        }
-
-        It 'Should not throw without -PassThru' {
-            { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) } | Should -Not -Throw
-        }
-
-        It 'Should not throw without -PassThru, with -Verbose' {
-            { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose } | Should -Not -Throw
-        }
-    }
-
-    Context 'When git ExitCode -ne 0' {
-        BeforeAll {
-            $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 128 } -Force
-        }
-
-        It 'Should not throw, return result with -PassThru' {
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru
-
-            $result.ExitCode | Should -BeExactly 128
-
-            $result.Output | Should -BeExactly 'Standard Output Message'
-
-            $result.StandardError | Should -BeExactly 'Standard Error Message'
-        }
-
-        It 'Should not throw, return result with -PassThru, with -Verbose' {
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Verbose
-
-            $result.ExitCode | Should -BeExactly 128
-
-            $result.Output | Should -BeExactly 'Standard Output Message'
-
-            $result.StandardError | Should -BeExactly 'Standard Error Message'
-        }
-
-        It 'Should throw without -PassThru' {
-            { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) } | Should -Throw
-        }
-
-        It 'Should throw without -PassThru, with -Verbose' {
-            { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose } | Should -Throw
-        }
-    }
-
-    Context 'When throwing an error' {
-        BeforeAll {
-            $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 128 } -Force
-
-            $tokenPrefix = ('pousr').ToCharArray() | Get-Random
-            $newTokenLength = Get-Random -Minimum 1 -Maximum 251
-            $newToken = (1..$newTokenLength | %{ ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
-        }
-
-        $testCases = @(
-            @{
-                'Command'      = @('status','--verbose');
-                'ErrorMessage' = 'status --verbose';
-            },
-            @{
-                'Command'      = @( 'remote','add','origin',"https://gh$($tokenPrefix)_$($newToken)@github.com/owner/repo.git" );
-                'ErrorMessage' = 'remote add origin https://**REDACTED-TOKEN**@github.com/owner/repo.git';
+                Mock -CommandName New-Object -MockWith { return $mockProcess } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
             }
-        )
 
-        It "Should throw exact with '<ErrorMessage>'" -TestCases $testCases {
-            param( $Command, $ErrorMessage )
+            Context 'When git ExitCode -eq 0' {
+                BeforeAll {
+                    $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+                }
 
-            $throwMessage = "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f $ErrorMessage))`n" +`
-                            "$($script:localizedData.Invoke_Git_ExitCodeMessage -f 128)`n" +`
-                            "$($script:localizedData.Invoke_Git_StandardOutputMessage -f 'Standard Output Message')`n" +`
-                            "$($script:localizedData.Invoke_Git_StandardErrorMessage -f 'Standard Error Message')`n" +`
-                            "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $TestDrive)`n"
+                It 'Should not throw, return result with -PassThru' {
+                    $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru
 
-            { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments $Command } | Should -Throw $throwMessage
-        }
-    }
+                    $result.ExitCode | Should -BeExactly 0
 
-    Context 'When arguments contain spaces' {
-        BeforeAll {
-            $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
-        }
+                    $result.Output | Should -BeExactly 'Standard Output Message'
 
-        It 'Should quote arguments containing spaces that are not already quoted' {
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', 'John Doe' ) -PassThru
+                    $result.StandardError | Should -BeExactly 'Standard Error Message'
+                }
 
-            # Verify that the processed arguments array contains properly quoted arguments
-            $processedArgs = $mockProcess.StartInfo.Arguments
-            $processedArgs | Should -Contain 'config'
-            $processedArgs | Should -Contain 'user.name'
-            $processedArgs | Should -Contain '"John Doe"'
-            $processedArgs | Should -Not -Contain 'John Doe'
-        }
+                It 'Should not throw, return result with -PassThru, with -Verbose' {
+                    $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Verbose
 
-        It 'Should not add quotes to arguments that are already quoted' {
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', '"John Doe"' ) -PassThru
+                    $result.ExitCode | Should -BeExactly 0
 
-            # Verify that already quoted arguments are not double-quoted
-            $processedArgs = $mockProcess.StartInfo.Arguments
-            $processedArgs | Should -Contain 'config'
-            $processedArgs | Should -Contain 'user.name'
-            $processedArgs | Should -Contain '"John Doe"'
-            $processedArgs | Should -Not -Contain '""John Doe""'
-        }
+                    $result.Output | Should -BeExactly 'Standard Output Message'
 
-        It 'Should not quote arguments without spaces' {
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', 'JohnDoe' ) -PassThru
+                    $result.StandardError | Should -BeExactly 'Standard Error Message'
+                }
 
-            # Verify that arguments without spaces are not quoted
-            $processedArgs = $mockProcess.StartInfo.Arguments
-            $processedArgs | Should -Contain 'config'
-            $processedArgs | Should -Contain 'user.name'
-            $processedArgs | Should -Contain 'JohnDoe'
-            $processedArgs | Should -Not -Contain '"JohnDoe"'
-        }
+                It 'Should not throw without -PassThru' {
+                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) } | Should -Not -Throw
+                }
 
-        It 'Should handle mixed arguments with and without spaces' {
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'commit', '-m', 'Fix bug in module', '--author', 'John Doe <john@example.com>' ) -PassThru
+                It 'Should not throw without -PassThru, with -Verbose' {
+                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose } | Should -Not -Throw
+                }
+            }
 
-            # Verify mixed argument handling
-            $processedArgs = $mockProcess.StartInfo.Arguments
-            $processedArgs | Should -Contain 'commit'
-            $processedArgs | Should -Contain '-m'
-            $processedArgs | Should -Contain '"Fix bug in module"'
-            $processedArgs | Should -Contain '--author'
-            $processedArgs | Should -Contain '"John Doe <john@example.com>"'
-        }
+            Context 'When git ExitCode -ne 0' {
+                BeforeAll {
+                    $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 128 } -Force
+                }
 
-        It 'Should handle arguments with different types of whitespace' {
-            $messageWithWhitespace = "Fix`tbug`nwith`rwhitespace"
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'commit', '-m', $messageWithWhitespace ) -PassThru
+                It 'Should not throw, return result with -PassThru' {
+                    $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru
 
-            # Verify that tab, newline, and carriage return characters trigger quoting
-            $processedArgs = $mockProcess.StartInfo.Arguments
-            $processedArgs | Should -Contain 'commit'
-            $processedArgs | Should -Contain '-m'
-            $processedArgs | Should -Contain "`"$messageWithWhitespace`""
-        }
-    }
+                    $result.ExitCode | Should -BeExactly 128
 
-    Context 'When git output contains multiple lines with whitespace' {
-        BeforeAll {
-            $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
-        }
+                    $result.Output | Should -BeExactly 'Standard Output Message'
 
-        It 'Should split CRLF lines and trim whitespace, filtering empty lines' {
-            Mock -CommandName New-Object -MockWith {
-                $testMockProcess = New-MockObject -Type System.Diagnostics.Process
-                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Start' -Value { return [bool]$true } -Force
-                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'WaitForExit' -Value { param($timeout) return [bool]$true } -Force
-                $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Dispose' -Value { } -Force
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+                    $result.StandardError | Should -BeExactly 'Standard Error Message'
+                }
 
-                # Mock StandardOutput to return multi-line string with CRLF, whitespace, and empty lines
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "  line1  `r`n`r`n  line2  `r`n   `r`n  line3  `r`n" } -PassThru -Force
-                } -Force
+                It 'Should not throw, return result with -PassThru, with -Verbose' {
+                    $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Verbose
 
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
-                } -Force
+                    $result.ExitCode | Should -BeExactly 128
+
+                    $result.Output | Should -BeExactly 'Standard Output Message'
+
+                    $result.StandardError | Should -BeExactly 'Standard Error Message'
+                }
+
+                It 'Should throw without -PassThru' {
+                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) } | Should -Throw
+                }
+
+                It 'Should throw without -PassThru, with -Verbose' {
+                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose } | Should -Throw
+                }
+            }
+
+            Context 'When throwing an error' {
+                BeforeAll {
+                    $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 128 } -Force
+
+                    $tokenPrefix = ('pousr').ToCharArray() | Get-Random
+                    $newTokenLength = Get-Random -Minimum 1 -Maximum 251
+                    $newToken = (1..$newTokenLength | % { ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
+                }
+
+                $testCases = @(
+                    @{
+                        'Command'      = @('status', '--verbose');
+                        'ErrorMessage' = 'status --verbose';
+                    },
+                    @{
+                        'Command'      = @( 'remote', 'add', 'origin', "https://gh$($tokenPrefix)_$($newToken)@github.com/owner/repo.git" );
+                        'ErrorMessage' = 'remote add origin https://**REDACTED-TOKEN**@github.com/owner/repo.git';
+                    }
+                )
+
+                It "Should throw exact with '<ErrorMessage>'" -TestCases $testCases {
+                    param( $Command, $ErrorMessage )
+
+                    $throwMessage = "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f $ErrorMessage))`n" + `
+                        "$($script:localizedData.Invoke_Git_ExitCodeMessage -f 128)`n" + `
+                        "$($script:localizedData.Invoke_Git_StandardOutputMessage -f 'Standard Output Message')`n" + `
+                        "$($script:localizedData.Invoke_Git_StandardErrorMessage -f 'Standard Error Message')`n" + `
+                        "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $TestDrive)`n"
+
+                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments $Command } | Should -Throw $throwMessage
+                }
+            }
+
+            Context 'When arguments contain spaces' {
+                BeforeAll {
+                    $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+                }
+
+                It 'Should quote arguments containing spaces that are not already quoted' {
+                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', 'John Doe' ) -PassThru
+
+                    # Verify that the processed arguments array contains properly quoted arguments
+                    $processedArgs = $mockProcess.StartInfo.Arguments
+                    $processedArgs | Should -Contain 'config'
+                    $processedArgs | Should -Contain 'user.name'
+                    $processedArgs | Should -Contain '"John Doe"'
+                    $processedArgs | Should -Not -Contain 'John Doe'
+                }
+
+                It 'Should not add quotes to arguments that are already quoted' {
+                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', '"John Doe"' ) -PassThru
+
+                    # Verify that already quoted arguments are not double-quoted
+                    $processedArgs = $mockProcess.StartInfo.Arguments
+                    $processedArgs | Should -Contain 'config'
+                    $processedArgs | Should -Contain 'user.name'
+                    $processedArgs | Should -Contain '"John Doe"'
+                    $processedArgs | Should -Not -Contain '""John Doe""'
+                }
+
+                It 'Should not quote arguments without spaces' {
+                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', 'JohnDoe' ) -PassThru
+
+                    # Verify that arguments without spaces are not quoted
+                    $processedArgs = $mockProcess.StartInfo.Arguments
+                    $processedArgs | Should -Contain 'config'
+                    $processedArgs | Should -Contain 'user.name'
+                    $processedArgs | Should -Contain 'JohnDoe'
+                    $processedArgs | Should -Not -Contain '"JohnDoe"'
+                }
+
+                It 'Should handle mixed arguments with and without spaces' {
+                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'commit', '-m', 'Fix bug in module', '--author', 'John Doe <john@example.com>' ) -PassThru
+
+                    # Verify mixed argument handling
+                    $processedArgs = $mockProcess.StartInfo.Arguments
+                    $processedArgs | Should -Contain 'commit'
+                    $processedArgs | Should -Contain '-m'
+                    $processedArgs | Should -Contain '"Fix bug in module"'
+                    $processedArgs | Should -Contain '--author'
+                    $processedArgs | Should -Contain '"John Doe <john@example.com>"'
+                }
+
+                It 'Should handle arguments with different types of whitespace' {
+                    $messageWithWhitespace = "Fix`tbug`nwith`rwhitespace"
+                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'commit', '-m', $messageWithWhitespace ) -PassThru
+
+                    # Verify that tab, newline, and carriage return characters trigger quoting
+                    $processedArgs = $mockProcess.StartInfo.Arguments
+                    $processedArgs | Should -Contain 'commit'
+                    $processedArgs | Should -Contain '-m'
+                    $processedArgs | Should -Contain "`"$messageWithWhitespace`""
+                }
+            }
+
+            Context 'When git output contains multiple lines with whitespace' {
+                BeforeAll {
+                    $mockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+                }
+
+                It 'Should split CRLF lines and trim whitespace, filtering empty lines' {
+                    Mock -CommandName New-Object -MockWith {
+                        $testMockProcess = New-MockObject -Type System.Diagnostics.Process
+                        $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Start' -Value { return [bool]$true } -Force
+                        $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'WaitForExit' -Value { param($timeout) return [bool]$true } -Force
+                        $testMockProcess | Add-Member -MemberType ScriptMethod -Name 'Dispose' -Value { } -Force
+                        $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
+
+                        # Mock StandardOutput to return multi-line string with CRLF, whitespace, and empty lines
+                        $testMockProcess |
+                            Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                                New-Object -TypeName 'Object' |
+                                    Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "  line1  `r`n`r`n  line2  `r`n   `r`n  line3  `r`n" } -PassThru -Force
+                                } -Force
+
+                $testMockProcess |
+                    Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                        New-Object -TypeName 'Object' |
+                            Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                        } -Force
 
                 # Need to add StartInfo property and its nested properties
                 $testMockStartInfo = New-Object -TypeName 'Object'
@@ -295,15 +297,17 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
 
                 # Mock StandardOutput to return multi-line string with LF, whitespace, and empty lines
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "  line1  `n`n  line2  `n   `n  line3  `n" } -PassThru -Force
-                } -Force
+                $testMockProcess |
+                    Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                        New-Object -TypeName 'Object' | `
+                                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "  line1  `n`n  line2  `n   `n  line3  `n" } -PassThru -Force
+                        } -Force
 
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
-                } -Force
+                $testMockProcess |
+                    Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                        New-Object -TypeName 'Object' | `
+                                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                        } -Force
 
                 # Need to add StartInfo property and its nested properties
                 $testMockStartInfo = New-Object -TypeName 'Object'
@@ -337,15 +341,17 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
 
                 # Mock StandardOutput with mixed line endings
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "line1`r`nline2`nline3`r`n" } -PassThru -Force
-                } -Force
+                $testMockProcess |
+                    Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                        New-Object -TypeName 'Object' | `
+                                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "line1`r`nline2`nline3`r`n" } -PassThru -Force
+                        } -Force
 
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
-                } -Force
+                $testMockProcess |
+                    Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                        New-Object -TypeName 'Object' | `
+                                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                        } -Force
 
                 # Need to add StartInfo property and its nested properties
                 $testMockStartInfo = New-Object -TypeName 'Object'
@@ -379,15 +385,17 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
 
                 # Mock StandardOutput with only empty lines and whitespace
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "`r`n   `r`n`t`r`n  " } -PassThru -Force
-                } -Force
+                $testMockProcess |
+                    Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                        New-Object -TypeName 'Object' | `
+                                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "`r`n   `r`n`t`r`n  " } -PassThru -Force
+                        } -Force
 
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
-                } -Force
+                $testMockProcess |
+                    Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                        New-Object -TypeName 'Object' | `
+                                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                        } -Force
 
                 # Need to add StartInfo property and its nested properties
                 $testMockStartInfo = New-Object -TypeName 'Object'
@@ -418,15 +426,17 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'ExitCode' -Value { 0 } -Force
 
                 # Mock StandardOutput with single line containing whitespace
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { "  single line  " } -PassThru -Force
-                } -Force
+                $testMockProcess |
+                    Add-Member -MemberType ScriptProperty -Name 'StandardOutput' -Value {
+                        New-Object -TypeName 'Object' | `
+                                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '  single line  ' } -PassThru -Force
+                        } -Force
 
-                $testMockProcess | Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
-                    New-Object -TypeName 'Object' | `
-                        Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
-                } -Force
+                $testMockProcess |
+                    Add-Member -MemberType ScriptProperty -Name 'StandardError' -Value {
+                        New-Object -TypeName 'Object' | `
+                                Add-Member -MemberType ScriptMethod -Name 'ReadToEnd' -Value { '' } -PassThru -Force
+                        } -Force
 
                 # Need to add StartInfo property and its nested properties
                 $testMockStartInfo = New-Object -TypeName 'Object'

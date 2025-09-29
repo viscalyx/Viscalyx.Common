@@ -44,13 +44,13 @@ Describe 'Assert-GitLocalChange' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
         }
 
         AfterEach {
@@ -66,7 +66,7 @@ Describe 'Assert-GitLocalChange' -Tag 'Integration' {
             # Make a change and commit it
             'New content' | Add-Content -Path 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Add new content" --quiet 2>&1
+            $null = git commit -m 'Add new content' --quiet 2>&1
 
             { Assert-GitLocalChange -ErrorAction Stop } | Should -Not -Throw
         }
@@ -86,13 +86,13 @@ Describe 'Assert-GitLocalChange' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
         }
 
         AfterEach {
@@ -136,13 +136,13 @@ Describe 'Assert-GitLocalChange' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
         }
 
         AfterEach {
@@ -188,13 +188,13 @@ Describe 'Assert-GitLocalChange' -Tag 'Integration' {
 
             # Initialize git repository
             $null = git init --quiet --initial-branch=main 2>&1
-            $null = git config user.email "test@example.com" 2>&1
-            $null = git config user.name "Test User" 2>&1
+            $null = git config user.email 'test@example.com' 2>&1
+            $null = git config user.name 'Test User' 2>&1
 
             # Create an initial commit to establish a proper git repository
             'Initial content' | Out-File -FilePath 'README.md' -Encoding utf8
             $null = git add README.md 2>&1
-            $null = git commit -m "Initial commit" --quiet 2>&1
+            $null = git commit -m 'Initial commit' --quiet 2>&1
         }
 
         AfterEach {

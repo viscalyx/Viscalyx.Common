@@ -55,12 +55,12 @@ Describe 'Merge-Patch' {
         It 'Should apply a patch' -ForEach @(
             @{
                 PatchEntry = @{
-                    StartOffset = 20
-                    EndOffset = 30
+                    StartOffset  = 20
+                    EndOffset    = 30
                     PatchContent = 'PatchedContent1'
                 }
             }
-         ) {
+        ) {
             InModuleScope -Parameters $_ -ScriptBlock {
                 $null = Merge-Patch -FilePath "$TestDrive/TestScript.ps1" -PatchEntry $PatchEntry
             }
@@ -86,25 +86,25 @@ Describe 'Merge-Patch' {
                 the discovery phase.
             #>
             @{
-                PatchEntry = @{
-                    StartOffset = -1
-                    EndOffset = 30
+                PatchEntry      = @{
+                    StartOffset  = -1
+                    EndOffset    = 30
                     PatchContent = 'PatchedContent1'
                 }
                 ExpectedMessage = "Start or end offset (-1-30) in patch entry does not exist in the script file '*/TestScript.ps1'. (MP0001)"
             },
             @{
-                PatchEntry = @{
-                    StartOffset = 20
-                    EndOffset = 1000
+                PatchEntry      = @{
+                    StartOffset  = 20
+                    EndOffset    = 1000
                     PatchContent = 'PatchedContent1'
                 }
                 ExpectedMessage = "Start or end offset (20-1000) in patch entry does not exist in the script file '*/TestScript.ps1'. (MP0001)"
             },
             @{
-                PatchEntry = @{
-                    StartOffset = 30
-                    EndOffset = 20
+                PatchEntry      = @{
+                    StartOffset  = 30
+                    EndOffset    = 20
                     PatchContent = 'PatchedContent1'
                 }
                 ExpectedMessage = "Start or end offset (30-20) in patch entry does not exist in the script file '*/TestScript.ps1'. (MP0001)"

@@ -49,7 +49,7 @@ Describe 'Hide-GitToken' {
 
     Context 'When command contains a legacy GitHub token' {
         BeforeAll {
-            $legacyToken = (1..40 | %{ ('abcdef1234567890').ToCharArray() | Get-Random }) -join ''
+            $legacyToken = (1..40 | % { ('abcdef1234567890').ToCharArray() | Get-Random }) -join ''
         }
 
         It "Should redact: $legacyToken" {
@@ -58,14 +58,14 @@ Describe 'Hide-GitToken' {
 
                 $result -eq $returnedValue | Should -BeTrue
             } -Parameters @{
-                legacyToken = $legacyToken
+                legacyToken   = $legacyToken
                 returnedValue = $returnedValue
             }
         }
     }
 
     Context 'When command contains a GitHub 5 character token' {
-        $newToken = (1..1 | %{ ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
+        $newToken = (1..1 | % { ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
         $testTokens = @(
             @{ 'Token' = "ghp_$newToken" },
             @{ 'Token' = "gho_$newToken" },
@@ -82,14 +82,14 @@ Describe 'Hide-GitToken' {
 
                 $result -eq $returnedValue | Should -BeTrue
             } -Parameters @{
-                Token = $Token
+                Token         = $Token
                 returnedValue = $returnedValue
             }
         }
     }
 
     Context 'When command contains a GitHub 40 character token' {
-        $newToken = (1..36 | %{ ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
+        $newToken = (1..36 | % { ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
         $testTokens = @(
             @{ 'Token' = "ghp_$newToken" },
             @{ 'Token' = "gho_$newToken" },
@@ -106,14 +106,14 @@ Describe 'Hide-GitToken' {
 
                 $result -eq $returnedValue | Should -BeTrue
             } -Parameters @{
-                Token = $Token
+                Token         = $Token
                 returnedValue = $returnedValue
             }
         }
     }
 
     Context 'When command contains a GitHub 100 character token' {
-        $newToken = (1..96 | %{ ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
+        $newToken = (1..96 | % { ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
         $testTokens = @(
             @{ 'Token' = "ghp_$newToken" },
             @{ 'Token' = "gho_$newToken" },
@@ -130,14 +130,14 @@ Describe 'Hide-GitToken' {
 
                 $result -eq $returnedValue | Should -BeTrue
             } -Parameters @{
-                Token = $Token
+                Token         = $Token
                 returnedValue = $returnedValue
             }
         }
     }
 
     Context 'When command contains a GitHub 200 character token' {
-        $newToken = (1..196 | %{ ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
+        $newToken = (1..196 | % { ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
         $testTokens = @(
             @{ 'Token' = "ghp_$newToken" },
             @{ 'Token' = "gho_$newToken" },
@@ -154,14 +154,14 @@ Describe 'Hide-GitToken' {
 
                 $result -eq $returnedValue | Should -BeTrue
             } -Parameters @{
-                Token = $Token
+                Token         = $Token
                 returnedValue = $returnedValue
             }
         }
     }
 
     Context 'When command contains a GitHub 255 character token' {
-        $newToken = (1..251 | %{ ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
+        $newToken = (1..251 | % { ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890').ToCharArray() | Get-Random }) -join ''
         $testTokens = @(
             @{ 'Token' = "ghp_$newToken" },
             @{ 'Token' = "gho_$newToken" },
@@ -178,7 +178,7 @@ Describe 'Hide-GitToken' {
 
                 $result -eq $returnedValue | Should -BeTrue
             } -Parameters @{
-                Token = $Token
+                Token         = $Token
                 returnedValue = $returnedValue
             }
         }

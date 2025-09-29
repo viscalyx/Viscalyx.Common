@@ -48,15 +48,15 @@ Describe 'Update-GitLocalBranch' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = 'Default'
-                ExpectedParameters = '[-BranchName <string>] [-UpstreamBranchName <string>] [-RemoteName <string>] [-Rebase] [-ReturnToCurrentBranch] [-OnlyUpdateRemoteTrackingBranch] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters       = '[-BranchName <string>] [-UpstreamBranchName <string>] [-RemoteName <string>] [-Rebase] [-ReturnToCurrentBranch] [-OnlyUpdateRemoteTrackingBranch] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
             @{
                 ExpectedParameterSetName = 'Default_SkipSwitchingBranch'
-                ExpectedParameters = '[-BranchName <string>] [-UpstreamBranchName <string>] [-RemoteName <string>] [-Rebase] [-SkipSwitchingBranch] [-OnlyUpdateRemoteTrackingBranch] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters       = '[-BranchName <string>] [-UpstreamBranchName <string>] [-RemoteName <string>] [-Rebase] [-SkipSwitchingBranch] [-OnlyUpdateRemoteTrackingBranch] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
             @{
                 ExpectedParameterSetName = 'Default_UseExistingTrackingBranch'
-                ExpectedParameters = '[-BranchName <string>] [-UpstreamBranchName <string>] [-RemoteName <string>] [-Rebase] [-ReturnToCurrentBranch] [-UseExistingTrackingBranch] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters       = '[-BranchName <string>] [-UpstreamBranchName <string>] [-RemoteName <string>] [-Rebase] [-ReturnToCurrentBranch] [-UseExistingTrackingBranch] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Update-GitLocalBranch').ParameterSets |
@@ -73,7 +73,7 @@ Describe 'Update-GitLocalBranch' {
         It 'Should have BranchName parameter with default value "main"' {
             $parameterInfo = (Get-Command -Name 'Update-GitLocalBranch').Parameters['BranchName']
             $parameterInfo.Attributes.Where{ $_ -is [System.Management.Automation.ParameterAttribute] }.Mandatory | Should -Contain $false
-            
+
             # Check default value by examining the parameter metadata
             $commandInfo = Get-Command -Name 'Update-GitLocalBranch'
             $defaultValue = $commandInfo.Parameters['BranchName'].DefaultValue

@@ -38,63 +38,78 @@ BeforeAll {
 
     # Initialize the remote repository first
     Push-Location -Path $script:remoteRepoPath
-    try {
+    try
+    {
         git init --bare --initial-branch=main *> $null
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 
     # Initialize the test repository and create test commits
     Push-Location -Path $script:testRepoPath
-    try {
+    try
+    {
         # Initialize git repository
         git init --initial-branch=main --quiet 2>$null
-        git config user.email "test@example.com" *> $null
-        git config user.name "Test User" *> $null
+        git config user.email 'test@example.com' *> $null
+        git config user.name 'Test User' *> $null
 
         # Add remote origin
         git remote add origin $script:remoteRepoPath *> $null
 
         # Create initial commit on main branch
-        "Initial content" | Out-File -FilePath 'test1.txt' -Encoding utf8
+        'Initial content' | Out-File -FilePath 'test1.txt' -Encoding utf8
         git add test1.txt *> $null
-        git commit -m "Initial commit" *> $null
+        git commit -m 'Initial commit' *> $null
 
         # Set up main branch and push to remote
         git branch -M main *> $null
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
             # Windows PowerShell - use cmd.exe for reliable output suppression
-            & cmd.exe /c "git push -u origin main --quiet >nul 2>&1"
-        } else {
+            & cmd.exe /c 'git push -u origin main --quiet >nul 2>&1'
+        }
+        else
+        {
             # PowerShell 7+ - capture output in variables
             $gitOutput = git push -u origin main --quiet 2>&1
         }
 
         # Create a feature branch
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
             # Windows PowerShell - use cmd.exe for reliable output suppression
-            & cmd.exe /c "git checkout -b feature/test --quiet >nul 2>&1"
-        } else {
+            & cmd.exe /c 'git checkout -b feature/test --quiet >nul 2>&1'
+        }
+        else
+        {
             # PowerShell 7+ - capture output in variables
             $gitOutput = git checkout -b feature/test --quiet 2>&1
         }
-        "Feature content" | Out-File -FilePath 'feature.txt' -Encoding utf8
+        'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
-        git commit -m "Feature commit" *> $null
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+        git commit -m 'Feature commit' *> $null
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
             # Windows PowerShell - use cmd.exe for reliable output suppression
-            & cmd.exe /c "git push -u origin feature/test --quiet >nul 2>&1"
-        } else {
+            & cmd.exe /c 'git push -u origin feature/test --quiet >nul 2>&1'
+        }
+        else
+        {
             # PowerShell 7+ - capture output in variables
             $gitOutput = git push -u origin feature/test --quiet 2>&1
         }
 
         # Switch back to main branch
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
+        if ($PSVersionTable.PSEdition -eq 'Desktop')
+        {
             # Windows PowerShell - use cmd.exe for reliable output suppression
-            & cmd.exe /c "git checkout main --quiet >nul 2>&1"
-        } else {
+            & cmd.exe /c 'git checkout main --quiet >nul 2>&1'
+        }
+        else
+        {
             # PowerShell 7+ - capture output in variables
             $gitOutput = git checkout main --quiet 2>&1
         }
@@ -102,20 +117,23 @@ BeforeAll {
         # Store the initial branch for reference
         $script:initialBranch = git rev-parse --abbrev-ref HEAD
     }
-    finally {
+    finally
+    {
         Pop-Location
     }
 }
 
 AfterAll {
     # Clean up - remove the test repositories
-    if (Test-Path -Path $script:testRepoPath) {
+    if (Test-Path -Path $script:testRepoPath)
+    {
         $previousProgressPreference = $ProgressPreference
         $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:testRepoPath -Recurse -Force -ErrorAction SilentlyContinue
         $ProgressPreference = $previousProgressPreference
     }
-    if (Test-Path -Path $script:remoteRepoPath) {
+    if (Test-Path -Path $script:remoteRepoPath)
+    {
         $previousProgressPreference = $ProgressPreference
         $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         Remove-Item -Path $script:remoteRepoPath -Recurse -Force -ErrorAction SilentlyContinue
@@ -131,11 +149,13 @@ Describe 'Receive-GitBranch' {
 
     AfterEach {
         # Return to original location and clean up any test changes
-        try {
+        try
+        {
             git checkout main --quiet 2>$null
             git reset --hard HEAD *> $null 2> $null
         }
-        catch {
+        catch
+        {
             # Ignore cleanup errors
         }
         Pop-Location
@@ -144,10 +164,13 @@ Describe 'Receive-GitBranch' {
     Context 'When checking out and pulling a branch' {
         It 'Should successfully checkout and pull main branch with -Checkout parameter' {
             # Start from feature branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout feature/test >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout feature/test >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 git checkout feature/test *>$null
             }
@@ -162,10 +185,13 @@ Describe 'Receive-GitBranch' {
 
         It 'Should successfully checkout and pull specified branch' {
             # Start from main branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout main --quiet >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout main --quiet >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = git checkout main --quiet 2>&1
             }
@@ -182,10 +208,13 @@ Describe 'Receive-GitBranch' {
     Context 'When using rebase mode' {
         It 'Should successfully checkout, fetch, and rebase with main branch' {
             # Start from feature branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout feature/test >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout feature/test >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 git checkout feature/test *>$null
             }
@@ -200,10 +229,13 @@ Describe 'Receive-GitBranch' {
 
         It 'Should successfully checkout and rebase feature branch with main upstream' {
             # Start from main branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout main --quiet >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout main --quiet >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = git checkout main --quiet 2>&1
             }
@@ -226,10 +258,13 @@ Describe 'Receive-GitBranch' {
     Context 'When using WhatIf parameter' {
         It 'Should not change current branch when WhatIf is specified' {
             # Start from feature branch
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout feature/test >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout feature/test >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - use direct redirection
                 git checkout feature/test *>$null
             }
@@ -247,10 +282,13 @@ Describe 'Receive-GitBranch' {
     Context 'When testing in a repository with local changes' {
         It 'Should successfully work when there are no local changes' {
             # Ensure clean working directory
-            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            if ($PSVersionTable.PSEdition -eq 'Desktop')
+            {
                 # Windows PowerShell - use cmd.exe for reliable output suppression
-                & cmd.exe /c "git checkout main --quiet >nul 2>&1"
-            } else {
+                & cmd.exe /c 'git checkout main --quiet >nul 2>&1'
+            }
+            else
+            {
                 # PowerShell 7+ - capture output in variables
                 $gitOutput = git checkout main --quiet 2>&1
             }
@@ -262,16 +300,18 @@ Describe 'Receive-GitBranch' {
 
         It 'Should handle repository with staged changes' {
             # Create staged changes
-            "Modified content" | Out-File -FilePath 'test1.txt' -Encoding utf8
+            'Modified content' | Out-File -FilePath 'test1.txt' -Encoding utf8
             git add test1.txt *> $null
 
             # Receive-GitBranch may succeed or fail depending on Git's behavior with staged changes
             # The command should handle this gracefully
-            $result = try {
+            $result = try
+            {
                 Receive-GitBranch -Checkout -BranchName 'feature/test' -Force 2>$null
                 $true
             }
-            catch {
+            catch
+            {
                 $false
             }
 
@@ -288,21 +328,28 @@ Describe 'Receive-GitBranch' {
         BeforeAll {
             # Add additional content to remote to test pulling
             Push-Location -Path $script:testRepoPath
-            try {
-                if ($PSVersionTable.PSEdition -eq 'Desktop') {
+            try
+            {
+                if ($PSVersionTable.PSEdition -eq 'Desktop')
+                {
                     # Windows PowerShell - use cmd.exe for reliable output suppression
-                    & cmd.exe /c "git checkout main --quiet >nul 2>&1"
-                } else {
+                    & cmd.exe /c 'git checkout main --quiet >nul 2>&1'
+                }
+                else
+                {
                     # PowerShell 7+ - capture output in variables
                     $gitOutput = git checkout main --quiet 2>&1
                 }
-                "Additional content" | Out-File -FilePath 'additional.txt' -Encoding utf8
+                'Additional content' | Out-File -FilePath 'additional.txt' -Encoding utf8
                 git add additional.txt *> $null
-                git commit -m "Additional commit" *> $null
-                if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                git commit -m 'Additional commit' *> $null
+                if ($PSVersionTable.PSEdition -eq 'Desktop')
+                {
                     # Windows PowerShell - use cmd.exe for reliable output suppression
-                    & cmd.exe /c "git push origin main >nul 2>&1"
-                } else {
+                    & cmd.exe /c 'git push origin main >nul 2>&1'
+                }
+                else
+                {
                     # PowerShell 7+ - use direct redirection
                     git push origin main *>$null
                 }
@@ -310,14 +357,16 @@ Describe 'Receive-GitBranch' {
                 # Reset local main to simulate being behind
                 git reset --hard HEAD~1 *> $null
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
         }
 
         It 'Should successfully pull new commits from remote' {
             Push-Location -Path $script:testRepoPath
-            try {
+            try
+            {
                 git checkout main --quiet 2>$null
 
                 # Count commits before pull
@@ -332,7 +381,8 @@ Describe 'Receive-GitBranch' {
                 # Should have pulled the additional commit
                 $commitsAfter | Should -Be ($commitsBefore + 1)
             }
-            finally {
+            finally
+            {
                 Pop-Location
             }
         }

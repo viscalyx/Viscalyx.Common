@@ -26,11 +26,11 @@ BeforeDiscovery {
     $script:parameterSetTestCases = @(
         @{
             ExpectedParameterSetName = 'Default'
-            ExpectedParameters = '[[-RemoteName] <string>] [<CommonParameters>]'
+            ExpectedParameters       = '[[-RemoteName] <string>] [<CommonParameters>]'
         },
         @{
             ExpectedParameterSetName = 'Name'
-            ExpectedParameters = '[-RemoteName] <string> [[-Name] <string>] [<CommonParameters>]'
+            ExpectedParameters       = '[-RemoteName] <string> [[-Name] <string>] [<CommonParameters>]'
         }
     )
 }

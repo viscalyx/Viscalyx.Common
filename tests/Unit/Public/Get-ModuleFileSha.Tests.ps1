@@ -46,11 +46,11 @@ Describe 'Get-ModuleFileSha' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = 'ModuleName'
-                ExpectedParameters = '-Name <string> [-Version <string>] [<CommonParameters>]'
+                ExpectedParameters       = '-Name <string> [-Version <string>] [<CommonParameters>]'
             }
             @{
                 ExpectedParameterSetName = 'Path'
-                ExpectedParameters = '-Path <string> [<CommonParameters>]'
+                ExpectedParameters       = '-Path <string> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Get-ModuleFileSha').ParameterSets |

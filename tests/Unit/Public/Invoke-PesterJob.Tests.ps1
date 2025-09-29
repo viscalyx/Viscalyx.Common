@@ -153,17 +153,20 @@ Describe 'Invoke-PesterJob' {
             }
 
             # Mock Test-Path to return true for parameter validation but false for internal check
-            Mock -CommandName Test-Path -MockWith { 
+            Mock -CommandName Test-Path -MockWith {
                 param($Path, $PathType)
-                if ($PathType -eq 'Leaf') {
+                if ($PathType -eq 'Leaf')
+                {
                     return $true  # For parameter validation
-                } else {
+                }
+                else
+                {
                     return $false  # For internal check (Test-Path -Path $BuildScriptPath)
                 }
             }
 
             $params = @{
-                Path = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
+                Path            = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                 BuildScriptPath = $buildScriptPath
             }
 
@@ -563,10 +566,12 @@ Describe 'Invoke-PesterJob' {
                     # Mock Get-Module to return Sampler module to simulate Sampler project
                     Mock -CommandName Get-Module -MockWith {
                         param($Name)
-                        if ($Name -eq 'Sampler') {
+                        if ($Name -eq 'Sampler')
+                        {
                             return @{ Name = 'Sampler'; Version = [version] '0.118.3' }
                         }
-                        elseif ($Name -eq 'Pester') {
+                        elseif ($Name -eq 'Pester')
+                        {
                             return @{ Version = [version] '5.4.0' }
                         }
                         return $null
@@ -575,7 +580,7 @@ Describe 'Invoke-PesterJob' {
 
                 It 'Should auto-enable PassThru when EnableSourceLineMapping is used' {
                     $params = @{
-                        Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                         EnableSourceLineMapping = $true
                     }
 
@@ -588,7 +593,7 @@ Describe 'Invoke-PesterJob' {
 
                 It 'Should not require ModuleBuilder check in Sampler project' {
                     $params = @{
-                        Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                         EnableSourceLineMapping = $true
                     }
 
@@ -601,13 +606,16 @@ Describe 'Invoke-PesterJob' {
                     # Mock Get-Module to return no Sampler module but with ModuleBuilder available
                     Mock -CommandName Get-Module -MockWith {
                         param($Name, $ListAvailable)
-                        if ($Name -eq 'Sampler') {
+                        if ($Name -eq 'Sampler')
+                        {
                             return $null
                         }
-                        elseif ($Name -eq 'Pester') {
+                        elseif ($Name -eq 'Pester')
+                        {
                             return @{ Version = [version] '5.4.0' }
                         }
-                        elseif ($Name -eq 'ModuleBuilder' -and $ListAvailable) {
+                        elseif ($Name -eq 'ModuleBuilder' -and $ListAvailable)
+                        {
                             return @{ Name = 'ModuleBuilder'; Version = [version] '3.0.0' }
                         }
                         return $null
@@ -616,7 +624,7 @@ Describe 'Invoke-PesterJob' {
 
                 It 'Should not throw when ModuleBuilder is available' {
                     $params = @{
-                        Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                         EnableSourceLineMapping = $true
                     }
 
@@ -629,13 +637,16 @@ Describe 'Invoke-PesterJob' {
                     # Mock Get-Module to return no Sampler module and no ModuleBuilder
                     Mock -CommandName Get-Module -MockWith {
                         param($Name, $ListAvailable)
-                        if ($Name -eq 'Sampler') {
+                        if ($Name -eq 'Sampler')
+                        {
                             return $null
                         }
-                        elseif ($Name -eq 'Pester') {
+                        elseif ($Name -eq 'Pester')
+                        {
                             return @{ Version = [version] '5.4.0' }
                         }
-                        elseif ($Name -eq 'ModuleBuilder') {
+                        elseif ($Name -eq 'ModuleBuilder')
+                        {
                             return $null
                         }
                         return $null
@@ -644,7 +655,7 @@ Describe 'Invoke-PesterJob' {
 
                 It 'Should throw error when ModuleBuilder is not available' {
                     $params = @{
-                        Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                         EnableSourceLineMapping = $true
                     }
 
@@ -667,9 +678,9 @@ Describe 'Invoke-PesterJob' {
                 # This should not throw an error when validating parameter type
                 $params = @{
                     FilterCodeCoverageResult = $filterArray
-                    Path = '.'
-                    SkipRun = $true
-                    SkipCodeCoverage = $true
+                    Path                     = '.'
+                    SkipRun                  = $true
+                    SkipCodeCoverage         = $true
                 }
 
                 # We're not actually running this, just validating parameter binding
@@ -683,10 +694,12 @@ Describe 'Invoke-PesterJob' {
                 # Mock Get-Module to return Sampler module to simulate Sampler project
                 Mock -CommandName Get-Module -MockWith {
                     param($Name)
-                    if ($Name -eq 'Sampler') {
+                    if ($Name -eq 'Sampler')
+                    {
                         return @{ Name = 'Sampler'; Version = [version] '0.118.3' }
                     }
-                    elseif ($Name -eq 'Pester') {
+                    elseif ($Name -eq 'Pester')
+                    {
                         return @{ Version = [version] '5.4.0' }
                     }
                     return $null
@@ -696,52 +709,52 @@ Describe 'Invoke-PesterJob' {
                 # These should match the structure that Pester's CodeCoverage.CommandsMissed provides
                 $script:mockCommandsMissed = @(
                     [PSCustomObject]@{
-                        File = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
-                        Line = 10
-                        StartLine = 10
-                        EndLine = 10
+                        File        = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
+                        Line        = 10
+                        StartLine   = 10
+                        EndLine     = 10
                         StartColumn = 1
-                        EndColumn = 50
-                        Class = ''
-                        Function = 'Get-Something'
-                        Command = 'Write-Verbose'
-                        HitCount = 0
+                        EndColumn   = 50
+                        Class       = ''
+                        Function    = 'Get-Something'
+                        Command     = 'Write-Verbose'
+                        HitCount    = 0
                     },
                     [PSCustomObject]@{
-                        File = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
-                        Line = 15
-                        StartLine = 15
-                        EndLine = 15
+                        File        = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
+                        Line        = 15
+                        StartLine   = 15
+                        EndLine     = 15
                         StartColumn = 1
-                        EndColumn = 50
-                        Class = 'TestClass'
-                        Function = ''
-                        Command = 'Write-Debug'
-                        HitCount = 0
+                        EndColumn   = 50
+                        Class       = 'TestClass'
+                        Function    = ''
+                        Command     = 'Write-Debug'
+                        HitCount    = 0
                     },
                     [PSCustomObject]@{
-                        File = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
-                        Line = 20
-                        StartLine = 20
-                        EndLine = 20
+                        File        = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
+                        Line        = 20
+                        StartLine   = 20
+                        EndLine     = 20
                         StartColumn = 1
-                        EndColumn = 50
-                        Class = ''
-                        Function = 'Set-Configuration'
-                        Command = '$variable = $value'
-                        HitCount = 0
+                        EndColumn   = 50
+                        Class       = ''
+                        Function    = 'Set-Configuration'
+                        Command     = '$variable = $value'
+                        HitCount    = 0
                     },
                     [PSCustomObject]@{
-                        File = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
-                        Line = 25
-                        StartLine = 25
-                        EndLine = 25
+                        File        = Join-Path -Path $TestDrive -ChildPath 'output/builtModule/TestModule/1.0.0/TestModule.psm1'
+                        Line        = 25
+                        StartLine   = 25
+                        EndLine     = 25
                         StartColumn = 1
-                        EndColumn = 50
-                        Class = ''
-                        Function = 'Test-HashFunction'
-                        Command = 'Get-FileHash'
-                        HitCount = 0
+                        EndColumn   = 50
+                        Class       = ''
+                        Function    = 'Test-HashFunction'
+                        Command     = 'Get-FileHash'
+                        HitCount    = 0
                     }
                 )
 
@@ -784,26 +797,33 @@ function Test-HashFunction {
                 Mock -CommandName ConvertTo-SourceLineNumber -MockWith {
                     param($InputObject, $PassThru)
 
-                    if ($PassThru) {
+                    if ($PassThru)
+                    {
                         # Add SourceLineNumber and SourceFile properties to each input object
-                        foreach ($item in $InputObject) {
+                        foreach ($item in $InputObject)
+                        {
                             # Create a copy of the original object with additional properties
                             $enhancedItem = $item.PSObject.Copy()
 
                             # Map to appropriate source file based on function or class name
-                            $sourceFile = if ($item.Function -eq 'Get-Something') {
+                            $sourceFile = if ($item.Function -eq 'Get-Something')
+                            {
                                 Join-Path -Path $TestDrive -ChildPath 'source/Public/Get-Something.ps1'
                             }
-                            elseif ($item.Function -eq 'Set-Configuration') {
+                            elseif ($item.Function -eq 'Set-Configuration')
+                            {
                                 Join-Path -Path $TestDrive -ChildPath 'source/Public/Set-Configuration.ps1'
                             }
-                            elseif ($item.Function -eq 'Test-HashFunction') {
+                            elseif ($item.Function -eq 'Test-HashFunction')
+                            {
                                 Join-Path -Path $TestDrive -ChildPath 'source/Public/Test-HashFunction.ps1'
                             }
-                            elseif ($item.Class -eq 'TestClass') {
+                            elseif ($item.Class -eq 'TestClass')
+                            {
                                 Join-Path -Path $TestDrive -ChildPath 'source/Classes/TestClass.ps1'
                             }
-                            else {
+                            else
+                            {
                                 Join-Path -Path $TestDrive -ChildPath 'source/Unknown.ps1'
                             }
 
@@ -814,24 +834,31 @@ function Test-HashFunction {
                             Write-Output $enhancedItem
                         }
                     }
-                    else {
+                    else
+                    {
                         # If not PassThru, return objects with only SourceLineNumber and SourceFile
-                        foreach ($item in $InputObject) {
+                        foreach ($item in $InputObject)
+                        {
                             [PSCustomObject]@{
                                 SourceLineNumber = $item.Line
-                                SourceFile = if ($item.Function -eq 'Get-Something') {
+                                SourceFile       = if ($item.Function -eq 'Get-Something')
+                                {
                                     Join-Path -Path $TestDrive -ChildPath 'source/Public/Get-Something.ps1'
                                 }
-                                elseif ($item.Function -eq 'Set-Configuration') {
+                                elseif ($item.Function -eq 'Set-Configuration')
+                                {
                                     Join-Path -Path $TestDrive -ChildPath 'source/Public/Set-Configuration.ps1'
                                 }
-                                elseif ($item.Function -eq 'Test-HashFunction') {
+                                elseif ($item.Function -eq 'Test-HashFunction')
+                                {
                                     Join-Path -Path $TestDrive -ChildPath 'source/Public/Test-HashFunction.ps1'
                                 }
-                                elseif ($item.Class -eq 'TestClass') {
+                                elseif ($item.Class -eq 'TestClass')
+                                {
                                     Join-Path -Path $TestDrive -ChildPath 'source/Classes/TestClass.ps1'
                                 }
-                                else {
+                                else
+                                {
                                     Join-Path -Path $TestDrive -ChildPath 'source/Unknown.ps1'
                                 }
                             }
@@ -847,8 +874,8 @@ function Test-HashFunction {
 
             It 'Should filter commands by function name pattern when FilterCodeCoverageResult is specified' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
-                    EnableSourceLineMapping = $true
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('Get-*')
                 }
 
@@ -861,8 +888,8 @@ function Test-HashFunction {
 
             It 'Should filter commands by class name pattern when FilterCodeCoverageResult is specified' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
-                    EnableSourceLineMapping = $true
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('Test*')
                 }
 
@@ -876,8 +903,8 @@ function Test-HashFunction {
 
             It 'Should filter commands by multiple patterns when FilterCodeCoverageResult contains multiple values' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
-                    EnableSourceLineMapping = $true
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('Get-*', 'Set-*')
                 }
 
@@ -891,8 +918,8 @@ function Test-HashFunction {
 
             It 'Should filter commands by specific hash-related pattern' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
-                    EnableSourceLineMapping = $true
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('*hash*')
                 }
 
@@ -905,7 +932,7 @@ function Test-HashFunction {
 
             It 'Should return all commands when FilterCodeCoverageResult is not specified' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                     EnableSourceLineMapping = $true
                 }
 
@@ -917,8 +944,8 @@ function Test-HashFunction {
 
             It 'Should return empty result when FilterCodeCoverageResult pattern matches no commands' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
-                    EnableSourceLineMapping = $true
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('NonExistent-*')
                 }
 
@@ -930,8 +957,8 @@ function Test-HashFunction {
 
             It 'Should select only specific properties in the final output' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
-                    EnableSourceLineMapping = $true
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('Get-*')
                 }
 
@@ -956,10 +983,12 @@ function Test-HashFunction {
                 # Mock Get-Module to return Sampler module
                 Mock -CommandName Get-Module -MockWith {
                     param($Name)
-                    if ($Name -eq 'Sampler') {
+                    if ($Name -eq 'Sampler')
+                    {
                         return @{ Name = 'Sampler'; Version = [version] '0.118.3' }
                     }
-                    elseif ($Name -eq 'Pester') {
+                    elseif ($Name -eq 'Pester')
+                    {
                         return @{ Version = [version] '5.4.0' }
                     }
                     return $null
@@ -968,8 +997,8 @@ function Test-HashFunction {
                 # Mock Receive-Job to return the Pester result object instead of commands missed
                 Mock -CommandName Receive-Job -MockWith {
                     return [PSCustomObject]@{
-                        Result = 'Passed'
-                        TotalCount = 5
+                        Result      = 'Passed'
+                        TotalCount  = 5
                         PassedCount = 5
                         FailedCount = 0
                     }
@@ -978,10 +1007,10 @@ function Test-HashFunction {
 
             It 'Should return original Pester result when SkipCodeCoverage is used with EnableSourceLineMapping' {
                 $params = @{
-                    Path = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
                     EnableSourceLineMapping = $true
-                    SkipCodeCoverage = $true
-                    PassThru = $true
+                    SkipCodeCoverage        = $true
+                    PassThru                = $true
                 }
 
                 $result = Invoke-PesterJob @params

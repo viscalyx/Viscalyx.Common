@@ -46,11 +46,11 @@ AfterAll {
 Describe 'Switch-GitLocalBranch' {
     Context 'When checking parameter sets' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
-        @{
-            ExpectedParameterSetName = '__AllParameterSets'
-            ExpectedParameters = '[-Name] <string> [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
-        }
-    ) {
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters       = '[-Name] <string> [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+        ) {
             $result = (Get-Command -Name 'Switch-GitLocalBranch').ParameterSets |
                 Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
                 Select-Object -Property @(
