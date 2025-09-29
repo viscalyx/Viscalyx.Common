@@ -207,15 +207,24 @@ function Invoke-Git
 
         if ($gitResult.ExitCode -ne 0 -and $PassThru -eq $false)
         {
-            $throwMessage = @(
+            $errorMessage = $script:localizedData.Invoke_Git_CommandFailed -f $gitResult.ExitCode
+
+            $detailsMessage = @(
                 "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))"
-                "$($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)"
                 "$($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.Output)"
                 "$($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)"
                 "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $WorkingDirectory)"
             ) -join "`n"
 
-            throw $throwMessage
+            $exception = [System.InvalidOperationException]::new("$errorMessage`n$detailsMessage")
+            $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                $exception,
+                'IG0009',
+                [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                $processedArguments
+            )
+
+            $PSCmdlet.ThrowTerminatingError($errorRecord)
         }
     }
 

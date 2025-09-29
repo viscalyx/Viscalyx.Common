@@ -167,13 +167,16 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 It "Should throw exact with '<ErrorMessage>'" -TestCases $testCases {
                     param( $Command, $ErrorMessage )
 
-                    $throwMessage = (
+                    $errorMessage = $script:localizedData.Invoke_Git_CommandFailed -f 128
+
+                    $detailsMessage = (
                         "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f $ErrorMessage))`n" +
-                        "$($script:localizedData.Invoke_Git_ExitCodeMessage -f 128)`n" +
                         "$($script:localizedData.Invoke_Git_StandardOutputMessage -f 'Standard Output Message')`n" +
                         "$($script:localizedData.Invoke_Git_StandardErrorMessage -f 'Standard Error Message')`n" +
-                        "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $TestDrive)`n"
+                        "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $TestDrive)"
                     )
+
+                    $throwMessage = "$errorMessage`n$detailsMessage`n"
 
                     { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments $Command } | Should -Throw $throwMessage
                 }

@@ -334,4 +334,5 @@ ConvertFrom-StringData @'
     Invoke_Git_WorkingDirectoryDebug = Working Directory: '{0}' (IG0006)
     Invoke_Git_TimeoutError = Git command timed out after {0} milliseconds. Command: git {1} (IG0007)
     Invoke_Git_KillProcessFailed = Failed to kill git process: {0} (IG0008)
+    Invoke_Git_CommandFailed = Git command failed with exit code {0}. (IG0009)
 '@
