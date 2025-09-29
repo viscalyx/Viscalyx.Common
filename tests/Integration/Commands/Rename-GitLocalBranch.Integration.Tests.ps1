@@ -99,7 +99,7 @@ Describe 'Rename-GitLocalBranch' {
         }
 
         It 'Should rename a local branch successfully' {
-            $null = Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force
+            $null = Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force -ErrorAction Stop
 
             # Verify the old branch no longer exists
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'feature/original-branch') -PassThru
@@ -130,7 +130,7 @@ Describe 'Rename-GitLocalBranch' {
             $originalCommit = $result.Output
 
             # Rename the branch
-            $null = Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force
+            $null = Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force -ErrorAction Stop
 
             # Get the commit hash after renaming
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
@@ -154,7 +154,7 @@ Describe 'Rename-GitLocalBranch' {
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Special commit')
 
             # Rename the branch
-            $null = Rename-GitLocalBranch -Name 'feature/test-123_special.branch' -NewName 'feature/renamed-branch' -Force
+            $null = Rename-GitLocalBranch -Name 'feature/test-123_special.branch' -NewName 'feature/renamed-branch' -Force -ErrorAction Stop
 
             # Verify the rename worked
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
@@ -166,7 +166,7 @@ Describe 'Rename-GitLocalBranch' {
     Context 'When handling error scenarios' {
         It 'Should throw error when trying to rename non-existent branch' {
             {
-                Rename-GitLocalBranch -Name 'non-existent-branch' -NewName 'new-branch-name' -ErrorAction Stop -Force
+                Rename-GitLocalBranch -Name 'non-existent-branch' -NewName 'new-branch-name' -Force -ErrorAction Stop
             } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
         }
 
@@ -177,7 +177,7 @@ Describe 'Rename-GitLocalBranch' {
 
             # Try to rename branch-two to branch-one (which already exists)
             {
-                Rename-GitLocalBranch -Name 'branch-two' -NewName 'branch-one' -ErrorAction Stop -Force
+                Rename-GitLocalBranch -Name 'branch-two' -NewName 'branch-one' -Force -ErrorAction Stop
             } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
 
             # Clean up
@@ -191,7 +191,7 @@ Describe 'Rename-GitLocalBranch' {
 
             # Try to rename to an invalid branch name (contains spaces and special chars)
             {
-                Rename-GitLocalBranch -Name 'valid-branch' -NewName 'invalid branch name with spaces!' -ErrorAction Stop -Force
+                Rename-GitLocalBranch -Name 'valid-branch' -NewName 'invalid branch name with spaces!' -Force -ErrorAction Stop
             } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
 
             # Clean up
@@ -248,7 +248,7 @@ Describe 'Rename-GitLocalBranch' {
             # Rename with upstream tracking - this will fail because the upstream doesn't exist yet
             # but we test that the error is handled correctly
             {
-                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -TrackUpstream -ErrorAction 'Stop' -Force
+                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -TrackUpstream -Force -ErrorAction Stop
             } | Should -Throw -Because "The upstream branch doesn't exist in our test setup"
 
             # Verify the branch was renamed despite the upstream tracking failure
@@ -264,7 +264,7 @@ Describe 'Rename-GitLocalBranch' {
             # In a real repository with proper remote setup, this would set the default branch
             # but in our test setup, it will fail because there's no remote HEAD to determine
             {
-                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -SetDefault -Force
+                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -SetDefault -Force -ErrorAction Stop
             } | Should -Throw -Because 'Cannot determine remote HEAD in test setup'
 
             # Verify the branch was renamed despite the set-head failure
@@ -282,7 +282,7 @@ Describe 'Rename-GitLocalBranch' {
 
             # Test with custom remote name - this will fail due to missing upstream branch
             {
-                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -RemoteName 'upstream' -TrackUpstream -Force
+                Rename-GitLocalBranch -Name 'remote-test-branch' -NewName 'renamed-remote-branch' -RemoteName 'upstream' -TrackUpstream -Force -ErrorAction Stop
             } | Should -Throw -Because "Upstream branch doesn't exist"
 
             # Clean up additional remote
@@ -304,7 +304,7 @@ Describe 'Rename-GitLocalBranch' {
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'current-branch-test', '--quiet')
 
             # Rename the current branch
-            $null = Rename-GitLocalBranch -Name 'current-branch-test' -NewName 'renamed-current-branch' -Force
+            $null = Rename-GitLocalBranch -Name 'current-branch-test' -NewName 'renamed-current-branch' -Force -ErrorAction Stop
 
             # Verify we're now on the renamed branch
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
@@ -322,7 +322,7 @@ Describe 'Rename-GitLocalBranch' {
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'other-branch', '--quiet')
 
             # Rename a branch we're not currently on
-            $null = Rename-GitLocalBranch -Name 'branch-to-rename' -NewName 'renamed-other-branch' -Force
+            $null = Rename-GitLocalBranch -Name 'branch-to-rename' -NewName 'renamed-other-branch' -Force -ErrorAction Stop
 
             # Verify the branch was renamed (should exist in branch list)
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-other-branch') -PassThru
