@@ -145,14 +145,15 @@ Describe 'Invoke-PesterJob' {
         It 'Should throw localized error when Pester import fails and build script not found' {
             # Create a valid build script file first to pass parameter validation
             $buildScriptPath = Join-Path -Path $TestDrive -ChildPath 'build.ps1'
-            New-Item -Path $buildScriptPath -ItemType File -Force
+            $null = New-Item -Path $buildScriptPath -ItemType File -Force
 
             # Mock Import-Module to always throw an error
             Mock -CommandName Import-Module -ParameterFilter { $Name -eq 'Pester' } -MockWith {
                 throw 'Mocked Pester import failure'
             }
 
-            # Mock Test-Path to return true for parameter validation but false for internal check
+            # Mock Test-Path with dual semantics: returns true for parameter validation (Leaf check)
+            # but false for internal build script existence check (default Test-Path behavior)
             Mock -CommandName Test-Path -MockWith {
                 param($Path, $PathType)
                 if ($PathType -eq 'Leaf')
