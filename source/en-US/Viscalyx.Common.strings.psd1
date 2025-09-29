@@ -99,6 +99,8 @@ ConvertFrom-StringData @'
     Push_GitTag_PushAllTags_ShouldProcessCaption = Push all tags (PGT0006)
     Push_GitTag_FailedPushTag = Failed to push tag '{0}' to remote '{1}'. (PGT0007)
     Push_GitTag_FailedPushAllTags = Failed to push all tags to remote '{0}'. (PGT0008)
+    Push_GitTag_NoLocalTags = No local tags found to push to remote '{0}'. (PGT0009)
+    Push_GitTag_FailedListTags = Failed to list local tags. Make sure you are in a valid git repository. (PGT0010)
 
     ## Receive-GitBranch
     Receive_GitBranch_CheckoutBranch = Checking out branch '{0}'. (RGB0005)

@@ -208,6 +208,52 @@ Describe 'Push-GitTag' {
         }
     }
 
+    Context 'When git tag command fails' {
+        BeforeAll {
+            Mock -CommandName git -MockWith {
+                if ($args[0] -eq 'tag')
+                {
+                    # Simulate git tag command failure
+                    $global:LASTEXITCODE = 128
+                    return $null
+                }
+                elseif ($args[0] -eq 'push')
+                {
+                    $global:LASTEXITCODE = 0
+                }
+                else
+                {
+                    throw "Mock git unexpected args: $($args -join ' ')"
+                }
+            }
+
+            $mockErrorMessage = InModuleScope -ScriptBlock {
+                $script:localizedData.Push_GitTag_FailedListTags
+            }
+        }
+
+        AfterEach {
+            $global:LASTEXITCODE = 0
+        }
+
+        It 'Should have a localized error message for failed git tag command' {
+            $mockErrorMessage | Should -Not -BeNullOrEmpty
+            $mockErrorMessage | Should -BeLike '*Failed to list local tags*'
+        }
+
+        It 'Should throw terminating error when git tag fails' {
+            { Push-GitTag -Force } | Should -Throw -ErrorId 'PGT0010,Push-GitTag'
+        }
+
+        It 'Should throw error with correct error code PGT0010' {
+            try {
+                Push-GitTag -Force
+            } catch {
+                $_.FullyQualifiedErrorId | Should -Be 'PGT0010,Push-GitTag'
+            }
+        }
+    }
+
     Context 'When pushing all tags with no local tags (no-op)' {
         BeforeAll {
             Mock -CommandName git -MockWith {
@@ -281,7 +327,8 @@ Describe 'Push-GitTag' {
         It 'Should not push all tags when WhatIf is specified' {
             Push-GitTag -WhatIf
 
-            Should -Invoke -CommandName git -Times 0
+            Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'push' } -Times 0
+            Should -Invoke -CommandName git -ParameterFilter { $args[0] -eq 'tag' } -Times 1
         }
     }
 
@@ -326,12 +373,126 @@ Describe 'Push-GitTag' {
         }
     }
 
+    Context 'When parameter sets are validated' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = 'AllTags'
+                ExpectedParameters = '[[-RemoteName] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+            @{
+                ExpectedParameterSetName = 'SingleTag'
+                ExpectedParameters = '[[-RemoteName] <string>] [[-Name] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Push-GitTag').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
+        }
+
+        It 'Should have AllTags as the default parameter set' {
+            $command = Get-Command -Name 'Push-GitTag'
+            $defaultParameterSet = $command.ParameterSets | Where-Object -FilterScript { $_.IsDefault }
+            $defaultParameterSet.Name | Should -Be 'AllTags'
+        }
+
+        It 'Should have Name parameter only in SingleTag parameter set' {
+            $command = Get-Command -Name 'Push-GitTag'
+            $parameterSetsWithName = $command.ParameterSets | Where-Object -FilterScript {
+                $_.Parameters.Name -contains 'Name'
+            }
+            $parameterSetsWithName.Count | Should -Be 1
+            $parameterSetsWithName[0].Name | Should -Be 'SingleTag'
+        }
+
+        It 'Should have RemoteName parameter in both parameter sets' {
+            $command = Get-Command -Name 'Push-GitTag'
+            $parameterSetsWithRemoteName = $command.ParameterSets | Where-Object -FilterScript {
+                $_.Parameters.Name -contains 'RemoteName'
+            }
+            $parameterSetsWithRemoteName.Count | Should -Be 2
+            $parameterSetsWithRemoteName.Name | Should -Contain 'AllTags'
+            $parameterSetsWithRemoteName.Name | Should -Contain 'SingleTag'
+        }
+
+        It 'Should have Force parameter in both parameter sets' {
+            $command = Get-Command -Name 'Push-GitTag'
+            $parameterSetsWithForce = $command.ParameterSets | Where-Object -FilterScript {
+                $_.Parameters.Name -contains 'Force'
+            }
+            $parameterSetsWithForce.Count | Should -Be 2
+            $parameterSetsWithForce.Name | Should -Contain 'AllTags'
+            $parameterSetsWithForce.Name | Should -Contain 'SingleTag'
+        }
+    }
+
+    Context 'When parameter properties are validated' {
+        It 'Should have RemoteName as a non-mandatory parameter with correct attributes' {
+            $parameterInfo = (Get-Command -Name 'Push-GitTag').Parameters['RemoteName']
+            $parameterInfo.Attributes.Mandatory | Should -BeFalse
+            $parameterInfo.ParameterType | Should -Be ([System.String])
+            $parameterInfo.Attributes.Position | Should -Contain 0
+        }
+
+        It 'Should have Name as a non-mandatory parameter with correct attributes' {
+            $parameterInfo = (Get-Command -Name 'Push-GitTag').Parameters['Name']
+            $parameterInfo.Attributes.Mandatory | Should -BeFalse
+            $parameterInfo.ParameterType | Should -Be ([System.String])
+            $parameterInfo.Attributes.Position | Should -Contain 1
+        }
+
+        It 'Should have Force as a non-mandatory SwitchParameter' {
+            $parameterInfo = (Get-Command -Name 'Push-GitTag').Parameters['Force']
+            $parameterInfo.Attributes.Mandatory | Should -BeFalse
+            $parameterInfo.ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
+        }
+
+        It 'Should have ValidateNotNullOrEmpty attribute on RemoteName parameter' {
+            $parameterInfo = (Get-Command -Name 'Push-GitTag').Parameters['RemoteName']
+            $validateAttributes = $parameterInfo.Attributes | Where-Object -FilterScript {
+                $_ -is [System.Management.Automation.ValidateNotNullOrEmptyAttribute]
+            }
+            $validateAttributes | Should -Not -BeNullOrEmpty
+        }
+
+        It 'Should have ValidateNotNullOrEmpty attribute on Name parameter' {
+            $parameterInfo = (Get-Command -Name 'Push-GitTag').Parameters['Name']
+            $validateAttributes = $parameterInfo.Attributes | Where-Object -FilterScript {
+                $_ -is [System.Management.Automation.ValidateNotNullOrEmptyAttribute]
+            }
+            $validateAttributes | Should -Not -BeNullOrEmpty
+        }
+
+        It 'Should support ShouldProcess' {
+            $command = Get-Command -Name 'Push-GitTag'
+            $command.Parameters.ContainsKey('WhatIf') | Should -BeTrue
+            $command.Parameters.ContainsKey('Confirm') | Should -BeTrue
+        }
+
+        It 'Should have ConfirmImpact set to Medium' {
+            $functionInfo = Get-Command -Name 'Push-GitTag'
+            $cmdletBindingAttribute = $functionInfo.ScriptBlock.Attributes | 
+                Where-Object -FilterScript { $_ -is [System.Management.Automation.CmdletBindingAttribute] }
+            $cmdletBindingAttribute.ConfirmImpact | Should -Be 'Medium'
+        }
+    }
+
     Context 'When parameter validation is tested' {
         BeforeAll {
             Mock -CommandName git -MockWith {
                 if ($args[0] -eq 'push')
                 {
                     $global:LASTEXITCODE = 0
+                }
+                elseif ($args[0] -eq 'tag')
+                {
+                    # Return some mock tags for testing
+                    $global:LASTEXITCODE = 0
+                    return @('v1.0.0')
                 }
                 else
                 {

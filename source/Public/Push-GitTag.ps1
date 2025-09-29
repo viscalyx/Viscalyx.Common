@@ -53,7 +53,7 @@
 #>
 function Push-GitTag
 {
-    [CmdletBinding(SupportsShouldProcess = $true)]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium', DefaultParameterSetName = 'AllTags')]
     [OutputType()]
     param
     (
@@ -62,7 +62,7 @@ function Push-GitTag
         [System.String]
         $RemoteName = 'origin',
 
-        [Parameter(Position = 1)]
+        [Parameter(Position = 1, ParameterSetName = 'SingleTag')]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Name,
@@ -89,6 +89,31 @@ function Push-GitTag
         $arguments += '--tags'
     }
 
+    # When pushing all tags, check if there are any local tags to push before prompting
+    if (-not $PSBoundParameters.ContainsKey('Name'))
+    {
+        $localTags = git tag
+
+        if ($LASTEXITCODE -ne 0)
+        {
+            $errorMessage = $script:localizedData.Push_GitTag_FailedListTags
+
+            $PSCmdlet.ThrowTerminatingError(
+                [System.Management.Automation.ErrorRecord]::new(
+                    $errorMessage,
+                    'PGT0010', # cspell: disable-line
+                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
+                    $null
+                )
+            )
+        }
+        elseif ([string]::IsNullOrEmpty($localTags) -or ($localTags -is [array] -and $localTags.Count -eq 0))
+        {
+            Write-Information -MessageData ($script:localizedData.Push_GitTag_NoLocalTags -f $RemoteName) -InformationAction Continue
+            return
+        }
+    }
+
     if ($PSBoundParameters.ContainsKey('Name'))
     {
         $descriptionMessage = $script:localizedData.Push_GitTag_PushTag_ShouldProcessVerboseDescription -f $Name, $RemoteName
@@ -104,17 +129,6 @@ function Push-GitTag
 
     if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
-        # When pushing all tags, check if there are any local tags to push
-        if (-not $PSBoundParameters.ContainsKey('Name'))
-        {
-            $localTags = git tag
-            if ($LASTEXITCODE -eq 0 -and ([string]::IsNullOrEmpty($localTags) -or ($localTags -is [array] -and $localTags.Count -eq 0)))
-            {
-                # No local tags exist in valid git repository, this is a no-op case
-                return
-            }
-            # If LASTEXITCODE -ne 0, let the error propagate by continuing to git push which will also fail
-        }
 
         git push @arguments
 
