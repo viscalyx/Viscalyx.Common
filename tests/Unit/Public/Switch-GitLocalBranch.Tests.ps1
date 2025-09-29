@@ -44,6 +44,51 @@ AfterAll {
 
 # cSpell: ignore LASTEXITCODE
 Describe 'Switch-GitLocalBranch' {
+    Context 'When checking parameter sets' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+        @{
+            ExpectedParameterSetName = '__AllParameterSets'
+            ExpectedParameters = '[-Name] <string> [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+        }
+    ) {
+            $result = (Get-Command -Name 'Switch-GitLocalBranch').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
+        }
+    }
+
+    Context 'When checking parameter properties' {
+        It 'Should have Name as a mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Switch-GitLocalBranch').Parameters['Name']
+            $parameterSet = $parameterInfo.ParameterSets['__AllParameterSets']
+            $parameterSet.IsMandatory | Should -BeTrue
+        }
+
+        It 'Should have Force as a non-mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Switch-GitLocalBranch').Parameters['Force']
+            $parameterSet = $parameterInfo.ParameterSets['__AllParameterSets']
+            $parameterSet.IsMandatory | Should -BeFalse
+        }
+
+        It 'Should have Name parameter at position 0' {
+            $parameterInfo = (Get-Command -Name 'Switch-GitLocalBranch').Parameters['Name']
+            $parameterSet = $parameterInfo.ParameterSets['__AllParameterSets']
+            $parameterSet.Position | Should -Be 0
+        }
+
+        It 'Should have Force parameter with no specific position' {
+            $parameterInfo = (Get-Command -Name 'Switch-GitLocalBranch').Parameters['Force']
+            $parameterSet = $parameterInfo.ParameterSets['__AllParameterSets']
+            $parameterSet.Position | Should -Be -2147483648
+        }
+    }
+
     Context 'When switching to a local branch successfully' {
         BeforeAll {
             Mock -CommandName Assert-GitLocalChange
@@ -220,7 +265,7 @@ Describe 'Switch-GitLocalBranch' {
                 }
         }
 
-        It 'Should accept valid branch names' {
+        It 'Should accept valid branch names with Force parameter' {
             Mock -CommandName Assert-GitLocalChange
             Mock -CommandName git -MockWith {
                 if ($args[0] -eq 'checkout')
@@ -232,6 +277,31 @@ Describe 'Switch-GitLocalBranch' {
             { Switch-GitLocalBranch -Name 'main' -Force } | Should -Not -Throw
             { Switch-GitLocalBranch -Name 'feature/branch-name' -Force } | Should -Not -Throw
             { Switch-GitLocalBranch -Name 'hotfix/fix-123' -Force } | Should -Not -Throw
+        }
+
+        It 'Should accept valid branch names without Force parameter' {
+            Mock -CommandName Assert-GitLocalChange
+            Mock -CommandName git -MockWith {
+                if ($args[0] -eq 'checkout')
+                {
+                    $global:LASTEXITCODE = 0
+                }
+            }
+
+            { Switch-GitLocalBranch -Name 'main' -Confirm:$false } | Should -Not -Throw
+            { Switch-GitLocalBranch -Name 'feature/branch-name' -Confirm:$false } | Should -Not -Throw
+        }
+
+        It 'Should accept positional parameter for Name' {
+            Mock -CommandName Assert-GitLocalChange
+            Mock -CommandName git -MockWith {
+                if ($args[0] -eq 'checkout')
+                {
+                    $global:LASTEXITCODE = 0
+                }
+            }
+
+            { Switch-GitLocalBranch 'main' -Force } | Should -Not -Throw
         }
     }
 }
