@@ -26,7 +26,7 @@ BeforeDiscovery {
 BeforeAll {
     $script:dscModuleName = 'Viscalyx.Common'
 
-    Import-Module -Name $script:dscModuleName
+    Import-Module -Name $script:dscModuleName -Force -ErrorAction Stop
 
     $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
     $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
