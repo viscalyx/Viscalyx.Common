@@ -48,7 +48,7 @@ Describe 'Update-RemoteTrackingBranch' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-RemoteName] <string> [[-BranchName] <string>] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters = '[-RemoteName] <string> [[-BranchName] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Update-RemoteTrackingBranch').ParameterSets |
