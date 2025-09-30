@@ -74,8 +74,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     coding guidelines.
   - Write-Verbose messages are now placed outside ShouldProcess blocks to provide
     detailed progress feedback during execution.
-  - Added parameter sets to enforce that `BranchName` can only be specified when
-    `-Checkout` is used, preventing invalid parameter combinations.
 
 ### Fixed
 
