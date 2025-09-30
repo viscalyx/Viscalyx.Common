@@ -153,6 +153,40 @@ ConvertFrom-StringData @'
     Request_GitTag_FailedFetchTag = Failed to fetch tag '{0}' from remote '{1}'. Make sure the tag exists and remote is accessible. (RQT0007)
     Request_GitTag_FailedFetchAllTags = Failed to fetch all tags from remote '{0}'. (RQT0008)
 
+    ## Start-GitRebase
+    Start_GitRebase_RebasingFrom = Rebasing current branch from '{0}'. (SGRE0002)
+    Start_GitRebase_FailedRebase = Failed to rebase from '{0}'. Make sure the branch exists and is accessible. (SGRE0003)
+    Start_GitRebase_Success = Successfully rebased current branch. (SGRE0004)
+    Start_GitRebase_ShouldProcessVerboseDescription = Rebasing current branch from '{0}'. (SGRE0005)
+    Start_GitRebase_ShouldProcessVerboseWarning = Are you sure you want to rebase current branch from '{0}'? (SGRE0006)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Start_GitRebase_ShouldProcessCaption = Rebase current branch (SGRE0007)
+
+    ## Stop-GitRebase
+    Stop_GitRebase_NotInRebaseState = The repository is not in a rebase state. Cannot abort rebase. (SPGR0001)
+    Stop_GitRebase_AbortingRebase = Aborting current rebase operation. (SPGR0002)
+    Stop_GitRebase_FailedAbort = Failed to abort rebase operation. (SPGR0003)
+    Stop_GitRebase_Success = Successfully aborted rebase operation. (SPGR0004)
+    Stop_GitRebase_ShouldProcessVerboseDescription = Aborting current rebase operation. (SPGR0005)
+    Stop_GitRebase_ShouldProcessVerboseWarning = Are you sure you want to abort the current rebase operation? (SPGR0006)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Stop_GitRebase_ShouldProcessCaption = Abort rebase operation (SPGR0007)
+
+    ## Resume-GitRebase
+    Resume_GitRebase_NotInRebaseState = The repository is not in a rebase state. Start a rebase operation first. (RGRE0001)
+    Resume_GitRebase_FailedRebase = Failed to {0} rebase. Make sure the repository is in a valid rebase state. (RGRE0002)
+    Resume_GitRebase_Resuming = Resuming rebase with action '{0}'. (RGRE0003)
+    Resume_GitRebase_Continue_Success = Successfully continued rebase operation. (RGRE0004)
+    Resume_GitRebase_Skip_Success = Successfully skipped commit and continued rebase operation. (RGRE0005)
+    Resume_GitRebase_Continue_ShouldProcessVerboseDescription = Continuing rebase operation after resolving conflicts. (RGRE0006)
+    Resume_GitRebase_Continue_ShouldProcessVerboseWarning = Are you sure you want to continue the rebase operation? (RGRE0007)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Resume_GitRebase_Continue_ShouldProcessCaption = Continue rebase (RGRE0008)
+    Resume_GitRebase_Skip_ShouldProcessVerboseDescription = Skipping current commit and continuing rebase operation. (RGRE0009)
+    Resume_GitRebase_Skip_ShouldProcessVerboseWarning = Are you sure you want to skip the current commit? (RGRE0010)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Resume_GitRebase_Skip_ShouldProcessCaption = Skip commit (RGRE0011)
+
     ## Install-ModulePatch
     Install_ModulePatch_ShouldProcessDescription = Apply module patch file at location '{0}'. (IMP0001)
     Install_ModulePatch_ShouldProcessConfirmation = Are you sure you want to apply the module patch at the location '{0}'? (IMP0002)
