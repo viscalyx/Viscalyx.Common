@@ -90,13 +90,16 @@
 #>
 function Receive-GitBranch
 {
-    [CmdletBinding(SupportsShouldProcess = $true)]
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        DefaultParameterSetName = 'Default'
+    )]
     [OutputType()]
     param
     (
-        [Parameter()]
+        [Parameter(ParameterSetName = 'Checkout')]
         [System.String]
-        $BranchName = 'main',
+        $BranchName = '.',
 
         [Parameter()]
         [System.String]
@@ -106,7 +109,7 @@ function Receive-GitBranch
         [System.String]
         $RemoteName = 'origin',
 
-        [Parameter()]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Checkout')]
         [System.Management.Automation.SwitchParameter]
         $Checkout,
 
@@ -128,45 +131,28 @@ function Receive-GitBranch
         $ConfirmPreference = 'None'
     }
 
+    $currentLocalBranchName = Get-GitLocalBranchName -Current
+
+    if ($BranchName -eq '.')
+    {
+        $BranchName = $currentLocalBranchName
+    }
+
     # Use current location if Path is not specified
     if (-not $PSBoundParameters.ContainsKey('Path'))
     {
         $Path = (Get-Location).Path
     }
 
-    # Determine the ShouldProcess messages based on parameters
-    if ($Checkout.IsPresent -and $Rebase.IsPresent)
+    # Checkout the specified branch if requested
+    if ($Checkout.IsPresent)
     {
-        $descriptionMessage = $script:localizedData.Receive_GitBranch_CheckoutRebase_ShouldProcessVerboseDescription -f $BranchName, $RemoteName, $UpstreamBranchName
-        $confirmationMessage = $script:localizedData.Receive_GitBranch_CheckoutRebase_ShouldProcessVerboseWarning -f $BranchName, $RemoteName, $UpstreamBranchName
-        $captionMessage = $script:localizedData.Receive_GitBranch_CheckoutRebase_ShouldProcessCaption
-    }
-    elseif ($Checkout.IsPresent)
-    {
-        $descriptionMessage = $script:localizedData.Receive_GitBranch_CheckoutPull_ShouldProcessVerboseDescription -f $BranchName
-        $confirmationMessage = $script:localizedData.Receive_GitBranch_CheckoutPull_ShouldProcessVerboseWarning -f $BranchName
-        $captionMessage = $script:localizedData.Receive_GitBranch_CheckoutPull_ShouldProcessCaption
-    }
-    elseif ($Rebase.IsPresent)
-    {
-        $descriptionMessage = $script:localizedData.Receive_GitBranch_Rebase_ShouldProcessVerboseDescription -f $RemoteName, $UpstreamBranchName
-        $confirmationMessage = $script:localizedData.Receive_GitBranch_Rebase_ShouldProcessVerboseWarning -f $RemoteName, $UpstreamBranchName
-        $captionMessage = $script:localizedData.Receive_GitBranch_Rebase_ShouldProcessCaption
-    }
-    else
-    {
-        $descriptionMessage = $script:localizedData.Receive_GitBranch_Pull_ShouldProcessVerboseDescription
-        $confirmationMessage = $script:localizedData.Receive_GitBranch_Pull_ShouldProcessVerboseWarning
-        $captionMessage = $script:localizedData.Receive_GitBranch_Pull_ShouldProcessCaption
-    }
+        $checkoutDescription = $script:localizedData.Receive_GitBranch_Checkout_ShouldProcessVerboseDescription -f $BranchName
+        $checkoutWarning = $script:localizedData.Receive_GitBranch_Checkout_ShouldProcessVerboseWarning -f $BranchName
+        $checkoutCaption = $script:localizedData.Receive_GitBranch_Checkout_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
-    {
-        # Checkout the specified branch if requested
-        if ($Checkout.IsPresent)
+        if ($PSCmdlet.ShouldProcess($checkoutDescription, $checkoutWarning, $checkoutCaption))
         {
-            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_CheckoutBranch -f $BranchName)
-
             try
             {
                 Invoke-Git -Path $Path -Arguments @('checkout', $BranchName) -ErrorAction 'Stop'
@@ -188,13 +174,20 @@ function Receive-GitBranch
                 Write-Error @errorMessageParameters
                 return
             }
+
+            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_Success)
         }
+    }
 
-        if ($Rebase.IsPresent)
+    if ($Rebase.IsPresent)
+    {
+        # Fetch upstream changes
+        $fetchDescription = $script:localizedData.Receive_GitBranch_Fetch_ShouldProcessVerboseDescription -f $UpstreamBranchName, $RemoteName
+        $fetchWarning = $script:localizedData.Receive_GitBranch_Fetch_ShouldProcessVerboseWarning -f $UpstreamBranchName, $RemoteName
+        $fetchCaption = $script:localizedData.Receive_GitBranch_Fetch_ShouldProcessCaption
+
+        if ($PSCmdlet.ShouldProcess($fetchDescription, $fetchWarning, $fetchCaption))
         {
-            # Fetch upstream changes
-            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_FetchUpstream -f $UpstreamBranchName, $RemoteName)
-
             try
             {
                 Invoke-Git -Path $Path -Arguments @('fetch', $RemoteName, $UpstreamBranchName) -ErrorAction 'Stop'
@@ -217,9 +210,16 @@ function Receive-GitBranch
                 return
             }
 
-            # Rebase local branch with upstream
-            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_RebaseWithUpstream -f $RemoteName, $UpstreamBranchName)
+            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_Success)
+        }
 
+        # Rebase local branch with upstream
+        $rebaseDescription = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessVerboseDescription -f $UpstreamBranchName, $RemoteName
+        $rebaseWarning = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessVerboseWarning -f $UpstreamBranchName, $RemoteName
+        $rebaseCaption = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessCaption
+
+        if ($PSCmdlet.ShouldProcess($rebaseDescription, $rebaseWarning, $rebaseCaption))
+        {
             try
             {
                 Invoke-Git -Path $Path -Arguments @('rebase', "$RemoteName/$UpstreamBranchName") -ErrorAction 'Stop'
@@ -241,12 +241,19 @@ function Receive-GitBranch
                 Write-Error @errorMessageParameters
                 return
             }
-        }
-        else
-        {
-            # Use git pull with default behavior
-            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_PullChanges)
 
+            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_Success)
+        }
+    }
+    else
+    {
+        # Use git pull with default behavior
+        $pullDescription = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessVerboseDescription -f $BranchName
+        $pullWarning = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessVerboseWarning -f $BranchName
+        $pullCaption = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessCaption
+
+        if ($PSCmdlet.ShouldProcess($pullDescription, $pullWarning, $pullCaption))
+        {
             try
             {
                 Invoke-Git -Path $Path -Arguments @('pull') -ErrorAction 'Stop'
@@ -266,8 +273,8 @@ function Receive-GitBranch
                 Write-Error @errorMessageParameters
                 return
             }
-        }
 
-        Write-Verbose -Message ($script:localizedData.Receive_GitBranch_Success)
+            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_Success)
+        }
     }
 }

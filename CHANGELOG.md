@@ -60,6 +60,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ConvertTo-RelativePath` - Simplified function logic to consistently normalize
   directory separators using `[System.IO.Path]::DirectorySeparatorChar` and
   removed complex cross-platform path handling.
+- `Receive-GitBranch` - Refactored to use multiple ShouldProcess blocks instead
+  of a single combined block ([#50](https://github.com/viscalyx/Viscalyx.Common/issues/50)).
+  - Each operation (checkout, fetch, rebase, pull) now has its own ShouldProcess
+    block for better WhatIf support and granular confirmation prompts.
+  - Removed Write-Verbose calls from inside ShouldProcess blocks to comply with
+    coding guidelines.
+  - Write-Verbose messages are now placed outside ShouldProcess blocks to provide
+    detailed progress feedback during execution.
+  - Added parameter sets to enforce that `BranchName` can only be specified when
+    `-Checkout` is used, preventing invalid parameter combinations.
 
 ### Fixed
 

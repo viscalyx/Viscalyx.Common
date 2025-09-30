@@ -45,20 +45,16 @@ AfterAll {
 # cSpell: ignore LASTEXITCODE
 Describe 'Receive-GitBranch' {
     Context 'When the command has correct parameter structure' {
-        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
-            @{
-                ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[[-BranchName] <string>] [[-UpstreamBranchName] <string>] [[-RemoteName] <string>] [[-Path] <string>] [-Checkout] [-Rebase] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
-            }
-        ) {
-            $result = (Get-Command -Name 'Receive-GitBranch').ParameterSets |
-                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
-                Select-Object -Property @(
-                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
-                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
-                )
-            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
-            $result.ParameterListAsString | Should -Be $ExpectedParameters
+        It 'Should have the correct parameter sets' {
+            $parameterSets = (Get-Command -Name 'Receive-GitBranch').ParameterSets
+            $parameterSets.Name | Should -Contain 'Default'
+            $parameterSets.Name | Should -Contain 'Checkout'
+            $parameterSets.Count | Should -Be 2
+        }
+
+        It 'Should have Default as the default parameter set' {
+            $defaultParameterSet = (Get-Command -Name 'Receive-GitBranch').DefaultParameterSet
+            $defaultParameterSet | Should -Be 'Default'
         }
 
         It 'Should have BranchName as a non-mandatory parameter with default value' {
@@ -82,9 +78,10 @@ Describe 'Receive-GitBranch' {
             $parameterInfo.Attributes.Mandatory | Should -BeFalse
         }
 
-        It 'Should have Checkout as a non-mandatory switch parameter' {
+        It 'Should have Checkout as a mandatory switch parameter in Checkout parameter set' {
             $parameterInfo = (Get-Command -Name 'Receive-GitBranch').Parameters['Checkout']
-            $parameterInfo.Attributes.Mandatory | Should -BeFalse
+            $checkoutAttribute = $parameterInfo.Attributes | Where-Object { $_.ParameterSetName -eq 'Checkout' }
+            $checkoutAttribute.Mandatory | Should -BeTrue
             $parameterInfo.ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
         }
 
@@ -113,6 +110,10 @@ Describe 'Receive-GitBranch' {
                 return @{
                     Path = '/test/repo'
                 }
+            }
+
+            Mock -CommandName Get-GitLocalBranchName -MockWith {
+                return 'main'
             }
 
             Mock -CommandName Invoke-Git
@@ -149,6 +150,10 @@ Describe 'Receive-GitBranch' {
                 return @{
                     Path = '/test/repo'
                 }
+            }
+
+            Mock -CommandName Get-GitLocalBranchName -MockWith {
+                return 'main'
             }
 
             Mock -CommandName Invoke-Git
@@ -223,6 +228,10 @@ Describe 'Receive-GitBranch' {
                 }
             }
 
+            Mock -CommandName Get-GitLocalBranchName -MockWith {
+                return 'main'
+            }
+
             Mock -CommandName Invoke-Git -MockWith {
                 if ($Arguments -contains 'checkout')
                 {
@@ -258,6 +267,10 @@ Describe 'Receive-GitBranch' {
                 return @{
                     Path = '/test/repo'
                 }
+            }
+
+            Mock -CommandName Get-GitLocalBranchName -MockWith {
+                return 'main'
             }
 
             Mock -CommandName Invoke-Git -MockWith {
@@ -303,6 +316,10 @@ Describe 'Receive-GitBranch' {
                 return @{
                     Path = '/test/repo'
                 }
+            }
+
+            Mock -CommandName Get-GitLocalBranchName -MockWith {
+                return 'main'
             }
 
             Mock -CommandName Invoke-Git -MockWith {
@@ -354,6 +371,10 @@ Describe 'Receive-GitBranch' {
                 }
             }
 
+            Mock -CommandName Get-GitLocalBranchName -MockWith {
+                return 'main'
+            }
+
             Mock -CommandName Invoke-Git -MockWith {
                 if ($Arguments -contains 'checkout')
                 {
@@ -397,6 +418,10 @@ Describe 'Receive-GitBranch' {
                 return @{
                     Path = '/test/repo'
                 }
+            }
+
+            Mock -CommandName Get-GitLocalBranchName -MockWith {
+                return 'main'
             }
 
             Mock -CommandName Invoke-Git
