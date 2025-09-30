@@ -93,9 +93,6 @@ function Get-GitTag
         $First = 1
         $Descending = $true
         $AsVersions = $true
-        # git describe --tags --abbrev=0
-
-        # $exitCode = $LASTEXITCODE # cSpell: ignore LASTEXITCODE
     }
 
     $arguments = @(
