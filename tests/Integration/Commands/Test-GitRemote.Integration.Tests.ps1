@@ -91,20 +91,20 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
         }
 
         It 'Should return false when testing for non-existing remote' {
-            $result = Test-GitRemote -Name 'nonexistent'
+            $result = Test-GitRemote -Name 'nonexistent' -ErrorAction Stop
             $result | Should -BeFalse
             $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should return false when testing for remote with different case' {
             # Note: Git remotes may be case-insensitive on some systems, so test with completely different name
-            $result = Test-GitRemote -Name 'notfound'
+            $result = Test-GitRemote -Name 'notfound' -ErrorAction Stop
             $result | Should -BeFalse
             $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should return false when testing for remote with partial name match' {
-            $result = Test-GitRemote -Name 'orig'
+            $result = Test-GitRemote -Name 'orig' -ErrorAction Stop
             $result | Should -BeFalse
             $result | Should -BeOfType [System.Boolean]
         }
@@ -172,19 +172,19 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
         }
 
         It 'Should return false when testing for "origin" remote in repository with no remotes' {
-            $result = Test-GitRemote -Name 'origin'
+            $result = Test-GitRemote -Name 'origin' -ErrorAction Stop
             $result | Should -BeFalse
             $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should return false when testing for "upstream" remote in repository with no remotes' {
-            $result = Test-GitRemote -Name 'upstream'
+            $result = Test-GitRemote -Name 'upstream' -ErrorAction Stop
             $result | Should -BeFalse
             $result | Should -BeOfType [System.Boolean]
         }
 
         It 'Should return false when testing for any remote name in repository with no remotes' {
-            $result = Test-GitRemote -Name 'anyremote'
+            $result = Test-GitRemote -Name 'anyremote' -ErrorAction Stop
             $result | Should -BeFalse
             $result | Should -BeOfType [System.Boolean]
         }
@@ -276,7 +276,7 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
 
         It 'Should return false before adding remote, then true after adding remote' {
             # Test before adding remote
-            $resultBefore = Test-GitRemote -Name 'newremote'
+            $resultBefore = Test-GitRemote -Name 'newremote' -ErrorAction Stop
             $resultBefore | Should -BeFalse
 
             # Add the remote
@@ -299,7 +299,7 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
             $null = git remote remove 'tempremote' 2>&1
 
             # Test after removing remote
-            $resultAfter = Test-GitRemote -Name 'tempremote'
+            $resultAfter = Test-GitRemote -Name 'tempremote' -ErrorAction Stop
             $resultAfter | Should -BeFalse
         }
 
@@ -312,14 +312,14 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
             $resultOldBefore | Should -BeTrue
 
             # Verify it doesn't exist with new name
-            $resultNewBefore = Test-GitRemote -Name 'newname'
+            $resultNewBefore = Test-GitRemote -Name 'newname' -ErrorAction Stop
             $resultNewBefore | Should -BeFalse
 
             # Rename the remote
             $null = git remote rename 'oldname' 'newname' 2>&1
 
             # Verify it doesn't exist with old name anymore
-            $resultOldAfter = Test-GitRemote -Name 'oldname'
+            $resultOldAfter = Test-GitRemote -Name 'oldname' -ErrorAction Stop
             $resultOldAfter | Should -BeFalse
 
             # Verify it exists with new name
