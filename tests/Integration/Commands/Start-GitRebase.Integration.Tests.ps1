@@ -197,7 +197,7 @@ Describe 'Start-GitRebase' {
 
             # Verify we don't have the main branch update yet
             $hasMainUpdate = Test-Path -Path (Join-Path -Path $script:testRepoPath -ChildPath 'test2.txt')
-            $hasMainUpdate | Should -Be $false
+            $hasMainUpdate | Should -BeFalse
 
             # Start the rebase
             $null = Start-GitRebase -Force -ErrorAction Stop
@@ -208,7 +208,7 @@ Describe 'Start-GitRebase' {
 
             # Verify that we now have the main branch update (test2.txt should exist)
             $hasMainUpdate = Test-Path -Path (Join-Path -Path $script:testRepoPath -ChildPath 'test2.txt')
-            $hasMainUpdate | Should -Be $true
+            $hasMainUpdate | Should -BeTrue
 
             # Verify that the commit count increased (rebased onto newer main)
             $commitCountAfter = (git rev-list --count HEAD)

@@ -226,7 +226,7 @@ Describe 'Stop-GitRebase' {
         It 'Should successfully abort a rebase operation' -Skip {
             # NOTE: This test is skipped because it requires creating a rebase conflict
             # which is difficult to automate reliably in integration tests
-            
+
             # Start a rebase that will cause a conflict
             $null = git rebase origin/main 2>&1
 
@@ -235,7 +235,7 @@ Describe 'Stop-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $true
+            $isRebasing | Should -BeTrue
 
             # Abort the rebase
             $null = Stop-GitRebase -Force -ErrorAction Stop
@@ -245,7 +245,7 @@ Describe 'Stop-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $false
+            $isRebasing | Should -BeFalse
 
             # Verify that the branch is back to its original state
             $currentCommit = git rev-parse HEAD
@@ -255,7 +255,7 @@ Describe 'Stop-GitRebase' {
         It 'Should use -Force to bypass confirmation' -Skip {
             # NOTE: This test is skipped because it requires creating a rebase conflict
             # which is difficult to automate reliably in integration tests
-            
+
             # Start a rebase that will cause a conflict
             $null = git rebase origin/main 2>&1
 
@@ -267,7 +267,7 @@ Describe 'Stop-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $false
+            $isRebasing | Should -BeFalse
         }
     }
 
@@ -278,7 +278,7 @@ Describe 'Stop-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $false
+            $isRebasing | Should -BeFalse
 
             # Attempt to abort rebase should fail
             { Stop-GitRebase -Force -ErrorAction Stop } | Should -Throw
@@ -289,7 +289,7 @@ Describe 'Stop-GitRebase' {
         It 'Should successfully abort rebase in specified path' -Skip {
             # NOTE: This test is skipped because it requires creating a rebase conflict
             # which is difficult to automate reliably in integration tests
-            
+
             # Start a rebase that will cause a conflict
             $null = git rebase origin/main 2>&1
 
@@ -298,7 +298,7 @@ Describe 'Stop-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $true
+            $isRebasing | Should -BeTrue
 
             # Return to previous directory
             Pop-Location
@@ -314,7 +314,7 @@ Describe 'Stop-GitRebase' {
                 $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
                 $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-                $isRebasing | Should -Be $false
+                $isRebasing | Should -BeFalse
 
                 # Verify that the branch is back to its original state
                 $currentCommit = git rev-parse HEAD
@@ -331,7 +331,7 @@ Describe 'Stop-GitRebase' {
         It 'Should successfully abort a non-conflicting rebase in progress' -Skip {
             # NOTE: This test is skipped because it's difficult to reliably create a rebase
             # state that doesn't immediately complete in an automated test environment
-            
+
             # Checkout main first to create a scenario for non-conflicting rebase
             if ($PSVersionTable.PSEdition -eq 'Desktop')
             {
@@ -380,7 +380,7 @@ Describe 'Stop-GitRebase' {
                 $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
                 $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-                $isRebasing | Should -Be $false
+                $isRebasing | Should -BeFalse
             }
             else
             {

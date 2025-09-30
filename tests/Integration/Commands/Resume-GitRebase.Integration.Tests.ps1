@@ -224,7 +224,7 @@ Describe 'Resume-GitRebase' {
             # NOTE: This test is skipped because it requires manual conflict resolution
             # which is difficult to automate reliably in integration tests
             # The command has been tested manually and works as expected
-            
+
             # Start a rebase that will cause a conflict
             $null = git rebase origin/main 2>&1
 
@@ -233,7 +233,7 @@ Describe 'Resume-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $true
+            $isRebasing | Should -BeTrue
 
             # Resolve the conflict by accepting theirs
             if (Test-Path -Path 'feature.txt')
@@ -250,13 +250,13 @@ Describe 'Resume-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $false
+            $isRebasing | Should -BeFalse
         }
 
         It 'Should use -Force to bypass confirmation' -Skip {
             # NOTE: This test is skipped because it requires manual conflict resolution
             # which is difficult to automate reliably in integration tests
-            
+
             # Start a rebase that will cause a conflict
             $null = git rebase origin/main 2>&1
 
@@ -276,7 +276,7 @@ Describe 'Resume-GitRebase' {
         It 'Should successfully skip current commit during rebase' -Skip {
             # NOTE: This test is skipped because it requires creating a rebase conflict
             # which is difficult to automate reliably in integration tests
-            
+
             # Start a rebase that will cause a conflict
             $null = git rebase origin/main 2>&1
 
@@ -285,7 +285,7 @@ Describe 'Resume-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $true
+            $isRebasing | Should -BeTrue
 
             # Skip the current commit
             $null = Resume-GitRebase -Skip -Force -ErrorAction Stop
@@ -302,7 +302,7 @@ Describe 'Resume-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $false
+            $isRebasing | Should -BeFalse
 
             # Attempt to resume rebase should fail
             { Resume-GitRebase -Force -ErrorAction Stop } | Should -Throw
@@ -314,7 +314,7 @@ Describe 'Resume-GitRebase' {
             $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
             $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-            $isRebasing | Should -Be $false
+            $isRebasing | Should -BeFalse
 
             # Attempt to skip should fail
             { Resume-GitRebase -Skip -Force -ErrorAction Stop } | Should -Throw
@@ -325,7 +325,7 @@ Describe 'Resume-GitRebase' {
         It 'Should successfully resume rebase in specified path' -Skip {
             # NOTE: This test is skipped because it requires creating a rebase conflict
             # which is difficult to automate reliably in integration tests
-            
+
             # Start a rebase that will cause a conflict
             $null = git rebase origin/main 2>&1
 
@@ -350,7 +350,7 @@ Describe 'Resume-GitRebase' {
                 $rebaseApplyPath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-apply'
                 $isRebasing = (Test-Path -Path $rebaseMergePath) -or (Test-Path -Path $rebaseApplyPath)
 
-                $isRebasing | Should -Be $false
+                $isRebasing | Should -BeFalse
             }
             finally
             {
