@@ -21,10 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Invoke-Git`
   - `New-GitTag`
   - `Push-GitTag`
-  - `Receive-GitBranch` ([#5](https://github.com/johlju/Viscalyx.Common/issues/5))
-  - `Remove-GitTag` ([#16](https://github.com/johlju/Viscalyx.Common/issues/16))
-  - `Rename-GitLocalBranch` ([#10](https://github.com/johlju/Viscalyx.Common/issues/10))
-  - `Rename-GitRemote` ([#11](https://github.com/johlju/Viscalyx.Common/issues/11))
+  - `Receive-GitBranch` ([#5](https://github.com/viscalyx/Viscalyx.Common/issues/5))
+  - `Remove-GitTag` ([#16](https://github.com/viscalyx/Viscalyx.Common/issues/16))
+  - `Rename-GitLocalBranch` ([#10](https://github.com/viscalyx/Viscalyx.Common/issues/10))
+  - `Rename-GitRemote` ([#11](https://github.com/viscalyx/Viscalyx.Common/issues/11))
   - `Request-GitTag`
   - `Resume-GitRebase` ([#14](https://github.com/viscalyx/Viscalyx.Common/issues/14))
   - `Start-GitRebase` ([#13](https://github.com/viscalyx/Viscalyx.Common/issues/13))
