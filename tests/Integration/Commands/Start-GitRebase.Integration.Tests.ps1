@@ -74,7 +74,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git push -u origin main --quiet 2>&1
+            $null = git push -u origin main --quiet 2>&1
         }
 
         # Create a feature branch
@@ -86,7 +86,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git checkout -b feature/test --quiet 2>&1
+            $null = git checkout -b feature/test --quiet 2>&1
         }
         'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
@@ -99,7 +99,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git push -u origin feature/test --quiet 2>&1
+            $null = git push -u origin feature/test --quiet 2>&1
         }
 
         # Add another commit to main on remote (simulating upstream changes)
@@ -111,7 +111,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git checkout main --quiet 2>&1
+            $null = git checkout main --quiet 2>&1
         }
         'Updated main content' | Out-File -FilePath 'test2.txt' -Encoding utf8
         git add test2.txt *> $null
@@ -124,7 +124,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git push origin main --quiet 2>&1
+            $null = git push origin main --quiet 2>&1
         }
     }
     finally
@@ -168,7 +168,7 @@ Describe 'Start-GitRebase' {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git checkout feature/test --quiet 2>&1
+            $null = git checkout feature/test --quiet 2>&1
         }
     }
 
@@ -238,7 +238,7 @@ Describe 'Start-GitRebase' {
             else
             {
                 # PowerShell 7+ - capture output in variables
-                $gitOutput = git checkout main --quiet 2>&1
+                $null = git checkout main --quiet 2>&1
             }
 
             # Create a new commit on feature branch from remote
@@ -250,7 +250,7 @@ Describe 'Start-GitRebase' {
             else
             {
                 # PowerShell 7+ - capture output in variables
-                $gitOutput = git checkout feature/test --quiet 2>&1
+                $null = git checkout feature/test --quiet 2>&1
             }
 
             # Reset to before the feature commit to test rebasing from feature branch
