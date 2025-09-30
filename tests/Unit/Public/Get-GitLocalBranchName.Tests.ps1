@@ -129,21 +129,19 @@ Describe 'Get-GitLocalBranchName' {
 
     Context 'When getting branch by name' {
         It 'Should call git branch --format with specific name when Name parameter is provided' {
-            InModuleScope -ScriptBlock {
-                Mock -CommandName 'git' -MockWith {
-                    return 'main'
-                }
-
-                $global:LASTEXITCODE = 0
-
-                $result = Get-GitLocalBranchName -Name 'main'
-
-                Should -Invoke -CommandName 'git' -ParameterFilter {
-                    $args -contains 'branch' -and $args -contains '--format=%(refname:short)' -and $args -contains '--list' -and $args -contains 'main'
-                } -Times 1 -Exactly
-
-                $result | Should -Be 'main'
+            Mock -CommandName 'git' -MockWith {
+                return 'main'
             }
+
+            $global:LASTEXITCODE = 0
+
+            $result = Get-GitLocalBranchName -Name 'main'
+
+            Should -Invoke -CommandName 'git' -ParameterFilter {
+                $args -contains 'branch' -and $args -contains '--format=%(refname:short)' -and $args -contains '--list' -and $args -contains 'main'
+            } -Times 1 -Exactly
+
+            $result | Should -Be 'main'
         }
 
         It 'Should support wildcard patterns in Name parameter' {
