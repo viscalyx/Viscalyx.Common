@@ -84,7 +84,7 @@ Describe 'Resume-GitRebase' {
         It 'Should not call Invoke-Git when repository is not in rebase state' {
             Mock -CommandName Invoke-Git
 
-            $null = Resume-GitRebase -Force
+            { Resume-GitRebase -Force -ErrorAction 'Stop' } | Should -Throw
 
             Should -Invoke -CommandName Invoke-Git -Exactly -Times 0
         }
