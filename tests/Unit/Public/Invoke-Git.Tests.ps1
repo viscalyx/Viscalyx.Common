@@ -153,7 +153,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
                     $result.ExitCode | Should -BeExactly 0
 
-                    $result.Output | Should -BeExactly 'Standard Output Message'
+                    $result.StandardOutput | Should -BeExactly 'Standard Output Message'
 
                     $result.StandardError | Should -BeExactly 'Standard Error Message'
                 }
@@ -163,7 +163,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
                     $result.ExitCode | Should -BeExactly 0
 
-                    $result.Output | Should -BeExactly 'Standard Output Message'
+                    $result.StandardOutput | Should -BeExactly 'Standard Output Message'
 
                     $result.StandardError | Should -BeExactly 'Standard Error Message'
                 }
@@ -187,7 +187,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
                     $result.ExitCode | Should -BeExactly 128
 
-                    $result.Output | Should -BeExactly 'Standard Output Message'
+                    $result.StandardOutput | Should -BeExactly 'Standard Output Message'
 
                     $result.StandardError | Should -BeExactly 'Standard Error Message'
                 }
@@ -197,7 +197,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
                     $result.ExitCode | Should -BeExactly 128
 
-                    $result.Output | Should -BeExactly 'Standard Output Message'
+                    $result.StandardOutput | Should -BeExactly 'Standard Output Message'
 
                     $result.StandardError | Should -BeExactly 'Standard Error Message'
                 }
@@ -354,10 +354,10 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
 
-            $result.Output | Should -HaveCount 3
-            $result.Output[0] | Should -BeExactly 'line1'
-            $result.Output[1] | Should -BeExactly 'line2'
-            $result.Output[2] | Should -BeExactly 'line3'
+            $result.StandardOutput | Should -HaveCount 3
+            $result.StandardOutput[0] | Should -BeExactly 'line1'
+            $result.StandardOutput[1] | Should -BeExactly 'line2'
+            $result.StandardOutput[2] | Should -BeExactly 'line3'
         }
 
         It 'Should split LF lines and trim whitespace, filtering empty lines' {
@@ -398,10 +398,10 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
 
-            $result.Output | Should -HaveCount 3
-            $result.Output[0] | Should -BeExactly 'line1'
-            $result.Output[1] | Should -BeExactly 'line2'
-            $result.Output[2] | Should -BeExactly 'line3'
+            $result.StandardOutput | Should -HaveCount 3
+            $result.StandardOutput[0] | Should -BeExactly 'line1'
+            $result.StandardOutput[1] | Should -BeExactly 'line2'
+            $result.StandardOutput[2] | Should -BeExactly 'line3'
         }
 
         It 'Should handle mixed CRLF and LF line endings' {
@@ -442,10 +442,10 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
 
-            $result.Output | Should -HaveCount 3
-            $result.Output[0] | Should -BeExactly 'line1'
-            $result.Output[1] | Should -BeExactly 'line2'
-            $result.Output[2] | Should -BeExactly 'line3'
+            $result.StandardOutput | Should -HaveCount 3
+            $result.StandardOutput[0] | Should -BeExactly 'line1'
+            $result.StandardOutput[1] | Should -BeExactly 'line2'
+            $result.StandardOutput[2] | Should -BeExactly 'line3'
         }
 
         It 'Should return $null when all lines are empty or whitespace' {
@@ -486,7 +486,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
 
-            $result.Output | Should -BeNullOrEmpty
+            $result.StandardOutput | Should -BeNullOrEmpty
         }
 
         It 'Should handle single line with whitespace (returns string for backward compatibility)' {
@@ -527,8 +527,8 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
 
-            $result.Output | Should -BeOfType [System.String]
-            $result.Output | Should -BeExactly 'single line'
+            $result.StandardOutput | Should -BeOfType [System.String]
+            $result.StandardOutput | Should -BeExactly 'single line'
         }
     }
 }

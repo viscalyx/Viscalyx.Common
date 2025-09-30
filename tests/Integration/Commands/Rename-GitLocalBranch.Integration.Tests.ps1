@@ -51,7 +51,7 @@ Describe 'Rename-GitLocalBranch' {
 
             # Get the default branch name (main or master)
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
-            $script:defaultBranch = $result.Output
+            $script:defaultBranch = $result.StandardOutput
         }
         finally
         {
@@ -103,17 +103,17 @@ Describe 'Rename-GitLocalBranch' {
 
             # Verify the old branch no longer exists
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'feature/original-branch') -PassThru
-            $oldBranch = $result.Output
+            $oldBranch = $result.StandardOutput
             $oldBranch | Should -BeNullOrEmpty
 
             # Verify the new branch exists
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'feature/renamed-branch') -PassThru
-            $newBranch = $result.Output
+            $newBranch = $result.StandardOutput
             $newBranch | Should -Not -BeNullOrEmpty
 
             # Verify we're currently on the renamed branch
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
-            $currentBranch = $result.Output
+            $currentBranch = $result.StandardOutput
             $currentBranch | Should -Be 'feature/renamed-branch'
         }
 
@@ -127,21 +127,21 @@ Describe 'Rename-GitLocalBranch' {
 
             # Get the commit hash before renaming
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
-            $originalCommit = $result.Output
+            $originalCommit = $result.StandardOutput
 
             # Rename the branch
             $null = Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force -ErrorAction Stop
 
             # Get the commit hash after renaming
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
-            $newCommit = $result.Output
+            $newCommit = $result.StandardOutput
 
             # Verify the commit history is preserved
             $originalCommit | Should -Be $newCommit
 
             # Verify the commit message is preserved
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('log', '-1', '--pretty=format:%s') -PassThru
-            $commitMessage = $result.Output
+            $commitMessage = $result.StandardOutput
             $commitMessage | Should -Be 'Feature commit'
         }
 
@@ -158,7 +158,7 @@ Describe 'Rename-GitLocalBranch' {
 
             # Verify the rename worked
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
-            $currentBranch = $result.Output
+            $currentBranch = $result.StandardOutput
             $currentBranch | Should -Be 'feature/renamed-branch'
         }
     }
@@ -221,7 +221,7 @@ Describe 'Rename-GitLocalBranch' {
 
         AfterEach {
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
-            $currentBranch = $result.Output
+            $currentBranch = $result.StandardOutput
             if ($currentBranch -ne $script:defaultBranch)
             {
                 Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
@@ -255,7 +255,7 @@ Describe 'Rename-GitLocalBranch' {
             # Switch back to see if branch was renamed before the upstream tracking failed
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-remote-branch') -PassThru
-            $branchExists = $result.Output
+            $branchExists = $result.StandardOutput
             $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if upstream tracking fails'
         }
 
@@ -270,7 +270,7 @@ Describe 'Rename-GitLocalBranch' {
             # Verify the branch was renamed despite the set-head failure
             Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-remote-branch') -PassThru
-            $branchExists = $result.Output
+            $branchExists = $result.StandardOutput
             $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if set-head fails'
         }
 
@@ -308,7 +308,7 @@ Describe 'Rename-GitLocalBranch' {
 
             # Verify we're now on the renamed branch
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
-            $currentBranch = $result.Output
+            $currentBranch = $result.StandardOutput
             $currentBranch | Should -Be 'renamed-current-branch'
 
             # Clean up
@@ -326,12 +326,12 @@ Describe 'Rename-GitLocalBranch' {
 
             # Verify the branch was renamed (should exist in branch list)
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-other-branch') -PassThru
-            $branchExists = $result.Output
+            $branchExists = $result.StandardOutput
             $branchExists | Should -Not -BeNullOrEmpty
 
             # Verify we're still on the other branch
             $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
-            $currentBranch = $result.Output
+            $currentBranch = $result.StandardOutput
             $currentBranch | Should -Be 'other-branch'
 
             # Clean up

@@ -27,7 +27,7 @@
     .OUTPUTS
         System.Collections.Hashtable
 
-        Returns a hashtable when PassThru parameter is specified containing ExitCode, Output, and StandardError.
+        Returns a hashtable when PassThru parameter is specified containing ExitCode, StandardOutput, and StandardError.
 
     .EXAMPLE
         Invoke-Git -WorkingDirectory 'C:\SomeDirectory' -Arguments @( 'clone', 'https://github.com/X-Guardian/xActiveDirectory.wiki.git', '--quiet' )
@@ -46,7 +46,7 @@
 
         The $result variable will contain a hashtable with the following keys:
             ExitCode
-            Output
+            StandardOutput
             StandardError
 
     .EXAMPLE
@@ -78,9 +78,9 @@ function Invoke-Git
     )
 
     $gitResult = @{
-        ExitCode      = -1
-        Output        = $null
-        StandardError = $null
+        ExitCode        = -1
+        StandardOutput  = $null
+        StandardError   = $null
     }
 
     # Process arguments to add quotes around arguments containing spaces if not already quoted
@@ -141,7 +141,7 @@ function Invoke-Git
                 $gitResult.StandardError = $process.StandardError.ReadToEnd()
                 $rawOutput = $process.StandardOutput.ReadToEnd()
 
-                $gitResult.Output = foreach ($line in ($rawOutput -split '\r?\n'))
+                $gitResult.StandardOutput = foreach ($line in ($rawOutput -split '\r?\n'))
                 {
                     $trimmed = $line.Trim()
                     if (-not [System.String]::IsNullOrEmpty($trimmed))
@@ -154,7 +154,7 @@ function Invoke-Git
             {
                 # If stream reading fails, set empty values
                 $gitResult.StandardError = ''
-                $gitResult.Output = @()
+                $gitResult.StandardOutput = @()
             }
 
             # Set exit code and throw error if timeout occurred
@@ -197,7 +197,7 @@ function Invoke-Git
             $PSBoundParameters['Debug'] -eq $true
         )
         {
-            Write-Verbose -Message ($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.Output)
+            Write-Verbose -Message ($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.StandardOutput)
             Write-Verbose -Message ($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)
             Write-Verbose -Message ($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)
 
@@ -211,7 +211,7 @@ function Invoke-Git
 
             $detailsMessage = @(
                 "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))"
-                "$($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.Output)"
+                "$($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.StandardOutput)"
                 "$($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)"
                 "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $WorkingDirectory)"
             ) -join "`n"
