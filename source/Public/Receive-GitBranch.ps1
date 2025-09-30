@@ -169,7 +169,7 @@ function Receive-GitBranch
 
             try
             {
-                Invoke-Git -Path $Path -Arguments @('checkout', $BranchName)
+                Invoke-Git -Path $Path -Arguments @('checkout', $BranchName) -ErrorAction 'Stop'
             }
             catch
             {
