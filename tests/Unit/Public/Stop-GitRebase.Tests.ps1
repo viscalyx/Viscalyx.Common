@@ -84,7 +84,7 @@ Describe 'Stop-GitRebase' {
         It 'Should not call Invoke-Git when not in rebase state' {
             Mock -CommandName Invoke-Git
 
-            $null = Stop-GitRebase -Force
+            { Stop-GitRebase -Force -ErrorAction 'Stop' } | Should -Throw
 
             Should -Invoke -CommandName Invoke-Git -Exactly -Times 0
         }
@@ -187,7 +187,7 @@ Describe 'Stop-GitRebase' {
             $null = Stop-GitRebase -Path '/custom/path' -Force
 
             Should -Invoke -CommandName Test-Path -ParameterFilter {
-                $Path -like '/custom/path/.git/rebase-*'
+                $Path -like ("{0}custom{0}path{0}.git{0}rebase*" -f [System.IO.Path]::DirectorySeparatorChar)
             }
         }
     }

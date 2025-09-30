@@ -186,7 +186,9 @@ Describe 'Resume-GitRebase' {
             $null = Resume-GitRebase -Path '/custom/path' -Force
 
             Should -Invoke -CommandName Test-Path -ParameterFilter {
-                $Path -like '/custom/path*'
+                {
+                    $Path -like ("{0}custom{0}path*" -f [System.IO.Path]::DirectorySeparatorChar)
+                }
             }
         }
     }
