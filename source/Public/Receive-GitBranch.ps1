@@ -28,7 +28,7 @@
         Specifies that the command should fetch the upstream branch and rebase
         the local branch using the fetched upstream branch instead of merging.
 
-    .PARAMETER WorkingDirectory
+    .PARAMETER Path
         Specifies the path to the git repository directory. If not specified,
         uses the current directory. When specified, the function will temporarily
         change to this directory to perform git operations.
@@ -76,7 +76,7 @@
         the current branch using those changes.
 
     .EXAMPLE
-        Receive-GitBranch -WorkingDirectory 'C:\repos\MyProject' -Checkout -BranchName 'feature-branch'
+        Receive-GitBranch -Path 'C:\repos\MyProject' -Checkout -BranchName 'feature-branch'
 
         Temporarily changes to the 'C:\repos\MyProject' directory, checks out the
         'feature-branch', pulls the latest changes, and then returns to the original directory.
@@ -116,7 +116,7 @@ function Receive-GitBranch
 
         [Parameter()]
         [System.String]
-        $WorkingDirectory,
+        $Path,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
@@ -128,10 +128,10 @@ function Receive-GitBranch
         $ConfirmPreference = 'None'
     }
 
-    # Use current location if WorkingDirectory is not specified
-    if (-not $PSBoundParameters.ContainsKey('WorkingDirectory'))
+    # Use current location if Path is not specified
+    if (-not $PSBoundParameters.ContainsKey('Path'))
     {
-        $WorkingDirectory = (Get-Location).Path
+        $Path = (Get-Location).Path
     }
 
     # Determine the ShouldProcess messages based on parameters
@@ -169,7 +169,7 @@ function Receive-GitBranch
 
             try
             {
-                Invoke-Git -WorkingDirectory $WorkingDirectory -Arguments @('checkout', $BranchName)
+                Invoke-Git -Path $Path -Arguments @('checkout', $BranchName)
             }
             catch
             {
@@ -197,7 +197,7 @@ function Receive-GitBranch
 
             try
             {
-                Invoke-Git -WorkingDirectory $WorkingDirectory -Arguments @('fetch', $RemoteName, $UpstreamBranchName) -ErrorAction 'Stop'
+                Invoke-Git -Path $Path -Arguments @('fetch', $RemoteName, $UpstreamBranchName) -ErrorAction 'Stop'
             }
             catch
             {
@@ -222,7 +222,7 @@ function Receive-GitBranch
 
             try
             {
-                Invoke-Git -WorkingDirectory $WorkingDirectory -Arguments @('rebase', "$RemoteName/$UpstreamBranchName") -ErrorAction 'Stop'
+                Invoke-Git -Path $Path -Arguments @('rebase', "$RemoteName/$UpstreamBranchName") -ErrorAction 'Stop'
             }
             catch
             {
@@ -249,7 +249,7 @@ function Receive-GitBranch
 
             try
             {
-                Invoke-Git -WorkingDirectory $WorkingDirectory -Arguments @('pull') -ErrorAction 'Stop'
+                Invoke-Git -Path $Path -Arguments @('pull') -ErrorAction 'Stop'
             }
             catch
             {

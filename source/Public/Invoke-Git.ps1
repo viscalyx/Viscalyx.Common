@@ -7,7 +7,7 @@
 
         Throws an error when git ExitCode -ne 0 and -PassThru switch -eq $false (or omitted).
 
-    .PARAMETER WorkingDirectory
+    .PARAMETER Path
         The path to the git working directory.
 
     .PARAMETER Timeout
@@ -28,17 +28,17 @@
         Returns a hashtable when PassThru parameter is specified containing ExitCode, StandardOutput, and StandardError.
 
     .EXAMPLE
-        Invoke-Git -WorkingDirectory 'C:\SomeDirectory' -Arguments @( 'clone', 'https://github.com/X-Guardian/xActiveDirectory.wiki.git', '--quiet' )
+        Invoke-Git -Path 'C:\SomeDirectory' -Arguments @( 'clone', 'https://github.com/X-Guardian/xActiveDirectory.wiki.git', '--quiet' )
 
         Invokes the Git executable to clone the specified repository to the working directory.
 
     .EXAMPLE
-        Invoke-Git -WorkingDirectory 'C:\SomeDirectory' -Arguments @( 'status' ) -Timeout 10000 -PassThru
+        Invoke-Git -Path 'C:\SomeDirectory' -Arguments @( 'status' ) -Timeout 10000 -PassThru
 
         Invokes the Git executable to return the status while having a 10000 millisecond timeout.
 
     .EXAMPLE
-        $result = Invoke-Git -WorkingDirectory 'C:\SomeDirectory' -Arguments @( 'status' ) -PassThru
+        $result = Invoke-Git -Path 'C:\SomeDirectory' -Arguments @( 'status' ) -PassThru
 
         Invokes the Git executable to return the status and stores the result in the $result variable.
 
@@ -48,7 +48,7 @@
             StandardError
 
     .EXAMPLE
-        Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.name', '"Test User"')
+        Invoke-Git -Path $script:testRepoPath -Arguments @('config', 'user.name', '"Test User"')
 
         Configures the git user name for the repository located in $script:testRepoPath.
 #>
@@ -60,7 +60,7 @@ function Invoke-Git
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $WorkingDirectory,
+        $Path,
 
         [Parameter()]
         [System.Int32]
@@ -106,7 +106,7 @@ function Invoke-Git
         $process.StartInfo.RedirectStandardError = $true
         $process.StartInfo.UseShellExecute = $false
         $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-        $process.StartInfo.WorkingDirectory = $WorkingDirectory
+        $process.StartInfo.WorkingDirectory = $Path
 
         if ($process.Start() -eq $true)
         {
@@ -200,7 +200,7 @@ function Invoke-Git
             Write-Verbose -Message ($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)
 
             Write-Debug -Message ($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))
-            Write-Debug -Message ($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $WorkingDirectory)
+            Write-Debug -Message ($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $Path)
         }
 
         if ($gitResult.ExitCode -ne 0 -and $PassThru -eq $false)
@@ -211,7 +211,7 @@ function Invoke-Git
                 "$($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))"
                 "$($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.StandardOutput)"
                 "$($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)"
-                "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $WorkingDirectory)"
+                "$($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $Path)"
             ) -join "`n"
 
             $exception = [System.InvalidOperationException]::new("$errorMessage`n$detailsMessage")

@@ -47,7 +47,7 @@ BeforeAll {
     Push-Location -Path $script:bareRepoPath
     try
     {
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:bareRepoPath -Arguments @('init', '--bare', '--initial-branch=main')
+        Viscalyx.Common\Invoke-Git -Path $script:bareRepoPath -Arguments @('init', '--bare', '--initial-branch=main')
     }
     finally
     {
@@ -59,22 +59,22 @@ BeforeAll {
     try
     {
         # Initialize git repository
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('init', '--initial-branch=main', '--quiet')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('init', '--initial-branch=main', '--quiet')
 
         # Configure git user for testing
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.name', 'Test User')
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.email', 'test@example.com')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('config', 'user.name', 'Test User')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('config', 'user.email', 'test@example.com')
 
         # Create initial commit
         'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', '.')
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Initial commit')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('add', '.')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('commit', '-m', 'Initial commit')
 
         # Add the bare repository as origin remote
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'add', 'origin', $script:bareRepoPath)
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('remote', 'add', 'origin', $script:bareRepoPath)
 
         # Get the current branch name (don't assume 'main' or 'master')
-        $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--show-current') -PassThru
+        $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '--show-current') -PassThru
         $currentBranch = $result.StandardOutput
         if (-not $currentBranch)
         {
@@ -82,14 +82,14 @@ BeforeAll {
         }
 
         # Push to origin
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('push', '--set-upstream', 'origin', $currentBranch, '--quiet')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('push', '--set-upstream', 'origin', $currentBranch, '--quiet')
 
         # Create and push tags
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('tag', 'v1.0.0')
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('tag', 'v1.1.0')
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('tag', 'v2.0.0')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('tag', 'v1.0.0')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('tag', 'v1.1.0')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('tag', 'v2.0.0')
 
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('push', 'origin', '--tags')
+        Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('push', 'origin', '--tags')
     }
     finally
     {
@@ -104,18 +104,18 @@ BeforeAll {
     try
     {
         # Clone the bare repository
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('clone', $script:bareRepoPath, '.')
+        Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('clone', $script:bareRepoPath, '.')
 
         # Configure git user for testing
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('config', 'user.name', 'Test User')
-        Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('config', 'user.email', 'test@example.com')
+        Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('config', 'user.name', 'Test User')
+        Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('config', 'user.email', 'test@example.com')
 
         # Remove all local tags to test fetching
-        $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+        $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
         $tags = $result.StandardOutput
         if ($tags)
         {
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + ($tags -split ("`n"))) -Verbose
+            Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments (@('tag', '-d') + ($tags -split ("`n"))) -Verbose
         }
     }
     finally
@@ -182,7 +182,7 @@ Describe 'Request-GitTag' {
 
         It 'Should successfully fetch a specific tag' {
             # Verify tag doesn't exist locally
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $existingTags = $result.StandardOutput
             $existingTags | Should -Not -Contain 'v1.0.0'
 
@@ -190,22 +190,22 @@ Describe 'Request-GitTag' {
             $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force -Verbose -ErrorAction Stop
 
             # Verify the tag now exists locally
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsAfterFetch = $result.StandardOutput
             $tagsAfterFetch | Should -Contain 'v1.0.0'
         }
 
         It 'Should successfully fetch multiple specific tags' {
             # Remove any existing tags
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $existingTags = $result.StandardOutput
             if ($existingTags)
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + $existingTags -split ("`n"))
+                Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments (@('tag', '-d') + $existingTags -split ("`n"))
             }
 
             # Verify tags don't exist locally
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $existingTags = $result.StandardOutput
             $existingTags | Should -Not -Contain 'v1.1.0'
             $existingTags | Should -Not -Contain 'v2.0.0'
@@ -215,7 +215,7 @@ Describe 'Request-GitTag' {
             $null = Request-GitTag -RemoteName 'origin' -Name 'v2.0.0' -Force -ErrorAction Stop
 
             # Verify the tags now exist locally
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsAfterFetch = $result.StandardOutput
             $tagsAfterFetch | Should -Contain 'v1.1.0'
             $tagsAfterFetch | Should -Contain 'v2.0.0'
@@ -233,11 +233,11 @@ Describe 'Request-GitTag' {
             Push-Location -Path $script:secondRepoPath
 
             # Remove all local tags to test fetching all
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $existingTags = $result.StandardOutput
             if ($existingTags)
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + ($existingTags -split ("`n"))) -Verbose
+                Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments (@('tag', '-d') + ($existingTags -split ("`n"))) -Verbose
             }
         }
 
@@ -247,7 +247,7 @@ Describe 'Request-GitTag' {
 
         It 'Should successfully fetch all tags' {
             # Verify no tags exist locally
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $existingTags = $result.StandardOutput
             $existingTags | Should -BeNullOrEmpty
 
@@ -255,7 +255,7 @@ Describe 'Request-GitTag' {
             $null = Request-GitTag -RemoteName 'origin' -Force -ErrorAction Stop
 
             # Verify all tags now exist locally
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsAfterFetch = $result.StandardOutput
             $tagsAfterFetch | Should -Contain 'v1.0.0'
             $tagsAfterFetch | Should -Contain 'v1.1.0'
@@ -267,7 +267,7 @@ Describe 'Request-GitTag' {
             $null = Request-GitTag -RemoteName 'origin' -Force -ErrorAction Stop
 
             # Verify tags exist
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsBeforeSecondFetch = $result.StandardOutput
             $tagsBeforeSecondFetch | Should -Contain 'v1.0.0'
 
@@ -275,7 +275,7 @@ Describe 'Request-GitTag' {
             $null = Request-GitTag -RemoteName 'origin' -Force -ErrorAction Stop
 
             # Verify tags still exist
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsAfterSecondFetch = $result.StandardOutput
             $tagsAfterSecondFetch | Should -Contain 'v1.0.0'
             $tagsAfterSecondFetch | Should -Contain 'v1.1.0'
@@ -308,11 +308,11 @@ Describe 'Request-GitTag' {
             Push-Location -Path $script:secondRepoPath
 
             # Remove test tag if it exists
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $existingTags = $result.StandardOutput
             if ($existingTags -contains 'v1.0.0')
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag', '-d', 'v1.0.0')
+                Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag', '-d', 'v1.0.0')
             }
         }
 
@@ -322,28 +322,28 @@ Describe 'Request-GitTag' {
 
         It 'Should not fetch tags when using WhatIf for specific tag' {
             # Ensure no tags exist initially
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsBeforeWhatIf = $result.StandardOutput
 
             # WhatIf should not perform the actual operation
             $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -WhatIf 2>$null
 
             # Verify that no tags were actually fetched
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsAfterWhatIf = $result.StandardOutput
             $tagsAfterWhatIf | Should -Be $tagsBeforeWhatIf
         }
 
         It 'Should not fetch tags when using WhatIf for all tags' {
             # Ensure no tags exist initially
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsBeforeWhatIf = $result.StandardOutput
 
             # WhatIf should not perform the actual operation
             $null = Request-GitTag -RemoteName 'origin' -WhatIf 2>$null
 
             # Verify that no tags were actually fetched
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsAfterWhatIf = $result.StandardOutput
             $tagsAfterWhatIf | Should -Be $tagsBeforeWhatIf
         }
@@ -353,7 +353,7 @@ Describe 'Request-GitTag' {
             $null = Request-GitTag -RemoteName 'origin' -Name 'v1.0.0' -Force -Confirm:$false -ErrorAction Stop
 
             # Verify the tag was actually fetched
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsAfterFetch = $result.StandardOutput
             $tagsAfterFetch | Should -Contain 'v1.0.0'
         }
@@ -368,7 +368,7 @@ Describe 'Request-GitTag' {
             Push-Location -Path $script:upstreamRepoPath
             try
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:upstreamRepoPath -Arguments @('init', '--bare', '--initial-branch=main')
+                Viscalyx.Common\Invoke-Git -Path $script:upstreamRepoPath -Arguments @('init', '--bare', '--initial-branch=main')
             }
             finally
             {
@@ -379,19 +379,19 @@ Describe 'Request-GitTag' {
             Push-Location -Path $script:testRepoPath
             try
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'add', 'upstream', $script:upstreamRepoPath)
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('tag', 'upstream-v1.0.0')
+                Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('remote', 'add', 'upstream', $script:upstreamRepoPath)
+                Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('tag', 'upstream-v1.0.0')
 
                 # Get the current branch name (don't assume 'main' or 'master')
-                $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--show-current') -PassThru
+                $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '--show-current') -PassThru
                 $currentBranch = $result.StandardOutput
                 if (-not $currentBranch)
                 {
                     throw 'Failed to determine current branch name'
                 }
 
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('push', 'upstream', $currentBranch, '--quiet')
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('push', 'upstream', '--tags', '--quiet')
+                Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('push', 'upstream', $currentBranch, '--quiet')
+                Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('push', 'upstream', '--tags', '--quiet')
             }
             finally
             {
@@ -402,7 +402,7 @@ Describe 'Request-GitTag' {
             Push-Location -Path $script:secondRepoPath
             try
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('remote', 'add', 'upstream', $script:upstreamRepoPath)
+                Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('remote', 'add', 'upstream', $script:upstreamRepoPath)
             }
             finally
             {
@@ -420,46 +420,46 @@ Describe 'Request-GitTag' {
 
         It 'Should fetch tags from different remotes' {
             # Remove all local tags
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $existingTags = $result.StandardOutput
             if ($existingTags)
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + $existingTags)
+                Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments (@('tag', '-d') + $existingTags)
             }
 
             # Fetch from origin
             $null = Request-GitTag -RemoteName 'origin' -Force -ErrorAction Stop
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $originTags = $result.StandardOutput
             $originTags | Should -Contain 'v1.0.0'
 
             # Remove all tags again
             if ($originTags)
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments (@('tag', '-d') + $originTags)
+                Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments (@('tag', '-d') + $originTags)
             }
 
             # Fetch from upstream
             $null = Request-GitTag -RemoteName 'upstream' -Force -ErrorAction Stop
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $upstreamTags = $result.StandardOutput
             $upstreamTags | Should -Contain 'upstream-v1.0.0'
         }
 
         It 'Should fetch specific tag from upstream remote' {
             # Remove the upstream tag if it exists locally
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $existingTags = $result.StandardOutput
             if ($existingTags -contains 'upstream-v1.0.0')
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag', '-d', 'upstream-v1.0.0')
+                Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag', '-d', 'upstream-v1.0.0')
             }
 
             # Fetch specific upstream tag
             $null = Request-GitTag -RemoteName 'upstream' -Name 'upstream-v1.0.0' -Force -ErrorAction Stop
 
             # Verify the tag was fetched
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('tag') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('tag') -PassThru
             $tagsAfterFetch = $result.StandardOutput
             $tagsAfterFetch | Should -Contain 'upstream-v1.0.0'
         }
@@ -476,9 +476,9 @@ Describe 'Request-GitTag' {
 
         It 'Should provide meaningful error when git fetch fails' {
             # Test with a malformed remote URL by temporarily changing the origin URL
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('config', '--get', 'remote.origin.url') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('config', '--get', 'remote.origin.url') -PassThru
             $originalUrl = $result.StandardOutput
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('remote', 'set-url', 'origin', 'invalid-url')
+            Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('remote', 'set-url', 'origin', 'invalid-url')
 
             try
             {
@@ -491,15 +491,15 @@ Describe 'Request-GitTag' {
             finally
             {
                 # Restore the original URL
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('remote', 'set-url', 'origin', $originalUrl)
+                Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('remote', 'set-url', 'origin', $originalUrl)
             }
         }
 
         It 'Should provide meaningful error when fetching all tags fails' {
             # Test with a malformed remote URL
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('config', '--get', 'remote.origin.url') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('config', '--get', 'remote.origin.url') -PassThru
             $originalUrl = $result.StandardOutput
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('remote', 'set-url', 'origin', 'invalid-url')
+            Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('remote', 'set-url', 'origin', 'invalid-url')
 
             try
             {
@@ -512,7 +512,7 @@ Describe 'Request-GitTag' {
             finally
             {
                 # Restore the original URL
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:secondRepoPath -Arguments @('remote', 'set-url', 'origin', $originalUrl)
+                Viscalyx.Common\Invoke-Git -Path $script:secondRepoPath -Arguments @('remote', 'set-url', 'origin', $originalUrl)
             }
         }
     }

@@ -80,7 +80,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
                     @{
                         ExpectedParameterSetName = '__AllParameterSets'
-                        ExpectedParameters       = '[-WorkingDirectory] <string> [[-Timeout] <int>] [[-Arguments] <string[]>] [-PassThru] [<CommonParameters>]'
+                        ExpectedParameters       = '[-Path] <string> [[-Timeout] <int>] [[-Arguments] <string[]>] [-PassThru] [<CommonParameters>]'
                     }
                 ) {
                     $result = (Get-Command -Name 'Invoke-Git').ParameterSets |
@@ -103,8 +103,8 @@ Describe 'Viscalyx.Common\Invoke-Git' {
             }
 
             Context 'Parameter Properties' {
-                It 'Should have WorkingDirectory as a mandatory parameter' {
-                    $parameterInfo = (Get-Command -Name 'Invoke-Git').Parameters['WorkingDirectory']
+                It 'Should have Path as a mandatory parameter' {
+                    $parameterInfo = (Get-Command -Name 'Invoke-Git').Parameters['Path']
                     $parameterInfo.Attributes.Mandatory | Should -Contain $true
                 }
 
@@ -131,7 +131,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 It 'Should have correct parameter types' {
                     $command = Get-Command -Name 'Invoke-Git'
 
-                    $command.Parameters['WorkingDirectory'].ParameterType | Should -Be ([System.String])
+                    $command.Parameters['Path'].ParameterType | Should -Be ([System.String])
                     $command.Parameters['Timeout'].ParameterType | Should -Be ([System.Int32])
                     $command.Parameters['PassThru'].ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
                     $command.Parameters['Arguments'].ParameterType | Should -Be ([System.String[]])
@@ -149,7 +149,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should not throw, return result with -PassThru' {
-                    $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru
+                    $result = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru
 
                     $result.ExitCode | Should -BeExactly 0
 
@@ -159,7 +159,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should not throw, return result with -PassThru, with -Verbose' {
-                    $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Verbose
+                    $result = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Verbose
 
                     $result.ExitCode | Should -BeExactly 0
 
@@ -169,11 +169,11 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should not throw without -PassThru' {
-                    $null = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' )
+                    $null = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status', '--verbose' )
                 }
 
                 It 'Should not throw without -PassThru, with -Verbose' {
-                    $null = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose
+                    $null = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose
                 }
             }
 
@@ -183,7 +183,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should not throw, return result with -PassThru' {
-                    $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru
+                    $result = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru
 
                     $result.ExitCode | Should -BeExactly 128
 
@@ -193,7 +193,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should not throw, return result with -PassThru, with -Verbose' {
-                    $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Verbose
+                    $result = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status', '--verbose' ) -PassThru -Verbose
 
                     $result.ExitCode | Should -BeExactly 128
 
@@ -203,11 +203,11 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should throw without -PassThru' {
-                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) } | Should -Throw
+                    { Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status', '--verbose' ) } | Should -Throw
                 }
 
                 It 'Should throw without -PassThru, with -Verbose' {
-                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose } | Should -Throw
+                    { Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status', '--verbose' ) -Verbose } | Should -Throw
                 }
             }
 
@@ -245,7 +245,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
                     $throwMessage = "$errorMessage`n$detailsMessage`n"
 
-                    { Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments $Command } | Should -Throw $throwMessage
+                    { Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments $Command } | Should -Throw $throwMessage
                 }
             }
 
@@ -255,7 +255,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should quote arguments containing spaces that are not already quoted' {
-                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', 'John Doe' ) -PassThru
+                    Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'config', 'user.name', 'John Doe' ) -PassThru
 
                     # Verify that the processed arguments array contains properly quoted arguments
                     $processedArgs = $mockProcess.StartInfo.Arguments
@@ -266,7 +266,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should not add quotes to arguments that are already quoted' {
-                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', '"John Doe"' ) -PassThru
+                    Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'config', 'user.name', '"John Doe"' ) -PassThru
 
                     # Verify that already quoted arguments are not double-quoted
                     $processedArgs = $mockProcess.StartInfo.Arguments
@@ -277,7 +277,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should not quote arguments without spaces' {
-                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'config', 'user.name', 'JohnDoe' ) -PassThru
+                    Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'config', 'user.name', 'JohnDoe' ) -PassThru
 
                     # Verify that arguments without spaces are not quoted
                     $processedArgs = $mockProcess.StartInfo.Arguments
@@ -288,7 +288,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 }
 
                 It 'Should handle mixed arguments with and without spaces' {
-                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'commit', '-m', 'Fix bug in module', '--author', 'John Doe <john@example.com>' ) -PassThru
+                    Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'commit', '-m', 'Fix bug in module', '--author', 'John Doe <john@example.com>' ) -PassThru
 
                     # Verify mixed argument handling
                     $processedArgs = $mockProcess.StartInfo.Arguments
@@ -301,7 +301,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
                 It 'Should handle arguments with different types of whitespace' {
                     $messageWithWhitespace = "Fix`tbug`nwith`rwhitespace"
-                    Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'commit', '-m', $messageWithWhitespace ) -PassThru
+                    Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'commit', '-m', $messageWithWhitespace ) -PassThru
 
                     # Verify that tab, newline, and carriage return characters trigger quoting
                     $processedArgs = $mockProcess.StartInfo.Arguments
@@ -352,7 +352,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 return $testMockProcess
             } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
 
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status' ) -PassThru
 
             $result.StandardOutput | Should -HaveCount 3
             $result.StandardOutput[0] | Should -BeExactly 'line1'
@@ -396,7 +396,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 return $testMockProcess
             } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
 
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status' ) -PassThru
 
             $result.StandardOutput | Should -HaveCount 3
             $result.StandardOutput[0] | Should -BeExactly 'line1'
@@ -440,7 +440,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 return $testMockProcess
             } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
 
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status' ) -PassThru
 
             $result.StandardOutput | Should -HaveCount 3
             $result.StandardOutput[0] | Should -BeExactly 'line1'
@@ -484,7 +484,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 return $testMockProcess
             } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
 
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status' ) -PassThru
 
             $result.StandardOutput | Should -BeNullOrEmpty
         }
@@ -525,7 +525,7 @@ Describe 'Viscalyx.Common\Invoke-Git' {
                 return $testMockProcess
             } -ParameterFilter { $TypeName -eq 'System.Diagnostics.Process' }
 
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @( 'status' ) -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @( 'status' ) -PassThru
 
             $result.StandardOutput | Should -BeOfType [System.String]
             $result.StandardOutput | Should -BeExactly 'single line'

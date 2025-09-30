@@ -48,7 +48,7 @@ Describe 'Receive-GitBranch' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[[-BranchName] <string>] [[-UpstreamBranchName] <string>] [[-RemoteName] <string>] [[-WorkingDirectory] <string>] [-Checkout] [-Rebase] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+                ExpectedParameters = '[[-BranchName] <string>] [[-UpstreamBranchName] <string>] [[-RemoteName] <string>] [[-Path] <string>] [-Checkout] [-Rebase] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Receive-GitBranch').ParameterSets |
@@ -94,8 +94,8 @@ Describe 'Receive-GitBranch' {
             $parameterInfo.ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
         }
 
-        It 'Should have WorkingDirectory as a non-mandatory parameter' {
-            $parameterInfo = (Get-Command -Name 'Receive-GitBranch').Parameters['WorkingDirectory']
+        It 'Should have Path as a non-mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Receive-GitBranch').Parameters['Path']
             $parameterInfo.Attributes.Mandatory | Should -BeFalse
             $parameterInfo.ParameterType | Should -Be ([System.String])
         }

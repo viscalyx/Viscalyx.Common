@@ -40,17 +40,17 @@ Describe 'Rename-GitLocalBranch' {
         try
         {
             # Initialize git repository
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('init', '--initial-branch=main', '--quiet')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.email', 'test@example.com')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('config', 'user.name', 'Test User')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('init', '--initial-branch=main', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('config', 'user.email', 'test@example.com')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('config', 'user.name', 'Test User')
 
             # Create initial commit
             'Initial content' | Out-File -FilePath 'test.txt' -Encoding utf8
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'test.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Initial commit')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('add', 'test.txt')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('commit', '-m', 'Initial commit')
 
             # Get the default branch name (main or master)
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
             $script:defaultBranch = $result.StandardOutput
         }
         finally
@@ -83,81 +83,81 @@ Describe 'Rename-GitLocalBranch' {
     Context 'When renaming a local branch successfully' {
         BeforeEach {
             # Ensure we start with the feature branch
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
 
             # Create feature branches for testing
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'feature/original-branch', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', '-b', 'feature/original-branch', '--quiet')
             'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'feature.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Feature commit')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('add', 'feature.txt')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('commit', '-m', 'Feature commit')
         }
 
         AfterEach {
             # Clean up any renamed branches for next test
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'feature/renamed-branch')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '-D', 'feature/renamed-branch')
         }
 
         It 'Should rename a local branch successfully' {
             $null = Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force -ErrorAction Stop
 
             # Verify the old branch no longer exists
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'feature/original-branch') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '--list', 'feature/original-branch') -PassThru
             $oldBranch = $result.StandardOutput
             $oldBranch | Should -BeNullOrEmpty
 
             # Verify the new branch exists
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'feature/renamed-branch') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '--list', 'feature/renamed-branch') -PassThru
             $newBranch = $result.StandardOutput
             $newBranch | Should -Not -BeNullOrEmpty
 
             # Verify we're currently on the renamed branch
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
             $currentBranch = $result.StandardOutput
             $currentBranch | Should -Be 'feature/renamed-branch'
         }
 
         It 'Should preserve commit history when renaming a branch' {
             # Make sure we have a fresh branch for this test
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', 'feature/original-branch', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', 'feature/original-branch', '--quiet')
 
             'Feature content' | Out-File -FilePath 'feature2.txt' -Encoding utf8
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'feature2.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Feature commit')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('add', 'feature2.txt')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('commit', '-m', 'Feature commit')
 
             # Get the commit hash before renaming
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
             $originalCommit = $result.StandardOutput
 
             # Rename the branch
             $null = Rename-GitLocalBranch -Name 'feature/original-branch' -NewName 'feature/renamed-branch' -Force -ErrorAction Stop
 
             # Get the commit hash after renaming
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('rev-parse', 'HEAD') -PassThru
             $newCommit = $result.StandardOutput
 
             # Verify the commit history is preserved
             $originalCommit | Should -Be $newCommit
 
             # Verify the commit message is preserved
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('log', '-1', '--pretty=format:%s') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('log', '-1', '--pretty=format:%s') -PassThru
             $commitMessage = $result.StandardOutput
             $commitMessage | Should -Be 'Feature commit'
         }
 
         It 'Should handle branch names with special characters' {
             # Create a branch with special characters
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'feature/test-123_special.branch', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', '-b', 'feature/test-123_special.branch', '--quiet')
 
             'Special content' | Out-File -FilePath 'special.txt' -Encoding utf8
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'special.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Special commit')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('add', 'special.txt')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('commit', '-m', 'Special commit')
 
             # Rename the branch
             $null = Rename-GitLocalBranch -Name 'feature/test-123_special.branch' -NewName 'feature/renamed-branch' -Force -ErrorAction Stop
 
             # Verify the rename worked
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
             $currentBranch = $result.StandardOutput
             $currentBranch | Should -Be 'feature/renamed-branch'
         }
@@ -172,8 +172,8 @@ Describe 'Rename-GitLocalBranch' {
 
         It 'Should throw error when trying to rename to existing branch name' {
             # Create two branches
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'branch-one', '--quiet')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'branch-two', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', '-b', 'branch-one', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', '-b', 'branch-two', '--quiet')
 
             # Try to rename branch-two to branch-one (which already exists)
             {
@@ -181,13 +181,13 @@ Describe 'Rename-GitLocalBranch' {
             } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
 
             # Clean up
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'branch-one')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'branch-two')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '-D', 'branch-one')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '-D', 'branch-two')
         }
 
         It 'Should throw error when trying to rename branch with invalid characters' {
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'valid-branch', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', '-b', 'valid-branch', '--quiet')
 
             # Try to rename to an invalid branch name (contains spaces and special chars)
             {
@@ -195,9 +195,9 @@ Describe 'Rename-GitLocalBranch' {
             } | Should -Throw -ExpectedMessage '*Failed to rename branch*'
 
             # Clean up
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
 
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'valid-branch')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '-D', 'valid-branch')
         }
     }
 
@@ -205,31 +205,31 @@ Describe 'Rename-GitLocalBranch' {
         BeforeEach {
             # Create a bare repository to act as a remote
             $script:bareRepoPath = Join-Path -Path $TestDrive -ChildPath 'BareTestRepo'
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @('init', '--bare', '--initial-branch=main', $script:bareRepoPath)
+            Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @('init', '--bare', '--initial-branch=main', $script:bareRepoPath)
 
             # Add the bare repo as origin remote
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'add', 'origin', $script:bareRepoPath)
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('remote', 'add', 'origin', $script:bareRepoPath)
 
             # Create and push a branch to remote
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'remote-test-branch', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', '-b', 'remote-test-branch', '--quiet')
 
             'Remote test content' | Out-File -FilePath 'remote-test.txt' -Encoding utf8
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('add', 'remote-test.txt')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('commit', '-m', 'Remote test commit')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('push', 'origin', 'remote-test-branch')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('add', 'remote-test.txt')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('commit', '-m', 'Remote test commit')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('push', 'origin', 'remote-test-branch')
         }
 
         AfterEach {
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
             $currentBranch = $result.StandardOutput
             if ($currentBranch -ne $script:defaultBranch)
             {
-                Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+                Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
             }
 
             # Remove test branches
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'renamed-remote-branch')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'remove', 'origin')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '-D', 'renamed-remote-branch')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('remote', 'remove', 'origin')
 
             # Remove bare repository
             if (Test-Path -Path $script:bareRepoPath)
@@ -243,7 +243,7 @@ Describe 'Rename-GitLocalBranch' {
 
         It 'Should rename branch with TrackUpstream when remote branch exists' {
             # First push the branch to remote if not already there
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('push', 'origin', 'remote-test-branch')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('push', 'origin', 'remote-test-branch')
 
             # Rename with upstream tracking - this will fail because the upstream doesn't exist yet
             # but we test that the error is handled correctly
@@ -253,8 +253,8 @@ Describe 'Rename-GitLocalBranch' {
 
             # Verify the branch was renamed despite the upstream tracking failure
             # Switch back to see if branch was renamed before the upstream tracking failed
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-remote-branch') -PassThru
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '--list', 'renamed-remote-branch') -PassThru
             $branchExists = $result.StandardOutput
             $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if upstream tracking fails'
         }
@@ -268,8 +268,8 @@ Describe 'Rename-GitLocalBranch' {
             } | Should -Throw -Because 'Cannot determine remote HEAD in test setup'
 
             # Verify the branch was renamed despite the set-head failure
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-remote-branch') -PassThru
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '--list', 'renamed-remote-branch') -PassThru
             $branchExists = $result.StandardOutput
             $branchExists | Should -Not -BeNullOrEmpty -Because 'Branch should still be renamed even if set-head fails'
         }
@@ -277,8 +277,8 @@ Describe 'Rename-GitLocalBranch' {
         It 'Should handle custom remote name' {
             # Add another remote with different name
             $script:upstreamRepoPath = Join-Path -Path $TestDrive -ChildPath 'UpstreamTestRepo'
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $TestDrive -Arguments @('init', '--bare', '--initial-branch=main', $script:upstreamRepoPath)
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'add', 'upstream', $script:upstreamRepoPath)
+            Viscalyx.Common\Invoke-Git -Path $TestDrive -Arguments @('init', '--bare', '--initial-branch=main', $script:upstreamRepoPath)
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('remote', 'add', 'upstream', $script:upstreamRepoPath)
 
             # Test with custom remote name - this will fail due to missing upstream branch
             {
@@ -286,7 +286,7 @@ Describe 'Rename-GitLocalBranch' {
             } | Should -Throw -Because "Upstream branch doesn't exist"
 
             # Clean up additional remote
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('remote', 'remove', 'upstream')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('remote', 'remove', 'upstream')
 
             if (Test-Path -Path $script:upstreamRepoPath)
             {
@@ -301,43 +301,43 @@ Describe 'Rename-GitLocalBranch' {
     Context 'When testing edge cases' {
         It 'Should work when renaming current branch' {
             # Create and switch to a test branch
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'current-branch-test', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', '-b', 'current-branch-test', '--quiet')
 
             # Rename the current branch
             $null = Rename-GitLocalBranch -Name 'current-branch-test' -NewName 'renamed-current-branch' -Force -ErrorAction Stop
 
             # Verify we're now on the renamed branch
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
             $currentBranch = $result.StandardOutput
             $currentBranch | Should -Be 'renamed-current-branch'
 
             # Clean up
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'renamed-current-branch')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '-D', 'renamed-current-branch')
         }
 
         It 'Should work when renaming branch that is not current' {
             # Create two test branches
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'branch-to-rename', '--quiet')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', '-b', 'other-branch', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', '-b', 'branch-to-rename', '--quiet')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', '-b', 'other-branch', '--quiet')
 
             # Rename a branch we're not currently on
             $null = Rename-GitLocalBranch -Name 'branch-to-rename' -NewName 'renamed-other-branch' -Force -ErrorAction Stop
 
             # Verify the branch was renamed (should exist in branch list)
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '--list', 'renamed-other-branch') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '--list', 'renamed-other-branch') -PassThru
             $branchExists = $result.StandardOutput
             $branchExists | Should -Not -BeNullOrEmpty
 
             # Verify we're still on the other branch
-            $result = Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
+            $result = Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('rev-parse', '--abbrev-ref', 'HEAD') -PassThru
             $currentBranch = $result.StandardOutput
             $currentBranch | Should -Be 'other-branch'
 
             # Clean up
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'other-branch')
-            Viscalyx.Common\Invoke-Git -WorkingDirectory $script:testRepoPath -Arguments @('branch', '-D', 'renamed-other-branch')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('checkout', $script:defaultBranch)
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '-D', 'other-branch')
+            Viscalyx.Common\Invoke-Git -Path $script:testRepoPath -Arguments @('branch', '-D', 'renamed-other-branch')
         }
     }
 }
