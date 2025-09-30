@@ -91,10 +91,7 @@
 #>
 function Receive-GitBranch
 {
-    [CmdletBinding(
-        SupportsShouldProcess = $true,
-        DefaultParameterSetName = 'Default'
-    )]
+    [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default', ConfirmImpact = 'Medium')]
     [OutputType()]
     param
     (
@@ -246,6 +243,22 @@ function Receive-GitBranch
     }
     else
     {
+        # Check if upstream tracking branch is configured before prompting
+        $hasUpstream = Invoke-Git -Path $Path -Arguments @('rev-parse', '--abbrev-ref', '@{u}') -PassThru
+
+        if ($hasUpstream.ExitCode -ne 0)
+        {
+            $errorMessageParameters = @{
+                Message      = $script:localizedData.Receive_GitBranch_NoTrackingBranch -f $BranchName
+                Category     = 'InvalidOperation'
+                ErrorId      = 'RGB0014' # cspell: disable-line
+                TargetObject = $BranchName
+            }
+
+            Write-Error @errorMessageParameters
+            return
+        }
+
         # Use git pull with default behavior
         $pullDescription = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessDescription -f $BranchName
         $pullWarning = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessConfirmation -f $BranchName
@@ -255,8 +268,6 @@ function Receive-GitBranch
         {
             try
             {
-                # TODO: This needs tracking branch being set, otherwise it will fail if the local branch is not set to track an upstream branch.
-                # This was handled by a UseExistingTrackingBranch switch in (legacy) Update-GitLocalBranch, but that switch is not present here.
                 Invoke-Git -Path $Path -Arguments @('pull') -ErrorAction 'Stop'
             }
             catch

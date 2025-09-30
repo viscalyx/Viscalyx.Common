@@ -116,7 +116,15 @@ Describe 'Receive-GitBranch' {
                 return 'main'
             }
 
-            Mock -CommandName Invoke-Git
+            Mock -CommandName Invoke-Git -MockWith {
+                if ($Arguments -contains 'rev-parse')
+                {
+                    # Simulate upstream tracking branch exists
+                    return @{
+                        ExitCode = 0
+                    }
+                }
+            }
         }
 
         It 'Should only pull changes by default without checkout' {
@@ -380,6 +388,13 @@ Describe 'Receive-GitBranch' {
                 {
                     # Checkout succeeds
                 }
+                elseif ($Arguments -contains 'rev-parse')
+                {
+                    # Simulate upstream tracking branch exists
+                    return @{
+                        ExitCode = 0
+                    }
+                }
                 elseif ($Arguments -contains 'pull')
                 {
                     throw 'Pull failed'
@@ -391,7 +406,7 @@ Describe 'Receive-GitBranch' {
             }
 
             $mockErrorMessage = InModuleScope -ScriptBlock {
-                $script:localizedData.Receive_GitBranch_FailedPull
+                $script:localizedData.Receive_GitBranch_FailedPull -f 'main'
             }
         }
 
@@ -424,13 +439,29 @@ Describe 'Receive-GitBranch' {
                 return 'main'
             }
 
-            Mock -CommandName Invoke-Git
+            Mock -CommandName Invoke-Git -MockWith {
+                if ($Arguments -contains 'rev-parse')
+                {
+                    # Simulate upstream tracking branch exists
+                    return @{
+                        ExitCode = 0
+                    }
+                }
+            }
         }
 
         It 'Should not execute git commands when WhatIf is specified' {
             $null = Receive-GitBranch -WhatIf
 
-            Should -Not -Invoke -CommandName Invoke-Git
+            # The rev-parse check runs before ShouldProcess, so it will be called once
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'rev-parse'
+            } -Times 1
+
+            # But pull should not be called due to WhatIf
+            Should -Not -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'pull'
+            }
         }
     }
 }

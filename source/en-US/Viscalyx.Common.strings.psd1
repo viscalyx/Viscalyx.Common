@@ -108,6 +108,7 @@ ConvertFrom-StringData @'
     Receive_GitBranch_FailedRebase = Failed to rebase with upstream branch '{1}' from remote '{0}'. Make sure the branches exist and are accessible. (RGB0010)
     Receive_GitBranch_FailedPull = Failed to pull changes into current branch '{0}'. Make sure the branch exists and is accessible (no staged or unstaged changes). (RGB0012)
     Receive_GitBranch_Success = Successfully updated branch. (RGB0013)
+    Receive_GitBranch_NoTrackingBranch = Branch '{0}' has no upstream tracking branch configured. Use 'git branch --set-upstream-to=<remote>/<branch>' to set one. (RGB0014)
     Receive_GitBranch_Checkout_ShouldProcessDescription = Checking out branch '{0}'. (RGB0026)
     Receive_GitBranch_Checkout_ShouldProcessConfirmation = Are you sure you want to checkout branch '{0}'? (RGB0027)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
