@@ -152,6 +152,62 @@ Describe 'Receive-GitBranch' {
         }
     }
 
+    Context 'When pulling from a remote branch without checkout' {
+        BeforeAll {
+            Mock -CommandName Get-Location -MockWith {
+                return @{
+                    Path = '/test/repo'
+                }
+            }
+
+            Mock -CommandName Get-GitLocalBranchName -MockWith {
+                return 'main'
+            }
+
+            Mock -CommandName Invoke-Git
+        }
+
+        It 'Should pull from specified remote and branch without checking out' {
+            $null = Receive-GitBranch -RemoteName 'upstream' -BranchName 'feature-branch' -Force
+
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'pull' -and $Arguments -contains 'upstream' -and $Arguments -contains 'feature-branch'
+            }
+
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'checkout'
+            } -Times 0
+
+            Should -Not -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'rev-parse'
+            }
+        }
+
+        It 'Should pull from specified remote with default branch when only RemoteName is specified' {
+            $null = Receive-GitBranch -RemoteName 'upstream' -Force
+
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'pull' -and $Arguments -contains 'upstream'
+            }
+
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'checkout'
+            } -Times 0
+        }
+
+        It 'Should pull specified branch from default remote when only BranchName is specified' {
+            $null = Receive-GitBranch -BranchName 'feature-branch' -Force
+
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'pull' -and $Arguments -contains 'origin' -and $Arguments -contains 'feature-branch'
+            }
+
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'checkout'
+            } -Times 0
+        }
+    }
+
     Context 'When using rebase behavior' {
         BeforeAll {
             Mock -CommandName Get-Location -MockWith {
@@ -423,6 +479,51 @@ Describe 'Receive-GitBranch' {
         It 'Should handle terminating error correctly' {
             {
                 Receive-GitBranch -Force -ErrorAction 'Stop'
+            } | Should -Throw -ExpectedMessage $mockErrorMessage
+        }
+    }
+
+    Context 'When pull from remote branch fails' {
+        BeforeAll {
+            Mock -CommandName Get-Location -MockWith {
+                return @{
+                    Path = '/test/repo'
+                }
+            }
+
+            Mock -CommandName Get-GitLocalBranchName -MockWith {
+                return 'main'
+            }
+
+            Mock -CommandName Invoke-Git -MockWith {
+                if ($Arguments -contains 'pull')
+                {
+                    throw 'Pull from remote failed'
+                }
+                else
+                {
+                    throw "Mock Invoke-Git unexpected args: $($Arguments -join ' ')"
+                }
+            }
+
+            $mockErrorMessage = InModuleScope -ScriptBlock {
+                $script:localizedData.Receive_GitBranch_FailedPullWithRemote -f 'upstream', 'feature-branch'
+            }
+        }
+
+        It 'Should handle non-terminating error correctly when pulling from remote branch' {
+            Mock -CommandName Write-Error
+
+            $null = Receive-GitBranch -RemoteName 'upstream' -BranchName 'feature-branch' -Force
+
+            Should -Invoke -CommandName Write-Error -ParameterFilter {
+                $Message -eq $mockErrorMessage
+            }
+        }
+
+        It 'Should handle terminating error correctly when pulling from remote branch' {
+            {
+                Receive-GitBranch -RemoteName 'upstream' -BranchName 'feature-branch' -Force -ErrorAction 'Stop'
             } | Should -Throw -ExpectedMessage $mockErrorMessage
         }
     }

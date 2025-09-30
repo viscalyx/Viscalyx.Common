@@ -109,6 +109,7 @@ ConvertFrom-StringData @'
     Receive_GitBranch_FailedPull = Failed to pull changes into current branch '{0}'. Make sure the branch exists and is accessible (no staged or unstaged changes). (RGB0012)
     Receive_GitBranch_Success = Successfully updated branch. (RGB0013)
     Receive_GitBranch_NoTrackingBranch = Branch '{0}' has no upstream tracking branch configured. Use 'git branch --set-upstream-to=<remote>/<branch>' to set one. (RGB0014)
+    Receive_GitBranch_FailedPullWithRemote = Failed to pull branch '{1}' from remote '{0}'. Make sure the branch exists and is accessible (no staged or unstaged changes). (RGB0015)
     Receive_GitBranch_Checkout_ShouldProcessDescription = Checking out branch '{0}'. (RGB0026)
     Receive_GitBranch_Checkout_ShouldProcessConfirmation = Are you sure you want to checkout branch '{0}'? (RGB0027)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
@@ -125,6 +126,10 @@ ConvertFrom-StringData @'
     Receive_GitBranch_PullOperation_ShouldProcessConfirmation = Are you sure you want to pull into current branch '{0}'? (RGB0036)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Receive_GitBranch_PullOperation_ShouldProcessCaption = Pull into current branch (RGB0037)
+    Receive_GitBranch_PullWithRemote_ShouldProcessDescription = Pulling branch '{1}' from remote '{0}'. (RGB0038)
+    Receive_GitBranch_PullWithRemote_ShouldProcessConfirmation = Are you sure you want to pull branch '{1}' from remote '{0}'? (RGB0039)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_PullWithRemote_ShouldProcessCaption = Pull from remote branch (RGB0040)
 
     ## Remove-GitTag
     Remove_GitTag_Local_ShouldProcessVerboseDescription = Removing tag '{0}' from local repository. (RGT0001)

@@ -8,10 +8,15 @@
         is used. When the -Rebase switch is used, it fetches the upstream branch and
         rebases the local branch using the fetched upstream branch instead of merging.
 
+        When BranchName and/or RemoteName are specified without -Checkout, the command
+        performs a pull from the specified remote branch without switching the current
+        branch first.
+
     .PARAMETER BranchName
-        Specifies the name of the local branch. If -Checkout is specified, this branch
-        will be checked out first. If not specified, defaults to '.' which is resolved
-        to the current local branch name.
+        Specifies the name of the branch. When used with -Checkout, this branch will
+        be checked out first. When used without -Checkout, specifies the remote branch
+        to pull from. If not specified, defaults to '.' which is resolved to the
+        current local branch name.
 
     .PARAMETER UpstreamBranchName
         Specifies the name of the upstream branch to pull from. If not specified,
@@ -52,6 +57,12 @@
         Receive-GitBranch
 
         Pulls the latest changes into the current branch using the default git pull behavior.
+
+    .EXAMPLE
+        Receive-GitBranch -RemoteName 'upstream' -BranchName 'feature-branch'
+
+        Pulls changes from the 'feature-branch' on the 'upstream' remote into the
+        current branch without checking out a different branch first.
 
     .EXAMPLE
         Receive-GitBranch -Checkout -BranchName 'feature-branch'
@@ -95,7 +106,7 @@ function Receive-GitBranch
     [OutputType()]
     param
     (
-        [Parameter(ParameterSetName = 'Checkout')]
+        [Parameter()]
         [System.String]
         $BranchName = '.',
 
@@ -243,50 +254,90 @@ function Receive-GitBranch
     }
     else
     {
-        # Check if upstream tracking branch is configured before prompting
-        $hasUpstream = Invoke-Git -Path $Path -Arguments @('rev-parse', '--abbrev-ref', '@{u}') -PassThru
+        # Determine if we should use git pull with explicit remote and branch
+        $useExplicitPull = $PSBoundParameters.ContainsKey('RemoteName') -or $PSBoundParameters.ContainsKey('BranchName')
 
-        if ($hasUpstream.ExitCode -ne 0)
+        if ($useExplicitPull)
         {
-            $errorMessageParameters = @{
-                Message      = $script:localizedData.Receive_GitBranch_NoTrackingBranch -f $BranchName
-                Category     = 'InvalidOperation'
-                ErrorId      = 'RGB0014' # cspell: disable-line
-                TargetObject = $BranchName
-            }
+            # Use git pull with explicit remote and branch
+            $pullDescription = $script:localizedData.Receive_GitBranch_PullWithRemote_ShouldProcessDescription -f $RemoteName, $BranchName
+            $pullWarning = $script:localizedData.Receive_GitBranch_PullWithRemote_ShouldProcessConfirmation -f $RemoteName, $BranchName
+            $pullCaption = $script:localizedData.Receive_GitBranch_PullWithRemote_ShouldProcessCaption
 
-            Write-Error @errorMessageParameters
-            return
+            if ($PSCmdlet.ShouldProcess($pullDescription, $pullWarning, $pullCaption))
+            {
+                try
+                {
+                    Invoke-Git -Path $Path -Arguments @('pull', $RemoteName, $BranchName) -ErrorAction 'Stop'
+                }
+                catch
+                {
+                    $errorMessage = $script:localizedData.Receive_GitBranch_FailedPullWithRemote -f $RemoteName, $BranchName
+
+                    $newException = New-Exception -Message $errorMessage -ErrorRecord $_
+
+                    $errorMessageParameters = @{
+                        Message      = $errorMessage
+                        Category     = 'InvalidOperation'
+                        ErrorId      = 'RGB0005' # cspell: disable-line
+                        TargetObject = $BranchName
+                        Exception    = $newException
+                    }
+
+                    Write-Error @errorMessageParameters
+                    return
+                }
+
+                Write-Information -MessageData ($script:localizedData.Receive_GitBranch_Success) -InformationAction 'Continue'
+            }
         }
-
-        # Use git pull with default behavior
-        $pullDescription = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessDescription -f $BranchName
-        $pullWarning = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessConfirmation -f $BranchName
-        $pullCaption = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessCaption
-
-        if ($PSCmdlet.ShouldProcess($pullDescription, $pullWarning, $pullCaption))
+        else
         {
-            try
-            {
-                Invoke-Git -Path $Path -Arguments @('pull') -ErrorAction 'Stop'
-            }
-            catch
-            {
-                $newException = New-Exception -Message ($script:localizedData.Receive_GitBranch_FailedPull -f $BranchName) -ErrorRecord $_
+            # Check if upstream tracking branch is configured before prompting
+            $hasUpstream = Invoke-Git -Path $Path -Arguments @('rev-parse', '--abbrev-ref', '@{u}') -PassThru
 
+            if ($hasUpstream.ExitCode -ne 0)
+            {
                 $errorMessageParameters = @{
-                    Message      = $script:localizedData.Receive_GitBranch_FailedPull -f $BranchName
+                    Message      = $script:localizedData.Receive_GitBranch_NoTrackingBranch -f $BranchName
                     Category     = 'InvalidOperation'
-                    ErrorId      = 'RGB0004' # cspell: disable-line
-                    TargetObject = $null
-                    Exception    = $newException
+                    ErrorId      = 'RGB0014' # cspell: disable-line
+                    TargetObject = $BranchName
                 }
 
                 Write-Error @errorMessageParameters
                 return
             }
 
-            Write-Information -MessageData ($script:localizedData.Receive_GitBranch_Success) -InformationAction 'Continue'
+            # Use git pull with default behavior
+            $pullDescription = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessDescription -f $BranchName
+            $pullWarning = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessConfirmation -f $BranchName
+            $pullCaption = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessCaption
+
+            if ($PSCmdlet.ShouldProcess($pullDescription, $pullWarning, $pullCaption))
+            {
+                try
+                {
+                    Invoke-Git -Path $Path -Arguments @('pull') -ErrorAction 'Stop'
+                }
+                catch
+                {
+                    $newException = New-Exception -Message ($script:localizedData.Receive_GitBranch_FailedPull -f $BranchName) -ErrorRecord $_
+
+                    $errorMessageParameters = @{
+                        Message      = $script:localizedData.Receive_GitBranch_FailedPull -f $BranchName
+                        Category     = 'InvalidOperation'
+                        ErrorId      = 'RGB0004' # cspell: disable-line
+                        TargetObject = $null
+                        Exception    = $newException
+                    }
+
+                    Write-Error @errorMessageParameters
+                    return
+                }
+
+                Write-Information -MessageData ($script:localizedData.Receive_GitBranch_Success) -InformationAction 'Continue'
+            }
         }
     }
 }
