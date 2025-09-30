@@ -285,7 +285,7 @@ Describe 'Push-GitTag' -Tag 'Integration' {
         }
 
         It 'Should not push all tags when WhatIf is specified' {
-            $null = Push-GitTag -WhatIf
+            $null = Push-GitTag -WhatIf -ErrorAction Stop
 
             # Verify no tags were pushed to the remote
             $remoteTags = & git ls-remote --tags origin 2>$null
