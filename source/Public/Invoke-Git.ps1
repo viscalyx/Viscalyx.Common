@@ -20,9 +20,7 @@
         The arguments to pass to the Git executable.
 
     .INPUTS
-        System.String[]
-
-        Arguments can be passed via the pipeline.
+        None. This function does not accept pipeline input.
 
     .OUTPUTS
         System.Collections.Hashtable
