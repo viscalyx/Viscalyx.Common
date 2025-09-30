@@ -74,7 +74,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git push -u origin main --quiet 2>&1
+            $null = git push -u origin main --quiet 2>&1
         }
 
         # Create a feature branch
@@ -86,7 +86,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git checkout -b feature/test --quiet 2>&1
+            $null = git checkout -b feature/test --quiet 2>&1
         }
         'Feature content' | Out-File -FilePath 'feature.txt' -Encoding utf8
         git add feature.txt *> $null
@@ -99,7 +99,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git push -u origin feature/test --quiet 2>&1
+            $null = git push -u origin feature/test --quiet 2>&1
         }
 
         # Switch back to main branch
@@ -111,7 +111,7 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git checkout main --quiet 2>&1
+            $null = git checkout main --quiet 2>&1
         }
 
         # Store the initial branch for reference
@@ -193,7 +193,7 @@ Describe 'Receive-GitBranch' {
             else
             {
                 # PowerShell 7+ - capture output in variables
-                $gitOutput = git checkout main --quiet 2>&1
+                $null = git checkout main --quiet 2>&1
             }
 
             # Use Receive-GitBranch to switch to feature branch and pull
@@ -237,7 +237,7 @@ Describe 'Receive-GitBranch' {
             else
             {
                 # PowerShell 7+ - capture output in variables
-                $gitOutput = git checkout main --quiet 2>&1
+                $null = git checkout main --quiet 2>&1
             }
 
             # Use Receive-GitBranch with rebase on feature branch
@@ -290,7 +290,7 @@ Describe 'Receive-GitBranch' {
             else
             {
                 # PowerShell 7+ - capture output in variables
-                $gitOutput = git checkout main --quiet 2>&1
+                $null = git checkout main --quiet 2>&1
             }
             git reset --hard HEAD *> $null
 
@@ -338,7 +338,7 @@ Describe 'Receive-GitBranch' {
                 else
                 {
                     # PowerShell 7+ - capture output in variables
-                    $gitOutput = git checkout main --quiet 2>&1
+                    $null = git checkout main --quiet 2>&1
                 }
                 'Additional content' | Out-File -FilePath 'additional.txt' -Encoding utf8
                 git add additional.txt *> $null
