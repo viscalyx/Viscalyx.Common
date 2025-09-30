@@ -120,12 +120,16 @@ function Resolve-DnsName
     }
     catch [System.Exception]
     {
+        $errorMessage = $script:localizedData.Resolve_DnsName_ResolutionFailed -f $HostName
+
+        $newException = New-Exception -Message $errorMessage -ErrorRecord $_
+
         $writeErrorParameters = @{
-            Message      = $script:localizedData.Resolve_DnsName_ResolutionFailed -f $HostName
+            Message      = $errorMessage
             Category     = 'ObjectNotFound'
             ErrorId      = 'RDN0005'
             TargetObject = $HostName
-            Exception    = $_.Exception
+            Exception    = $newException
         }
 
         Write-Error @writeErrorParameters

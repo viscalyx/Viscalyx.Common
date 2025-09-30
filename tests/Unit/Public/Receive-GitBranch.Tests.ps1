@@ -78,6 +78,12 @@ Describe 'Receive-GitBranch' {
             $parameterInfo.ParameterType | Should -Be ([System.Management.Automation.SwitchParameter])
         }
 
+        It 'Should have WorkingDirectory as a non-mandatory parameter' {
+            $parameterInfo = (Get-Command -Name 'Receive-GitBranch').Parameters['WorkingDirectory']
+            $parameterInfo.Attributes.Mandatory | Should -BeFalse
+            $parameterInfo.ParameterType | Should -Be ([System.String])
+        }
+
         It 'Should support ShouldProcess' {
             $commandInfo = Get-Command -Name 'Receive-GitBranch'
             $commandInfo.Parameters.ContainsKey('WhatIf') | Should -BeTrue
@@ -87,132 +93,130 @@ Describe 'Receive-GitBranch' {
 
     Context 'When using default parameters with pull behavior' {
         BeforeAll {
-            Mock -CommandName git -MockWith {
-                $global:LASTEXITCODE = 0
+            Mock -CommandName Get-Location -MockWith {
+                return @{
+                    Path = '/test/repo'
+                }
             }
-        }
 
-        AfterEach {
-            $global:LASTEXITCODE = 0
+            Mock -CommandName Invoke-Git
         }
 
         It 'Should only pull changes by default without checkout' {
             $null = Receive-GitBranch -Force
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'pull'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'pull'
             }
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'checkout'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'checkout'
             } -Times 0
         }
 
         It 'Should checkout specified branch and pull changes when -Checkout is used' {
             $null = Receive-GitBranch -Checkout -BranchName 'feature-branch' -Force
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'checkout' -and $args[1] -eq 'feature-branch'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'checkout' -and $Arguments -contains 'feature-branch'
             }
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'pull'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'pull'
             }
         }
     }
 
     Context 'When using rebase behavior' {
         BeforeAll {
-            Mock -CommandName git -MockWith {
-                $global:LASTEXITCODE = 0
+            Mock -CommandName Get-Location -MockWith {
+                return @{
+                    Path = '/test/repo'
+                }
             }
-        }
 
-        AfterEach {
-            $global:LASTEXITCODE = 0
+            Mock -CommandName Invoke-Git
         }
 
         It 'Should fetch and rebase without checkout by default' {
             $null = Receive-GitBranch -Rebase -Force
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args[2] -eq 'main'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'fetch' -and $Arguments -contains 'origin' -and $Arguments -contains 'main'
             }
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'rebase' -and $args[1] -eq 'origin/main'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'rebase' -and $Arguments -contains 'origin/main'
             }
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'checkout'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'checkout'
             } -Times 0
         }
 
         It 'Should checkout, fetch, and rebase when -Checkout is used' {
             $null = Receive-GitBranch -Checkout -Rebase -BranchName 'feature-branch' -Force
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'checkout' -and $args[1] -eq 'feature-branch'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'checkout' -and $Arguments -contains 'feature-branch'
             }
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args[2] -eq 'main'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'fetch' -and $Arguments -contains 'origin' -and $Arguments -contains 'main'
             }
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'rebase' -and $args[1] -eq 'origin/main'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'rebase' -and $Arguments -contains 'origin/main'
             }
         }
 
         It 'Should checkout, fetch, and rebase with custom branches' {
             $null = Receive-GitBranch -Checkout -BranchName 'feature' -UpstreamBranchName 'develop' -Rebase -Force
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'checkout' -and $args[1] -eq 'feature'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'checkout' -and $Arguments -contains 'feature'
             }
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'fetch' -and $args[1] -eq 'origin' -and $args[2] -eq 'develop'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'fetch' -and $Arguments -contains 'origin' -and $Arguments -contains 'develop'
             }
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'rebase' -and $args[1] -eq 'origin/develop'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'rebase' -and $Arguments -contains 'origin/develop'
             }
         }
 
         It 'Should use custom remote name when specified' {
             $null = Receive-GitBranch -RemoteName 'upstream' -UpstreamBranchName 'main' -Rebase -Force
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'fetch' -and $args[1] -eq 'upstream' -and $args[2] -eq 'main'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'fetch' -and $Arguments -contains 'upstream' -and $Arguments -contains 'main'
             }
 
-            Should -Invoke -CommandName git -ParameterFilter {
-                $args[0] -eq 'rebase' -and $args[1] -eq 'upstream/main'
+            Should -Invoke -CommandName Invoke-Git -ParameterFilter {
+                $Arguments -contains 'rebase' -and $Arguments -contains 'upstream/main'
             }
         }
     }
 
     Context 'When checkout fails' {
         BeforeAll {
-            Mock -CommandName git -MockWith {
-                if ($args[0] -eq 'checkout')
-                {
-                    $global:LASTEXITCODE = 1
+            Mock -CommandName Get-Location -MockWith {
+                return @{
+                    Path = '/test/repo'
                 }
-                else
+            }
+
+            Mock -CommandName Invoke-Git -MockWith {
+                if ($Arguments -contains 'checkout')
                 {
-                    $global:LASTEXITCODE = 0
+                    throw 'Checkout failed'
                 }
             }
 
             $mockErrorMessage = InModuleScope -ScriptBlock {
                 $script:localizedData.Receive_GitBranch_FailedCheckout -f 'nonexistent-branch'
             }
-        }
-
-        AfterEach {
-            $global:LASTEXITCODE = 0
         }
 
         It 'Should handle non-terminating error correctly when checkout is used' {
@@ -234,28 +238,30 @@ Describe 'Receive-GitBranch' {
 
     Context 'When fetch fails during rebase' {
         BeforeAll {
-            Mock -CommandName git -MockWith {
-                if ($args[0] -eq 'checkout')
-                {
-                    $global:LASTEXITCODE = 0
+            Mock -CommandName Get-Location -MockWith {
+                return @{
+                    Path = '/test/repo'
                 }
-                elseif ($args[0] -eq 'fetch')
+            }
+
+            Mock -CommandName Invoke-Git -MockWith {
+                if ($Arguments -contains 'checkout')
                 {
-                    $global:LASTEXITCODE = 1
+                    # Checkout succeeds
+                }
+                elseif ($Arguments -contains 'fetch')
+                {
+                    throw 'Fetch failed'
                 }
                 else
                 {
-                    throw "Mock git unexpected args: $($args -join ' ')"
+                    throw "Mock Invoke-Git unexpected args: $($Arguments -join ' ')"
                 }
             }
 
             $mockErrorMessage = InModuleScope -ScriptBlock {
                 $script:localizedData.Receive_GitBranch_FailedFetch -f 'origin', 'main'
             }
-        }
-
-        AfterEach {
-            $global:LASTEXITCODE = 0
         }
 
         It 'Should handle non-terminating error correctly' {
@@ -277,32 +283,34 @@ Describe 'Receive-GitBranch' {
 
     Context 'When rebase fails' {
         BeforeAll {
-            Mock -CommandName git -MockWith {
-                if ($args[0] -eq 'checkout')
-                {
-                    $global:LASTEXITCODE = 0
+            Mock -CommandName Get-Location -MockWith {
+                return @{
+                    Path = '/test/repo'
                 }
-                elseif ($args[0] -eq 'fetch')
+            }
+
+            Mock -CommandName Invoke-Git -MockWith {
+                if ($Arguments -contains 'checkout')
                 {
-                    $global:LASTEXITCODE = 0
+                    # Checkout succeeds
                 }
-                elseif ($args[0] -eq 'rebase')
+                elseif ($Arguments -contains 'fetch')
                 {
-                    $global:LASTEXITCODE = 1
+                    # Fetch succeeds
+                }
+                elseif ($Arguments -contains 'rebase')
+                {
+                    throw 'Rebase failed'
                 }
                 else
                 {
-                    throw "Mock git unexpected args: $($args -join ' ')"
+                    throw "Mock Invoke-Git unexpected args: $($Arguments -join ' ')"
                 }
             }
 
             $mockErrorMessage = InModuleScope -ScriptBlock {
                 $script:localizedData.Receive_GitBranch_FailedRebase -f 'origin', 'main'
             }
-        }
-
-        AfterEach {
-            $global:LASTEXITCODE = 0
         }
 
         It 'Should handle non-terminating error correctly' {
@@ -324,28 +332,30 @@ Describe 'Receive-GitBranch' {
 
     Context 'When pull fails' {
         BeforeAll {
-            Mock -CommandName git -MockWith {
-                if ($args[0] -eq 'checkout')
-                {
-                    $global:LASTEXITCODE = 0
+            Mock -CommandName Get-Location -MockWith {
+                return @{
+                    Path = '/test/repo'
                 }
-                elseif ($args[0] -eq 'pull')
+            }
+
+            Mock -CommandName Invoke-Git -MockWith {
+                if ($Arguments -contains 'checkout')
                 {
-                    $global:LASTEXITCODE = 1
+                    # Checkout succeeds
+                }
+                elseif ($Arguments -contains 'pull')
+                {
+                    throw 'Pull failed'
                 }
                 else
                 {
-                    throw "Mock git unexpected args: $($args -join ' ')"
+                    throw "Mock Invoke-Git unexpected args: $($Arguments -join ' ')"
                 }
             }
 
             $mockErrorMessage = InModuleScope -ScriptBlock {
                 $script:localizedData.Receive_GitBranch_FailedPull
             }
-        }
-
-        AfterEach {
-            $global:LASTEXITCODE = 0
         }
 
         It 'Should handle non-terminating error correctly' {
@@ -367,19 +377,19 @@ Describe 'Receive-GitBranch' {
 
     Context 'When using WhatIf' {
         BeforeAll {
-            Mock -CommandName git -MockWith {
-                $global:LASTEXITCODE = 0
+            Mock -CommandName Get-Location -MockWith {
+                return @{
+                    Path = '/test/repo'
+                }
             }
-        }
 
-        AfterEach {
-            $global:LASTEXITCODE = 0
+            Mock -CommandName Invoke-Git
         }
 
         It 'Should not execute git commands when WhatIf is specified' {
             $null = Receive-GitBranch -WhatIf
 
-            Should -Not -Invoke -CommandName git
+            Should -Not -Invoke -CommandName Invoke-Git
         }
     }
 }

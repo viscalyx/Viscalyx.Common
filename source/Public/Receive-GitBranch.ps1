@@ -28,6 +28,11 @@
         Specifies that the command should fetch the upstream branch and rebase
         the local branch using the fetched upstream branch instead of merging.
 
+    .PARAMETER WorkingDirectory
+        Specifies the path to the git repository directory. If not specified,
+        uses the current directory. When specified, the function will temporarily
+        change to this directory to perform git operations.
+
     .PARAMETER Force
         Forces the operation to proceed without confirmation prompts when similar
         to -Confirm:$false.
@@ -70,6 +75,12 @@
         Fetches changes from the 'main' branch on the 'upstream' remote and rebases
         the current branch using those changes.
 
+    .EXAMPLE
+        Receive-GitBranch -WorkingDirectory 'C:\repos\MyProject' -Checkout -BranchName 'feature-branch'
+
+        Temporarily changes to the 'C:\repos\MyProject' directory, checks out the
+        'feature-branch', pulls the latest changes, and then returns to the original directory.
+
     .NOTES
         This function requires Git to be installed and accessible from the command line.
 
@@ -104,6 +115,10 @@ function Receive-GitBranch
         $Rebase,
 
         [Parameter()]
+        [System.String]
+        $WorkingDirectory,
+
+        [Parameter()]
         [System.Management.Automation.SwitchParameter]
         $Force
     )
@@ -111,6 +126,12 @@ function Receive-GitBranch
     if ($Force.IsPresent -and -not $Confirm)
     {
         $ConfirmPreference = 'None'
+    }
+
+    # Use current location if WorkingDirectory is not specified
+    if (-not $PSBoundParameters.ContainsKey('WorkingDirectory'))
+    {
+        $WorkingDirectory = (Get-Location).Path
     }
 
     # Determine the ShouldProcess messages based on parameters
@@ -146,15 +167,22 @@ function Receive-GitBranch
         {
             Write-Verbose -Message ($script:localizedData.Receive_GitBranch_CheckoutBranch -f $BranchName)
 
-            git checkout $BranchName
-
-            if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
+            try
             {
+                Invoke-Git -WorkingDirectory $WorkingDirectory -Arguments @('checkout', $BranchName)
+            }
+            catch
+            {
+                $errorMessage = $script:localizedData.Receive_GitBranch_FailedCheckout -f $BranchName
+
+                $newException = New-Exception -Message $errorMessage -ErrorRecord $_
+
                 $errorMessageParameters = @{
-                    Message      = $script:localizedData.Receive_GitBranch_FailedCheckout -f $BranchName
+                    Message      = $errorMessage
                     Category     = 'InvalidOperation'
                     ErrorId      = 'RGB0001' # cspell: disable-line
                     TargetObject = $BranchName
+                    Exception    = $newException
                 }
 
                 Write-Error @errorMessageParameters
@@ -167,15 +195,22 @@ function Receive-GitBranch
             # Fetch upstream changes
             Write-Verbose -Message ($script:localizedData.Receive_GitBranch_FetchUpstream -f $UpstreamBranchName, $RemoteName)
 
-            git fetch $RemoteName $UpstreamBranchName
-
-            if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
+            try
             {
+                Invoke-Git -WorkingDirectory $WorkingDirectory -Arguments @('fetch', $RemoteName, $UpstreamBranchName) -ErrorAction 'Stop'
+            }
+            catch
+            {
+                $errorMessage = $script:localizedData.Receive_GitBranch_FailedFetch -f $RemoteName, $UpstreamBranchName
+
+                $newException = New-Exception -Message $errorMessage -ErrorRecord $_
+
                 $errorMessageParameters = @{
-                    Message      = $script:localizedData.Receive_GitBranch_FailedFetch -f $RemoteName, $UpstreamBranchName
+                    Message      = $errorMessage
                     Category     = 'InvalidOperation'
                     ErrorId      = 'RGB0002' # cspell: disable-line
                     TargetObject = $UpstreamBranchName
+                    Exception    = $newException
                 }
 
                 Write-Error @errorMessageParameters
@@ -185,15 +220,22 @@ function Receive-GitBranch
             # Rebase local branch with upstream
             Write-Verbose -Message ($script:localizedData.Receive_GitBranch_RebaseWithUpstream -f $RemoteName, $UpstreamBranchName)
 
-            git rebase "$RemoteName/$UpstreamBranchName"
-
-            if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
+            try
             {
+                Invoke-Git -WorkingDirectory $WorkingDirectory -Arguments @('rebase', "$RemoteName/$UpstreamBranchName") -ErrorAction 'Stop'
+            }
+            catch
+            {
+                $errorMessage = $script:localizedData.Receive_GitBranch_FailedRebase -f $RemoteName, $UpstreamBranchName
+
+                $newException = New-Exception -Message $errorMessage -ErrorRecord $_
+
                 $errorMessageParameters = @{
-                    Message      = $script:localizedData.Receive_GitBranch_FailedRebase -f $RemoteName, $UpstreamBranchName
+                    Message      = $errorMessage
                     Category     = 'InvalidOperation'
                     ErrorId      = 'RGB0003' # cspell: disable-line
                     TargetObject = $UpstreamBranchName
+                    Exception    = $newException
                 }
 
                 Write-Error @errorMessageParameters
@@ -205,15 +247,20 @@ function Receive-GitBranch
             # Use git pull with default behavior
             Write-Verbose -Message ($script:localizedData.Receive_GitBranch_PullChanges)
 
-            git pull
-
-            if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
+            try
             {
+                Invoke-Git -WorkingDirectory $WorkingDirectory -Arguments @('pull') -ErrorAction 'Stop'
+            }
+            catch
+            {
+                $newException = New-Exception -Message $script:localizedData.Receive_GitBranch_FailedPull -ErrorRecord $_
+
                 $errorMessageParameters = @{
                     Message      = $script:localizedData.Receive_GitBranch_FailedPull
                     Category     = 'InvalidOperation'
                     ErrorId      = 'RGB0004' # cspell: disable-line
                     TargetObject = $null
+                    Exception    = $newException
                 }
 
                 Write-Error @errorMessageParameters
