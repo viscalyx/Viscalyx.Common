@@ -103,31 +103,33 @@ ConvertFrom-StringData @'
     Push_GitTag_FailedListTags = Failed to list local tags. Make sure you are in a valid git repository. (PGT0010)
 
     ## Receive-GitBranch
-    Receive_GitBranch_CheckoutBranch = Checking out branch '{0}'. (RGB0005)
     Receive_GitBranch_FailedCheckout = Failed to checkout branch '{0}'. Make sure the branch exists and is accessible. (RGB0006)
-    Receive_GitBranch_FetchUpstream = Fetching upstream branch '{0}' from remote '{1}'. (RGB0007)
     Receive_GitBranch_FailedFetch = Failed to fetch upstream branch '{1}' from remote '{0}'. Make sure the branch exists and is accessible. (RGB0008)
-    Receive_GitBranch_RebaseWithUpstream = Rebasing with upstream branch '{1}' from remote '{0}'. (RGB0009)
     Receive_GitBranch_FailedRebase = Failed to rebase with upstream branch '{1}' from remote '{0}'. Make sure the branches exist and are accessible. (RGB0010)
-    Receive_GitBranch_PullChanges = Pulling changes into current branch. (RGB0011)
-    Receive_GitBranch_FailedPull = Failed to pull changes into current branch. Make sure the branch exists and is accessible. (RGB0012)
+    Receive_GitBranch_FailedPull = Failed to pull changes into current branch '{0}'. Make sure the branch exists and is accessible (no staged or unstaged changes). (RGB0012)
     Receive_GitBranch_Success = Successfully updated branch. (RGB0013)
-    Receive_GitBranch_CheckoutRebase_ShouldProcessVerboseDescription = Checking out branch '{0}' and rebasing with upstream branch '{2}' from remote '{1}'. (RGB0014)
-    Receive_GitBranch_CheckoutRebase_ShouldProcessVerboseWarning = Are you sure you want to checkout and rebase branch '{0}' with upstream branch '{2}' from remote '{1}'? (RGB0015)
+    Receive_GitBranch_NoTrackingBranch = Branch '{0}' has no upstream tracking branch configured. Use 'git branch --set-upstream-to=<remote>/<branch>' to set one. (RGB0014)
+    Receive_GitBranch_FailedPullWithRemote = Failed to pull branch '{1}' from remote '{0}'. Make sure the branch exists and is accessible (no staged or unstaged changes). (RGB0015)
+    Receive_GitBranch_Checkout_ShouldProcessDescription = Checking out branch '{0}'. (RGB0026)
+    Receive_GitBranch_Checkout_ShouldProcessConfirmation = Are you sure you want to checkout branch '{0}'? (RGB0027)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    Receive_GitBranch_CheckoutRebase_ShouldProcessCaption = Checkout and rebase branch (RGB0016)
-    Receive_GitBranch_CheckoutPull_ShouldProcessVerboseDescription = Checking out branch '{0}' and pulling latest changes. (RGB0017)
-    Receive_GitBranch_CheckoutPull_ShouldProcessVerboseWarning = Are you sure you want to checkout and pull into branch '{0}'? (RGB0018)
+    Receive_GitBranch_Checkout_ShouldProcessCaption = Checkout branch (RGB0028)
+    Receive_GitBranch_Fetch_ShouldProcessDescription = Fetching upstream branch '{0}' from remote '{1}'. (RGB0029)
+    Receive_GitBranch_Fetch_ShouldProcessConfirmation = Are you sure you want to fetch upstream branch '{0}' from remote '{1}'? (RGB0030)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    Receive_GitBranch_CheckoutPull_ShouldProcessCaption = Checkout and pull branch (RGB0019)
-    Receive_GitBranch_Rebase_ShouldProcessVerboseDescription = Rebasing current branch with upstream branch '{1}' from remote '{0}'. (RGB0020)
-    Receive_GitBranch_Rebase_ShouldProcessVerboseWarning = Are you sure you want to rebase current branch with upstream branch '{1}' from remote '{0}'? (RGB0021)
+    Receive_GitBranch_Fetch_ShouldProcessCaption = Fetch upstream branch (RGB0031)
+    Receive_GitBranch_RebaseOperation_ShouldProcessDescription = Rebasing local branch '{0}' with upstream branch '{1}' from remote '{2}'. (RGB0032)
+    Receive_GitBranch_RebaseOperation_ShouldProcessConfirmation = Are you sure you want to rebase local branch '{0}' with upstream branch '{1}' from remote '{2}'? (RGB0033)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    Receive_GitBranch_Rebase_ShouldProcessCaption = Rebase current branch (RGB0022)
-    Receive_GitBranch_Pull_ShouldProcessVerboseDescription = Pulling latest changes into current branch. (RGB0023)
-    Receive_GitBranch_Pull_ShouldProcessVerboseWarning = Are you sure you want to pull into current branch? (RGB0024)
+    Receive_GitBranch_RebaseOperation_ShouldProcessCaption = Rebase with upstream branch (RGB0034)
+    Receive_GitBranch_PullOperation_ShouldProcessDescription = Pulling latest changes into current branch '{0}'. (RGB0035)
+    Receive_GitBranch_PullOperation_ShouldProcessConfirmation = Are you sure you want to pull into current branch '{0}'? (RGB0036)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
-    Receive_GitBranch_Pull_ShouldProcessCaption = Pull into current branch (RGB0025)
+    Receive_GitBranch_PullOperation_ShouldProcessCaption = Pull into current branch (RGB0037)
+    Receive_GitBranch_PullWithRemote_ShouldProcessDescription = Pulling branch '{1}' from remote '{0}'. (RGB0038)
+    Receive_GitBranch_PullWithRemote_ShouldProcessConfirmation = Are you sure you want to pull branch '{1}' from remote '{0}'? (RGB0039)
+    # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
+    Receive_GitBranch_PullWithRemote_ShouldProcessCaption = Pull from remote branch (RGB0040)
 
     ## Remove-GitTag
     Remove_GitTag_Local_ShouldProcessVerboseDescription = Removing tag '{0}' from local repository. (RGT0001)

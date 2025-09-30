@@ -48,6 +48,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   usage for consistency and clarity.
 - `New-SamplerGitHubReleaseTag` - Major architectural rewrite with the following
   key improvements:
+- `Receive-GitBranch` - Enhanced to allow pulling from a remote branch without
+  requiring the `-Checkout` switch. The `BranchName` parameter is now available
+  in both parameter sets, enabling scenarios like
+  `Receive-GitBranch -RemoteName 'upstream' -BranchName 'feature-branch'` to
+  pull from a remote branch directly into the current branch
+  ([#50](https://github.com/viscalyx/Viscalyx.Common/issues/50)).
   - Complete implementation refactor replacing ~200 lines of raw Git commands
     with dedicated PowerShell helper functions for improved reliability.
   - Enhanced error handling using proper try-catch blocks instead of manual
@@ -60,6 +66,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ConvertTo-RelativePath` - Simplified function logic to consistently normalize
   directory separators using `[System.IO.Path]::DirectorySeparatorChar` and
   removed complex cross-platform path handling.
+- `Receive-GitBranch` - Refactored to use multiple ShouldProcess blocks instead
+  of a single combined block ([#50](https://github.com/viscalyx/Viscalyx.Common/issues/50)).
+  - Each operation (checkout, fetch, rebase, pull) now has its own ShouldProcess
+    block for better WhatIf support and granular confirmation prompts.
+  - Removed Write-Verbose calls from inside ShouldProcess blocks to comply with
+    coding guidelines.
+  - Write-Verbose messages are now placed outside ShouldProcess blocks to provide
+    detailed progress feedback during execution.
 
 ### Fixed
 

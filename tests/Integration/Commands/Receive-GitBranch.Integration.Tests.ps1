@@ -373,7 +373,7 @@ Describe 'Receive-GitBranch' {
                 $commitsBefore = @(git log --oneline).Count
 
                 # Use Receive-GitBranch to pull latest changes
-                $null = Receive-GitBranch -BranchName 'main' -Force -ErrorAction Stop
+                $null = Receive-GitBranch -Force -ErrorAction Stop
 
                 # Count commits after pull
                 $commitsAfter = @(git log --oneline).Count
