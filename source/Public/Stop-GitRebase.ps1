@@ -112,7 +112,7 @@ function Stop-GitRebase
             $errorMessageParameters = @{
                 Message      = $errorMessage
                 Category     = 'InvalidOperation'
-                ErrorId      = 'SPGR0002' # cspell: disable-line
+                ErrorId      = 'SPGR0003' # cspell: disable-line
                 TargetObject = $Path
                 Exception    = $newException
             }

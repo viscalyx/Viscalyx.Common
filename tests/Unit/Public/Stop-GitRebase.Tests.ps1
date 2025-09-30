@@ -227,10 +227,10 @@ Describe 'Stop-GitRebase' {
             } | Should -Throw -ExpectedMessage $mockErrorMessage
         }
 
-        It 'Should throw error with correct error code SPGR0002' {
+        It 'Should throw error with correct error code SPGR0003' {
             {
                 Stop-GitRebase -Force -ErrorAction 'Stop'
-            } | Should -Throw -ErrorId 'SPGR0002,Stop-GitRebase'
+            } | Should -Throw -ErrorId 'SPGR0003,Stop-GitRebase'
         }
     }
 
