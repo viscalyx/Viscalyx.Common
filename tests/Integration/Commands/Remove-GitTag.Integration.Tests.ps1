@@ -76,10 +76,10 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git push -u origin main --quiet 2>&1
+            $null = git push -u origin main --quiet 2>&1
             if ($LASTEXITCODE -ne 0)
             {
-                $gitOutput = git push -u origin master --quiet 2>&1
+                $null = git push -u origin master --quiet 2>&1
             }
         }
 
@@ -396,7 +396,7 @@ Describe 'Remove-GitTag' {
             else
             {
                 # PowerShell 7+ - capture output in variables
-                $gitOutput = git push origin 'test-tag-1' 2>&1
+                $null = git push origin 'test-tag-1' 2>&1
             }
         }
 

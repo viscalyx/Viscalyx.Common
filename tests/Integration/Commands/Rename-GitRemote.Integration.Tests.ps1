@@ -69,7 +69,7 @@ BeforeAll {
         }
         else
         {
-            $gitOutput = git init --initial-branch=main --quiet 2>&1
+            $null = git init --initial-branch=main --quiet 2>&1
         }
         git config user.email 'test@example.com' *> $null
         git config user.name 'Test User' *> $null
@@ -96,10 +96,10 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git push -u myremote main --quiet 2>&1
+            $null = git push -u myremote main --quiet 2>&1
             if ($LASTEXITCODE -ne 0)
             {
-                $gitOutput = git push -u myremote master --quiet 2>&1
+                $null = git push -u myremote master --quiet 2>&1
             }
         }
 
@@ -115,10 +115,10 @@ BeforeAll {
         else
         {
             # PowerShell 7+ - capture output in variables
-            $gitOutput = git push upstream main 2>&1
+            $null = git push upstream main 2>&1
             if ($LASTEXITCODE -ne 0)
             {
-                $gitOutput = git push upstream master 2>&1
+                $null = git push upstream master 2>&1
             }
         }
     }
@@ -235,7 +235,7 @@ Describe 'Rename-GitRemote' {
             else
             {
                 # PowerShell 7+ - capture output in variables
-                $gitOutput = git push --set-upstream origin $currentBranch --quiet 2>&1
+                $null = git push --set-upstream origin $currentBranch --quiet 2>&1
             }
 
             # Now a regular push should work without errors
