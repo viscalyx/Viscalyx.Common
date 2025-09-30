@@ -28,7 +28,7 @@
         Specifies the release tag to create. Must be in the format 'vX.X.X'. If
         not specified, the latest preview tag will be used.
 
-    .PARAMETER SwitchBackToPreviousBranch
+    .PARAMETER ReturnToCurrentBranch
         Specifies that the command should switches back to the previous branch after
         creating the release tag.
 
@@ -47,17 +47,24 @@
         to the 'origin' remote.
 
     .EXAMPLE
-        New-SamplerGitHubReleaseTag -SwitchBackToPreviousBranch
+        New-SamplerGitHubReleaseTag -ReturnToCurrentBranch
 
         Creates a new release tag and switches back to the previous branch.
 
-    .NOTES
-        This function requires Git to be installed and accessible from the command
-        line.
+    .INPUTS
+        None
+
+        This function does not accept values over the pipeline.
+
+    .OUTPUTS
+        None
+
+        This function does not return any objects.
 #>
 function New-SamplerGitHubReleaseTag
 {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType()]
     param
     (
         [Parameter()]
@@ -75,15 +82,15 @@ function New-SamplerGitHubReleaseTag
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
-        $SwitchBackToPreviousBranch,
+        $ReturnToCurrentBranch,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
-        $Force,
+        $PushTag,
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]
-        $PushTag
+        $Force
     )
 
     if ($Force.IsPresent -and -not $Confirm)
@@ -91,212 +98,107 @@ function New-SamplerGitHubReleaseTag
         $ConfirmPreference = 'None'
     }
 
-    # Check if the remote specified in $UpstreamRemoteName exists locally and throw an error if it doesn't.
-    $remoteExists = git remote | Where-Object -FilterScript { $_ -eq $UpstreamRemoteName }
-
-    if (-not $remoteExists)
+    # Only check assertions if not in WhatIf mode.
+    if (-not $WhatIfPreference)
     {
-        $PSCmdlet.ThrowTerminatingError(
-            [System.Management.Automation.ErrorRecord]::new(
-                ($script:localizedData.New_SamplerGitHubReleaseTag_RemoteMissing -f $UpstreamRemoteName),
-                'NSGRT0001', # cspell: disable-line
-                [System.Management.Automation.ErrorCategory]::ObjectNotFound,
-                $UpstreamRemoteName
-            )
-        )
+        Assert-GitRemote -Name $UpstreamRemoteName -Verbose:$VerbosePreference -ErrorAction 'Stop'
     }
 
-    $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessDescription -f $DefaultBranchName, $UpstreamRemoteName
-    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessConfirmation -f $DefaultBranchName, $UpstreamRemoteName
-    $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FetchUpstream_ShouldProcessCaption
+    $currentLocalBranchName = Get-GitLocalBranchName -Current -Verbose:$VerbosePreference -ErrorAction 'Stop'
 
-    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
+    if ($DefaultBranchName -ne $currentLocalBranchName)
     {
-        # Fetch $DefaultBranchName from upstream and throw an error if it doesn't exist.
-        git fetch $UpstreamRemoteName $DefaultBranchName
+        # This command will also assert that there are no local changes if not in WhatIf mode.
+        Switch-GitLocalBranch -Name $DefaultBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
 
-        if ($LASTEXITCODE -ne 0) # cSpell: ignore LASTEXITCODE
+        $switchedBranch = $true
+    }
+
+    try
+    {
+        Update-GitLocalBranch -Rebase -SkipSwitchingBranch -RemoteName $UpstreamRemoteName -BranchName $DefaultBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+
+        $headCommitId = Get-GitBranchCommit -Latest -Verbose:$VerbosePreference -ErrorAction 'Stop'
+    }
+    catch
+    {
+        # If something failed, revert back to the previous branch if requested.
+        if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
         {
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchBranchFromRemote -f $DefaultBranchName, $UpstreamRemoteName),
-                    'NSGRT0002', # cspell: disable-line
+            # This command will also assert that there are no local changes if not in WhatIf mode.
+            Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+        }
+
+        $PSCmdlet.ThrowTerminatingError($_)
+    }
+
+    try
+    {
+        # Fetch all tags from the upstream remote.
+        Request-GitTag -RemoteName $UpstreamRemoteName -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
+    }
+    catch
+    {
+        if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
+        {
+            Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+        }
+
+        $PSCmdlet.ThrowTerminatingError($_)
+    }
+
+    <#
+        We cannot reliably determine during WhatIf if the current latest tag is
+        the actual latest preview tag. So this section is skipped during WhatIf.
+    #>
+    if (-not $PSBoundParameters.ContainsKey('ReleaseTag') -and -not $WhatIfPreference)
+    {
+        try
+        {
+            $latestTag = Get-GitTag -Latest -Verbose:$VerbosePreference -ErrorAction 'Stop'
+
+            if (-not $latestTag)
+            {
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                    [System.InvalidOperationException]::new($script:localizedData.New_SamplerGitHubReleaseTag_MissingTagsInLocalRepository),
+                    'NSGRT0032', # cspell: disable-line
                     [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $UpstreamRemoteName
+                    'tag'
                 )
-            )
-        }
-    }
 
-    if ($SwitchBackToPreviousBranch.IsPresent)
-    {
-        $currentLocalBranchName = git rev-parse --abbrev-ref HEAD
+                $PSCmdlet.ThrowTerminatingError($errorRecord)
+            }
 
-        if ($LASTEXITCODE -ne 0)
-        {
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    $script:localizedData.New_SamplerGitHubReleaseTag_FailedGetLocalBranchName,
-                    'NSGRT0003', # cspell: disable-line
+            $isCorrectlyFormattedPreviewTag = $latestTag -match '^(v\d+\.\d+\.\d+)-.*'
+
+            if ($isCorrectlyFormattedPreviewTag)
+            {
+                $ReleaseTag = $matches[1]
+            }
+            else
+            {
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                    [System.InvalidOperationException]::new(($script:localizedData.New_SamplerGitHubReleaseTag_LatestTagIsNotPreview -f $latestTag)),
+                    'NSGRT0010', # cspell: disable-line
                     [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $null
+                    $latestTag
                 )
-            )
+
+                $PSCmdlet.ThrowTerminatingError($errorRecord)
+            }
+        }
+        catch
+        {
+            if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
+            {
+                Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+            }
+
+            $PSCmdlet.ThrowTerminatingError($_)
         }
     }
 
-    $continueProcessing = $true
-    $errorMessage = $null
-    $switchedToDefaultBranch = $false
-
-    $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessDescription -f $DefaultBranchName, $UpstreamRemoteName
-    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessConfirmation -f $DefaultBranchName
-    $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_Rebase_ShouldProcessCaption
-
-    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
-    {
-        git checkout $DefaultBranchName
-
-        if ($LASTEXITCODE -ne 0)
-        {
-            $continueProcessing = $false
-            $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedCheckoutLocalBranch -f $DefaultBranchName
-            $errorCode = 'NSGRT0004' # cspell: disable-line
-        }
-
-        # Set only after successful checkout
-        if ($continueProcessing)
-        {
-            $switchedToDefaultBranch = $true
-        }
-
-        if ($continueProcessing)
-        {
-            git rebase $UpstreamRemoteName/$DefaultBranchName
-
-            if ($LASTEXITCODE -ne 0)
-            {
-                $continueProcessing = $false
-                $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedRebaseLocalDefaultBranch -f $DefaultBranchName, $UpstreamRemoteName
-                $errorCode = 'NSGRT0005' # cspell: disable-line
-            }
-
-            if ($continueProcessing)
-            {
-                $headCommitId = git rev-parse HEAD
-
-                if ($LASTEXITCODE -ne 0)
-                {
-                    $continueProcessing = $false
-                    $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedGetLastCommitId -f $DefaultBranchName
-                    $errorCode = 'NSGRT0006' # cspell: disable-line
-                }
-            }
-        }
-
-        if (-not $continueProcessing)
-        {
-            # If something failed, revert back to the previous branch if requested.
-            if ($SwitchBackToPreviousBranch.IsPresent -and $switchedToDefaultBranch)
-            {
-                git checkout $currentLocalBranchName
-            }
-
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    $errorMessage,
-                    $errorCode, # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $DefaultBranchName
-                )
-            )
-        }
-    }
-
-    $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessDescription -f $UpstreamRemoteName
-    $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessConfirmation -f $UpstreamRemoteName
-    $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_UpstreamTags_ShouldProcessCaption
-
-    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
-    {
-        git fetch $UpstreamRemoteName --tags
-
-        if ($LASTEXITCODE -ne 0)
-        {
-            if ($SwitchBackToPreviousBranch.IsPresent -and $switchedToDefaultBranch)
-            {
-                git checkout $currentLocalBranchName
-            }
-
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    ($script:localizedData.New_SamplerGitHubReleaseTag_FailedFetchTagsFromUpstreamRemote -f $UpstreamRemoteName),
-                    'NSGRT0007', # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $UpstreamRemoteName
-                )
-            )
-        }
-    }
-
-    if (-not $ReleaseTag)
-    {
-        $tagExist = git tag | Select-Object -First 1
-
-        if ($LASTEXITCODE -ne 0 -or -not $tagExist)
-        {
-            $continueProcessing = $false
-            $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedGetTagsOrMissingTagsInLocalRepository
-            $errorCode = 'NSGRT0008' # cspell: disable-line
-        }
-
-        if ($continueProcessing)
-        {
-            $latestPreviewTag = git describe --tags --abbrev=0
-
-            if ($LASTEXITCODE -ne 0)
-            {
-                $continueProcessing = $false
-                $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_FailedDescribeTags
-                $errorCode = 'NSGRT0009' # cspell: disable-line
-            }
-
-            if ($continueProcessing)
-            {
-                $isCorrectlyFormattedPreviewTag = $latestPreviewTag -match '^(v\d+\.\d+\.\d+)-.*'
-
-                if ($isCorrectlyFormattedPreviewTag)
-                {
-                    $ReleaseTag = $matches[1]
-                }
-                else
-                {
-                    $continueProcessing = $false
-                    $errorMessage = $script:localizedData.New_SamplerGitHubReleaseTag_LatestTagIsNotPreview -f $latestPreviewTag
-                    $errorCode = 'NSGRT0010' # cspell: disable-line
-                }
-            }
-        }
-
-        if (-not $continueProcessing)
-        {
-            if ($SwitchBackToPreviousBranch.IsPresent -and $switchedToDefaultBranch)
-            {
-                git checkout $currentLocalBranchName
-            }
-
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    $errorMessage,
-                    $errorCode, # cspell: disable-line
-                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $null
-                )
-            )
-        }
-    }
-
-    if ($WhatIfPreference)
+    if ($WhatIfPreference -and -not $ReleaseTag)
     {
         $messageShouldProcess = $script:localizedData.New_SamplerGitHubReleaseTag_NewTagWhatIf_ShouldProcessDescription
     }
@@ -309,62 +211,48 @@ function New-SamplerGitHubReleaseTag
     $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessConfirmation -f $ReleaseTag
     $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_NewTag_ShouldProcessCaption
 
-    if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
+    # If ReleaseTag is specified and in WhatIf mode then we can skip ShouldProcess and let each individual command handle it.
+    if (($WhatIfPreference -and $PSBoundParameters.ContainsKey('ReleaseTag')) -or $PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
     {
-        git tag $ReleaseTag
-
-        if ($LASTEXITCODE -ne 0)
+        try
         {
-            $PSCmdlet.ThrowTerminatingError(
-                [System.Management.Automation.ErrorRecord]::new(
-                    ($script:localizedData.New_SamplerGitHubReleaseTag_FailedCreateTag -f $ReleaseTag),
-                    'NSGRT0035',
-                    [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                    $ReleaseTag
-                )
-            )
-        }
+            <#
+                Already asked if the user wants to create the tag, so we use Force
+                to avoid asking again when creating the tag.
+            #>
+            New-GitTag -Name $ReleaseTag -Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
 
-        if ($PushTag -and ($Force -or $PSCmdlet.ShouldContinue(($script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueMessage -f $UpstreamRemoteName), $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldContinueCaption)))
-        {
-            $pushDescriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessDescription -f $ReleaseTag, $UpstreamRemoteName
-            $pushConfirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessConfirmation -f $ReleaseTag, $UpstreamRemoteName
-            $pushCaptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_PushTag_ShouldProcessCaption
-
-            if ($PSCmdlet.ShouldProcess($pushDescriptionMessage, $pushConfirmationMessage, $pushCaptionMessage))
+            if ($PushTag.IsPresent)
             {
-                git push $UpstreamRemoteName --tags
+                Push-GitTag -RemoteName $UpstreamRemoteName -Name $ReleaseTag -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
 
-                Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedAndPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
+                if (-not $WhatIfPreference)
+                {
+                    Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedAndPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
+                }
+            }
+            else
+            {
+                if (-not $WhatIfPreference)
+                {
+                    # cSpell: disable-next-line
+                    Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedNotPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
+                }
             }
         }
-        else
+        catch
         {
-            Write-Information -MessageData (ConvertTo-AnsiString -InputString ($script:localizedData.New_SamplerGitHubReleaseTag_TagCreatedNotPushed -f $ReleaseTag, $UpstreamRemoteName)) -InformationAction Continue
+            if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
+            {
+                Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
+            }
+
+            $PSCmdlet.ThrowTerminatingError($_)
         }
     }
 
-    if ($SwitchBackToPreviousBranch.IsPresent)
+    if ($ReturnToCurrentBranch.IsPresent -and $switchedBranch)
     {
-        $descriptionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessDescription -f $currentLocalBranchName
-        $confirmationMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessConfirmation -f $currentLocalBranchName
-        $captionMessage = $script:localizedData.New_SamplerGitHubReleaseTag_SwitchBack_ShouldProcessCaption
-
-        if ($PSCmdlet.ShouldProcess($descriptionMessage, $confirmationMessage, $captionMessage))
-        {
-            git checkout $currentLocalBranchName
-
-            if ($LASTEXITCODE -ne 0)
-            {
-                $PSCmdlet.ThrowTerminatingError(
-                    [System.Management.Automation.ErrorRecord]::new(
-                        ($script:localizedData.New_SamplerGitHubReleaseTag_FailedCheckoutPreviousBranch -f $currentLocalBranchName),
-                        'NSGRT0011', # cspell: disable-line
-                        [System.Management.Automation.ErrorCategory]::InvalidOperation,
-                        $currentLocalBranchName
-                    )
-                )
-            }
-        }
+        Switch-GitLocalBranch -Name $currentLocalBranchName -Verbose:$VerbosePreference -ErrorAction 'Stop'
     }
 }

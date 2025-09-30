@@ -22,6 +22,11 @@
         Specifies the ending index of the substring to be extracted. The value
         must be less than the length of the input string.
 
+    .INPUTS
+        System.Management.Automation.PSCustomObject
+
+        Accepts PSCustomObject with Start and End properties from the pipeline.
+
     .EXAMPLE
         PS> Split-StringAtIndex -InputString "Hello, World!" -StartIndex 0 -EndIndex 4
 

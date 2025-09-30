@@ -51,14 +51,15 @@ function Get-ModuleFileSha
         $Version,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Path')]
-        [ValidateScript({
-            if (-not (Test-Path -Path $_ -PathType Container))
+        [ValidateScript(
             {
-                throw $script:localizedData.Get_ModuleFileSha_PathMustBeDirectory
-            }
+                if (-not (Test-Path -Path $_ -PathType Container))
+                {
+                    throw $script:localizedData.Get_ModuleFileSha_PathMustBeDirectory
+                }
 
-            return $true
-        })]
+                return $true
+            })]
         [System.String]
         $Path
     )
@@ -129,10 +130,10 @@ function Get-ModuleFileSha
 
             [PSCustomObject]@{
                 # Output the relative path
-                ModuleBase = $path
+                ModuleBase   = $path
                 RelativePath = $file.FullName.Substring($path.Length + 1)
-                FileName = $file.Name
-                HashSHA  = $fileHash.Hash
+                FileName     = $file.Name
+                HashSHA      = $fileHash.Hash
             }
         }
     }

@@ -5,9 +5,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Viscalyx.Common
+  - Added unit tests to run in Windows PowerShell.
+- Public commands:
+  - `Assert-GitLocalChange`
+  - `Assert-GitRemote`
+  - `Disable-CursorShortcutCode`
+  - `Get-GitBranchCommit`
+  - `Get-GitLocalBranchName`
+  - `Get-GitRemote`
+  - `Get-GitRemoteBranch`
+  - `Get-GitTag`
+  - `Invoke-Git`
+  - `New-GitTag`
+  - `Push-GitTag`
+  - `Receive-GitBranch` ([#5](https://github.com/johlju/Viscalyx.Common/issues/5))
+  - `Remove-GitTag` ([#16](https://github.com/johlju/Viscalyx.Common/issues/16))
+  - `Rename-GitLocalBranch` ([#10](https://github.com/johlju/Viscalyx.Common/issues/10))
+  - `Rename-GitRemote` ([#11](https://github.com/johlju/Viscalyx.Common/issues/11))
+  - `Request-GitTag`
+  - `Switch-GitLocalBranch`
+  - `Test-GitLocalChanges`
+  - `Test-GitRemote`
+  - `Test-GitRemoteBranch`
+  - `Update-GitLocalBranch`
+  - `Update-RemoteTrackingBranch`
+- Documentation:
+  - `Testing-PowerShell-Modules.md` - Comprehensive beginner's guide for
+    testing PowerShell modules with `Invoke-PesterJob`, covering session
+    isolation, code coverage, source line mapping, and best practices for
+    different resource types including MOF-based and class-based DSC resources.
+
 ### Changed
 
-- `Invoke-PesterJob` - Updated documentation example to use `-TestNameFilter` parameter instead of the `-TestName` alias and removed reference to alias usage for consistency and clarity.
+- `Invoke-PesterJob` - Updated documentation example to use `-TestNameFilter`
+  parameter instead of the `-TestName` alias and removed reference to alias
+  usage for consistency and clarity.
+- `New-SamplerGitHubReleaseTag` - Major architectural rewrite with the following
+  key improvements:
+  - Complete implementation refactor replacing ~200 lines of raw Git commands
+    with dedicated PowerShell helper functions for improved reliability.
+  - Enhanced error handling using proper try-catch blocks instead of manual
+    `$LASTEXITCODE` checking, with automatic cleanup on failures.
+  - Improved WhatIf support with intelligent handling that skips complex logic
+    during WhatIf operations.
+  - Renamed `SwitchBackToPreviousBranch` parameter to `ReturnToCurrentBranch`
+    for better clarity.
+  - Updated documentation sections.
+- `ConvertTo-RelativePath` - Simplified function logic to consistently normalize
+  directory separators using `[System.IO.Path]::DirectorySeparatorChar` and
+  removed complex cross-platform path handling.
+
+### Fixed
+
+- `Push-GitTag` now properly handles the no-op case when trying to push all
+  tags but no local tags exist, treating it as a successful operation instead
+  of throwing an error.
 
 ## [0.6.0] - 2025-09-25
 

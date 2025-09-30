@@ -109,7 +109,7 @@ Describe 'Assert-IPv4Address' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-IPAddress] <String> [<CommonParameters>]'
+                ExpectedParameters       = '[-IPAddress] <String> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Assert-IPv4Address').ParameterSets |

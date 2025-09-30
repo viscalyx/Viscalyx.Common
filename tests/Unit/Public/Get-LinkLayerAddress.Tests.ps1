@@ -47,7 +47,7 @@ Describe 'Get-LinkLayerAddress' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = '__AllParameterSets'
-                ExpectedParameters = '[-IPAddress] <string> [<CommonParameters>]'
+                ExpectedParameters       = '[-IPAddress] <string> [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Get-LinkLayerAddress').ParameterSets |
@@ -257,8 +257,8 @@ Describe 'Get-LinkLayerAddress' {
                 InModuleScope -ScriptBlock {
                     # We need to mock the command execution within the module scope
                     Mock -CommandName Invoke-Expression -MockWith {
-                        return "? (192.168.1.1) at a:b:c:d:e:f on en0 ifscope [ethernet]"
-                    } -ParameterFilter { $Command -like "*arp -n*" }
+                        return '? (192.168.1.1) at a:b:c:d:e:f on en0 ifscope [ethernet]'
+                    } -ParameterFilter { $Command -like '*arp -n*' }
                 }
             }
 
@@ -313,7 +313,8 @@ Describe 'Get-LinkLayerAddress' {
             Mock -CommandName Write-Warning
 
             # Mock the current OS environment without changing it
-            if ($IsMacOS) {
+            if ($IsMacOS)
+            {
                 # On macOS, we'll just test that it processes multiple inputs
                 InModuleScope -ScriptBlock {
                     $script:IsMacOS = $true
@@ -321,14 +322,16 @@ Describe 'Get-LinkLayerAddress' {
                     $script:IsLinux = $false
                 }
             }
-            elseif ($IsLinux) {
+            elseif ($IsLinux)
+            {
                 InModuleScope -ScriptBlock {
                     $script:IsLinux = $true
                     $script:IsWindows = $false
                     $script:IsMacOS = $false
                 }
             }
-            else {
+            else
+            {
                 # Assume Windows for testing
                 InModuleScope -ScriptBlock {
                     $script:IsWindows = $true
@@ -356,14 +359,16 @@ Describe 'Get-LinkLayerAddress' {
             Mock -CommandName Write-Warning
 
             # Mock the current OS environment
-            if ($IsMacOS) {
+            if ($IsMacOS)
+            {
                 InModuleScope -ScriptBlock {
                     $script:IsMacOS = $true
                     $script:IsWindows = $false
                     $script:IsLinux = $false
                 }
             }
-            else {
+            else
+            {
                 # Assume Windows for testing
                 InModuleScope -ScriptBlock {
                     $script:IsWindows = $true

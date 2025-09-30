@@ -101,10 +101,12 @@ Describe 'Resolve-DnsName' {
     Context 'When DNS resolution fails' {
         It 'Should throw an error for non-existent domain' {
             $errorRecord = $null
-            try {
+            try
+            {
                 Viscalyx.Common\Resolve-DnsName -HostName 'this-domain-does-not-exist-12345.invalid' -ErrorAction Stop
             }
-            catch {
+            catch
+            {
                 $errorRecord = $_
             }
 
@@ -115,10 +117,12 @@ Describe 'Resolve-DnsName' {
 
         It 'Should throw an error for invalid hostname format' {
             $errorRecord = $null
-            try {
+            try
+            {
                 Viscalyx.Common\Resolve-DnsName -HostName 'invalid..hostname' -ErrorAction Stop
             }
-            catch {
+            catch
+            {
                 $errorRecord = $_
             }
 

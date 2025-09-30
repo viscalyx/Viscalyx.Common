@@ -29,7 +29,7 @@ BeforeAll {
     Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 }
 
-Describe 'Get-LinkLayerAddress Integration Tests' {
+Describe 'Get-LinkLayerAddress' {
     Context 'When querying a reachable IP address' {
         BeforeAll {
             # Use a common gateway IP that should be reachable in most environments
@@ -37,8 +37,10 @@ Describe 'Get-LinkLayerAddress Integration Tests' {
             $commonGatewayIPs = @('192.168.1.1', '192.168.0.1', '10.0.0.1', '172.16.0.1')
             $reachableIP = $null
 
-            foreach ($ip in $commonGatewayIPs) {
-                if (Test-Connection -ComputerName $ip -Count 1 -Quiet -ErrorAction SilentlyContinue) {
+            foreach ($ip in $commonGatewayIPs)
+            {
+                if (Test-Connection -ComputerName $ip -Count 1 -Quiet -ErrorAction SilentlyContinue)
+                {
                     $reachableIP = $ip
                     break
                 }

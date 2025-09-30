@@ -47,10 +47,13 @@ Describe 'Send-WakeOnLan' {
         It 'Should have the correct parameters in parameter set __AllParameterSets' {
             $result = (Get-Command -Name 'Send-WakeOnLan').ParameterSets[0].ToString()
 
-            if ($PSVersionTable.PSVersion.Major -eq 5) {
+            if ($PSVersionTable.PSVersion.Major -eq 5)
+            {
                 # Windows PowerShell 5.1 shows <uint16> for System.UInt16 type
                 $result | Should -Be '[-LinkLayerAddress] <string> [[-Broadcast] <string>] [[-Port] <uint16>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
-            } else {
+            }
+            else
+            {
                 # PowerShell Core/7+ shows <ushort> for System.UInt16 type
                 $result | Should -Be '[-LinkLayerAddress] <string> [[-Broadcast] <string>] [[-Port] <ushort>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
             }
@@ -70,14 +73,14 @@ Describe 'Send-WakeOnLan' {
             # Mock the UDP client to avoid actual network operations
             $mockUdpClient = [PSCustomObject] @{
                 EnableBroadcast = $false
-                ConnectCalled = $false
-                SendCalled = $false
-                CloseCalled = $false
-                DisposeCalled = $false
-                ConnectedHost = $null
-                ConnectedPort = $null
-                SentPacket = $null
-                SentLength = $null
+                ConnectCalled   = $false
+                SendCalled      = $false
+                CloseCalled     = $false
+                DisposeCalled   = $false
+                ConnectedHost   = $null
+                ConnectedPort   = $null
+                SentPacket      = $null
+                SentLength      = $null
             }
 
             # Add methods to the mock object
@@ -176,14 +179,17 @@ Describe 'Send-WakeOnLan' {
 
             # Check that packet starts with 6 bytes of 0xFF
             $packet = $mockUdpClient.SentPacket
-            for ($i = 0; $i -lt 6; $i++) {
+            for ($i = 0; $i -lt 6; $i++)
+            {
                 $packet[$i] | Should -Be 255
             }
 
             # Check that the MAC address is repeated 16 times
             $expectedMacBytes = @(0x00, 0x11, 0x22, 0x33, 0x44, 0x55)
-            for ($repetition = 0; $repetition -lt 16; $repetition++) {
-                for ($byteIndex = 0; $byteIndex -lt 6; $byteIndex++) {
+            for ($repetition = 0; $repetition -lt 16; $repetition++)
+            {
+                for ($byteIndex = 0; $byteIndex -lt 6; $byteIndex++)
+                {
                     $packetIndex = 6 + ($repetition * 6) + $byteIndex
                     $packet[$packetIndex] | Should -Be $expectedMacBytes[$byteIndex]
                 }
@@ -201,10 +207,10 @@ Describe 'Send-WakeOnLan' {
             } -MockWith {
                 $mockUdpClient = [PSCustomObject] @{
                     EnableBroadcast = $false
-                    ConnectCalled = $false
-                    SendCalled = $false
-                    CloseCalled = $false
-                    DisposeCalled = $false
+                    ConnectCalled   = $false
+                    SendCalled      = $false
+                    CloseCalled     = $false
+                    DisposeCalled   = $false
                 }
 
                 $mockUdpClient | Add-Member -MemberType ScriptMethod -Name 'Connect' -Value {
@@ -265,8 +271,8 @@ Describe 'Send-WakeOnLan' {
 
             $mockUdpClient = [PSCustomObject] @{
                 EnableBroadcast = $false
-                ConnectCalled = $false
-                SendCalled = $false
+                ConnectCalled   = $false
+                SendCalled      = $false
             }
 
             $mockUdpClient | Add-Member -MemberType ScriptMethod -Name 'Connect' -Value {
@@ -300,17 +306,17 @@ Describe 'Send-WakeOnLan' {
     Context 'When invalid MAC address is provided' {
         It 'Should throw error for invalid MAC address format' {
             { Send-WakeOnLan -LinkLayerAddress 'invalid' -Force } |
-                Should -Throw -ExpectedMessage "*does not match the*pattern*"
+                Should -Throw -ExpectedMessage '*does not match the*pattern*'
         }
 
         It 'Should throw error for MAC address with wrong length' {
             { Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44' -Force } |
-                Should -Throw -ExpectedMessage "*does not match the*pattern*"
+                Should -Throw -ExpectedMessage '*does not match the*pattern*'
         }
 
         It 'Should throw error for MAC address with invalid characters' {
             { Send-WakeOnLan -LinkLayerAddress 'GG:11:22:33:44:55' -Force } |
-                Should -Throw -ExpectedMessage "*does not match the*pattern*"
+                Should -Throw -ExpectedMessage '*does not match the*pattern*'
         }
     }
 
@@ -333,8 +339,8 @@ Describe 'Send-WakeOnLan' {
 
             $mockUdpClient = [PSCustomObject] @{
                 EnableBroadcast = $false
-                DisposeCalled = $false
-                CloseCalled = $false
+                DisposeCalled   = $false
+                CloseCalled     = $false
             }
 
             $mockUdpClient | Add-Member -MemberType ScriptMethod -Name 'Connect' -Value {
@@ -361,7 +367,7 @@ Describe 'Send-WakeOnLan' {
         }
 
         It 'Should properly dispose UDP client even when Connect fails' {
-            { Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force } | Should -Throw -ExpectedMessage "*Failed to send Wake-on-LAN packet*"
+            { Send-WakeOnLan -LinkLayerAddress '00:11:22:33:44:55' -Force } | Should -Throw -ExpectedMessage '*Failed to send Wake-on-LAN packet*'
 
             $mockUdpClient.CloseCalled | Should -BeTrue
             $mockUdpClient.DisposeCalled | Should -BeTrue
@@ -375,8 +381,8 @@ Describe 'Send-WakeOnLan' {
 
             $mockUdpClient = [PSCustomObject] @{
                 EnableBroadcast = $false
-                ConnectCalled = $false
-                SendCalled = $false
+                ConnectCalled   = $false
+                SendCalled      = $false
             }
 
             $mockUdpClient | Add-Member -MemberType ScriptMethod -Name 'Connect' -Value {

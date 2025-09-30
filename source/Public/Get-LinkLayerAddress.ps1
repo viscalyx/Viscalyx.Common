@@ -57,16 +57,17 @@ function Get-LinkLayerAddress
     param
     (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [ValidateScript({
-            if (Test-IPv4Address -IPAddress $_)
+        [ValidateScript(
             {
-                $true
-            }
-            else
-            {
-                throw ($script:localizedData.Get_LinkLayerAddress_InvalidIPAddress -f $_)
-            }
-        })]
+                if (Test-IPv4Address -IPAddress $_)
+                {
+                    $true
+                }
+                else
+                {
+                    throw ($script:localizedData.Get_LinkLayerAddress_InvalidIPAddress -f $_)
+                }
+            })]
         [System.String]
         $IPAddress
     )

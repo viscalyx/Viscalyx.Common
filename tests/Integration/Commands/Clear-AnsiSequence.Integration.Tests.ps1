@@ -32,7 +32,7 @@ BeforeAll {
     $script:esc = [System.Char] 0x1b
 }
 
-Describe 'Clear-AnsiSequence Integration Tests' {
+Describe 'Clear-AnsiSequence' {
     Context 'When clearing basic escaped ANSI sequences' {
         It 'Should remove simple color sequences' {
             $inputString = "$($script:esc)[32mGreen text$($script:esc)[0m"
@@ -264,13 +264,13 @@ Describe 'Clear-AnsiSequence Integration Tests' {
         }
 
         It 'Should enable accurate visible length calculation' {
-            $formattedString = "[32mHello[0m [31mWorld[0m"
+            $formattedString = '[32mHello[0m [31mWorld[0m'
 
             $result = Clear-AnsiSequence -InputString $formattedString -ErrorAction Stop
             $visibleLength = $result.Length
 
             $visibleLength | Should -BeExactly 11  # "Hello World"
-            $result | Should -BeExactly "Hello World"
+            $result | Should -BeExactly 'Hello World'
         }
 
         It 'Should handle progress bar-like sequences' {

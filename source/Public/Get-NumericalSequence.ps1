@@ -10,6 +10,11 @@
         Specifies the number to be processed. This parameter is mandatory and can be
         provided via the pipeline.
 
+    .INPUTS
+        System.Int32
+
+        Accepts integers from the pipeline for processing.
+
     .OUTPUTS
         System.Object[]
 
@@ -64,7 +69,7 @@ function Get-NumericalSequence
 
             $ranges += [PSCustomObject] @{
                 Start = $start
-                End = $end
+                End   = $end
             }
 
             $start = $Number
@@ -83,7 +88,7 @@ function Get-NumericalSequence
 
             $ranges += [PSCustomObject] @{
                 Start = $start
-                End = $end
+                End   = $end
             }
         }
 

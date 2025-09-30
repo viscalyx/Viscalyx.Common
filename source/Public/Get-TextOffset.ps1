@@ -12,6 +12,16 @@
     .PARAMETER TextToFind
         Specifies the text to search for within the file.
 
+    .INPUTS
+        None
+
+        This function does not accept pipeline input.
+
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject
+
+        Returns a custom object with ScriptFile, StartOffset, and EndOffset properties, or $null if the text is not found.
+
     .EXAMPLE
         Get-TextOffset -FilePath 'C:\path\to\your\script.ps1' -TextToFind 'if ($condition) {'
 #>

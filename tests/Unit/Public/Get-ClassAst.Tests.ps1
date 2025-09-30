@@ -47,11 +47,11 @@ Describe 'Get-ClassAst' {
         It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
             @{
                 ExpectedParameterSetName = 'String'
-                ExpectedParameters = '-Path <string[]> [-ClassName <string>] [<CommonParameters>]'
+                ExpectedParameters       = '-Path <string[]> [-ClassName <string>] [<CommonParameters>]'
             }
             @{
                 ExpectedParameterSetName = 'FileInfo'
-                ExpectedParameters = '-ScriptFile <FileInfo[]> [-ClassName <string>] [<CommonParameters>]'
+                ExpectedParameters       = '-ScriptFile <FileInfo[]> [-ClassName <string>] [<CommonParameters>]'
             }
         ) {
             $result = (Get-Command -Name 'Get-ClassAst').ParameterSets |
@@ -114,7 +114,7 @@ class MyDscResource
 
         It 'Should throw an error' {
             # This evaluates just part of the expected error message.
-            { Get-ClassAst -Path $mockBuiltModuleScriptFilePath } | Should -Throw "*MyDscResource*missing a Set method*"
+            { Get-ClassAst -Path $mockBuiltModuleScriptFilePath } | Should -Throw '*MyDscResource*missing a Set method*'
         }
     }
 
@@ -276,7 +276,7 @@ class FileTestClass2
             $unsupportedInput = [System.Collections.Hashtable]@{ SomeProperty = 'Value' }
 
             # The hashtable will be converted to string, then treated as a file path
-            { $unsupportedInput | Get-ClassAst } | Should -Throw "*does not exist*"
+            { $unsupportedInput | Get-ClassAst } | Should -Throw '*does not exist*'
         }
     }
 }

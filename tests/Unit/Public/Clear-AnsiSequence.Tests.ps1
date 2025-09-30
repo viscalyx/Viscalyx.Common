@@ -80,7 +80,7 @@ Describe 'Clear-AnsiSequence' {
         It 'Should have the correct parameters in parameter set __AllParameterSets' {
             $r = (Get-Command -Name 'Clear-AnsiSequence').ParameterSets |
                 Where-Object { $_.Name -eq '__AllParameterSets' } |
-                Select-Object @{N='Name';E={$_.Name}}, @{N='Sig';E={$_.ToString()}}
+                Select-Object @{N = 'Name'; E = { $_.Name } }, @{N = 'Sig'; E = { $_.ToString() } }
             $r.Name | Should -Be '__AllParameterSets'
             $r.Sig  | Should -Be '[-InputString] <String> [-RemovePartial] [<CommonParameters>]'
         }
@@ -306,15 +306,15 @@ Describe 'Clear-AnsiSequence' {
 
     Context 'When calculating visible length' {
         It 'Should enable accurate length calculation' {
-            $formattedString = "[32mHello[0m [31mWorld[0m"
+            $formattedString = '[32mHello[0m [31mWorld[0m'
             $visibleLength = (Clear-AnsiSequence -InputString $formattedString).Length
             $visibleLength | Should -BeExactly 11  # "Hello World"
         }
 
         It 'Should handle long formatted strings' {
-            $formattedString = "[1;32mThis is a very long string with multiple [31mformatted[32m sections and [0mreset[32m sequences[0m"
+            $formattedString = '[1;32mThis is a very long string with multiple [31mformatted[32m sections and [0mreset[32m sequences[0m'
             $plainText = Clear-AnsiSequence -InputString $formattedString
-            $plainText | Should -BeExactly "This is a very long string with multiple formatted sections and reset sequences"
+            $plainText | Should -BeExactly 'This is a very long string with multiple formatted sections and reset sequences'
             $plainText.Length | Should -BeExactly 79
         }
     }
