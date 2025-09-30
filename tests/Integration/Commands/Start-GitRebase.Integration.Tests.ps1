@@ -201,7 +201,7 @@ Describe 'Start-GitRebase' {
     Context 'When rebasing from default origin/main' {
         It 'Should successfully start rebase from origin/main' {
             # Reset feature branch to before main's updates to ensure rebase has something to do
-            git reset --hard HEAD~2 --quiet 2> $null
+            git reset --hard 'HEAD~2' --quiet 2> $null
 
             # Store the current number of commits
             $commitCountBefore = (git rev-list --count HEAD)
@@ -220,7 +220,7 @@ Describe 'Start-GitRebase' {
 
         It 'Should use -Force to bypass confirmation' {
             # Reset feature branch to before main's updates
-            git reset --hard HEAD~2 --quiet 2> $null
+            git reset --hard 'HEAD~2' --quiet 2> $null
 
             # This test verifies that -Force works without user interaction
             { Start-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
@@ -254,7 +254,7 @@ Describe 'Start-GitRebase' {
             }
 
             # Reset to before the feature commit to test rebasing from feature branch
-            git reset --hard HEAD~1 --quiet *> $null
+            git reset --hard 'HEAD~1' --quiet *> $null
 
             # Start the rebase from origin/feature/test
             { Start-GitRebase -RemoteName 'origin' -Branch 'feature/test' -Force -ErrorAction Stop } | Should -Not -Throw
@@ -273,7 +273,7 @@ Describe 'Start-GitRebase' {
             # This may be a limitation of how git rebase interacts with working directory.
 
             # Reset feature branch to before main's updates
-            git reset --hard HEAD~2 --quiet *> $null
+            git reset --hard 'HEAD~2' --quiet *> $null
 
             # Store the current commit count
             $commitCountBefore = (git rev-list --count HEAD)
