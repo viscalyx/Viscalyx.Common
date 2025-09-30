@@ -45,6 +45,22 @@ AfterAll {
 # cSpell: ignore LASTEXITCODE
 Describe 'Receive-GitBranch' {
     Context 'When the command has correct parameter structure' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters = '[[-BranchName] <string>] [[-UpstreamBranchName] <string>] [[-RemoteName] <string>] [[-WorkingDirectory] <string>] [-Checkout] [-Rebase] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Receive-GitBranch').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
+        }
+
         It 'Should have BranchName as a non-mandatory parameter with default value' {
             $parameterInfo = (Get-Command -Name 'Receive-GitBranch').Parameters['BranchName']
             $parameterInfo.Attributes.Mandatory | Should -BeFalse
