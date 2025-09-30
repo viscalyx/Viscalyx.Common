@@ -581,7 +581,7 @@ Describe 'Invoke-PesterJob' {
 
                 It 'Should auto-enable PassThru when EnableSourceLineMapping is used' {
                     $params = @{
-                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                         EnableSourceLineMapping = $true
                     }
 
@@ -594,7 +594,7 @@ Describe 'Invoke-PesterJob' {
 
                 It 'Should not require ModuleBuilder check in Sampler project' {
                     $params = @{
-                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                         EnableSourceLineMapping = $true
                     }
 
@@ -625,7 +625,7 @@ Describe 'Invoke-PesterJob' {
 
                 It 'Should not throw when ModuleBuilder is available' {
                     $params = @{
-                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                         EnableSourceLineMapping = $true
                     }
 
@@ -656,7 +656,7 @@ Describe 'Invoke-PesterJob' {
 
                 It 'Should throw error when ModuleBuilder is not available' {
                     $params = @{
-                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                        Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                         EnableSourceLineMapping = $true
                     }
 
@@ -875,7 +875,7 @@ function Test-HashFunction {
 
             It 'Should filter commands by function name pattern when FilterCodeCoverageResult is specified' {
                 $params = @{
-                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('Get-*')
                 }
@@ -889,7 +889,7 @@ function Test-HashFunction {
 
             It 'Should filter commands by class name pattern when FilterCodeCoverageResult is specified' {
                 $params = @{
-                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('Test*')
                 }
@@ -904,7 +904,7 @@ function Test-HashFunction {
 
             It 'Should filter commands by multiple patterns when FilterCodeCoverageResult contains multiple values' {
                 $params = @{
-                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('Get-*', 'Set-*')
                 }
@@ -919,7 +919,7 @@ function Test-HashFunction {
 
             It 'Should filter commands by specific hash-related pattern' {
                 $params = @{
-                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('*hash*')
                 }
@@ -933,7 +933,7 @@ function Test-HashFunction {
 
             It 'Should return all commands when FilterCodeCoverageResult is not specified' {
                 $params = @{
-                    Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     EnableSourceLineMapping = $true
                 }
 
@@ -945,7 +945,7 @@ function Test-HashFunction {
 
             It 'Should return empty result when FilterCodeCoverageResult pattern matches no commands' {
                 $params = @{
-                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('NonExistent-*')
                 }
@@ -958,7 +958,7 @@ function Test-HashFunction {
 
             It 'Should select only specific properties in the final output' {
                 $params = @{
-                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                     = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     EnableSourceLineMapping  = $true
                     FilterCodeCoverageResult = @('Get-*')
                 }
@@ -1008,7 +1008,7 @@ function Test-HashFunction {
 
             It 'Should return original Pester result when SkipCodeCoverage is used with EnableSourceLineMapping' {
                 $params = @{
-                    Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath\tests'
+                    Path                    = Join-Path -Path $TestDrive -ChildPath 'MockPath/tests'
                     EnableSourceLineMapping = $true
                     SkipCodeCoverage        = $true
                     PassThru                = $true
