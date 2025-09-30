@@ -238,7 +238,7 @@ Describe 'Stop-GitRebase' {
             $isRebasing | Should -Be $true
 
             # Abort the rebase
-            { Stop-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Stop-GitRebase -Force -ErrorAction Stop
 
             # Verify that the rebase was aborted
             $rebaseMergePath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-merge'
@@ -260,7 +260,7 @@ Describe 'Stop-GitRebase' {
             $null = git rebase origin/main 2>&1
 
             # This test verifies that -Force works without user interaction
-            { Stop-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Stop-GitRebase -Force -ErrorAction Stop
 
             # Verify that the rebase was aborted
             $rebaseMergePath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-merge'
@@ -304,7 +304,7 @@ Describe 'Stop-GitRebase' {
             Pop-Location
 
             # Abort rebase from outside the repository using -Path
-            { Stop-GitRebase -Path $script:testRepoPath -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Stop-GitRebase -Path $script:testRepoPath -Force -ErrorAction Stop
 
             # Verify the rebase was aborted
             Push-Location -Path $script:testRepoPath
@@ -373,7 +373,7 @@ Describe 'Stop-GitRebase' {
             if ($isRebasing)
             {
                 # Abort the rebase
-                { Stop-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
+                $null = Stop-GitRebase -Force -ErrorAction Stop
 
                 # Verify that the rebase was aborted
                 $rebaseMergePath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-merge'

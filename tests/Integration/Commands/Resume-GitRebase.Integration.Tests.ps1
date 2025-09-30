@@ -243,7 +243,7 @@ Describe 'Resume-GitRebase' {
             }
 
             # Resume the rebase
-            { Resume-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Resume-GitRebase -Force -ErrorAction Stop
 
             # Verify that the rebase completed
             $rebaseMergePath = Join-Path -Path $script:testRepoPath -ChildPath '.git' | Join-Path -ChildPath 'rebase-merge'
@@ -268,7 +268,7 @@ Describe 'Resume-GitRebase' {
             }
 
             # This test verifies that -Force works without user interaction
-            { Resume-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Resume-GitRebase -Force -ErrorAction Stop
         }
     }
 
@@ -288,7 +288,7 @@ Describe 'Resume-GitRebase' {
             $isRebasing | Should -Be $true
 
             # Skip the current commit
-            { Resume-GitRebase -Skip -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Resume-GitRebase -Skip -Force -ErrorAction Stop
 
             # Verify that the rebase completed or continued
             # After skip, rebase might complete or continue to next commit
@@ -340,7 +340,7 @@ Describe 'Resume-GitRebase' {
             Pop-Location
 
             # Resume rebase from outside the repository using -Path
-            { Resume-GitRebase -Path $script:testRepoPath -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Resume-GitRebase -Path $script:testRepoPath -Force -ErrorAction Stop
 
             # Verify the rebase completed
             Push-Location -Path $script:testRepoPath

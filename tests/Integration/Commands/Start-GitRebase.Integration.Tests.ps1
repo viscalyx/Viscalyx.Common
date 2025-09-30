@@ -160,16 +160,7 @@ Describe 'Start-GitRebase' {
         git fetch origin *> $null
 
         # Checkout feature branch for each test
-        if ($PSVersionTable.PSEdition -eq 'Desktop')
-        {
-            # Windows PowerShell - use cmd.exe for reliable output suppression
-            & cmd.exe /c 'git checkout feature/test --quiet >nul 2>&1'
-        }
-        else
-        {
-            # PowerShell 7+ - capture output in variables
-            $null = git checkout feature/test --quiet 2>&1
-        }
+        git checkout feature/test --quiet 2>&1 | Out-Null
     }
 
     AfterEach {
@@ -200,18 +191,24 @@ Describe 'Start-GitRebase' {
 
     Context 'When rebasing from default origin/main' {
         It 'Should successfully start rebase from origin/main' {
-            # Reset feature branch to before main's updates to ensure rebase has something to do
-            git reset --hard 'HEAD~2' --quiet 2> $null
-
-            # Store the current number of commits
+            # Feature branch is already behind main (doesn't have main's latest commit)
+            # Store the current number of commits before rebase
             $commitCountBefore = (git rev-list --count HEAD)
 
+            # Verify we don't have the main branch update yet
+            $hasMainUpdate = Test-Path -Path (Join-Path -Path $script:testRepoPath -ChildPath 'test2.txt')
+            $hasMainUpdate | Should -Be $false
+
             # Start the rebase
-            { Start-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Start-GitRebase -Force -ErrorAction Stop
 
             # Verify that the rebase was successful
             $currentBranch = git rev-parse --abbrev-ref HEAD
             $currentBranch | Should -Be 'feature/test'
+
+            # Verify that we now have the main branch update (test2.txt should exist)
+            $hasMainUpdate = Test-Path -Path (Join-Path -Path $script:testRepoPath -ChildPath 'test2.txt')
+            $hasMainUpdate | Should -Be $true
 
             # Verify that the commit count increased (rebased onto newer main)
             $commitCountAfter = (git rev-list --count HEAD)
@@ -219,11 +216,9 @@ Describe 'Start-GitRebase' {
         }
 
         It 'Should use -Force to bypass confirmation' {
-            # Reset feature branch to before main's updates
-            git reset --hard 'HEAD~2' --quiet 2> $null
-
+            # Feature branch is already behind main, no reset needed
             # This test verifies that -Force works without user interaction
-            { Start-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Start-GitRebase -Force -ErrorAction Stop
         }
     }
 
@@ -253,11 +248,11 @@ Describe 'Start-GitRebase' {
                 $null = git checkout feature/test --quiet 2>&1
             }
 
-            # Reset to before the feature commit to test rebasing from feature branch
-            git reset --hard 'HEAD~1' --quiet *> $null
+            # Reset to the parent commit to test rebasing from feature branch
+            git reset --hard HEAD^ --quiet *> $null
 
             # Start the rebase from origin/feature/test
-            { Start-GitRebase -RemoteName 'origin' -Branch 'feature/test' -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Start-GitRebase -RemoteName 'origin' -Branch 'feature/test' -Force -ErrorAction Stop
 
             # Verify that the rebase was successful
             $currentBranch = git rev-parse --abbrev-ref HEAD
@@ -272,14 +267,14 @@ Describe 'Start-GitRebase' {
             # a working directory different from the repository root.
             # This may be a limitation of how git rebase interacts with working directory.
 
-            # Reset feature branch to before main's updates
-            git reset --hard 'HEAD~2' --quiet *> $null
+            # Reset feature branch to origin/main
+            git reset --hard origin/main --quiet *> $null
 
             # Store the current commit count
             $commitCountBefore = (git rev-list --count HEAD)
 
             # Start rebase using -Path parameter (still from within the repo, but explicitly specifying path)
-            { Start-GitRebase -Path $script:testRepoPath -Force -ErrorAction Stop } | Should -Not -Throw
+            $null = Start-GitRebase -Path $script:testRepoPath -Force -ErrorAction Stop
 
             # Verify the rebase was successful
             $currentBranch = git rev-parse --abbrev-ref HEAD
