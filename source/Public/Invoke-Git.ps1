@@ -196,9 +196,9 @@ function Invoke-Git
         )
         {
             Write-Verbose -Message ($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.StandardOutput)
-            Write-Verbose -Message ($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)
-            Write-Verbose -Message ($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)
 
+            Write-Debug -Message ($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)
+            Write-Debug -Message ($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)
             Write-Debug -Message ($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))
             Write-Debug -Message ($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $Path)
         }
