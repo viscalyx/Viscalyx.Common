@@ -214,8 +214,8 @@ function Receive-GitBranch
         }
 
         # Rebase local branch with upstream
-        $rebaseDescription = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessVerboseDescription -f $UpstreamBranchName, $RemoteName
-        $rebaseWarning = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessVerboseWarning -f $UpstreamBranchName, $RemoteName
+        $rebaseDescription = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessVerboseDescription -f $BranchName, $UpstreamBranchName, $RemoteName
+        $rebaseWarning = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessVerboseWarning -f $BranchName, $UpstreamBranchName, $RemoteName
         $rebaseCaption = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessCaption
 
         if ($PSCmdlet.ShouldProcess($rebaseDescription, $rebaseWarning, $rebaseCaption))
@@ -226,6 +226,7 @@ function Receive-GitBranch
             }
             catch
             {
+                # TODO: If for example there are unstaged changes it will fail, but not show the error message from Invoke-Git unless switching to ErrorView = 'Detailed'.
                 $errorMessage = $script:localizedData.Receive_GitBranch_FailedRebase -f $RemoteName, $UpstreamBranchName
 
                 $newException = New-Exception -Message $errorMessage -ErrorRecord $_
@@ -256,6 +257,8 @@ function Receive-GitBranch
         {
             try
             {
+                # TODO: This needs tracking branch being set, otherwise it will fail if the local branch is not set to track an upstream branch.
+                # This was handled by a UseExistingTrackingBranch switch in (legacy) Update-GitLocalBranch, but that switch is not present here.
                 Invoke-Git -Path $Path -Arguments @('pull') -ErrorAction 'Stop'
             }
             catch

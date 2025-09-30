@@ -116,8 +116,8 @@ ConvertFrom-StringData @'
     Receive_GitBranch_Fetch_ShouldProcessVerboseWarning = Are you sure you want to fetch upstream branch '{0}' from remote '{1}'? (RGB0030)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Receive_GitBranch_Fetch_ShouldProcessCaption = Fetch upstream branch (RGB0031)
-    Receive_GitBranch_RebaseOperation_ShouldProcessVerboseDescription = Rebasing with upstream branch '{0}' from remote '{1}'. (RGB0032)
-    Receive_GitBranch_RebaseOperation_ShouldProcessVerboseWarning = Are you sure you want to rebase with upstream branch '{0}' from remote '{1}'? (RGB0033)
+    Receive_GitBranch_RebaseOperation_ShouldProcessVerboseDescription = Rebasing local branch '{0}' with upstream branch '{1}' from remote '{2}'. (RGB0032)
+    Receive_GitBranch_RebaseOperation_ShouldProcessVerboseWarning = Are you sure you want to rebase local branch '{0}' with upstream branch '{1}' from remote '{2}'? (RGB0033)
     # This string shall not end with full stop (.) since it is used as a title of ShouldProcess messages.
     Receive_GitBranch_RebaseOperation_ShouldProcessCaption = Rebase with upstream branch (RGB0034)
     Receive_GitBranch_PullOperation_ShouldProcessVerboseDescription = Pulling latest changes into current branch '{0}'. (RGB0035)
