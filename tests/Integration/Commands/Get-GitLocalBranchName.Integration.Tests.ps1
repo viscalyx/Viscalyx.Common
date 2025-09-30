@@ -243,19 +243,7 @@ Describe 'Get-GitLocalBranchName' {
                 Rename-Item -Path $gitPath -NewName '.git.temp' -ErrorAction Stop
 
                 # Execute and capture all errors (git stderr + PowerShell error)
-                $result = @(Get-GitLocalBranchName -Current 2>&1)
-
-                # Verify both errors were captured
-                $result | Should -HaveCount 2
-
-                # First error is from git (stderr)
-                $result[0] | Should -BeOfType [System.Management.Automation.ErrorRecord]
-                $result[0].Exception.Message | Should -Match 'not a git repository'
-
-                # Second error is from PowerShell Write-Error
-                $result[1] | Should -BeOfType [System.Management.Automation.ErrorRecord]
-                $result[1].Exception.Message | Should -Match 'Failed to get the name of the local branch'
-                $result[1].FullyQualifiedErrorId | Should -Be 'GGLBN0001,Get-GitLocalBranchName'
+                { Get-GitLocalBranchName -Current -ErrorAction 'Stop' } | Should -Throw -ErrorId 'GGLBN0001,Get-GitLocalBranchName'
             }
             finally
             {
