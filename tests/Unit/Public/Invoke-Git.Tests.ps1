@@ -92,10 +92,10 @@ Describe 'Viscalyx.Common\Invoke-Git' {
 
                     $result.ParameterSetName | Should -Be $ExpectedParameterSetName
 
-                    if ($PSVersionTable.PSVersion.Major -eq 5)
+                    if ($PSVersionTable.PSEdition -eq 'Desktop')
                     {
-                        # Windows PowerShell 5.1 shows <int32> for System.Int32 type
-                        $ExpectedParameters = $ExpectedParameters -replace '<int>', '<int32>'
+                        # Windows PowerShell shows <int> instead of <int32> for System.Int32 type
+                        $ExpectedParameters = $ExpectedParameters -replace '<int32>', '<int>'
                     }
 
                     $result.ParameterListAsString | Should -Be $ExpectedParameters
