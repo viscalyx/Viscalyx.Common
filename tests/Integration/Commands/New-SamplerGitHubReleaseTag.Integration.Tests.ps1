@@ -204,7 +204,7 @@ Describe 'New-SamplerGitHubReleaseTag' -Tag 'Integration' {
         }
 
         It 'Should not create tag when WhatIf is specified' {
-            $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v2.0.0' -WhatIf
+            $null = New-SamplerGitHubReleaseTag -ReleaseTag 'v2.0.0' -WhatIf -ErrorAction Stop
 
             # Verify the tag was NOT created
             $tags = & git tag
