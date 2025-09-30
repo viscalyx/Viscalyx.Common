@@ -195,7 +195,7 @@ function Invoke-Git
             $PSBoundParameters['Debug'] -eq $true
         )
         {
-            Write-Verbose -Message ($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.StandardOutput)
+            Write-Verbose -Message "`t{0}" - (($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.StandardOutput))
 
             Write-Debug -Message ($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)
             Write-Debug -Message ($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)
