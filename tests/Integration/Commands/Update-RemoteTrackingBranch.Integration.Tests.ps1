@@ -351,11 +351,11 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
         }
 
         It 'Should throw error when remote does not exist' {
-            { Update-RemoteTrackingBranch -RemoteName 'nonexistent' -Confirm:$false -ErrorAction Stop 2>$null } | Should -Throw
+            { Update-RemoteTrackingBranch -RemoteName 'nonexistent' -Force -Confirm:$false -ErrorAction Stop } | Should -Throw
         }
 
         It 'Should throw error when remote does not exist with specific branch' {
-            { Update-RemoteTrackingBranch -RemoteName 'nonexistent' -BranchName 'main' -Confirm:$false -ErrorAction Stop 2>$null } | Should -Throw
+            { Update-RemoteTrackingBranch -RemoteName 'nonexistent' -BranchName 'main' -Force -Confirm:$false -ErrorAction Stop } | Should -Throw
         }
     }
 
@@ -370,7 +370,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
         }
 
         It 'Should throw error when trying to fetch non-existent branch' {
-            { Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'nonexistent-branch' -Confirm:$false -ErrorAction Stop 2>$null } | Should -Throw
+            { Update-RemoteTrackingBranch -RemoteName 'origin' -BranchName 'nonexistent-branch' -Force -Confirm:$false -ErrorAction Stop } | Should -Throw
         }
     }
 
