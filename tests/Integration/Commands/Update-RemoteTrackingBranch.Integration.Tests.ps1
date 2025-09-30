@@ -441,7 +441,7 @@ Describe 'Update-RemoteTrackingBranch' -Tag 'Integration' {
         }
 
         It 'Should throw error when not in a git repository' {
-            { Update-RemoteTrackingBranch -RemoteName 'origin' -Confirm:$false -ErrorAction Stop } | Should -Throw
+            { Update-RemoteTrackingBranch -RemoteName 'origin' -Force -Confirm:$false -ErrorAction Stop } | Should -Throw
         }
     }
 
