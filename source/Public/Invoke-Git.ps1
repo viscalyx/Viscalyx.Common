@@ -197,10 +197,10 @@ function Invoke-Git
         {
             Write-Verbose -Message ("`t{0}" -f ($script:localizedData.Invoke_Git_StandardOutputMessage -f $gitResult.StandardOutput))
 
-            Write-Debug -Message ("`t{0}" -f ($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError))
-            Write-Debug -Message ("`t{0}" -f ($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode))
-            Write-Debug -Message ("`t{0}" -f ($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments))))
-            Write-Debug -Message ("`t{0}" -f ($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $Path))
+            Write-Debug -Message ($script:localizedData.Invoke_Git_StandardErrorMessage -f $gitResult.StandardError)
+            Write-Debug -Message ($script:localizedData.Invoke_Git_ExitCodeMessage -f $gitResult.ExitCode)
+            Write-Debug -Message ($script:localizedData.Invoke_Git_CommandDebug -f ('git {0}' -f (Hide-GitToken -InputString $processedArguments)))
+            Write-Debug -Message ($script:localizedData.Invoke_Git_WorkingDirectoryDebug -f $Path)
         }
 
         if ($gitResult.ExitCode -ne 0 -and $PassThru -eq $false)
