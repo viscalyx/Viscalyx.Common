@@ -59,6 +59,7 @@ function Invoke-Git
     param
     (
         [Parameter(Mandatory = $true)]
+        [Alias('WorkingDirectory')]
         [System.String]
         $Path,
 
