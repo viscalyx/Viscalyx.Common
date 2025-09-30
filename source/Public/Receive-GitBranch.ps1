@@ -147,8 +147,8 @@ function Receive-GitBranch
     # Checkout the specified branch if requested
     if ($Checkout.IsPresent)
     {
-        $checkoutDescription = $script:localizedData.Receive_GitBranch_Checkout_ShouldProcessVerboseDescription -f $BranchName
-        $checkoutWarning = $script:localizedData.Receive_GitBranch_Checkout_ShouldProcessVerboseWarning -f $BranchName
+        $checkoutDescription = $script:localizedData.Receive_GitBranch_Checkout_ShouldProcessDescription -f $BranchName
+        $checkoutWarning = $script:localizedData.Receive_GitBranch_Checkout_ShouldProcessConfirmation -f $BranchName
         $checkoutCaption = $script:localizedData.Receive_GitBranch_Checkout_ShouldProcessCaption
 
         if ($PSCmdlet.ShouldProcess($checkoutDescription, $checkoutWarning, $checkoutCaption))
@@ -174,16 +174,14 @@ function Receive-GitBranch
                 Write-Error @errorMessageParameters
                 return
             }
-
-            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_Success)
         }
     }
 
     if ($Rebase.IsPresent)
     {
         # Fetch upstream changes
-        $fetchDescription = $script:localizedData.Receive_GitBranch_Fetch_ShouldProcessVerboseDescription -f $UpstreamBranchName, $RemoteName
-        $fetchWarning = $script:localizedData.Receive_GitBranch_Fetch_ShouldProcessVerboseWarning -f $UpstreamBranchName, $RemoteName
+        $fetchDescription = $script:localizedData.Receive_GitBranch_Fetch_ShouldProcessDescription -f $UpstreamBranchName, $RemoteName
+        $fetchWarning = $script:localizedData.Receive_GitBranch_Fetch_ShouldProcessConfirmation -f $UpstreamBranchName, $RemoteName
         $fetchCaption = $script:localizedData.Receive_GitBranch_Fetch_ShouldProcessCaption
 
         if ($PSCmdlet.ShouldProcess($fetchDescription, $fetchWarning, $fetchCaption))
@@ -209,13 +207,11 @@ function Receive-GitBranch
                 Write-Error @errorMessageParameters
                 return
             }
-
-            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_Success)
         }
 
         # Rebase local branch with upstream
-        $rebaseDescription = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessVerboseDescription -f $BranchName, $UpstreamBranchName, $RemoteName
-        $rebaseWarning = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessVerboseWarning -f $BranchName, $UpstreamBranchName, $RemoteName
+        $rebaseDescription = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessDescription -f $BranchName, $UpstreamBranchName, $RemoteName
+        $rebaseWarning = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessConfirmation -f $BranchName, $UpstreamBranchName, $RemoteName
         $rebaseCaption = $script:localizedData.Receive_GitBranch_RebaseOperation_ShouldProcessCaption
 
         if ($PSCmdlet.ShouldProcess($rebaseDescription, $rebaseWarning, $rebaseCaption))
@@ -243,14 +239,14 @@ function Receive-GitBranch
                 return
             }
 
-            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_Success)
+            Write-Information -MessageData ($script:localizedData.Receive_GitBranch_Success) -InformationAction 'Continue'
         }
     }
     else
     {
         # Use git pull with default behavior
-        $pullDescription = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessVerboseDescription -f $BranchName
-        $pullWarning = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessVerboseWarning -f $BranchName
+        $pullDescription = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessDescription -f $BranchName
+        $pullWarning = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessConfirmation -f $BranchName
         $pullCaption = $script:localizedData.Receive_GitBranch_PullOperation_ShouldProcessCaption
 
         if ($PSCmdlet.ShouldProcess($pullDescription, $pullWarning, $pullCaption))
@@ -277,7 +273,7 @@ function Receive-GitBranch
                 return
             }
 
-            Write-Verbose -Message ($script:localizedData.Receive_GitBranch_Success)
+            Write-Information -MessageData ($script:localizedData.Receive_GitBranch_Success) -InformationAction 'Continue'
         }
     }
 }
