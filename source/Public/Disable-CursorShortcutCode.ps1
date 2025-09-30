@@ -93,7 +93,10 @@ function Disable-CursorShortcutCode
 
         if ($PSCmdlet.ShouldProcess($shouldProcessDescription, $shouldProcessConfirmation, $shouldProcessCaption))
         {
+            $previousErrorActionPreference = $ErrorActionPreference
+            $ErrorActionPreference = 'Stop'
             Move-Item -Path $codeCmdPath -Destination $codeCmdPathDestination -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
+            $ErrorActionPreference = $previousErrorActionPreference
 
             Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_RenamedCodeCmd -InformationAction 'Continue'
         }
@@ -111,7 +114,10 @@ function Disable-CursorShortcutCode
 
         if ($PSCmdlet.ShouldProcess($shouldProcessDescription, $shouldProcessConfirmation, $shouldProcessCaption))
         {
+            $previousErrorActionPreference = $ErrorActionPreference
+            $ErrorActionPreference = 'Stop'
             Move-Item -Path $codePath -Destination $codePathDestination -Force:$Force -Verbose:$VerbosePreference -ErrorAction 'Stop'
+            $ErrorActionPreference = $previousErrorActionPreference
 
             Write-Information -MessageData $script:localizedData.Disable_CursorShortcutCode_RenamedCode -InformationAction 'Continue'
         }

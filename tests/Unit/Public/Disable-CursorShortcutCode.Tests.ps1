@@ -92,7 +92,7 @@ Describe 'Disable-CursorShortcutCode' {
             }
 
             It 'Should rename both code.cmd and code files' {
-                Disable-CursorShortcutCode -Confirm:$false
+                $null = Disable-CursorShortcutCode -Confirm:$false
 
                 Should -Invoke -CommandName Test-Path -Exactly -Times 2
                 Should -Invoke -CommandName Move-Item -Exactly -Times 2
@@ -110,7 +110,7 @@ Describe 'Disable-CursorShortcutCode' {
             }
 
             It 'Should rename only code.cmd file' {
-                Disable-CursorShortcutCode -Confirm:$false
+                $null = Disable-CursorShortcutCode -Confirm:$false
 
                 Should -Invoke -CommandName Test-Path -Exactly -Times 2
                 Should -Invoke -CommandName Move-Item -Exactly -Times 1
@@ -124,7 +124,7 @@ Describe 'Disable-CursorShortcutCode' {
             }
 
             It 'Should not rename any files and display appropriate messages' {
-                Disable-CursorShortcutCode -Confirm:$false
+                $null = Disable-CursorShortcutCode -Confirm:$false
 
                 Should -Invoke -CommandName Test-Path -Exactly -Times 2
                 Should -Invoke -CommandName Move-Item -Times 0
@@ -145,7 +145,7 @@ Describe 'Disable-CursorShortcutCode' {
         }
 
         It 'Should display message that Cursor path was not found' {
-            Disable-CursorShortcutCode -Confirm:$false
+            $null = Disable-CursorShortcutCode -Confirm:$false
 
             Should -Invoke -CommandName Test-Path -Times 0
             Should -Invoke -CommandName Move-Item -Times 0
@@ -169,7 +169,7 @@ Describe 'Disable-CursorShortcutCode' {
         }
 
         It 'Should not perform any file operations when WhatIf is specified' {
-            Disable-CursorShortcutCode -WhatIf
+            $null = Disable-CursorShortcutCode -WhatIf
 
             Should -Invoke -CommandName Test-Path -Exactly -Times 2
             Should -Invoke -CommandName Move-Item -Times 0
@@ -193,7 +193,7 @@ Describe 'Disable-CursorShortcutCode' {
         }
 
         It 'Should perform operations without confirmation when Force is specified' {
-            Disable-CursorShortcutCode -Force
+            $null = Disable-CursorShortcutCode -Force
 
             Should -Invoke -CommandName Test-Path -Exactly -Times 2
             Should -Invoke -CommandName Move-Item -Exactly -Times 2
