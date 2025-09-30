@@ -175,6 +175,22 @@ Describe 'Start-GitRebase' {
     }
 
     Context 'When verifying parameters' {
+        It 'Should have the correct parameters in parameter set <ExpectedParameterSetName>' -ForEach @(
+            @{
+                ExpectedParameterSetName = '__AllParameterSets'
+                ExpectedParameters       = '[[-RemoteName] <string>] [[-Branch] <string>] [[-Path] <string>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]'
+            }
+        ) {
+            $result = (Get-Command -Name 'Start-GitRebase').ParameterSets |
+                Where-Object -FilterScript { $_.Name -eq $ExpectedParameterSetName } |
+                Select-Object -Property @(
+                    @{ Name = 'ParameterSetName'; Expression = { $_.Name } },
+                    @{ Name = 'ParameterListAsString'; Expression = { $_.ToString() } }
+                )
+            $result.ParameterSetName | Should -Be $ExpectedParameterSetName
+            $result.ParameterListAsString | Should -Be $ExpectedParameters
+        }
+
         It 'Should have RemoteName parameter with default value of origin' {
             $command = Get-Command -Name Start-GitRebase
             $parameter = $command.Parameters['RemoteName']
