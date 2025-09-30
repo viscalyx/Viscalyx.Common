@@ -167,42 +167,38 @@ Describe 'Get-GitLocalBranchName' {
 
     Context 'When getting all branches' {
         It 'Should call git branch --format --list without name when no parameters are provided' {
-            InModuleScope -ScriptBlock {
-                Mock -CommandName 'git' -MockWith {
-                    return @('main', 'develop', 'feature/test')
-                }
-
-                $global:LASTEXITCODE = 0
-
-                $result = Get-GitLocalBranchName
-
-                Should -Invoke -CommandName 'git' -ParameterFilter {
-                    $args -contains 'branch' -and $args -contains '--format=%(refname:short)' -and $args -contains '--list' -and $args.Count -eq 3
-                } -Times 1 -Exactly
-
-                $result | Should -Be @('main', 'develop', 'feature/test')
+            Mock -CommandName 'git' -MockWith {
+                return @('main', 'develop', 'feature/test')
             }
+
+            $global:LASTEXITCODE = 0
+
+            $result = Get-GitLocalBranchName
+
+            Should -Invoke -CommandName 'git' -ParameterFilter {
+                $args -contains 'branch' -and $args -contains '--format=%(refname:short)' -and $args -contains '--list' -and $args.Count -eq 3
+            } -Times 1 -Exactly
+
+            $result | Should -Be @('main', 'develop', 'feature/test')
         }
     }
 
     Context 'When git command fails' {
         It 'Should handle git command errors gracefully when getting current branch' {
-            InModuleScope -ScriptBlock {
-                Mock -CommandName 'git' -MockWith {
-                    return $null
-                }
-
-                Mock -CommandName 'Write-Error' -MockWith {
-                    Write-Output 'Mocked error'
-                }
-
-                # Simulate LASTEXITCODE failure
-                $global:LASTEXITCODE = 128
-
-                $result = Get-GitLocalBranchName -Current -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-
-                Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly
+            Mock -CommandName 'git' -MockWith {
+                return $null
             }
+
+            Mock -CommandName 'Write-Error' -MockWith {
+                Write-Output 'Mocked error'
+            }
+
+            # Simulate LASTEXITCODE failure
+            $global:LASTEXITCODE = 128
+
+            $result = Get-GitLocalBranchName -Current -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+
+            Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly
         }
 
         It 'Should handle git command errors gracefully when getting branch by name' {
@@ -225,27 +221,29 @@ Describe 'Get-GitLocalBranchName' {
         }
 
         It 'Should write correct error message when git fails' {
-            InModuleScope -ScriptBlock {
-                Mock -CommandName 'git' -MockWith {
-                    return $null
-                }
-
-                Mock -CommandName 'Write-Error' -MockWith {
-                    param($Message, $Category, $ErrorId, $TargetObject)
-
-                    $Message | Should -Be $script:localizedData.Get_GitLocalBranchName_Failed
-                    $Category | Should -Be 'ObjectNotFound'
-                    $ErrorId | Should -Be 'GGLBN0001'
-                    $TargetObject | Should -Be $null
-                }
-
-                # Simulate LASTEXITCODE failure
-                $global:LASTEXITCODE = 128
-
-                Get-GitLocalBranchName -Current -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-
-                Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly
+            $localizedMessage = InModuleScope -ScriptBlock {
+                $script:localizedData.Get_GitLocalBranchName_Failed
             }
+
+            Mock -CommandName 'git' -MockWith {
+                return $null
+            }
+
+            Mock -CommandName 'Write-Error' -MockWith {
+                param($Message, $Category, $ErrorId, $TargetObject)
+
+                $Message | Should -Be $localizedMessage
+                $Category | Should -Be 'ObjectNotFound'
+                $ErrorId | Should -Be 'GGLBN0001'
+                $TargetObject | Should -Be $null
+            }
+
+            # Simulate LASTEXITCODE failure
+            $global:LASTEXITCODE = 128
+
+            Get-GitLocalBranchName -Current -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+
+            Should -Invoke -CommandName 'Write-Error' -Times 1 -Exactly
         }
     }
 
