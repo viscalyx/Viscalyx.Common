@@ -140,11 +140,9 @@ function Receive-GitBranch
         $ConfirmPreference = 'None'
     }
 
-    $currentLocalBranchName = Get-GitLocalBranchName -Current
-
     if ($BranchName -eq '.')
     {
-        $BranchName = $currentLocalBranchName
+        $BranchName = Get-GitLocalBranchName -Current
     }
 
     # Use current location if Path is not specified
