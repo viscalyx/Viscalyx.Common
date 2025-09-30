@@ -145,21 +145,19 @@ Describe 'Get-GitLocalBranchName' {
         }
 
         It 'Should support wildcard patterns in Name parameter' {
-            InModuleScope -ScriptBlock {
-                Mock -CommandName 'git' -MockWith {
-                    return @('feature/branch1', 'feature/branch2')
-                }
-
-                $global:LASTEXITCODE = 0
-
-                $result = Get-GitLocalBranchName -Name 'feature/*'
-
-                Should -Invoke -CommandName 'git' -ParameterFilter {
-                    $args -contains 'branch' -and $args -contains '--format=%(refname:short)' -and $args -contains '--list' -and $args -contains 'feature/*'
-                } -Times 1 -Exactly
-
-                $result | Should -Be @('feature/branch1', 'feature/branch2')
+            Mock -CommandName 'git' -MockWith {
+                return @('feature/branch1', 'feature/branch2')
             }
+
+            $global:LASTEXITCODE = 0
+
+            $result = Get-GitLocalBranchName -Name 'feature/*'
+
+            Should -Invoke -CommandName 'git' -ParameterFilter {
+                $args -contains 'branch' -and $args -contains '--format=%(refname:short)' -and $args -contains '--list' -and $args -contains 'feature/*'
+            } -Times 1 -Exactly
+
+            $result | Should -Be @('feature/branch1', 'feature/branch2')
         }
     }
 
