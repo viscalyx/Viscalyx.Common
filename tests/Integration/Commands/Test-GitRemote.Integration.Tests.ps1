@@ -117,7 +117,7 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
 
         It 'Should handle remote names with special characters' {
             # Add a remote with special characters
-            git remote add 'remote-with-dash' 'https://github.com/special/repo.git' -ErrorAction Stop | Out-Null
+            $null = git remote add 'remote-with-dash' 'https://github.com/special/repo.git' 2>&1
 
             $result = Test-GitRemote -Name 'remote-with-dash' -ErrorAction Stop
             $result | Should -BeTrue
@@ -126,7 +126,7 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
 
         It 'Should handle remote names with underscores' {
             # Add a remote with underscores
-            git remote add 'remote_with_underscore' 'https://github.com/underscore/repo.git' -ErrorAction Stop | Out-Null
+            $null = git remote add 'remote_with_underscore' 'https://github.com/underscore/repo.git' 2>&1
 
             $result = Test-GitRemote -Name 'remote_with_underscore' -ErrorAction Stop
             $result | Should -BeTrue
@@ -280,7 +280,7 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
             $resultBefore | Should -BeFalse
 
             # Add the remote
-            git remote add 'newremote' 'https://github.com/new/repo.git' -ErrorAction Stop | Out-Null
+            $null = git remote add 'newremote' 'https://github.com/new/repo.git' 2>&1
 
             # Test after adding remote
             $resultAfter = Test-GitRemote -Name 'newremote' -ErrorAction Stop
@@ -289,7 +289,7 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
 
         It 'Should return true before removing remote, then false after removing remote' {
             # Add a remote first
-            git remote add 'tempremote' 'https://github.com/temp/repo.git' -ErrorAction Stop | Out-Null
+            $null = git remote add 'tempremote' 'https://github.com/temp/repo.git' 2>&1
 
             # Test before removing remote
             $resultBefore = Test-GitRemote -Name 'tempremote' -ErrorAction Stop
@@ -305,7 +305,7 @@ Describe 'Test-GitRemote' -Tag 'Integration' {
 
         It 'Should return true after renaming from old name to new name' {
             # Add a remote first
-            git remote add 'oldname' 'https://github.com/test/repo.git' -ErrorAction Stop | Out-Null
+            $null = git remote add 'oldname' 'https://github.com/test/repo.git' 2>&1
 
             # Verify it exists with old name
             $resultOldBefore = Test-GitRemote -Name 'oldname' -ErrorAction Stop
