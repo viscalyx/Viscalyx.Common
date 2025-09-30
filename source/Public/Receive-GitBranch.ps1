@@ -223,6 +223,7 @@ function Receive-GitBranch
             catch
             {
                 # TODO: If for example there are unstaged changes it will fail, but not show the error message from Invoke-Git unless switching to ErrorView = 'Detailed'.
+                # It will show when passing -Debug, but should be propagated to error message.
                 $errorMessage = $script:localizedData.Receive_GitBranch_FailedRebase -f $RemoteName, $UpstreamBranchName
 
                 $newException = New-Exception -Message $errorMessage -ErrorRecord $_
