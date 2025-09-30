@@ -201,11 +201,11 @@ Describe 'Start-GitRebase' {
     Context 'When rebasing from default origin/main' {
         It 'Should successfully start rebase from origin/main' {
             # Reset feature branch to before main's updates to ensure rebase has something to do
-            git reset --hard HEAD~2 --quiet *> $null
-            
+            git reset --hard HEAD~2 --quiet 2> $null
+
             # Store the current number of commits
             $commitCountBefore = (git rev-list --count HEAD)
-            
+
             # Start the rebase
             { Start-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
 
@@ -220,8 +220,8 @@ Describe 'Start-GitRebase' {
 
         It 'Should use -Force to bypass confirmation' {
             # Reset feature branch to before main's updates
-            git reset --hard HEAD~2 --quiet *> $null
-            
+            git reset --hard HEAD~2 --quiet 2> $null
+
             # This test verifies that -Force works without user interaction
             { Start-GitRebase -Force -ErrorAction Stop } | Should -Not -Throw
         }
@@ -271,20 +271,20 @@ Describe 'Start-GitRebase' {
             # appears to have issues finding remote references when executed from
             # a working directory different from the repository root.
             # This may be a limitation of how git rebase interacts with working directory.
-            
+
             # Reset feature branch to before main's updates
             git reset --hard HEAD~2 --quiet *> $null
-            
+
             # Store the current commit count
             $commitCountBefore = (git rev-list --count HEAD)
-            
+
             # Start rebase using -Path parameter (still from within the repo, but explicitly specifying path)
             { Start-GitRebase -Path $script:testRepoPath -Force -ErrorAction Stop } | Should -Not -Throw
 
             # Verify the rebase was successful
             $currentBranch = git rev-parse --abbrev-ref HEAD
             $currentBranch | Should -Be 'feature/test'
-            
+
             # Verify commit count increased
             $commitCountAfter = (git rev-list --count HEAD)
             $commitCountAfter | Should -BeGreaterThan $commitCountBefore
