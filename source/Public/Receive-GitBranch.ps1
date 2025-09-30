@@ -10,7 +10,8 @@
 
     .PARAMETER BranchName
         Specifies the name of the local branch. If -Checkout is specified, this branch
-        will be checked out first. If not specified, defaults to 'main'.
+        will be checked out first. If not specified, defaults to '.' which is resolved
+        to the current local branch name.
 
     .PARAMETER UpstreamBranchName
         Specifies the name of the upstream branch to pull from. If not specified,
@@ -30,8 +31,8 @@
 
     .PARAMETER Path
         Specifies the path to the git repository directory. If not specified,
-        uses the current directory. When specified, the function will temporarily
-        change to this directory to perform git operations.
+        uses the current directory. When specified, runs the git operations
+        in the specified directory.
 
     .PARAMETER Force
         Forces the operation to proceed without confirmation prompts when similar
@@ -78,8 +79,8 @@
     .EXAMPLE
         Receive-GitBranch -Path 'C:\repos\MyProject' -Checkout -BranchName 'feature-branch'
 
-        Temporarily changes to the 'C:\repos\MyProject' directory, checks out the
-        'feature-branch', pulls the latest changes, and then returns to the original directory.
+        Sets the working directory to 'C:\repos\MyProject', checks out the
+        'feature-branch', and pulls the latest changes.
 
     .NOTES
         This function requires Git to be installed and accessible from the command line.
@@ -260,10 +261,10 @@ function Receive-GitBranch
             }
             catch
             {
-                $newException = New-Exception -Message $script:localizedData.Receive_GitBranch_FailedPull -ErrorRecord $_
+                $newException = New-Exception -Message ($script:localizedData.Receive_GitBranch_FailedPull -f $BranchName) -ErrorRecord $_
 
                 $errorMessageParameters = @{
-                    Message      = $script:localizedData.Receive_GitBranch_FailedPull
+                    Message      = $script:localizedData.Receive_GitBranch_FailedPull -f $BranchName
                     Category     = 'InvalidOperation'
                     ErrorId      = 'RGB0004' # cspell: disable-line
                     TargetObject = $null
