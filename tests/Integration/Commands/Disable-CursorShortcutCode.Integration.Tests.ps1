@@ -46,6 +46,15 @@ Describe 'Disable-CursorShortcutCode' {
     BeforeAll {
         Mock -CommandName Move-Item
 
+        <#
+            Pester 6 do not fall through to the real command when no -ParameterFilter
+            matches. This is a forwarding default so unmatched Test-Path calls run the
+            real cmdlet.
+        #>
+        Mock -CommandName Test-Path -MockWith {
+            & (Get-Command -Name 'Test-Path' -CommandType Cmdlet) @PesterBoundParameters
+        }
+
         if ($env:Path -notmatch 'Cursor')
         {
             $script:mockPreviousEnvironmentVariablePath = $env:Path
