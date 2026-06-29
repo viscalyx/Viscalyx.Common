@@ -366,7 +366,7 @@ Describe 'Out-Difference' {
 
             $result = Out-Difference -Reference $expected -Difference $actual
 
-            $result | Should-BeEquivalent @()
+            $result | Should-BeNull
         }
     }
 
@@ -531,7 +531,7 @@ Describe 'Out-Difference' {
 
             $result = Out-Difference -Reference $expected -Difference $actual
 
-            $result | Should-BeEquivalent @()
+            $result | Should-BeNull
         }
     }
 

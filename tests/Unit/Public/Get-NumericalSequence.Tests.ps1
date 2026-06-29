@@ -105,8 +105,6 @@ Describe 'Get-NumericalSequence' {
 
         $result = $numbers | Get-NumericalSequence
 
-        $expected = @()
-
-        $result | Should-BeEquivalent $expected
+        $result | Should-BeNull
     }
 }
