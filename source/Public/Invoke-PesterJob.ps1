@@ -390,8 +390,7 @@ function Invoke-PesterJob
 
         if ($importedPesterModule)
         {
-            #Write-Information -MessageData $script:localizedData.Invoke_PesterJob_PesterAlreadyImported -InformationAction 'Continue'
-            Write-Information -MessageData 'Pester already imported' -InformationAction 'Continue'
+            Write-Debug -Message $script:localizedData.Invoke_PesterJob_PesterAlreadyImported
 
             break
         }
@@ -413,7 +412,7 @@ function Invoke-PesterJob
 
             if ($triesCount -eq 1 -and $BuildScriptPath -and (Test-Path -Path $BuildScriptPath))
             {
-                Write-Information -MessageData 'Could not import Pester. Running build script to make sure required modules is available in session. This can take a few seconds.' -InformationAction 'Continue'
+                Write-Information -MessageData $script:localizedData.Invoke_PesterJob_MissingPesterRunningBuildScript -InformationAction 'Continue'
 
                 # Redirect all streams to $null, except the error stream (stream 2)
                 & $BuildScriptPath @buildScriptParameter 3>&1 4>&1 5>&1 6>&1 > $null
@@ -434,7 +433,7 @@ function Invoke-PesterJob
 
     $pesterModuleVersion = $importedPesterModule | Get-ModuleVersion
 
-    Write-Information -MessageData ('Using imported Pester v{0}.' -f $pesterModuleVersion) -InformationAction 'Continue'
+    Write-Information -MessageData ($script:localizedData.Invoke_PesterJob_UsingImportedPester -f $pesterModuleVersion) -InformationAction 'Continue'
 
     # Check for EnableSourceLineMapping requirements
     if ($EnableSourceLineMapping.IsPresent)
@@ -629,9 +628,23 @@ function Invoke-PesterJob
             $EnableSourceLineMapping
         )
 
-        Write-Information -MessageData 'Running build task ''noop'' inside the job to setup the test pipeline.' -InformationAction 'Continue'
+        if ($BuildScriptPath -and (Test-Path -Path $BuildScriptPath))
+        {
+            $messageBuildScript = 'Found build script ''{0}''' -f $BuildScriptPath
 
-        $null = & $BuildScriptPath @buildScriptParameter
+            if ($BuildScriptParameter)
+            {
+                $messageBuildScript += ' Running build task ''{0}'' inside the job to setup the test pipeline.' -f $BuildScriptParameter
+            }
+
+            Write-Information -MessageData $messageBuildScript -InformationAction 'Continue'
+
+            $null = & $BuildScriptPath @buildScriptParameter
+        }
+        else
+        {
+            Write-Debug -Message 'No build script specified or found. Skipping build script execution inside the job.'
+        }
 
         if ($ShowError.IsPresent)
         {
