@@ -373,22 +373,32 @@ function Invoke-PesterJob
         $BuildScriptParameter = @{ Task = 'noop' }
     )
 
-    if (-not $PSBoundParameters.ContainsKey('BuildScriptPath'))
+    $defaultBuildScriptPath = Join-Path -Path $RootPath -ChildPath 'build.ps1'
+
+    if (-not $PSBoundParameters.ContainsKey('BuildScriptPath') -and (Test-Path -Path $defaultBuildScriptPath -PathType 'Leaf'))
     {
-        $BuildScriptPath = Join-Path -Path $RootPath -ChildPath 'build.ps1'
+        $BuildScriptPath = $defaultBuildScriptPath
     }
 
     $pesterModuleVersion = $null
 
+    $triesCount = 0
+
     do
     {
-        $triesCount = 0
+        $importedPesterModule = Get-Module -Name 'Pester' -ErrorAction 'SilentlyContinue'
+
+        if ($importedPesterModule)
+        {
+            #Write-Information -MessageData $script:localizedData.Invoke_PesterJob_PesterAlreadyImported -InformationAction 'Continue'
+            Write-Information -MessageData 'Pester already imported' -InformationAction 'Continue'
+
+            break
+        }
 
         try
         {
             $importedPesterModule = Import-Module -Name 'Pester' -MinimumVersion '4.10.1' -ErrorAction 'Stop' -PassThru
-
-            $pesterModuleVersion = $importedPesterModule | Get-ModuleVersion
 
             <#
                 Assuming that the project is a Sampler project if the Sampler
@@ -401,7 +411,7 @@ function Invoke-PesterJob
         {
             $triesCount++
 
-            if ($triesCount -eq 1 -and (Test-Path -Path $BuildScriptPath))
+            if ($triesCount -eq 1 -and $BuildScriptPath -and (Test-Path -Path $BuildScriptPath))
             {
                 Write-Information -MessageData 'Could not import Pester. Running build script to make sure required modules is available in session. This can take a few seconds.' -InformationAction 'Continue'
 
@@ -421,6 +431,8 @@ function Invoke-PesterJob
             }
         }
     } until ($importedPesterModule)
+
+    $pesterModuleVersion = $importedPesterModule | Get-ModuleVersion
 
     Write-Information -MessageData ('Using imported Pester v{0}.' -f $pesterModuleVersion) -InformationAction 'Continue'
 

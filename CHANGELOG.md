@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bump action codeql-action/upload-sarif to v4
 - Bump action checkout to v7
+- `Invoke-PesterJob`
+  - Check for existing Pester module before importing.
+  - Support using Pester even if there is no build script.
+
+### Fixed
+
+- `Invoke-PesterJob`
+  - Make sure loop stops after first attempt of running build script to avoid
+    infinite loop when build script fails to install Pester module.
 
 ## [0.7.0] - 2025-09-30
 
