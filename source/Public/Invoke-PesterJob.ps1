@@ -380,8 +380,6 @@ function Invoke-PesterJob
         $BuildScriptPath = $defaultBuildScriptPath
     }
 
-    $pesterModuleVersion = $null
-
     $triesCount = 0
 
     do

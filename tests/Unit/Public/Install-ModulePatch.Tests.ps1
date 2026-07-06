@@ -33,7 +33,7 @@ BeforeAll {
     $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
 
     $script:previousProgressPreference = $ProgressPreference
-    $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
+    $ProgressPreference = 'SilentlyContinue' # Suppress progress output during testing
 }
 
 AfterAll {
