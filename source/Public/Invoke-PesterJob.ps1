@@ -632,14 +632,14 @@ function Invoke-PesterJob
 
         if ($BuildScriptPath -and (Test-Path -Path $BuildScriptPath))
         {
-            $messageBuildScript = 'Found build script ''{0}''' -f $BuildScriptPath
+            $messageBuildScript = 'Found build script ''{0}''. Running build script inside the job to setup the test pipeline.' -f $BuildScriptPath
+
+            Write-Information -MessageData $messageBuildScript -InformationAction 'Continue'
 
             if ($BuildScriptParameter)
             {
-                $messageBuildScript += ' Running build task ''{0}'' inside the job to setup the test pipeline.' -f $BuildScriptParameter
+                Write-Debug -Message ('Build script parameters: {0}' -f ($BuildScriptParameter | Out-String))
             }
-
-            Write-Information -MessageData $messageBuildScript -InformationAction 'Continue'
 
             $null = & $BuildScriptPath @buildScriptParameter
         }
