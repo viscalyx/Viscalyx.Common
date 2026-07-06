@@ -398,13 +398,6 @@ function Invoke-PesterJob
         try
         {
             $importedPesterModule = Import-Module -Name 'Pester' -MinimumVersion '4.10.1' -ErrorAction 'Stop' -PassThru
-
-            <#
-                Assuming that the project is a Sampler project if the Sampler
-                module is available in the session. Also assuming that a Sampler
-                build task has been run prior to running the command.
-            #>
-            $isSamplerProject = $null -ne (Get-Module -Name 'Sampler')
         }
         catch
         {
@@ -434,6 +427,15 @@ function Invoke-PesterJob
     $pesterModuleVersion = $importedPesterModule | Get-ModuleVersion
 
     Write-Information -MessageData ($script:localizedData.Invoke_PesterJob_UsingImportedPester -f $pesterModuleVersion) -InformationAction 'Continue'
+
+    <#
+        Assuming that the project is a Sampler project if the Sampler
+        module is available in the session. Also assuming that a Sampler
+        build task has been run prior to running the command.
+    #>
+    $isSamplerProject = $null -ne (Get-Module -Name 'Sampler')
+
+    Write-Debug -Message ($script:localizedData.Invoke_PesterJob_Debug_IsSamplerProject -f $isSamplerProject)
 
     # Check for EnableSourceLineMapping requirements
     if ($EnableSourceLineMapping.IsPresent)

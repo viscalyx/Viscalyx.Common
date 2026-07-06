@@ -292,6 +292,7 @@ ConvertFrom-StringData @'
     Invoke_PesterJob_PesterAlreadyImported = Pester module is already imported. (IPJ0006)
     Invoke_PesterJob_MissingPesterRunningBuildScript = Could not import Pester. Running build script to make sure required modules is available in session. This can take a few seconds. (IPJ0007)
     Invoke_PesterJob_UsingImportedPester = Using imported Pester v{0}. (IPJ0008)
+    Invoke_PesterJob_Debug_IsSamplerProject = Evaluted to be a Sampler project: {0}. (IPJ0009)
 
     ## Switch-GitLocalBranch
     Switch_GitLocalBranch_FailedCheckoutLocalBranch = Failed to checkout the local branch '{0}'. Make sure the branch exists and is accessible. (SGLB0001)
