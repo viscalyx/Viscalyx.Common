@@ -83,8 +83,11 @@ The text includes multiple lines.
     }
 
     AfterEach {
+        $previousProgressPreference = $ProgressPreference
+        $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
         # Remove the test file
         Remove-Item -Path $testFilePath -Force
+        $ProgressPreference = $previousProgressPreference
     }
 
     Context 'When the text is found in the file' {

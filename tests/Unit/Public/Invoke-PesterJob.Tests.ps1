@@ -575,6 +575,7 @@ Describe 'Invoke-PesterJob' {
                         {
                             return @{ Version = [version] '5.4.0' }
                         }
+
                         return $null
                     }
                 }

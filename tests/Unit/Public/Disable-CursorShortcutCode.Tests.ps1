@@ -31,6 +31,9 @@ BeforeAll {
     $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
     $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
     $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
+
+    $previousProgressPreference = $ProgressPreference
+    $ProgressPreference = 'SilentlyContinue' # Suppress progress output during deletion
 }
 
 AfterAll {
@@ -40,6 +43,8 @@ AfterAll {
 
     # Unload the module being tested so that it doesn't impact any other tests.
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    $ProgressPreference = $previousProgressPreference
 }
 
 Describe 'Disable-CursorShortcutCode' {
