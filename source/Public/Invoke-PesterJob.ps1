@@ -373,37 +373,37 @@ function Invoke-PesterJob
         $BuildScriptParameter = @{ Task = 'noop' }
     )
 
-    if (-not $PSBoundParameters.ContainsKey('BuildScriptPath'))
+    $defaultBuildScriptPath = Join-Path -Path $RootPath -ChildPath 'build.ps1'
+
+    if (-not $PSBoundParameters.ContainsKey('BuildScriptPath') -and (Test-Path -Path $defaultBuildScriptPath -PathType 'Leaf'))
     {
-        $BuildScriptPath = Join-Path -Path $RootPath -ChildPath 'build.ps1'
+        $BuildScriptPath = $defaultBuildScriptPath
     }
 
-    $pesterModuleVersion = $null
+    $triesCount = 0
 
     do
     {
-        $triesCount = 0
+        $importedPesterModule = Get-Module -Name 'Pester' -ErrorAction 'SilentlyContinue'
+
+        if ($importedPesterModule)
+        {
+            Write-Debug -Message $script:localizedData.Invoke_PesterJob_PesterAlreadyImported
+
+            break
+        }
 
         try
         {
             $importedPesterModule = Import-Module -Name 'Pester' -MinimumVersion '4.10.1' -ErrorAction 'Stop' -PassThru
-
-            $pesterModuleVersion = $importedPesterModule | Get-ModuleVersion
-
-            <#
-                Assuming that the project is a Sampler project if the Sampler
-                module is available in the session. Also assuming that a Sampler
-                build task has been run prior to running the command.
-            #>
-            $isSamplerProject = $null -ne (Get-Module -Name 'Sampler')
         }
         catch
         {
             $triesCount++
 
-            if ($triesCount -eq 1 -and (Test-Path -Path $BuildScriptPath))
+            if ($triesCount -eq 1 -and $BuildScriptPath -and (Test-Path -Path $BuildScriptPath))
             {
-                Write-Information -MessageData 'Could not import Pester. Running build script to make sure required modules is available in session. This can take a few seconds.' -InformationAction 'Continue'
+                Write-Information -MessageData $script:localizedData.Invoke_PesterJob_MissingPesterRunningBuildScript -InformationAction 'Continue'
 
                 # Redirect all streams to $null, except the error stream (stream 2)
                 & $BuildScriptPath @buildScriptParameter 3>&1 4>&1 5>&1 6>&1 > $null
@@ -422,7 +422,18 @@ function Invoke-PesterJob
         }
     } until ($importedPesterModule)
 
-    Write-Information -MessageData ('Using imported Pester v{0}.' -f $pesterModuleVersion) -InformationAction 'Continue'
+    $pesterModuleVersion = $importedPesterModule | Get-ModuleVersion
+
+    Write-Information -MessageData ($script:localizedData.Invoke_PesterJob_UsingImportedPester -f $pesterModuleVersion) -InformationAction 'Continue'
+
+    <#
+        Assuming that the project is a Sampler project if the Sampler
+        module is available in the session. Also assuming that a Sampler
+        build task has been run prior to running the command.
+    #>
+    $isSamplerProject = $null -ne (Get-Module -Name 'Sampler')
+
+    Write-Debug -Message ($script:localizedData.Invoke_PesterJob_Debug_IsSamplerProject -f $isSamplerProject)
 
     # Check for EnableSourceLineMapping requirements
     if ($EnableSourceLineMapping.IsPresent)
@@ -617,9 +628,23 @@ function Invoke-PesterJob
             $EnableSourceLineMapping
         )
 
-        Write-Information -MessageData 'Running build task ''noop'' inside the job to setup the test pipeline.' -InformationAction 'Continue'
+        if ($BuildScriptPath -and (Test-Path -Path $BuildScriptPath))
+        {
+            $messageBuildScript = 'Found build script ''{0}''. Running build script inside the job to setup the test pipeline.' -f $BuildScriptPath
 
-        $null = & $BuildScriptPath @buildScriptParameter
+            Write-Information -MessageData $messageBuildScript -InformationAction 'Continue'
+
+            if ($BuildScriptParameter)
+            {
+                Write-Debug -Message ('Build script parameters: {0}' -f ($BuildScriptParameter | Out-String))
+            }
+
+            $null = & $BuildScriptPath @buildScriptParameter
+        }
+        else
+        {
+            Write-Debug -Message 'No build script specified or found. Skipping build script execution inside the job.'
+        }
 
         if ($ShowError.IsPresent)
         {
